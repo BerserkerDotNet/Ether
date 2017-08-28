@@ -1,0 +1,125 @@
+﻿@inject IOptions<VSTSConfiguration> configuration
+
+@{
+    object notificationObj;
+    string notification = "";
+    if (TempData.TryGetValue(TempDataExtensions.NotificationData, out notificationObj))
+    {
+        notification = notificationObj as string;
+    }
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Ether</title>
+    <environment include="Development">
+        <link rel="stylesheet" href="~/lib/jquery/jquery-ui.css" />
+        <link rel="stylesheet" href="~/lib/bootstrap/css/bootstrap.css" />
+    </environment>
+    <environment exclude="Development">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" 
+              integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"
+              asp-fallback-href="~/lib/bootstrap/css/bootstrap.min.css" asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute">
+        <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.min.css" 
+              integrity="sha384-kcAOn9fN4XSd+TGsNu2OQKSuV5ngOwt7tg73O4EpaD91QXvrfgvf0MR7/2dUjoI6" crossorigin="anonymous"
+              asp-fallback-href="~/lib/jquery/jquery-ui.min.css" asp-fallback-test-class="ui-datepicker" asp-fallback-test-property="display" asp-fallback-test-value="none">
+    </environment>
+</head>
+<body>
+    <header class="navbar navbar-default">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#mainNavigation" aria-expanded="false">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" asp-controller="Home" asp-action="Index">Ether Reports</a>
+            </div>
+
+            <nav class="collapse navbar-collapse" id="mainNavigation">
+                <ul class="nav navbar-nav">
+                    <li class="@ActiveCSSClass("Home")"><a asp-controller="Home" asp-action="Index">Home @ActiveAccessibilityMarker("Home") </a></li>
+                    <li class="@ActiveCSSClass("Reports")"><a asp-controller="Reports" asp-action="Index">Reports @ActiveAccessibilityMarker("Reports")</a></li>
+                    <li class="@ActiveCSSClass("Profiles")"><a asp-controller="Profile" asp-action="Index">Profiles @ActiveAccessibilityMarker("Profiles")</a></li>
+                </ul>
+                <p class="navbar-text navbar-right">Signed in as <a href="#" class="navbar-link">Foo</a></p>
+            </nav>
+        </div>
+    </header>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+
+                @if (configuration.Value.AccessToken == null || configuration.Value.InstanceName == null)
+                {
+                    <div class="alert alert-warning" role="alert">
+                        <strong>Warning!</strong> Configuration is not complete, make sure you have both InstanceName and AccessToken environment variables.
+                    </div>
+                }
+
+                @if (!string.IsNullOrEmpty(notification))
+                {
+                    var notificationParts = notification.Split('|');
+                    if (notificationParts.Count() == 2)
+                    {
+
+                        var type = notificationParts[0];
+                        var message = notificationParts[1];
+                        var cssClass = type == TempDataExtensions.NotificationError ? "alert-danger" : (type == TempDataExtensions.NotificationWarning ? "alert-warning" : "alert-success");
+                        var title = type == TempDataExtensions.NotificationError ? "Oops!" : (type == TempDataExtensions.NotificationWarning ? "Warning!" : "Success");
+                        <div class="alert @cssClass alert-dismissible" role="alert">
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <strong>@title</strong> @message
+                        </div>
+                    }
+                }
+                @RenderBody()
+            </div>
+        </div>
+    </div>
+    <environment include="Development">
+        <script src="~/lib/jquery/jquery.js"></script>
+        <script src="~/lib/jquery-validation/jquery.validate.js"></script>
+        <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+        <script src="~/lib/jquery/jquery-ui.js"></script>
+        <script src="~/lib/bootstrap/js/bootstrap.js"></script>
+    </environment>
+    <environment exclude="Development">
+        <script src="https://code.jquery.com/jquery-3.2.1.min.js"
+                integrity="sha384-xBuQ/xzmlsLoJpyjoggmTEz8OWUFM0/RC5BsqQBDX2v5cMvDHcMakNTNrHIW2I5f"
+                crossorigin="anonymous"
+                asp-fallback-src="~/lib/jquery/jquery.min.js" asp-fallback-test="window.jQuery"></script>
+        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" 
+                integrity="sha384-Dziy8F2VlJQLMShA6FHWNul/veM9bCkRUaLqr199K94ntO5QUrLJBEbYegdSkkqX" 
+                crossorigin="anonymous"
+                asp-fallback-src="~/lib/jquery/jquery-ui.min.js" asp-fallback-test="window.jQuery.ui"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" 
+                integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"
+                asp-fallback-src="~/lib/bootstrap/js/bootstrap.min.js" asp-fallback-test="window.jQuery && window.jQuery.fn && window.jQuery.fn.modal"></script>
+    </environment>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>
+
+@functions {
+    public Microsoft.AspNetCore.Html.IHtmlContent ActiveAccessibilityMarker(string menu)
+    {
+        return IsActive(menu) ? Html.Raw("<span class='sr-only'>(current)</span>") : Html.Raw("");
+    }
+
+    public string ActiveCSSClass(string menu)
+    {
+        return IsActive(menu) ? "active" : "";
+    }
+
+    private bool IsActive(string menu)
+    {
+        var currentMenu = ViewData["CurrentMenu"] as string;
+        return !string.IsNullOrEmpty(currentMenu) && string.Equals(currentMenu, menu, StringComparison.OrdinalIgnoreCase);
+    }
+
+}

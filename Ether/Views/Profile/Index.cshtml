@@ -1,0 +1,61 @@
+﻿@model IEnumerable<ProfileViewModel>
+@{
+    ViewData["Title"] = "Profiles";
+    ViewData["CurrentMenu"] = "Profiles";
+    var membersPropertyName = Utils.GetNameForAllItems(typeof(TeamMember));
+    var repositoriesPropertyName = Utils.GetNameForAllItems(typeof(VSTSRepository));
+    var allMembers = ViewData[membersPropertyName] as IEnumerable<TeamMember>;
+    var allRepositories = ViewData[repositoriesPropertyName] as IEnumerable<VSTSRepository>;
+}
+
+<h2>Profiles</h2>
+
+<table class="table table-hover">
+    <caption>Available profiles</caption>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Repositories</th>
+            <th>Members</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tfoot>
+        <tr>
+            <td>
+                <a asp-action="Edit" class="btn btn-success">Add</a>
+            </td>
+        </tr>
+    </tfoot>
+    <tbody>
+        @foreach (var profile in Model)
+        {
+            <tr>
+                <td>@profile.Name</td>
+                <td>@string.Join(", ", allRepositories.Where(r=> profile.Repositories.Contains(r.Id)).Select(r=> $"{r.Project} - {r.Name}"))</td>
+                <td>@string.Join(", ", allMembers.Where(m=> profile.Members.Contains(m.Id)).Select(m=>m.DisplayName))</td>
+                <td width="150">
+                    <form class="form-inline" asp-action="Delete" method="post">
+                        <a asp-action="Edit" asp-route-id="@profile.Id" class="btn btn-primary">Edit</a>
+                        <input type="hidden" value="@profile.Id" name="Id" />
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts{
+
+    <script>
+        $(document).ready(function () {
+            $('.btn-danger').click(function (e) {
+                var name = $(this).parent().parent().children("td:first").text();
+                if (!confirm("Are you sure you want to delete profile '" + name + "'?")) {
+                    e.preventDefault();
+                }
+             });
+        });
+    </script>
+}
