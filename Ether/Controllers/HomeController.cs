@@ -1,11 +1,11 @@
-﻿using Ether.Interfaces;
+﻿using Ether.Extensions;
+using Ether.Interfaces;
 using Ether.Models;
 using Ether.Types.DTO;
+using Ether.Types.Filters;
 using Ether.Types.Reporters;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using System.Collections.Generic;
-using System.Linq;
+using System;
 using System.Threading.Tasks;
 
 namespace Ether.Controllers
@@ -21,30 +21,30 @@ namespace Ether.Controllers
             _pullRequestsReporter = pullRequestsReporter;
         }
 
-        public async Task<IActionResult> Index()
+        [IHave(typeof(Profile))]
+        public IActionResult Index()
         {
-            var allProfiles = await _repository.GetAllAsync<Profile>();
             var model = new ReportViewModel();
-            model.Profiles = await GetAllProfiles();
-
             return View(model);
         }
 
         [HttpPost]
+        [IHave(typeof(Profile))]
         public async Task<IActionResult> Report(ReportViewModel model)
         {
-            model.Profiles = await GetAllProfiles();
             if (!ModelState.IsValid)
                 return View(nameof(Index), model);
 
-            var report = await _pullRequestsReporter.ReportAsync(model.Profile, model.StartDate.Value, model.EndDate.Value);
-            return RedirectToAction("View", "Reports", new { Id = report.Id });
-        }
-
-        private async Task<IEnumerable<SelectListItem>> GetAllProfiles()
-        {
-            var allProfiles = await _repository.GetAllAsync<Profile>();
-            return allProfiles.Select(p => new SelectListItem() { Text = p.Name, Value = p.Id.ToString() });
+            try
+            {
+                var report = await _pullRequestsReporter.ReportAsync(model.Profile, model.StartDate.Value, model.EndDate.Value);
+                return RedirectToAction("View", "Reports", new { Id = report.Id });
+            }
+            catch(Exception ex)
+            {
+                TempData.WithError($"Error while generating report: '{ex.Message}'");
+                return RedirectToAction(nameof(Index));
+            }
         }
     }
 }

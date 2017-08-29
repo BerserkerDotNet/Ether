@@ -26,9 +26,12 @@ namespace Ether.Types.Reporters
 
         public async Task<PullRequestsReport> ReportAsync(Guid profileId, DateTime startDate, DateTime endDate)
         {
+            if (string.IsNullOrEmpty(_configuration.AccessToken) || string.IsNullOrEmpty(_configuration.InstanceName))
+                throw new ArgumentException("Configuration is missing.");
+
             var profile = await _repository.GetSingleAsync<Profile>(p => p.Id == profileId);
             if (profile == null)
-                return null;
+                throw new ArgumentException("Selected profile was not found.");
 
             var repositories = await _repository.GetAsync<VSTSRepository>(r => profile.Repositories.Contains(r.Id));
             var members = await _repository.GetAsync<TeamMember>(m => profile.Members.Contains(m.Id));

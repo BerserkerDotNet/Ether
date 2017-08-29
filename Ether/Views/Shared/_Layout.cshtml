@@ -46,7 +46,7 @@
                     <li class="@ActiveCSSClass("Reports")"><a asp-controller="Reports" asp-action="Index">Reports @ActiveAccessibilityMarker("Reports")</a></li>
                     <li class="@ActiveCSSClass("Profiles")"><a asp-controller="Profile" asp-action="Index">Profiles @ActiveAccessibilityMarker("Profiles")</a></li>
                 </ul>
-                <p class="navbar-text navbar-right">Signed in as <a href="#" class="navbar-link">Foo</a></p>
+                <p class="navbar-text navbar-right">Signed in as <a href="#" class="navbar-link">@User.Identity.Name</a></p>
             </nav>
         </div>
     </header>
@@ -83,10 +83,10 @@
     </div>
     <environment include="Development">
         <script src="~/lib/jquery/jquery.js"></script>
-        <script src="~/lib/jquery-validation/jquery.validate.js"></script>
-        <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
         <script src="~/lib/jquery/jquery-ui.js"></script>
         <script src="~/lib/bootstrap/js/bootstrap.js"></script>
+        <script src="~/lib/jquery-validation/jquery.validate.js"></script>
+        <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
     </environment>
     <environment exclude="Development">
         <script src="https://code.jquery.com/jquery-3.2.1.min.js"

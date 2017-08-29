@@ -6,6 +6,7 @@
     var repositoriesPropertyName = Utils.GetNameForAllItems(typeof(VSTSRepository));
     var allMembers = ViewData[membersPropertyName] as IEnumerable<TeamMember>;
     var allRepositories = ViewData[repositoriesPropertyName] as IEnumerable<VSTSRepository>;
+    var membersByTeam = allMembers.GroupBy(m => m.TeamName);
 }
 
 <h2>Edit Profile</h2>
@@ -25,15 +26,19 @@
             }
         </fieldset>
     </div>
-    <fieldset>
-        <legend>Repositories</legend>
-        @foreach (var member in allMembers)
+        @foreach (var team in membersByTeam)
         {
-            <label for="member-@member.Id">@member.DisplayName</label>
-            <input type="checkbox" name="Members" value="@member.Id" id="member-@member.Id" @(Model.Members.Contains(member.Id) ? "checked" : "") />
+            <div class="form-group">
+                <fieldset>
+                    <legend>@team.Key</legend>
+                    @foreach (var member in team)
+                    {
+                        <label for="member-@member.Id">@member.DisplayName</label>
+                        <input type="checkbox" name="Members" value="@member.Id" id="member-@member.Id" @(Model.Members.Contains(member.Id) ? "checked" : "") />
+                    }
+                </fieldset>
+            </div>
         }
-    </fieldset>
-
     <input asp-for="Id" type="hidden" />
     <button type="submit" class="btn btn-success">Save</button>
     <a asp-action="Index" class="btn btn-danger">Cancel</a>

@@ -1,6 +1,9 @@
 ﻿@{
     ViewData["Title"] = "Reports";
     ViewData["CurrentMenu"] = "Home";
+    var profilesPropertyName = Utils.GetNameForAllItems(typeof(Profile));
+    var allProfiles = (ViewData[profilesPropertyName] as IEnumerable<Profile>)
+        .Select(p => new SelectListItem { Text = p.Name, Value = p.Id.ToString() });
 }
 @model ReportViewModel
 
@@ -10,7 +13,7 @@
     <div asp-validation-summary="All" class="text-danger"></div>
     <div class="form-group">
         <label asp-for="Profile">Profile:</label>
-        <select asp-for="Profile" asp-items="@Model.Profiles" class="form-control">
+        <select asp-for="Profile" asp-items="@allProfiles" class="form-control">
         </select>
         <span asp-validation-for="Profile" class="text-danger"></span>
     </div>
@@ -24,17 +27,32 @@
         <input asp-for="EndDate" type="text" class="form-control"/>
         <span asp-validation-for="EndDate" class="text-danger"></span>
     </div>
-    <button type="submit" class="btn btn-success">Create a report</button>
+    <button id="generateReportBtn" type="submit" class="btn btn-success">Create a report</button>
+
 </form>
 @section Scripts{
     <script>
         $(document).ready(function () {
             var calendarOptions = {
                 changeMonth: true,
-                changeYear: true
+                changeYear: true,
+                minDate: "-6M",
+                maxDate: "+1M"
             };
             $('#StartDate').datepicker(calendarOptions);
             $('#EndDate').datepicker(calendarOptions);
+            $("#progressbar").progressbar({
+                value: false
+            });
+
+            $('form').submit(function (e) {
+                if ($(this).valid()) {
+                    var btn = $('#generateReportBtn');
+                    btn.attr("disabled", true);
+                    btn.html('<img src="https://www.shopirvinespectrumcenter.com/images/spinner.gif" height="32" /><span>Generating report...</span>');
+                }
+             });
+
         });
     </script>
 }
