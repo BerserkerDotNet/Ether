@@ -5,6 +5,7 @@ using Ether.Types.DTO;
 using Ether.Types.Filters;
 using Ether.Types.Reporters;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 
@@ -14,16 +15,19 @@ namespace Ether.Controllers
     {
         private readonly IRepository _repository;
         private readonly PullRequestsReporter _pullRequestsReporter;
+        private readonly ILogger<HomeController> _logger;
 
-        public HomeController(IRepository repository, PullRequestsReporter pullRequestsReporter)
+        public HomeController(IRepository repository, PullRequestsReporter pullRequestsReporter, ILogger<HomeController> logger)
         {
             _repository = repository;
             _pullRequestsReporter = pullRequestsReporter;
+            _logger = logger;
         }
 
         [IHave(typeof(Profile))]
         public IActionResult Index()
         {
+            _logger.LogInformation("Loading main page");
             var model = new ReportViewModel();
             return View(model);
         }
@@ -37,6 +41,7 @@ namespace Ether.Controllers
 
             try
             {
+                
                 var report = await _pullRequestsReporter.ReportAsync(model.Profile, model.StartDate.Value, model.EndDate.Value);
                 return RedirectToAction("View", "Reports", new { Id = report.Id });
             }

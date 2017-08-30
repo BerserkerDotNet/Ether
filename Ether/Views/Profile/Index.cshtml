@@ -14,19 +14,20 @@
     <caption>Available profiles</caption>
     <thead>
         <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="text-right">
+                <a asp-action="Edit" class="btn btn-success">Add new</a>
+            </td>
+        </tr>
+        <tr>
             <th>Name</th>
             <th>Repositories</th>
             <th>Members</th>
             <th>Actions</th>
         </tr>
     </thead>
-    <tfoot>
-        <tr>
-            <td>
-                <a asp-action="Edit" class="btn btn-success">Add</a>
-            </td>
-        </tr>
-    </tfoot>
     <tbody>
         @foreach (var profile in Model)
         {
@@ -51,7 +52,7 @@
     <script>
         $(document).ready(function () {
             $('.btn-danger').click(function (e) {
-                var name = $(this).parent().parent().children("td:first").text();
+                var name = $(this).parents('tr').children("td:first").text();
                 if (!confirm("Are you sure you want to delete profile '" + name + "'?")) {
                     e.preventDefault();
                 }

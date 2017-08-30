@@ -2,6 +2,7 @@
 using Ether.Types.Configuration;
 using Ether.Types.Data;
 using Ether.Types.DTO;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System;
@@ -15,12 +16,14 @@ namespace Ether.Types.Reporters
     {
         private readonly VSTSClient _client;
         private readonly IRepository _repository;
+        private readonly ILogger<PullRequestsReporter> _logger;
         private readonly VSTSConfiguration _configuration;
 
-        public PullRequestsReporter(VSTSClient client, IRepository repository, IOptions<VSTSConfiguration> configuration)
+        public PullRequestsReporter(VSTSClient client, IRepository repository, IOptions<VSTSConfiguration> configuration, ILogger<PullRequestsReporter> logger)
         {
             _client = client;
             _repository = repository;
+            _logger = logger;
             _configuration = configuration.Value;
         }
 
@@ -32,6 +35,8 @@ namespace Ether.Types.Reporters
             var profile = await _repository.GetSingleAsync<Profile>(p => p.Id == profileId);
             if (profile == null)
                 throw new ArgumentException("Selected profile was not found.");
+
+            _logger.LogWarning("Report requested for {Profile} starting from {StartDate} until {EndDate}", profile.Name, startDate, endDate);
 
             var repositories = await _repository.GetAsync<VSTSRepository>(r => profile.Repositories.Contains(r.Id));
             var members = await _repository.GetAsync<TeamMember>(m => profile.Members.Contains(m.Id));

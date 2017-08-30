@@ -1,0 +1,76 @@
+﻿@model TeamMembersViewModel
+@{
+    ViewData["Title"] = "Team Members";
+    ViewData["CurrentMenu"] = "Settings";
+}
+
+<h2>Team Members</h2>
+
+<form asp-action="TeamMembers" method="get" id="filterForm">
+    <fieldset>
+        <legend>Show only:</legend>
+        @foreach (var team in Model.AllTeams)
+        {
+            var id = team.Replace(' ', '_').ToLower();
+            <label for="team-@id">@team</label>
+            <input type="checkbox" name="Teams" value="@team" id="team-@id" @(Model.Teams.Contains(team)? "checked": "") />
+        }
+    </fieldset>
+</form>
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="text-right">
+                <a asp-action="EditMember" class="btn btn-success">Add new</a>
+            </td>
+        </tr>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>TeamName</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var member in Model.TeamMembers)
+        {
+            <tr>
+                <td>@member.DisplayName</td>
+                <td>@member.Email</td>
+                <td>@member.TeamName</td>
+                <td width="150">
+                    <form class="form-inline" asp-action="DeleteMember" method="post">
+                        <a asp-action="EditMember" asp-route-id="@member.Id" class="btn btn-primary">Edit</a>
+                        <input type="hidden" value="@member.Id" name="Id" />
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts{
+
+    <script>
+        $(document).ready(function () {
+            $('input[type="checkbox"]').checkboxradio({
+                icon: false
+            });
+
+            $('input[type="checkbox"]').click(function () {
+                $('#filterForm').submit();
+            });
+
+            $('.btn-danger').click(function (e) {
+                var name = $(this).parents('tr').children("td:first").text();
+                if (!confirm("Are you sure you want to delete '" + name + "'?")) {
+                    e.preventDefault();
+                }
+             });
+        });
+    </script>
+}

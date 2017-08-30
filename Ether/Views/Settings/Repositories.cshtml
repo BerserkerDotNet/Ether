@@ -1,0 +1,55 @@
+﻿@model IEnumerable<VSTSRepository>
+@{
+    ViewData["Title"] = "Repositories";
+    ViewData["CurrentMenu"] = "Settings";
+}
+
+<h2>Repositories</h2>
+
+<table class="table table-hover">
+    <caption>Available repositories</caption>
+    <thead>
+        <tr>
+            <td></td>
+            <td></td>
+            <td class="text-right">
+                <a asp-action="EditRepository" class="btn btn-success">Add new</a>
+            </td>
+        </tr>
+        <tr>
+            <th>Name</th>
+            <th>Project</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var repo in Model)
+        {
+            <tr>
+                <td>@repo.Name</td>
+                <td>@repo.Project</td>
+                <td width="150">
+                    <form class="form-inline" asp-action="DeleteRepository" method="post">
+                        <a asp-action="EditRepository" asp-route-id="@repo.Id" class="btn btn-primary">Edit</a>
+                        <input type="hidden" value="@repo.Id" name="Id" />
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts{
+
+    <script>
+        $(document).ready(function () {
+            $('.btn-danger').click(function (e) {
+                var name = $(this).parents('tr').children("td:first").text();
+                if (!confirm("Are you sure you want to delete '" + name + "'?")) {
+                    e.preventDefault();
+                }
+             });
+        });
+    </script>
+}
