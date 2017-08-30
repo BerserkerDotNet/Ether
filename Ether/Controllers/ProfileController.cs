@@ -11,11 +11,11 @@ using System.Threading.Tasks;
 
 namespace Ether.Controllers
 {
-    public class ProfileController : Controller
+    public class ProfilesController : Controller
     {
         private readonly IRepository _repository;
 
-        public ProfileController(IRepository repository)
+        public ProfilesController(IRepository repository)
         {
             _repository = repository;
         }

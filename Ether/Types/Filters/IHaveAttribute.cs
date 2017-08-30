@@ -25,7 +25,7 @@ namespace Ether.Types.Filters
 
             public void OnActionExecuted(ActionExecutedContext context)
             {
-                
+
             }
 
             public void OnActionExecuting(ActionExecutingContext context)
@@ -38,6 +38,5 @@ namespace Ether.Types.Filters
                 controller.ViewData[allItemsPropertyName] = _repository.GetAll(_modelType);
             }
         }
-
     }
 }

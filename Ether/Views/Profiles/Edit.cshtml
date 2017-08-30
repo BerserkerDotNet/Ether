@@ -1,7 +1,6 @@
 ﻿@model ProfileViewModel
 @{
     ViewData["Title"] = "Edit Profile";
-    ViewData["CurrentMenu"] = "Profiles";
     var membersPropertyName = Utils.GetNameForAllItems(typeof(TeamMember));
     var repositoriesPropertyName = Utils.GetNameForAllItems(typeof(VSTSRepository));
     var allMembers = ViewData[membersPropertyName] as IEnumerable<TeamMember>;

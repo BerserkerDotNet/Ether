@@ -1,6 +1,7 @@
 ﻿using Ether.Interfaces;
 using Ether.Types.Configuration;
 using Ether.Types.Data;
+using Ether.Types.Filters;
 using Ether.Types.Reporters;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
@@ -36,8 +37,10 @@ namespace Ether
             services.AddOptions();
             services.Configure<VSTSConfiguration>(_configuration);
             services.AddResponseCompression();
-            services.AddMvc()
-                .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<Startup>());
+            services.AddMvc(o =>
+            {
+                o.Filters.Add<CurrentMenuIndicatorFilter>();
+            }).AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<Startup>());
             services.AddScoped(typeof(IRepository), typeof(FileRepository));
             services.AddScoped<VSTSClient>();
             services.AddScoped<PullRequestsReporter>();
