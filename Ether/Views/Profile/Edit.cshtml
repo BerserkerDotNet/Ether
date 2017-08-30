@@ -11,10 +11,16 @@
 
 <h2>Edit Profile</h2>
 
+<div class="alert alert-info" role="alert">
+    <strong>Hint.</strong> Click on the repository or on the member to add them to the profile.
+</div>
+
 <form asp-action="Edit" method="post">
+    <div asp-validation-summary="All" class="text-danger"></div>
     <div class="form-group">
         <label asp-for="Name">Name:</label>
         <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
     </div>
     <div class="form-group">
         <fieldset>
@@ -22,10 +28,12 @@
             @foreach (var repo in allRepositories)
             {
                 <label for="repo-@repo.Id">@repo.Name</label>
-                <input type="checkbox" name="Repositories" value="@repo.Id" id="repo-@repo.Id" @(Model.Repositories.Contains(repo.Id) ? "checked" : "") />
+                <input type="checkbox" name="Repositories" value="@repo.Id" id="repo-@repo.Id" @(Model.Repositories!=null && Model.Repositories.Contains(repo.Id) ? "checked" : "") />
             }
         </fieldset>
+        <span asp-validation-for="Repositories" class="text-danger"></span>
     </div>
+    <div class="form-group">
         @foreach (var team in membersByTeam)
         {
             <div class="form-group">
@@ -34,11 +42,14 @@
                     @foreach (var member in team)
                     {
                         <label for="member-@member.Id">@member.DisplayName</label>
-                        <input type="checkbox" name="Members" value="@member.Id" id="member-@member.Id" @(Model.Members.Contains(member.Id) ? "checked" : "") />
+                        <input type="checkbox" name="Members" value="@member.Id" id="member-@member.Id" @(Model.Members!= null && Model.Members.Contains(member.Id) ? "checked" : "") />
                     }
                 </fieldset>
             </div>
         }
+        <span asp-validation-for="Members" class="text-danger"></span>
+    </div>
+
     <input asp-for="Id" type="hidden" />
     <button type="submit" class="btn btn-success">Save</button>
     <a asp-action="Index" class="btn btn-danger">Cancel</a>

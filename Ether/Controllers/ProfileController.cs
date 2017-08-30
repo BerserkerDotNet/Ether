@@ -82,7 +82,6 @@ namespace Ether.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-
         private async Task<IEnumerable<ProfileViewModel>> GetAllProfiles()
         {
             return (await _repository.GetAllAsync<Profile>()).Select(p => new ProfileViewModel
