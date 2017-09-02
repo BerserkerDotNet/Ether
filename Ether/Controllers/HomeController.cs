@@ -2,6 +2,7 @@
 using Ether.Interfaces;
 using Ether.Models;
 using Ether.Types.DTO;
+using Ether.Types.DTO.Reports;
 using Ether.Types.Filters;
 using Ether.Types.Reporters;
 using Microsoft.AspNetCore.Mvc;
@@ -41,8 +42,12 @@ namespace Ether.Controllers
 
             try
             {
-                
-                var report = await _pullRequestsReporter.ReportAsync(model.Profile, model.StartDate.Value, model.EndDate.Value);
+                var report = await _pullRequestsReporter.ReportAsync(new ReportQuery
+                {
+                    ProfileId = model.Profile,
+                    StartDate =  model.StartDate.Value,
+                    EndDate = model.EndDate.Value
+                });
                 return RedirectToAction("View", "Reports", new { Id = report.Id });
             }
             catch(Exception ex)

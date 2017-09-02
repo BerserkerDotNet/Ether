@@ -1,4 +1,4 @@
-﻿@model IEnumerable<PullRequestsReport>
+﻿@model IEnumerable<ReportResult>
 @{
     ViewData["Title"] = "Reports";
 }
@@ -9,6 +9,7 @@
     <caption>List of available reports</caption>
     <thead>
         <tr>
+            <th>Report name</th>
             <th>Profile name</th>
             <th>Taken</th>
             <th>Start date</th>
@@ -20,6 +21,7 @@
         @foreach (var report in Model)
         {
             <tr>
+                <td>@report.ReportName</td>
                 <td>@report.ProfileName</td>
                 <td>@report.DateTaken</td>
                 <td>@report.StartDate.ToString("MM/dd/yyyy")</td>

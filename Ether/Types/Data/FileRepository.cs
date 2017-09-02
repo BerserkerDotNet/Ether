@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using Ether.Interfaces;
-using Microsoft.AspNetCore.Hosting;
-using System.IO;
+﻿using Ether.Interfaces;
 using Ether.Types.DTO;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
 using Newtonsoft.Json;
-using System.Linq;
+using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Ether.Types.Data
 {
@@ -22,12 +22,15 @@ namespace Ether.Types.Data
                 Directory.CreateDirectory(_dataPath);
         }
 
-        public async Task<bool> CreateAsync<T>(T item)
+        public async Task<bool> CreateAsync<T>(T item, Type typeOverride = null)
             where T : BaseDto
         {
-            var records = (await GetAllAsync<T>()).ToList();
+            var type = typeOverride == null ? typeof(T) : typeOverride;
+            var records = (await GetAllByTypeAsync(type))
+                .OfType<T>()
+                .ToList();
             records.Add(item);
-            await SaveAsync(records);
+            await SaveAsync(records, typeOverride);
 
             return true;
         }
@@ -50,10 +53,21 @@ namespace Ether.Types.Data
             return (await GetAllAsync<T>()).Where(predicate);
         }
 
-        public async Task<T> GetSingleAsync<T>(Func<T, bool> predicate) 
+        public async Task<T> GetSingleAsync<T>(Func<T, bool> predicate, Func<T, Type> typeOverride = null) 
             where T : BaseDto
         {
-            return (await GetAllAsync<T>()).FirstOrDefault(predicate);
+            var allItems = await GetAllAsync<T>();
+            var item = allItems.FirstOrDefault(predicate);
+
+            //TODO: This is ugly, need a better way
+            if (typeOverride == null)
+                return item;
+
+            var type = typeOverride(item);
+            var newItems = await GetAllByTypeAsync(typeof(T), type);
+            return newItems
+                .Cast<T>()
+                .FirstOrDefault(predicate);
         }
 
         public async Task<IEnumerable<T>> GetAllAsync<T>() 
@@ -67,15 +81,16 @@ namespace Ether.Types.Data
             return JsonConvert.DeserializeObject<IEnumerable<T>>(text);
         }
 
-        public IEnumerable GetAll(Type itemType)
+        public async Task<IEnumerable> GetAllByTypeAsync(Type itemType, Type typeOverride = null)
         {
             var file = GetFilePath(itemType);
             if (!File.Exists(file))
                 return Enumerable.Empty<BaseDto>();
 
-            var text = File.ReadAllText(file);
+            var text = await File.ReadAllTextAsync(file);
             var generic = typeof(IEnumerable<>);
-            var genericCollection = generic.MakeGenericType(itemType);
+            var actualType = typeOverride == null ? itemType : typeOverride;
+            var genericCollection = generic.MakeGenericType(actualType);
             return JsonConvert.DeserializeObject(text, genericCollection) as IEnumerable;
         }
 
@@ -94,9 +109,10 @@ namespace Ether.Types.Data
             return true;
         }
 
-        private async Task SaveAsync<T>(IEnumerable<T> items)
+        private async Task SaveAsync<T>(IEnumerable<T> items, Type typeOverride = null)
         {
-            var file = GetFilePath<T>();
+            var type = typeOverride == null ? typeof(T) : typeOverride;
+            var file = GetFilePath(type);
             await File.WriteAllTextAsync(file, JsonConvert.SerializeObject(items));
         }
 

@@ -2,6 +2,7 @@
 using Ether.Types.Configuration;
 using Ether.Types.Data;
 using Ether.Types.DTO;
+using Ether.Types.DTO.Reports;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -12,49 +13,34 @@ using System.Threading.Tasks;
 
 namespace Ether.Types.Reporters
 {
-    public class PullRequestsReporter
+    public class PullRequestsReporter : ReporterBase
     {
         private readonly VSTSClient _client;
-        private readonly IRepository _repository;
-        private readonly ILogger<PullRequestsReporter> _logger;
-        private readonly VSTSConfiguration _configuration;
 
         public PullRequestsReporter(VSTSClient client, IRepository repository, IOptions<VSTSConfiguration> configuration, ILogger<PullRequestsReporter> logger)
+            :base(repository, configuration, logger)
         {
             _client = client;
-            _repository = repository;
-            _logger = logger;
-            _configuration = configuration.Value;
         }
 
-        public async Task<PullRequestsReport> ReportAsync(Guid profileId, DateTime startDate, DateTime endDate)
+        public override string Name => $"Pull requests report";
+
+        protected async override Task<ReportResult> ReportInternal(ReportInput input)
         {
-            if (string.IsNullOrEmpty(_configuration.AccessToken) || string.IsNullOrEmpty(_configuration.InstanceName))
-                throw new ArgumentException("Configuration is missing.");
-
-            var profile = await _repository.GetSingleAsync<Profile>(p => p.Id == profileId);
-            if (profile == null)
-                throw new ArgumentException("Selected profile was not found.");
-
-            _logger.LogWarning("Report requested for {Profile} starting from {StartDate} until {EndDate}", profile.Name, startDate, endDate);
-
-            var repositories = await _repository.GetAsync<VSTSRepository>(r => profile.Repositories.Contains(r.Id));
-            var members = await _repository.GetAsync<TeamMember>(m => profile.Members.Contains(m.Id));
-
             var resultingPrs = new List<PullRequest>();
-            foreach (var repo in repositories)
+            foreach (var repo in input.Repositories)
             {
-                foreach (var member in members)
+                foreach (var member in input.Members)
                 {
                     var PRsUrl = $"https://{_configuration.InstanceName}.visualstudio.com/DefaultCollection/{repo.Project}/_apis/git/repositories/{repo.Name}/pullRequests?api-version=3.0&creatorId={member.Id}&status=Completed&$top=100";
-                    var prsResponseText = _client.ExecuteGet(PRsUrl).Result;
+                    var prsResponseText = await _client.ExecuteGet(PRsUrl);
                     var prs = JsonConvert.DeserializeObject<PRResponse>(prsResponseText).Value
-                        .Where(p => p.CreationDate >= startDate && p.CreationDate <= endDate).ToList();
+                        .Where(p => p.CreationDate >= input.Query.StartDate && p.CreationDate <= input.Query.EndDate).ToList();
 
                     foreach (var pr in prs)
                     {
                         var iterationUrl = $"https://{_configuration.InstanceName}.visualstudio.com/DefaultCollection/{repo.Project}/_apis/git/repositories/{repo.Name}/pullRequests/{pr.PullRequestId}/iterations?api-version=3.0";
-                        var iterationResponseText = _client.ExecuteGet(iterationUrl).Result;
+                        var iterationResponseText = await _client.ExecuteGet(iterationUrl);
                         var iterationsResponse = JsonConvert.DeserializeObject<IterationsResponse>(iterationResponseText);
                         pr.Iterations = iterationsResponse.Count;
                         pr.Author = member.DisplayName;
@@ -63,13 +49,13 @@ namespace Ether.Types.Reporters
                 }
             }
 
+            return GetReport(resultingPrs);
+        }
+
+        private PullRequestsReport GetReport(List<PullRequest> resultingPrs)
+        {
             var groupedResult = resultingPrs.GroupBy(p => p.Author);
             var report = new PullRequestsReport();
-            report.Id = Guid.NewGuid();
-            report.DateTaken = DateTime.Now;
-            report.StartDate = startDate;
-            report.EndDate = endDate;
-            report.ProfileName = profile.Name;
             report.IndividualReports = new List<PullRequestsReport.IndividualPRReport>(groupedResult.Count());
             foreach (var personResult in groupedResult)
             {
@@ -82,9 +68,10 @@ namespace Ether.Types.Reporters
                 report.IndividualReports.Add(individualReport);
             }
 
-            await _repository.CreateAsync(report);
+
             return report;
         }
+
 
         private class PRResponse
         {

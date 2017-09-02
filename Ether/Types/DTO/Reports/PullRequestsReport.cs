@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace Ether.Types.DTO
+namespace Ether.Types.DTO.Reports
 {
-    public class PullRequestsReport : BaseDto
+    public class PullRequestsReport : ReportResult
     {
-        public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
-        public string ProfileName { get; set; }
-        public DateTime DateTaken { get; set; }
-
         public int TotalPRs => IndividualReports.Sum(r => r.TotalPRs);
         public double AverageIterations => IndividualReports.Sum(r => r.AverageIterations) / IndividualReports.Count;
         public double CodeQuality => IndividualReports.Sum(r => r.CodeQuality) / IndividualReports.Count;

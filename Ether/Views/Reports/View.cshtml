@@ -1,46 +1,10 @@
-﻿@model PullRequestsReport
+﻿@model ReportResult
 @{
     ViewData["Title"] = "Report";
 }
 
 <h2>Report</h2>
 
-<table class="table table-hover table-bordered">
-    <caption>Report on @Model.ProfileName, from @Model.StartDate.ToString("MM/dd/yyyy") to @Model.EndDate.ToString("MM/dd/yyyy")</caption>
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Total PRs</th>
-            <th>Total iterations</th>
-            <th>Avg iterations</th>
-            <th>Code quality (%)</th>
-        </tr>
-    </thead>
-    <tfoot>
-        <tr class="active">
-            <th>Total PRs:</th>
-            <td class="success">@Model.TotalPRs</td>
-        </tr>
-        <tr class="active">
-            <th>Avg iterations:</th>
-            <td class="success">@Model.AverageIterations</td>
-        </tr>
-        <tr class="active">
-            <th>Code quality:</th>
-            <td class="success">@Model.CodeQuality</td>
-        </tr>
-    </tfoot>
-    <tbody>
-        @foreach (var report in Model.IndividualReports)
-        {
-            <tr>
-                <td>@report.TeamMember</td>
-                <td>@report.TotalPRs</td>
-                <td>@report.TotalIterations</td>
-                <td>@report.AverageIterations</td>
-                <td>@report.CodeQuality</td>
-            </tr>
-        }
-    </tbody>
-</table>
+@Html.DisplayForModel()
+
 <a asp-action="Index" class="btn btn-primary">Back to list</a>

@@ -1,7 +1,7 @@
 ﻿using Ether.Extensions;
 using Ether.Interfaces;
 using Ether.Types.Configuration;
-using Ether.Types.DTO;
+using Ether.Types.DTO.Reports;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System;
@@ -21,7 +21,8 @@ namespace Ether.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var reports = (await _repository.GetAllAsync<PullRequestsReport>()).OrderByDescending(r => r.DateTaken);
+            var reports = (await _repository.GetAllAsync<ReportResult>())
+                .OrderByDescending(r => r.DateTaken);
             return View(reports);
         }
 
@@ -30,7 +31,7 @@ namespace Ether.Controllers
             if (!id.HasValue)
                 return RedirectToAction(nameof(Index));
 
-            var report = await _repository.GetSingleAsync<PullRequestsReport>(r => r.Id == id.Value);
+            var report = await _repository.GetSingleAsync<ReportResult>(r => r.Id == id.Value, r => Type.GetType(r.ReportType));
             if (report == null)
             {
                 TempData.WithError($"Report with {id} does not exist.");

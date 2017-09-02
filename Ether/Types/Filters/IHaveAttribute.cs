@@ -1,7 +1,8 @@
-﻿using System;
+﻿using Ether.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Ether.Interfaces;
+using System;
+using System.Threading.Tasks;
 
 namespace Ether.Types.Filters
 {
@@ -12,7 +13,7 @@ namespace Ether.Types.Filters
             Arguments = new[] { modelType };
         }
 
-        private class IHaveFilter : IActionFilter
+        private class IHaveFilter : IAsyncActionFilter
         {
             private readonly IRepository _repository;
             private readonly Type _modelType;
@@ -23,19 +24,20 @@ namespace Ether.Types.Filters
                 _modelType = modelType;
             }
 
-            public void OnActionExecuted(ActionExecutedContext context)
+            public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
             {
-
+                await AddItems(context);
+                await next();
             }
 
-            public void OnActionExecuting(ActionExecutingContext context)
+            private async Task AddItems(ActionExecutingContext context)
             {
                 var controller = context.Controller as Controller;
                 if (controller == null)
                     return;
 
                 var allItemsPropertyName = Utils.GetNameForAllItems(_modelType);
-                controller.ViewData[allItemsPropertyName] = _repository.GetAll(_modelType);
+                controller.ViewData[allItemsPropertyName] = await _repository.GetAllByTypeAsync(_modelType);
             }
         }
     }
