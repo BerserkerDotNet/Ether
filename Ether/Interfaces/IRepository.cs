@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace Ether.Interfaces
@@ -10,13 +11,17 @@ namespace Ether.Interfaces
     {
         Task<IEnumerable<T>> GetAllAsync<T>() where T: BaseDto;
 
-        Task<IEnumerable> GetAllByTypeAsync(Type itemType, Type typeOverride = null);
+        Task<IEnumerable> GetAllByTypeAsync(Type itemType);
 
-        Task<IEnumerable<T>> GetAsync<T>(Func<T, bool> predicate) where T : BaseDto;
+        Task<IEnumerable<T>> GetAsync<T>(Expression<Func<T, bool>> predicate) where T : BaseDto;
 
-        Task<T> GetSingleAsync<T>(Func<T, bool> predicate, Func<T, Type> typeOverride = null) where T : BaseDto;
+        Task<T> GetSingleAsync<T>(Expression<Func<T, bool>> predicate) where T : BaseDto;
 
-        Task<bool> CreateAsync<T>(T item, Type typeOverride = null) where T : BaseDto;
+        Task<TProjection> GetFieldValue<TType, TProjection>(Expression<Func<TType, bool>> predicate, Expression<Func<TType, TProjection>> projection) where TType : BaseDto;
+
+        Task<object> GetSingleAsync(Guid id, Type itemType);
+
+        Task<bool> CreateAsync<T>(T item) where T : BaseDto;
 
         Task<bool> CreateOrUpdateAsync<T>(T item) where T : BaseDto;
 

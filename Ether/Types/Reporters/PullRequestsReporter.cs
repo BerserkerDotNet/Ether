@@ -1,11 +1,9 @@
 ﻿using Ether.Interfaces;
 using Ether.Types.Configuration;
 using Ether.Types.Data;
-using Ether.Types.DTO;
 using Ether.Types.DTO.Reports;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +14,7 @@ namespace Ether.Types.Reporters
     public class PullRequestsReporter : ReporterBase
     {
         private readonly VSTSClient _client;
+        private static readonly Guid _reporterId = Guid.Parse("e6f4ff5a-a71d-4706-8d34-9227c55c5644");
 
         public PullRequestsReporter(VSTSClient client, IRepository repository, IOptions<VSTSConfiguration> configuration, ILogger<PullRequestsReporter> logger)
             :base(repository, configuration, logger)
@@ -23,25 +22,29 @@ namespace Ether.Types.Reporters
             _client = client;
         }
 
-        public override string Name => $"Pull requests report";
+        public override string Name => $"Completed Pull Requestes report";
 
-        protected async override Task<ReportResult> ReportInternal(ReportInput input)
+        public override Guid Id => _reporterId;
+
+        public override Type ReportType => typeof(PullRequestsReport);
+
+        protected async override Task<ReportResult> ReportInternal()
         {
             var resultingPrs = new List<PullRequest>();
-            foreach (var repo in input.Repositories)
+            foreach (var repo in Input.Repositories)
             {
-                foreach (var member in input.Members)
+                var project = Input.GetProjectFor(repo);
+                foreach (var member in Input.Members)
                 {
-                    var PRsUrl = $"https://{_configuration.InstanceName}.visualstudio.com/DefaultCollection/{repo.Project}/_apis/git/repositories/{repo.Name}/pullRequests?api-version=3.0&creatorId={member.Id}&status=Completed&$top=100";
-                    var prsResponseText = await _client.ExecuteGet(PRsUrl);
-                    var prs = JsonConvert.DeserializeObject<PRResponse>(prsResponseText).Value
-                        .Where(p => p.CreationDate >= input.Query.StartDate && p.CreationDate <= input.Query.EndDate).ToList();
+                    var PRsUrl = $"https://{_configuration.InstanceName}.visualstudio.com/DefaultCollection/{project.Name}/_apis/git/repositories/{repo.Name}/pullRequests?api-version=3.0&creatorId={member.Id}&status=Completed&$top=100";
+                    var prsResponse = await _client.ExecuteGet<PRResponse>(PRsUrl);
+                    var prs = prsResponse.Value
+                        .Where(p => p.CreationDate >= Input.Query.StartDate && p.CreationDate <= Input.Query.EndDate).ToList();
 
                     foreach (var pr in prs)
                     {
-                        var iterationUrl = $"https://{_configuration.InstanceName}.visualstudio.com/DefaultCollection/{repo.Project}/_apis/git/repositories/{repo.Name}/pullRequests/{pr.PullRequestId}/iterations?api-version=3.0";
-                        var iterationResponseText = await _client.ExecuteGet(iterationUrl);
-                        var iterationsResponse = JsonConvert.DeserializeObject<IterationsResponse>(iterationResponseText);
+                        var iterationUrl = $"https://{_configuration.InstanceName}.visualstudio.com/DefaultCollection/{project.Name}/_apis/git/repositories/{repo.Name}/pullRequests/{pr.PullRequestId}/iterations?api-version=3.0";
+                        var iterationsResponse = await _client.ExecuteGet<IterationsResponse>(iterationUrl);
                         pr.Iterations = iterationsResponse.Count;
                         pr.Author = member.DisplayName;
                         resultingPrs.Add(pr);

@@ -26,7 +26,8 @@ namespace Ether.Extensions
 
         private static void AddMessage(ITempDataDictionary data, string type, string message)
         {
-            data.Add(NotificationData, $"{type}|{message}");
+            if (!data.ContainsKey(NotificationData))
+                data.Add(NotificationData, $"{type}|{message}");
         }
     }
 }

@@ -9,6 +9,7 @@ namespace Ether.Types.Validators
         public ReportViewModelValidator()
         {
             RuleFor(r => r.Profile).NotNull();
+            RuleFor(r => r.Report).NotNull();
             RuleFor(r => r.StartDate)
                 .NotNull()
                 .LessThan(p => p.EndDate)

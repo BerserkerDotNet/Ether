@@ -5,6 +5,7 @@ using Ether.Types.DTO.Reports;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -26,12 +27,20 @@ namespace Ether.Controllers
             return View(reports);
         }
 
-        public async Task<IActionResult> View(Guid? id)
+        public async Task<IActionResult> View(Guid? id, [FromServices]IEnumerable<IReporter> reporters)
         {
             if (!id.HasValue)
                 return RedirectToAction(nameof(Index));
 
-            var report = await _repository.GetSingleAsync<ReportResult>(r => r.Id == id.Value, r => Type.GetType(r.ReportType));
+            var reporterId = await _repository.GetFieldValue<ReportResult, Guid>(r => r.Id == id.Value, r => r.ReporterId);
+            var reporter = reporters.SingleOrDefault(r => r.Id == reporterId);
+            if (reporter == null)
+            {
+                TempData.WithError($"Report with {id} does not exist.");
+                return RedirectToAction(nameof(Index));
+            }
+
+            var report = await _repository.GetSingleAsync(id.Value, reporter.ReportType);
             if (report == null)
             {
                 TempData.WithError($"Report with {id} does not exist.");

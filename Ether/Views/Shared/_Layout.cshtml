@@ -26,9 +26,14 @@
               integrity="sha384-kcAOn9fN4XSd+TGsNu2OQKSuV5ngOwt7tg73O4EpaD91QXvrfgvf0MR7/2dUjoI6" crossorigin="anonymous"
               asp-fallback-href="~/lib/jquery/jquery-ui.min.css" asp-fallback-test-class="ui-datepicker" asp-fallback-test-property="display" asp-fallback-test-value="none">
     </environment>
+    <style>
+        body {
+            padding-top: 70px;
+        }
+    </style>
 </head>
 <body>
-    <header class="navbar navbar-default">
+    <header class="navbar navbar-default navbar-fixed-top">
         @Html.Partial("_Navigation")
     </header>
     <div class="container">

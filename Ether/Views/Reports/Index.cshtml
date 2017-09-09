@@ -9,6 +9,11 @@
     <caption>List of available reports</caption>
     <thead>
         <tr>
+            <td colspan="6" class="text-right">
+                <a asp-controller="Home" asp-action="Index" class="btn btn-success">New</a>
+            </td>
+        </tr>
+        <tr>
             <th>Report name</th>
             <th>Profile name</th>
             <th>Taken</th>
@@ -28,7 +33,7 @@
                 <td>@report.EndDate.ToString("MM/dd/yyyy")</td>
                 <td width="150">
                     <form class="form-inline" asp-action="Delete" method="post">
-                        <a asp-action="View" asp-route-id="@report.Id" class="btn btn-success">View</a>
+                        <a asp-action="View" asp-route-id="@report.Id" class="btn btn-primary">View</a>
                         <input type="hidden" value="@report.Id" name="Id" />
                         <button type="submit" class="btn btn-danger">Delete</button>
                     </form>

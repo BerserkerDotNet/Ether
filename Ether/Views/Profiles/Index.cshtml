@@ -3,8 +3,10 @@
     ViewData["Title"] = "Profiles";
     var membersPropertyName = Utils.GetNameForAllItems(typeof(TeamMember));
     var repositoriesPropertyName = Utils.GetNameForAllItems(typeof(VSTSRepository));
+    var projectsPropertyName = Utils.GetNameForAllItems(typeof(VSTSProject));
     var allMembers = ViewData[membersPropertyName] as IEnumerable<TeamMember>;
     var allRepositories = ViewData[repositoriesPropertyName] as IEnumerable<VSTSRepository>;
+    var allProjects = ViewData[projectsPropertyName] as IEnumerable<VSTSProject>;
 }
 
 <h2>Profiles</h2>

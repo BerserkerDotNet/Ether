@@ -20,6 +20,7 @@ namespace Ether.Controllers
             _repository = repository;
         }
 
+        [IHave(typeof(VSTSProject))]
         [IHave(typeof(VSTSRepository))]
         [IHave(typeof(TeamMember))]
         public async Task<IActionResult> Index()

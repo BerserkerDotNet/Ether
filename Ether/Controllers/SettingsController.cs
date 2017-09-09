@@ -2,6 +2,7 @@
 using Ether.Interfaces;
 using Ether.Models;
 using Ether.Types.DTO;
+using Ether.Types.Filters;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Linq;
@@ -83,14 +84,50 @@ namespace Ether.Controllers
             return RedirectToAction(nameof(TeamMembers));
         }
 
+        public async Task<IActionResult> Projects()
+        {
+            var projects = await _repository.GetAllAsync<VSTSProject>();
+            return View(projects.OrderBy(p => p.Name));
+        }
+
+        public async Task<IActionResult> EditProject(Guid? id)
+        {
+            if (!id.HasValue)
+                return View(new VSTSProject { Id = Guid.NewGuid() });
+
+            var project = await _repository.GetSingleAsync<VSTSProject>(p => p.Id == id.Value);
+            if(project == null)
+                return View(new VSTSProject { Id = Guid.NewGuid() });
+
+            return View(project);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditProject(VSTSProject model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            await _repository.CreateOrUpdateAsync(model);
+            return RedirectToAction(nameof(Projects));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteProject(Guid id)
+        {
+            await _repository.DeleteAsync<VSTSProject>(id);
+            return RedirectToAction(nameof(Projects));
+        }
+
+        [IHave(typeof(VSTSProject))]
         public async Task<IActionResult> Repositories()
         {
             var repositories = (await _repository.GetAllAsync<VSTSRepository>())
-                .OrderBy(r => r.Project)
-                .ThenBy(r => r.Name);
+                .OrderBy(r => r.Name);
             return View(repositories);
         }
 
+        [IHave(typeof(VSTSProject))]
         public async Task<IActionResult> EditRepository(Guid? id)
         {
             if (!id.HasValue)
@@ -104,6 +141,7 @@ namespace Ether.Controllers
         }
 
         [HttpPost]
+        [IHave(typeof(VSTSProject))]
         public async Task<IActionResult> EditRepository(VSTSRepository model)
         {
             if (!ModelState.IsValid)

@@ -1,0 +1,46 @@
+﻿@model WorkItemsReport
+@{
+    var workItems = Model.IndividualReports.SelectMany(r => r.WorkItems)
+        .OrderBy(w => w.Reason);
+    var workItemsByResolution = workItems.GroupBy(w => w.Reason);
+ }
+
+<table class="table table-hover table-bordered">
+    <caption>Resolved work items</caption>
+    <thead>
+        <tr>
+            <th>Type</th>
+            <th>Id</th>
+            <th>Title</th>
+            <th>Resolution</th>
+            <th>Resolved by</th>
+        </tr>
+    </thead>
+    <tfoot>
+
+        <tr class="active">
+            <th colspan="2"><strong>Total</strong> - @workItems.Count()</th>
+            <td class="success" colspan="3">
+                <ul class="list-inline">
+                    @foreach (var resolution in workItemsByResolution)
+                    {
+                        <li><strong>@resolution.Key</strong> - @resolution.Count()</li>
+                    }
+                </ul>
+            </td>
+        </tr>
+    </tfoot>
+    <tbody>
+        @foreach (var report in workItems)
+        {
+            <tr>
+                <td>@report.Type</td>
+                <td>@report.Id</td>
+                <td>@report.Title</td>
+                <td width="140">@report.Reason</td>
+                <td>@report.TeamMember</td>
+            </tr>
+        }
+    </tbody>
+</table>
+

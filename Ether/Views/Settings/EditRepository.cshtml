@@ -1,10 +1,12 @@
 ﻿@model VSTSRepository
 @{
     ViewData["Title"] = "Edit Repository";
+    var projectsPropertyName = Utils.GetNameForAllItems(typeof(VSTSProject));
+    var allProjects = (ViewData[projectsPropertyName] as IEnumerable<VSTSProject>)
+        .Select(p => new SelectListItem { Text = p.Name, Value = p.Id.ToString() }); ;
 }
 
 <h2>Edit Repository</h2>
-
 
 <form asp-action="EditRepository" method="post">
     <div asp-validation-summary="All" class="text-danger"></div>
@@ -15,7 +17,7 @@
     </div>
     <div class="form-group">
         <label asp-for="Project">Project:</label>
-        <input asp-for="Project" class="form-control" />
+        <select asp-for="Project" asp-items="@allProjects" class="form-control"></select>
         <span asp-validation-for="Project" class="text-danger"></span>
     </div>
     <input asp-for="Id" type="hidden"/>

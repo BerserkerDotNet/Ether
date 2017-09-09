@@ -1,40 +1,38 @@
-﻿@model IEnumerable<VSTSRepository>
+﻿@model IEnumerable<VSTSProject>
+
 @{
-    ViewData["Title"] = "Repositories";
+    ViewData["Title"] = "Projects";
     ViewData["CurrentMenu"] = "Settings";
-    var projectsPropertyName = Utils.GetNameForAllItems(typeof(VSTSProject));
-    var allProjects = ViewData[projectsPropertyName] as IEnumerable<VSTSProject>;
 }
 
-<h2>Repositories</h2>
+<h2>Projects</h2>
 
 <table class="table table-hover">
-    <caption>Available repositories</caption>
+    <caption>Available projects</caption>
     <thead>
         <tr>
             <td></td>
             <td></td>
             <td class="text-right">
-                <a asp-action="EditRepository" class="btn btn-success">Add new</a>
+                <a asp-action="EditProject" class="btn btn-success">Add new</a>
             </td>
         </tr>
         <tr>
             <th>Name</th>
-            <th>Project</th>
+            <th>Does not have work items</th>
             <th>Actions</th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var repo in Model)
+        @foreach (var project in Model)
         {
-            var project = allProjects.Single(p => p.Id == repo.Project);
             <tr>
-                <td>@repo.Name</td>
                 <td>@project.Name</td>
+                <td>@project.DoesNotHaveWorkItems</td>
                 <td width="150">
-                    <form class="form-inline" asp-action="DeleteRepository" method="post">
-                        <a asp-action="EditRepository" asp-route-id="@repo.Id" class="btn btn-primary">Edit</a>
-                        <input type="hidden" value="@repo.Id" name="Id" />
+                    <form class="form-inline" asp-action="DeleteProject" method="post">
+                        <a asp-action="EditProject" asp-route-id="@project.Id" class="btn btn-primary">Edit</a>
+                        <input type="hidden" value="@project.Id" name="Id" />
                         <button type="submit" class="btn btn-danger">Delete</button>
                     </form>
                 </td>
@@ -56,3 +54,5 @@
         });
     </script>
 }
+
+

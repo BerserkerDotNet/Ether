@@ -4,10 +4,11 @@ using Ether.Models;
 using Ether.Types.DTO;
 using Ether.Types.DTO.Reports;
 using Ether.Types.Filters;
-using Ether.Types.Reporters;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Ether.Controllers
@@ -15,13 +16,13 @@ namespace Ether.Controllers
     public class HomeController : Controller
     {
         private readonly IRepository _repository;
-        private readonly PullRequestsReporter _pullRequestsReporter;
+        private readonly IEnumerable<IReporter> _repoters;
         private readonly ILogger<HomeController> _logger;
 
-        public HomeController(IRepository repository, PullRequestsReporter pullRequestsReporter, ILogger<HomeController> logger)
+        public HomeController(IRepository repository, IEnumerable<IReporter> repoters, ILogger<HomeController> logger)
         {
             _repository = repository;
-            _pullRequestsReporter = pullRequestsReporter;
+            _repoters = repoters;
             _logger = logger;
         }
 
@@ -42,12 +43,20 @@ namespace Ether.Controllers
 
             try
             {
-                var report = await _pullRequestsReporter.ReportAsync(new ReportQuery
+                var reporter = _repoters.SingleOrDefault(r => r.Id == model.Report);
+                if (reporter == null)
+                {
+                    TempData.WithError($"Selected report cannot be handled!");
+                    return RedirectToAction(nameof(Index));
+                }
+
+                var report = await reporter.ReportAsync(new ReportQuery
                 {
                     ProfileId = model.Profile,
-                    StartDate =  model.StartDate.Value,
+                    StartDate = model.StartDate.Value,
                     EndDate = model.EndDate.Value
                 });
+
                 return RedirectToAction("View", "Reports", new { Id = report.Id });
             }
             catch(Exception ex)

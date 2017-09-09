@@ -1,5 +1,6 @@
 ﻿using Ether.Types.Configuration;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -18,7 +19,7 @@ namespace Ether.Types.Data
             _configuration = configuration.Value;
         }
 
-        public async Task<string> ExecuteGet(string url)
+        public async Task<T> ExecuteGet<T>(string url)
         {
             using (var client = new HttpClient())
             {
@@ -26,7 +27,28 @@ namespace Ether.Types.Data
                 using (var response = await client.GetAsync(url))
                 {
                     response.EnsureSuccessStatusCode();
-                    return await response.Content.ReadAsStringAsync();
+                    var resultContent = await response.Content.ReadAsStringAsync();
+                    return JsonConvert.DeserializeObject<T>(resultContent);
+                }
+            }
+        }
+
+        public Task<T> ExecutePost<T>(string url, object payload)
+        {
+            return ExecutePost<T>(url, JsonConvert.SerializeObject(payload));
+        }
+
+        public async Task<T> ExecutePost<T>(string url, string payload)
+        {
+            using (var client = new HttpClient())
+            {
+                AddHeaders(client);
+                var content = new StringContent(payload, Encoding.UTF8, JsonMimeType);
+                using (var response = await client.PostAsync(url, content))
+                {
+                    response.EnsureSuccessStatusCode();
+                    var resultContent = await response.Content.ReadAsStringAsync();
+                    return JsonConvert.DeserializeObject<T>(resultContent);
                 }
             }
         }

@@ -36,14 +36,16 @@ namespace Ether
             });
             services.AddOptions();
             services.Configure<VSTSConfiguration>(_configuration);
+            services.Configure<DbConfig>(_configuration.GetSection("DbConfig"));
             services.AddResponseCompression();
             services.AddMvc(o =>
             {
                 o.Filters.Add<CurrentMenuIndicatorFilter>();
             }).AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<Startup>());
-            services.AddScoped(typeof(IRepository), typeof(FileRepository));
+            services.AddSingleton<IRepository, MongoRepository>();
             services.AddScoped<VSTSClient>();
-            services.AddScoped<PullRequestsReporter>();
+            services.AddScoped<IReporter, PullRequestsReporter>();
+            services.AddScoped<IReporter, WorkItemsReporter>();
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)

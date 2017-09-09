@@ -1,12 +1,16 @@
-﻿@{
+﻿@inject IEnumerable<IReporter> Reporters
+
+@{
     ViewData["Title"] = "Reports";
     var profilesPropertyName = Utils.GetNameForAllItems(typeof(Profile));
     var allProfiles = (ViewData[profilesPropertyName] as IEnumerable<Profile>)
         .Select(p => new SelectListItem { Text = p.Name, Value = p.Id.ToString() });
+
+    var allReporters = Reporters.Select(r => new SelectListItem { Text = r.Name, Value = r.Id.ToString() });
 }
 @model ReportViewModel
 
-<h2>Reports</h2>
+<h2>New Report</h2>
 
 <form asp-action="Report" method="post">
     <div asp-validation-summary="All" class="text-danger"></div>
@@ -15,6 +19,11 @@
         <select asp-for="Profile" asp-items="@allProfiles" class="form-control">
         </select>
         <span asp-validation-for="Profile" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Report">Report:</label>
+        <select asp-for="Report" asp-items="@allReporters" class="form-control"></select>
+        <span asp-validation-for="Report" class="text-danger"></span>
     </div>
     <div class="form-group">
         <label asp-for="StartDate">Start date:</label>

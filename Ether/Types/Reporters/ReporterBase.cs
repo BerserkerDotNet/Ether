@@ -14,10 +14,10 @@ namespace Ether.Types.Reporters
     public abstract class ReporterBase : IReporter
     {
         protected readonly IRepository _repository;
-        protected readonly ILogger<PullRequestsReporter> _logger;
+        protected readonly ILogger<IReporter> _logger;
         protected readonly VSTSConfiguration _configuration;
 
-        public ReporterBase(IRepository repository, IOptions<VSTSConfiguration> configuration, ILogger<PullRequestsReporter> logger)
+        public ReporterBase(IRepository repository, IOptions<VSTSConfiguration> configuration, ILogger<IReporter> logger)
         {
             _repository = repository;
             _logger = logger;
@@ -26,30 +26,34 @@ namespace Ether.Types.Reporters
 
         public abstract string Name { get; }
 
+        public abstract Guid Id { get; }
+
+        public abstract Type ReportType { get; }
+
         public async Task<ReportResult> ReportAsync(ReportQuery query)
         {
             if (string.IsNullOrEmpty(_configuration.AccessToken) || string.IsNullOrEmpty(_configuration.InstanceName))
                 throw new ArgumentException("Configuration is missing.");
 
-            var input = await GetInputData(query);
-            _logger.LogWarning("Report requested for {Profile} starting from {StartDate} until {EndDate}", input.Profile.Name, query.StartDate, query.EndDate);
+            Input = await GetInputData(query);
+            _logger.LogWarning("Report requested for {Profile} starting from {StartDate} until {EndDate}", Input.Profile.Name, query.StartDate, Input.ActualEndDate);
 
-            var result = await ReportInternal(input);
-            PopulateStandartFields(result, input);
-            await _repository.CreateAsync(result, typeOverride: typeof(ReportResult));
+            var result = await ReportInternal();
+            PopulateStandardFields(result);
+            await _repository.CreateAsync(result);
             return result;
         }
 
-        protected abstract Task<ReportResult> ReportInternal(ReportInput input);
+        protected abstract Task<ReportResult> ReportInternal();
 
-        private void PopulateStandartFields(ReportResult report, ReportInput input)
+        private void PopulateStandardFields(ReportResult report)
         {
             report.Id = Guid.NewGuid();
             report.DateTaken = DateTime.UtcNow;
-            report.StartDate = input.Query.StartDate;
-            report.EndDate = input.Query.EndDate;
-            report.ProfileName = input.Profile.Name;
-            report.ReportType = report.GetType().AssemblyQualifiedName;
+            report.StartDate = Input.Query.StartDate;
+            report.EndDate = Input.Query.EndDate;
+            report.ProfileName = Input.Profile.Name;
+            report.ReporterId = Id;
             report.ReportName = Name;
         }
 
@@ -61,15 +65,20 @@ namespace Ether.Types.Reporters
 
             var repositories = await _repository.GetAsync<VSTSRepository>(r => profile.Repositories.Contains(r.Id));
             var members = await _repository.GetAsync<TeamMember>(m => profile.Members.Contains(m.Id));
+            var projectsIds = repositories.Select(r => r.Project);
+            var projects = await _repository.GetAsync<VSTSProject>(p => projectsIds.Contains(p.Id));
 
             return new ReportInput
             {
                 Query = query,
                 Profile = profile,
                 Repositories = repositories,
-                Members = members
+                Members = members,
+                Projects = projects
             };
         }
+
+        protected ReportInput Input { get; private set; }
 
         protected class ReportInput
         {
@@ -77,6 +86,22 @@ namespace Ether.Types.Reporters
             public Profile Profile { get; set; }
             public IEnumerable<VSTSRepository> Repositories { get; set; }
             public IEnumerable<TeamMember> Members { get; set; }
+            public IEnumerable<VSTSProject> Projects { get; set; }
+
+            public VSTSProject GetProjectFor(VSTSRepository repo)
+            {
+                return Projects.SingleOrDefault(p => p.Id == repo.Project);
+            }
+
+            public DateTime ActualEndDate
+            {
+                get
+                {
+                    var today = DateTime.UtcNow.Date;
+                    var endDate = today < Query.EndDate ? today : Query.EndDate;
+                    return endDate.AddDays(1).AddMilliseconds(-1);
+                }
+            }
         }
     }
 }

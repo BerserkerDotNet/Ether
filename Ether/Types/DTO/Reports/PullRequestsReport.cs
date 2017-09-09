@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using Ether.Types.Attributes;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Ether.Types.DTO.Reports
 {
+    [DbName(nameof(ReportResult))]
     public class PullRequestsReport : ReportResult
     {
         public int TotalPRs => IndividualReports.Sum(r => r.TotalPRs);
