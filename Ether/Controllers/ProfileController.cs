@@ -20,17 +20,12 @@ namespace Ether.Controllers
             _repository = repository;
         }
 
-        [IHave(typeof(VSTSProject))]
-        [IHave(typeof(VSTSRepository))]
-        [IHave(typeof(TeamMember))]
         public async Task<IActionResult> Index()
         {
             var allProfiles = await GetAllProfiles();
             return View(allProfiles);
         }
 
-        [IHave(typeof(VSTSRepository))]
-        [IHave(typeof(TeamMember))]
         public async Task<IActionResult> Edit(Guid? id)
         {
             var model = new ProfileViewModel();
@@ -53,8 +48,6 @@ namespace Ether.Controllers
         }
 
         [HttpPost]
-        [IHave(typeof(VSTSRepository))]
-        [IHave(typeof(TeamMember))]
         public async Task<IActionResult> Edit(ProfileViewModel model)
         {
             if (!ModelState.IsValid)

@@ -1,9 +1,8 @@
 ﻿@model VSTSRepository
+@inject IAll<VSTSProject> Projects
 @{
     ViewData["Title"] = "Edit Repository";
-    var projectsPropertyName = Utils.GetNameForAllItems(typeof(VSTSProject));
-    var allProjects = (ViewData[projectsPropertyName] as IEnumerable<VSTSProject>)
-        .Select(p => new SelectListItem { Text = p.Name, Value = p.Id.ToString() }); ;
+    var allProjects = Projects.Value.Select(p => new SelectListItem { Text = p.Name, Value = p.Id.ToString() });
 }
 
 <h2>Edit Repository</h2>

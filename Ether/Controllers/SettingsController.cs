@@ -119,7 +119,6 @@ namespace Ether.Controllers
             return RedirectToAction(nameof(Projects));
         }
 
-        [IHave(typeof(VSTSProject))]
         public async Task<IActionResult> Repositories()
         {
             var repositories = (await _repository.GetAllAsync<VSTSRepository>())
@@ -127,7 +126,6 @@ namespace Ether.Controllers
             return View(repositories);
         }
 
-        [IHave(typeof(VSTSProject))]
         public async Task<IActionResult> EditRepository(Guid? id)
         {
             if (!id.HasValue)
@@ -141,7 +139,6 @@ namespace Ether.Controllers
         }
 
         [HttpPost]
-        [IHave(typeof(VSTSProject))]
         public async Task<IActionResult> EditRepository(VSTSRepository model)
         {
             if (!ModelState.IsValid)

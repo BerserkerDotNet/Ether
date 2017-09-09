@@ -1,9 +1,7 @@
 ﻿using Ether.Extensions;
 using Ether.Interfaces;
 using Ether.Models;
-using Ether.Types.DTO;
 using Ether.Types.DTO.Reports;
-using Ether.Types.Filters;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -26,7 +24,6 @@ namespace Ether.Controllers
             _logger = logger;
         }
 
-        [IHave(typeof(Profile))]
         public IActionResult Index()
         {
             _logger.LogInformation("Loading main page");
@@ -35,7 +32,6 @@ namespace Ether.Controllers
         }
 
         [HttpPost]
-        [IHave(typeof(Profile))]
         public async Task<IActionResult> Report(ReportViewModel model)
         {
             if (!ModelState.IsValid)

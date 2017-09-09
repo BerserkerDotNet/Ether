@@ -11,6 +11,8 @@ namespace Ether.Interfaces
     {
         Task<IEnumerable<T>> GetAllAsync<T>() where T: BaseDto;
 
+        IEnumerable<T> GetAll<T>() where T : BaseDto;
+
         Task<IEnumerable> GetAllByTypeAsync(Type itemType);
 
         Task<IEnumerable<T>> GetAsync<T>(Expression<Func<T, bool>> predicate) where T : BaseDto;

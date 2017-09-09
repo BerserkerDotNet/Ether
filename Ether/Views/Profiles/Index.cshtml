@@ -1,12 +1,8 @@
 ﻿@model IEnumerable<ProfileViewModel>
+@inject IAll<VSTSRepository> Repositories
+@inject IAll<TeamMember> TeamMembers
 @{
     ViewData["Title"] = "Profiles";
-    var membersPropertyName = Utils.GetNameForAllItems(typeof(TeamMember));
-    var repositoriesPropertyName = Utils.GetNameForAllItems(typeof(VSTSRepository));
-    var projectsPropertyName = Utils.GetNameForAllItems(typeof(VSTSProject));
-    var allMembers = ViewData[membersPropertyName] as IEnumerable<TeamMember>;
-    var allRepositories = ViewData[repositoriesPropertyName] as IEnumerable<VSTSRepository>;
-    var allProjects = ViewData[projectsPropertyName] as IEnumerable<VSTSProject>;
 }
 
 <h2>Profiles</h2>
@@ -34,8 +30,8 @@
         {
             <tr>
                 <td>@profile.Name</td>
-                <td>@string.Join(", ", allRepositories.Where(r=> profile.Repositories.Contains(r.Id)).Select(r=> $"{r.Project} - {r.Name}"))</td>
-                <td>@string.Join(", ", allMembers.Where(m=> profile.Members.Contains(m.Id)).Select(m=>m.DisplayName))</td>
+                <td>@string.Join(", ", Repositories.Value.Where(r=> profile.Repositories.Contains(r.Id)).Select(r=> r.Name))</td>
+                <td>@string.Join(", ", TeamMembers.Value.Where(m=> profile.Members.Contains(m.Id)).Select(m=>m.DisplayName))</td>
                 <td width="150">
                     <form class="form-inline" asp-action="Delete" method="post">
                         <a asp-action="Edit" asp-route-id="@profile.Id" class="btn btn-primary">Edit</a>

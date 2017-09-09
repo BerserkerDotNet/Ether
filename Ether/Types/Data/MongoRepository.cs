@@ -40,6 +40,13 @@ namespace Ether.Types.Data
                 .ToListAsync();
         }
 
+        public IEnumerable<T> GetAll<T>() where T : BaseDto
+        {
+            return GetCollectionFor<T>()
+                .AsQueryable()
+                .ToList();
+        }
+
         public async Task<IEnumerable> GetAllByTypeAsync(Type itemType)
         {
             var items = await GetCollectionFor(itemType)

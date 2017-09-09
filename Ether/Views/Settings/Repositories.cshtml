@@ -1,9 +1,7 @@
 ﻿@model IEnumerable<VSTSRepository>
+@inject IAll<VSTSProject> Projects
 @{
     ViewData["Title"] = "Repositories";
-    ViewData["CurrentMenu"] = "Settings";
-    var projectsPropertyName = Utils.GetNameForAllItems(typeof(VSTSProject));
-    var allProjects = ViewData[projectsPropertyName] as IEnumerable<VSTSProject>;
 }
 
 <h2>Repositories</h2>
@@ -27,7 +25,7 @@
     <tbody>
         @foreach (var repo in Model)
         {
-            var project = allProjects.Single(p => p.Id == repo.Project);
+            var project = Projects.Value.Single(p => p.Id == repo.Project);
             <tr>
                 <td>@repo.Name</td>
                 <td>@project.Name</td>

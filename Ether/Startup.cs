@@ -44,6 +44,7 @@ namespace Ether
             }).AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<Startup>());
             services.AddSingleton<IRepository, MongoRepository>();
             services.AddScoped<VSTSClient>();
+            services.AddScoped(typeof(IAll<>), typeof(DataManager<>));
             services.AddScoped<IReporter, PullRequestsReporter>();
             services.AddScoped<IReporter, WorkItemsReporter>();
         }

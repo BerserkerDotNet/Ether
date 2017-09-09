@@ -1,11 +1,10 @@
 ﻿@model ProfileViewModel
+@inject IAll<TeamMember> TeamMembers
+@inject IAll<VSTSRepository> Repositories
+
 @{
     ViewData["Title"] = "Edit Profile";
-    var membersPropertyName = Utils.GetNameForAllItems(typeof(TeamMember));
-    var repositoriesPropertyName = Utils.GetNameForAllItems(typeof(VSTSRepository));
-    var allMembers = ViewData[membersPropertyName] as IEnumerable<TeamMember>;
-    var allRepositories = ViewData[repositoriesPropertyName] as IEnumerable<VSTSRepository>;
-    var membersByTeam = allMembers.GroupBy(m => m.TeamName);
+    var membersByTeam = TeamMembers.Value.GroupBy(m => m.TeamName);
 }
 
 <h2>Edit Profile</h2>
@@ -24,7 +23,7 @@
     <div class="form-group">
         <fieldset>
             <legend>Repositories</legend>
-            @foreach (var repo in allRepositories)
+            @foreach (var repo in Repositories.Value)
             {
                 <label for="repo-@repo.Id">@repo.Name</label>
                 <input type="checkbox" name="Repositories" value="@repo.Id" id="repo-@repo.Id" @(Model.Repositories!=null && Model.Repositories.Contains(repo.Id) ? "checked" : "") />
