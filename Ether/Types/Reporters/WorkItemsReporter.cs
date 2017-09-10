@@ -19,12 +19,13 @@ namespace Ether.Types.Reporters
                         ([Microsoft.VSTS.Common.ResolvedBy] IN ({0}) AND [Microsoft.VSTS.Common.ResolvedDate] >= '{2}' AND [Microsoft.VSTS.Common.ResolvedDate] <= '{3}') OR 
                         ([Microsoft.VSTS.Common.ClosedBy] IN ({0}) AND [Microsoft.VSTS.Common.ClosedDate] >= '{2}' AND [Microsoft.VSTS.Common.ClosedDate] <= '{3}')
                         ASOF '{1}'";
+
         private static readonly DateTime VSTSMaxDate = new DateTime(9999, 1, 1);
         private static readonly Guid _reporterId = Guid.Parse("54c62ebe-cfef-46d5-b90f-ebb00a1611b7");
 
-        private readonly VSTSClient _client;
+        private readonly IVSTSClient _client;
 
-        public WorkItemsReporter(VSTSClient client, IRepository repository, IOptions<VSTSConfiguration> configuration, ILogger<WorkItemsReporter> logger) 
+        public WorkItemsReporter(IVSTSClient client, IRepository repository, IOptions<VSTSConfiguration> configuration, ILogger<WorkItemsReporter> logger) 
             : base(repository, configuration, logger)
         {
             _client = client;
@@ -71,7 +72,9 @@ namespace Ether.Types.Reporters
                     var currentDate = Input.Query.StartDate.AddDays(i);
                     var queryString = string.Format(WorkItemsQuery, emails, currentDate.ToString("MM/dd/yyyy"), Input.Query.StartDate.ToString("MM/dd/yyyy"), Input.ActualEndDate.ToString("MM/dd/yyyy"));
                     var query = new ItemsQuery(queryString);
-                    var wiqlEndPoint = $"https://{_configuration.InstanceName}.visualstudio.com/{project.Name}/_apis/wit/wiql?api-version=3.0";
+                    var wiqlEndPoint = VSTSApiUrl.Create(_configuration.InstanceName)
+                        .ForWIQL(project.Name)
+                        .Build();
                     var workItemsResponse = await _client.ExecutePost<WorkItemsQueryResponse>(wiqlEndPoint, query);
                     var newItems = workItemsResponse.WorkItems
                         .Where(w => !workItemsIds.Contains(w.Id))
@@ -86,8 +89,11 @@ namespace Ether.Types.Reporters
 
         private async Task<IEnumerable<WorkItemResolution>> GetResolutionsFor(int id)
         {
-            var updatesUrl = $"https://{_configuration.InstanceName}.visualstudio.com/DefaultCollection/_apis/wit/WorkItems/{id}/updates?api-version=3.0";
-            var updates = await _client.ExecuteGet<ValueResponse<WorkItemUpdate>>(updatesUrl);
+            var url = VSTSApiUrl.Create(_configuration.InstanceName)
+                .ForWorkItems(id)
+                .WithSection("updates")
+                .Build();
+            var updates = await _client.ExecuteGet<ValueResponse<WorkItemUpdate>>(url);
             var initialUpdate = updates.Value.First();
             var actualUpdates = updates.Value
                 .SkipWhile(u => u.RevisedDate != VSTSMaxDate && u.RevisedDate <= Input.Query.StartDate)
@@ -96,7 +102,7 @@ namespace Ether.Types.Reporters
 
             var itemType = initialUpdate.WorkItemType.NewValue;
             var title = updates.Value.Last(u => !string.IsNullOrEmpty(u.Title.NewValue)).Title.NewValue;
-            var resolvedItem = actualUpdates.LastOrDefault(i => (itemType == "Bug" && i.State.NewValue == "Resolved" && Input.Members.Any(m => i.ResolvedBy.NewValue.Contains(m.Email))));
+            var resolvedItem = actualUpdates.LastOrDefault(i => (itemType == "Bug" && i.State.NewValue == "Resolved" && i.State.OldValue!="Closed" && Input.Members.Any(m => i.ResolvedBy.NewValue.Contains(m.Email))));
             var investigatedItem = actualUpdates.LastOrDefault(i =>
                 i.AreaPath.IsValueChanged() &&
                 i.AssignedTo.IsValueCleared() &&

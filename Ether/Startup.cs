@@ -43,7 +43,7 @@ namespace Ether
                 o.Filters.Add<CurrentMenuIndicatorFilter>();
             }).AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<Startup>());
             services.AddSingleton<IRepository, MongoRepository>();
-            services.AddScoped<VSTSClient>();
+            services.AddScoped<IVSTSClient, VSTSClient>();
             services.AddScoped(typeof(IAll<>), typeof(DataManager<>));
             services.AddScoped<IReporter, PullRequestsReporter>();
             services.AddScoped<IReporter, WorkItemsReporter>();

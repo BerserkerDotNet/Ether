@@ -1,4 +1,5 @@
-﻿using Ether.Types.Configuration;
+﻿using Ether.Interfaces;
+using Ether.Types.Configuration;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Ether.Types.Data
 {
-    public class VSTSClient
+    public class VSTSClient : IVSTSClient
     {
         private const string JsonMimeType = "application/json";
         private readonly VSTSConfiguration _configuration;

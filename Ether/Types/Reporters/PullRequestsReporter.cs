@@ -13,10 +13,10 @@ namespace Ether.Types.Reporters
 {
     public class PullRequestsReporter : ReporterBase
     {
-        private readonly VSTSClient _client;
+        private readonly IVSTSClient _client;
         private static readonly Guid _reporterId = Guid.Parse("e6f4ff5a-a71d-4706-8d34-9227c55c5644");
 
-        public PullRequestsReporter(VSTSClient client, IRepository repository, IOptions<VSTSConfiguration> configuration, ILogger<PullRequestsReporter> logger)
+        public PullRequestsReporter(IVSTSClient client, IRepository repository, IOptions<VSTSConfiguration> configuration, ILogger<PullRequestsReporter> logger)
             :base(repository, configuration, logger)
         {
             _client = client;
@@ -36,14 +36,23 @@ namespace Ether.Types.Reporters
                 var project = Input.GetProjectFor(repo);
                 foreach (var member in Input.Members)
                 {
-                    var PRsUrl = $"https://{_configuration.InstanceName}.visualstudio.com/DefaultCollection/{project.Name}/_apis/git/repositories/{repo.Name}/pullRequests?api-version=3.0&creatorId={member.Id}&status=Completed&$top=100";
-                    var prsResponse = await _client.ExecuteGet<PRResponse>(PRsUrl);
+                    var prsUrl = VSTSApiUrl.Create(_configuration.InstanceName)
+                        .ForPullRequests(project.Name, repo.Name)
+                        .WithQueryParameter("creatorId", member.Id.ToString())
+                        .WithQueryParameter("status", "Completed")
+                        .Top(100)
+                        .Build();
+                    var prsResponse = await _client.ExecuteGet<PRResponse>(prsUrl);
                     var prs = prsResponse.Value
                         .Where(p => p.CreationDate >= Input.Query.StartDate && p.CreationDate <= Input.Query.EndDate).ToList();
 
                     foreach (var pr in prs)
                     {
-                        var iterationUrl = $"https://{_configuration.InstanceName}.visualstudio.com/DefaultCollection/{project.Name}/_apis/git/repositories/{repo.Name}/pullRequests/{pr.PullRequestId}/iterations?api-version=3.0";
+                        var iterationUrl = VSTSApiUrl.Create(_configuration.InstanceName)
+                            .ForPullRequests(project.Name, repo.Name)
+                            .WithSection(pr.PullRequestId.ToString())
+                            .WithSection("iterations")
+                            .Build();
                         var iterationsResponse = await _client.ExecuteGet<IterationsResponse>(iterationUrl);
                         pr.Iterations = iterationsResponse.Count;
                         pr.Author = member.DisplayName;

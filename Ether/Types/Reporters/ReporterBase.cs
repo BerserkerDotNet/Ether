@@ -33,7 +33,10 @@ namespace Ether.Types.Reporters
         public async Task<ReportResult> ReportAsync(ReportQuery query)
         {
             if (string.IsNullOrEmpty(_configuration.AccessToken) || string.IsNullOrEmpty(_configuration.InstanceName))
+            {
+                _logger.LogWarning("Attempt to generate report without proper configuration!");
                 throw new ArgumentException("Configuration is missing.");
+            }
 
             Input = await GetInputData(query);
             _logger.LogWarning("Report requested for {Profile} starting from {StartDate} until {EndDate}", Input.Profile.Name, query.StartDate, Input.ActualEndDate);
@@ -92,7 +95,6 @@ namespace Ether.Types.Reporters
             {
                 return Projects.SingleOrDefault(p => p.Id == repo.Project);
             }
-
             public DateTime ActualEndDate
             {
                 get
