@@ -14,8 +14,7 @@
     <div asp-validation-summary="All" class="text-danger"></div>
     <div class="form-group">
         <label asp-for="Profile">Profile:</label>
-        <select asp-for="Profile" asp-items="@allProfiles" class="form-control">
-        </select>
+        <select asp-for="Profile" asp-items="@allProfiles" class="form-control"></select>
         <span asp-validation-for="Profile" class="text-danger"></span>
     </div>
     <div class="form-group">
@@ -23,15 +22,23 @@
         <select asp-for="Report" asp-items="@allReporters" class="form-control"></select>
         <span asp-validation-for="Report" class="text-danger"></span>
     </div>
-    <div class="form-group">
-        <label asp-for="StartDate">Start date:</label>
-        <input asp-for="StartDate" type="text" class="form-control"/>
-        <span asp-validation-for="StartDate" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="EndDate">End date:</label>
-        <input asp-for="EndDate" type="text" class="form-control"/>
-        <span asp-validation-for="EndDate" class="text-danger"></span>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label id="StartDateLabel" asp-for="StartDate">Start date:</label>
+                <div id="StartDateDiv"></div>
+                <input asp-for="StartDate" type="hidden" />
+                <span asp-validation-for="StartDate" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label id="EndDateLabel" asp-for="EndDate">End date:</label>
+                <div id="EndDateDiv"></div>
+                <input asp-for="EndDate" type="hidden" />
+                <span asp-validation-for="EndDate" class="text-danger"></span>
+            </div>
+        </div>
     </div>
     <button id="generateReportBtn" type="submit" class="btn btn-success">Create a report</button>
 
@@ -39,17 +46,31 @@
 @section Scripts{
     <script>
         $(document).ready(function () {
-            var calendarOptions = {
+            var commonOptions = {
                 changeMonth: true,
                 changeYear: true,
                 minDate: "-6M",
-                maxDate: "+1M"
+                maxDate: "+1D",
+                numberOfMonths: 2,
             };
-            $('#StartDate').datepicker(calendarOptions);
-            $('#EndDate').datepicker(calendarOptions);
-            $("#progressbar").progressbar({
-                value: false
-            });
+
+            var startDateOptions = $.extend({
+                defaultDate: "-1W",
+                altField: "#StartDate",
+                onSelect: function (date) {
+                    setSelectedStartDate(date);
+                }
+            }, commonOptions);
+            var startDate = $('#StartDateDiv').datepicker(startDateOptions);
+
+            var endDateOptions = $.extend({
+                defaultDate: "+1D",
+                altField: "#EndDate",
+                onSelect: function (date) {
+                    setSelectedEndDate(date);
+                }
+            }, commonOptions);
+            var endDate = $('#EndDateDiv').datepicker(endDateOptions);
 
             $('form').submit(function (e) {
                 if ($(this).valid()) {
@@ -57,8 +78,17 @@
                     btn.attr("disabled", true);
                     btn.html('<img src="/images/spinner.gif" height="32" /><span>Generating report...</span>');
                 }
-             });
+            });
 
+            setSelectedStartDate(startDate.datepicker("getDate").toLocaleDateString());
+            setSelectedEndDate(endDate.datepicker("getDate").toLocaleDateString());
         });
+        function setSelectedStartDate(date) {
+            $('#StartDateLabel').text('Start date (' + date + '):');
+        }
+
+        function setSelectedEndDate(date) {
+            $('#EndDateLabel').text('End date (' + date + '):');
+        }
     </script>
 }

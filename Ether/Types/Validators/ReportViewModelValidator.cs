@@ -17,7 +17,7 @@ namespace Ether.Types.Validators
             RuleFor(r => r.EndDate)
                 .NotNull()
                 .GreaterThan(p => p.StartDate)
-                .LessThan(p => DateTime.Now.AddMonths(1)).WithMessage("Date shouldn't be more than 1 month in the future"); ;
+                .LessThan(p => DateTime.Now.AddDays(1)).WithMessage("Date shouldn't be more than 1 day in the future"); ;
         }
     }
 }

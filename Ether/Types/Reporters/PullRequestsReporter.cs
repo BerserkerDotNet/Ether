@@ -22,7 +22,7 @@ namespace Ether.Types.Reporters
             _client = client;
         }
 
-        public override string Name => $"Completed Pull Requestes report";
+        public override string Name => $"Completed Pull Requests report";
 
         public override Guid Id => _reporterId;
 
