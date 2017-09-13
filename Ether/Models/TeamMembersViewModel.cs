@@ -1,4 +1,4 @@
-﻿using Ether.Types.DTO;
+﻿using Ether.Core.Models.DTO;
 using System.Collections.Generic;
 
 namespace Ether.Models

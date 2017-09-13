@@ -1,7 +1,7 @@
 ﻿using Ether.Extensions;
-using Ether.Interfaces;
-using Ether.Types.Configuration;
-using Ether.Types.DTO.Reports;
+using Ether.Core.Interfaces;
+using Ether.Core.Configuration;
+using Ether.Core.Models.DTO.Reports;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System;

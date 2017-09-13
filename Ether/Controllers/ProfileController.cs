@@ -1,13 +1,12 @@
 ﻿using Ether.Extensions;
-using Ether.Interfaces;
+using Ether.Core.Interfaces;
 using Ether.Models;
-using Ether.Types.DTO;
-using Ether.Types.Filters;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Ether.Core.Models.DTO;
 
 namespace Ether.Controllers
 {

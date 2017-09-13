@@ -1,4 +1,4 @@
-﻿using Ether.Types.DTO;
+﻿using Ether.Core.Models.DTO;
 using System;
 using System.Collections.Generic;
 using System.Linq;

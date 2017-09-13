@@ -13,6 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Ether.Core\Ether.Core.csproj" />
     <ProjectReference Include="..\Ether\Ether.csproj" />
   </ItemGroup>
 

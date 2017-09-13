@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Ether.Interfaces;
-using Ether.Types.Configuration;
-using Ether.Types.DTO.Reports;
-using Ether.Types.Reporters;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using Moq;
 using FluentAssertions;
 using Microsoft.Extensions.Logging.Internal;
+using Ether.Core.Configuration;
+using Ether.Core.Interfaces;
+using Ether.Core.Models;
+using Ether.Core.Reporters;
+using Ether.Core.Models.DTO.Reports;
 
 namespace Ether.Tests.Reporters
 {

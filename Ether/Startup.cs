@@ -1,8 +1,8 @@
-﻿using Ether.Interfaces;
-using Ether.Types.Configuration;
-using Ether.Types.Data;
-using Ether.Types.Filters;
-using Ether.Types.Reporters;
+﻿using Ether.Core.Interfaces;
+using Ether.Core.Configuration;
+using Ether.Core.Data;
+using Ether.Core.Filters;
+using Ether.Core.Reporters;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;

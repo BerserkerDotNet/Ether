@@ -1,13 +1,13 @@
 ﻿using Ether.Extensions;
-using Ether.Interfaces;
+using Ether.Core.Interfaces;
 using Ether.Models;
-using Ether.Types.DTO.Reports;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Ether.Core.Models;
 
 namespace Ether.Controllers
 {
