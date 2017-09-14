@@ -9,6 +9,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using static Ether.Core.Models.DTO.Reports.WorkItemsReport;
+using Ether.Core.Models;
+using Ether.Core.Models.VSTS;
 
 namespace Ether.Core.Reporters
 {
@@ -51,8 +53,8 @@ namespace Ether.Core.Reporters
                 var individualReport = new IndividualWorkItemsReport();
                 individualReport.WorkItems = resolution
                     .ToList()
-                    .OrderBy(r => r.Reason)
-                    .ThenBy(r => r.Id);
+                    .OrderBy(r => r.Reason);
+                    //.ThenBy(r => r.Id);
                 individualReport.TeamMember = resolution.Key;
                 result.IndividualReports.Add(individualReport);
             }
@@ -113,12 +115,12 @@ namespace Ether.Core.Reporters
             List<WorkItemResolution> result = new List<WorkItemResolution>(2);
             if (resolvedItem != null)
             {
-                result.Add(WorkItemResolution.GetResolved(id, title, itemType, resolvedItem));
+                //result.Add(WorkItemResolution.GetResolved(id, title, itemType, resolvedItem));
             }
 
             if (investigatedItem != null)
             {
-                result.Add(WorkItemResolution.GetInvestigated(id, title, itemType, investigatedItem));
+                //result.Add(WorkItemResolution.GetInvestigated(id, title, itemType, investigatedItem));
             }
 
             return result;
@@ -152,47 +154,7 @@ namespace Ether.Core.Reporters
             public T[] Value { get; set; }
         }
 
-        public class WorkItemUpdate
-        {
-            public DateTime RevisedDate { get; set; }
-
-            public Dictionary<string, UpdateValue> Fields { get; set; }
-
-            public UpdateValue Reason => this["System.Reason"];
-            public UpdateValue AreaPath => this["System.AreaPath"];
-            public UpdateValue ResolvedBy => this["Microsoft.VSTS.Common.ResolvedBy"];
-            public UpdateValue AssignedTo => this["System.AssignedTo"];
-            public UpdateValue State => this["System.State"];
-            public UpdateValue WorkItemType => this["System.WorkItemType"];
-            public UpdateValue Title => this["System.Title"];
-
-            public UpdateValue this[string key]
-            {
-                get
-                {
-                    if (Fields == null || !Fields.ContainsKey(key))
-                        return new UpdateValue();
-
-                    return Fields[key];
-                }
-            }
-
-            public struct UpdateValue
-            {
-                public string NewValue { get; set; }
-                public string OldValue { get; set; }
-
-                public bool IsValueChanged()
-                {
-                    return !string.Equals(NewValue, OldValue);
-                }
-
-                public bool IsValueCleared()
-                {
-                    return !string.IsNullOrEmpty(OldValue) && string.IsNullOrEmpty(NewValue);
-                }
-            }
-        }
+        
         #endregion
     }
 }

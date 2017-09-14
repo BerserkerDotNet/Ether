@@ -1,11 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using Ether.Core.Models;
 
 namespace Ether.Core.Interfaces
 {
-    public interface IWorkItemClassifier
+    public interface IWorkItemsClassifier
     {
-        Task<string> Classify(int id);
-        Task<string> ClassifyAll(IEnumerable<int> ids);
+        WorkItemResolution Classify(WorkItemResolutionRequest request);
     }
 }
