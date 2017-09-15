@@ -10,6 +10,7 @@ namespace Ether.Core.Reporters.Classifiers
         public WorkItemResolution Classify(WorkItemResolutionRequest request)
         {
             const string ResolvedState = "Resolved";
+            const string ClosedState = "Closed";
 
             if (request == null)
                 throw new ArgumentNullException(nameof(request));
@@ -18,12 +19,13 @@ namespace Ether.Core.Reporters.Classifiers
             if (!supportedTypes.Contains(request.WorkItemType))
                 return WorkItemResolution.None;
 
-            var resolutionUpdate = request.WorkItemUpdates.LastOrDefault(u => u.State.NewValue == ResolvedState);
+            var resolutionUpdate = request.WorkItemUpdates.LastOrDefault(u => u.State.NewValue == ResolvedState 
+                    && u.State.OldValue != ClosedState
+                    && request.Team.Any(t => !string.IsNullOrEmpty(u.ResolvedBy.NewValue) && u.ResolvedBy.NewValue.Contains(t.Email)));
             if (resolutionUpdate == null)
                 return WorkItemResolution.None;
 
-            var resolution = new WorkItemResolution(ResolvedState, resolutionUpdate.Reason.NewValue, resolutionUpdate.RevisedDate, resolutionUpdate.ResolvedBy.NewValue);
-            return resolution;
+            return new WorkItemResolution(ResolvedState, resolutionUpdate.Reason.NewValue, resolutionUpdate.RevisedDate, resolutionUpdate.ResolvedBy.NewValue);
         }
     }
 }

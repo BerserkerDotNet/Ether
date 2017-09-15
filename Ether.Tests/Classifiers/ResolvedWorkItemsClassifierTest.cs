@@ -6,6 +6,7 @@ using FluentAssertions;
 using NUnit.Framework;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Ether.Tests.Classifiers
@@ -51,7 +52,6 @@ namespace Ether.Tests.Classifiers
             {
                 WorkItemType = "Bug",
                 WorkItemUpdates = Enumerable.Empty<WorkItemUpdate>()
-                
             });
 
             result.Should().NotBeNull();
@@ -64,10 +64,10 @@ namespace Ether.Tests.Classifiers
             var result = _classifier.Classify(new WorkItemResolutionRequest
             {
                 WorkItemType = "Bug",
-                WorkItemUpdates = new[] 
+                WorkItemUpdates = new[]
                 {
-                    GetUpdate("Active"),
-                    GetUpdate("New")
+                    UpdateBuilder.GetActivated(revisedOn: DateTime.MinValue),
+                    UpdateBuilder.GetNew(revisedOn: DateTime.MinValue)
                 }
             });
 
@@ -75,7 +75,81 @@ namespace Ether.Tests.Classifiers
             result.IsNone.Should().BeTrue();
         }
 
-        [Test, TestCaseSource(nameof(GetTestCasesForResolved))]
+        [Test]
+        public void ShouldReturnNoneIfResolvedNotByTheTeam()
+        {
+            var result = _classifier.Classify(new WorkItemResolutionRequest
+            {
+                WorkItemType = "Bug",
+                Team = ResolvedTestsDataProvider.FakeTeam,
+                WorkItemUpdates = new[]
+                {
+                    UpdateBuilder.Resolved(new TeamMember{DisplayName="Not a member", Email="not@team.com" })
+                        .Because("Reasons")
+                        .Build()
+                }
+            });
+
+            result.Should().NotBeNull();
+            result.IsNone.Should().BeTrue();
+        }
+
+        [Test]
+        public void ShouldReturnNoneIfMovedToResolvedFromClosed()
+        {
+            var result = _classifier.Classify(new WorkItemResolutionRequest
+            {
+                WorkItemType = "Bug",
+                Team = ResolvedTestsDataProvider.FakeTeam,
+                WorkItemUpdates = new[]
+                {
+                    UpdateBuilder.Resolved(ResolvedTestsDataProvider.FakeTeam.ElementAt(0), from: "Closed")
+                        .Because("Reasons")
+                        .Build()
+                }
+            });
+
+            result.Should().NotBeNull();
+            result.IsNone.Should().BeTrue();
+        }
+
+        [Test]
+        public void ShouldReturnNoneIfStateIsNotSet()
+        {
+            var result = _classifier.Classify(new WorkItemResolutionRequest
+            {
+                WorkItemType = "Bug",
+                Team = ResolvedTestsDataProvider.FakeTeam,
+                WorkItemUpdates = new[]
+                {
+                    UpdateBuilder.Update().Build()
+                }
+            });
+
+            result.Should().NotBeNull();
+            result.IsNone.Should().BeTrue();
+        }
+
+        [Test]
+        public void ShouldReturnNoneIfResolvedbyIsNotSet()
+        {
+            var result = _classifier.Classify(new WorkItemResolutionRequest
+            {
+                WorkItemType = "Bug",
+                Team = ResolvedTestsDataProvider.FakeTeam,
+                WorkItemUpdates = new[]
+                {
+                    UpdateBuilder.Resolved()
+                        .With(UpdateBuilder.ResolvedByField, new WorkItemUpdate.UpdateValue())
+                        .Build()
+                }
+            });
+
+            result.Should().NotBeNull();
+            result.IsNone.Should().BeTrue();
+        }
+
+        [Test, TestCaseSource(typeof(ResolvedTestsDataProvider), nameof(ResolvedTestsDataProvider.GetTestCasesForResolved))]
         public void ShouldReturnResolvedResolution(WorkItemResolutionRequest request, string expectedReason, DateTime expectedResolutionDate, string expectedTeamMember)
         {
             var result = _classifier.Classify(request);
@@ -86,44 +160,37 @@ namespace Ether.Tests.Classifiers
             result.TeamMember.Should().Be(expectedTeamMember);
         }
 
-        private static IEnumerable GetTestCasesForResolved()
+        public static class ResolvedTestsDataProvider
         {
-            const string CannotReproduce = "Cannot Reproduce";
-            var team = Enumerable.Range(1, 3).Select(i => new TeamMember { TeamName = $"Member {i}", Email = $"member{i}@foo.com" });
-
-            var simpleCannotReproduce = new TestCaseData(new WorkItemResolutionRequest
+            public static IEnumerable GetTestCasesForResolved()
             {
-                WorkItemId = 0,
-                WorkItemType = "Bug",
-                Team = team,
-                WorkItemUpdates = new[] { new WorkItemUpdate
+                return new[] { GetSimpleCannotReproduce(FakeTeam) };
+            }
+
+            public static IEnumerable<TeamMember> FakeTeam => Enumerable.Range(1, 3)
+                .Select(i => new TeamMember { TeamName = $"Member {i}", Email = $"member{i}@foo.com" })
+                .ToList();
+
+            private static TestCaseData GetSimpleCannotReproduce(IEnumerable<TeamMember> team)
+            {
+                const string CannotReproduce = "Cannot Reproduce";
+                var expectedTeamMember = $"{team.ElementAt(0).DisplayName} <{team.ElementAt(0).Email}>";
+                var revisedDate = DateTime.UtcNow.AddDays(-4);
+                var request = new WorkItemResolutionRequest
                 {
-                    Fields = new System.Collections.Generic.Dictionary<string, WorkItemUpdate.UpdateValue> {
-                        { "System.State", new WorkItemUpdate.UpdateValue {NewValue="Resolved", OldValue = "New" } },
-                        { "Microsoft.VSTS.Common.ResolvedBy", new WorkItemUpdate.UpdateValue { NewValue = $"{team.ElementAt(0).DisplayName} <{team.ElementAt(0).Email}>", OldValue = "" } },
-                        { "System.Reason", new WorkItemUpdate.UpdateValue {NewValue = CannotReproduce, OldValue = "" } }
-                    },
-                    RevisedDate = DateTime.UtcNow.AddDays(-4) } }
-            }, CannotReproduce, DateTime.UtcNow.AddDays(-4), $"{team.ElementAt(0).DisplayName} <{team.ElementAt(0).Email}>")
-            .SetName(nameof(ResolvedWorkItemsClassifierTest.ShouldReturnResolvedResolution) + "OnSimpleCannotReproduce");
-
-
-            return new [] { simpleCannotReproduce };
-        }
-
-        private static WorkItemUpdate GetUpdate(string newState, string oldState = "New", string reason = "None", TeamMember resolvedBy = null)
-        {
-            resolvedBy = resolvedBy ?? new TeamMember { DisplayName = "Foo", Email = "Foo@bar.com" };
-            var teamMemberString = $"{resolvedBy.DisplayName} <{resolvedBy.Email}>";
-            return new WorkItemUpdate
-            {
-                Fields = new System.Collections.Generic.Dictionary<string, WorkItemUpdate.UpdateValue> {
-                        { "System.State", new WorkItemUpdate.UpdateValue {NewValue = newState, OldValue = oldState } },
-                        { "Microsoft.VSTS.Common.ResolvedBy", new WorkItemUpdate.UpdateValue { NewValue = teamMemberString, OldValue = "" } },
-                        { "System.Reason", new WorkItemUpdate.UpdateValue {NewValue = reason, OldValue = "" } }
-                    },
-                RevisedDate = DateTime.UtcNow.AddDays(-4)
-            };
+                    WorkItemId = 0,
+                    WorkItemType = "Bug",
+                    Team = team,
+                    WorkItemUpdates = new[]
+                    {
+                        UpdateBuilder.Resolved(team.ElementAt(0))
+                            .Because(CannotReproduce)
+                            .Build(revisedDate)
+                    }
+                };
+                return new TestCaseData(request, CannotReproduce, revisedDate, expectedTeamMember)
+                    .SetName(nameof(ResolvedWorkItemsClassifierTest.ShouldReturnResolvedResolution) + "OnSimpleCannotReproduce");
+            }
         }
     }
 }
