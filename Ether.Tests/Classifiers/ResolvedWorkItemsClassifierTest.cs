@@ -44,6 +44,37 @@ namespace Ether.Tests.Classifiers
             result.IsNone.Should().BeTrue();
         }
 
+        [Test]
+        public void ShouldReturnNoneIfEmptyHistoryItems()
+        {
+            var result = _classifier.Classify(new WorkItemResolutionRequest
+            {
+                WorkItemType = "Bug",
+                WorkItemUpdates = Enumerable.Empty<WorkItemUpdate>()
+                
+            });
+
+            result.Should().NotBeNull();
+            result.IsNone.Should().BeTrue();
+        }
+
+        [Test]
+        public void ShouldReturnNoneIfNoMatchingHistoryItems()
+        {
+            var result = _classifier.Classify(new WorkItemResolutionRequest
+            {
+                WorkItemType = "Bug",
+                WorkItemUpdates = new[] 
+                {
+                    GetUpdate("Active"),
+                    GetUpdate("New")
+                }
+            });
+
+            result.Should().NotBeNull();
+            result.IsNone.Should().BeTrue();
+        }
+
         [Test, TestCaseSource(nameof(GetTestCasesForResolved))]
         public void ShouldReturnResolvedResolution(WorkItemResolutionRequest request, string expectedReason, DateTime expectedResolutionDate, string expectedTeamMember)
         {
@@ -78,6 +109,21 @@ namespace Ether.Tests.Classifiers
 
 
             return new [] { simpleCannotReproduce };
+        }
+
+        private static WorkItemUpdate GetUpdate(string newState, string oldState = "New", string reason = "None", TeamMember resolvedBy = null)
+        {
+            resolvedBy = resolvedBy ?? new TeamMember { DisplayName = "Foo", Email = "Foo@bar.com" };
+            var teamMemberString = $"{resolvedBy.DisplayName} <{resolvedBy.Email}>";
+            return new WorkItemUpdate
+            {
+                Fields = new System.Collections.Generic.Dictionary<string, WorkItemUpdate.UpdateValue> {
+                        { "System.State", new WorkItemUpdate.UpdateValue {NewValue = newState, OldValue = oldState } },
+                        { "Microsoft.VSTS.Common.ResolvedBy", new WorkItemUpdate.UpdateValue { NewValue = teamMemberString, OldValue = "" } },
+                        { "System.Reason", new WorkItemUpdate.UpdateValue {NewValue = reason, OldValue = "" } }
+                    },
+                RevisedDate = DateTime.UtcNow.AddDays(-4)
+            };
         }
     }
 }
