@@ -101,8 +101,10 @@ namespace Ether.Core.Reporters
                 get
                 {
                     var today = DateTime.UtcNow.Date;
-                    var endDate = today < Query.EndDate ? today : Query.EndDate;
-                    return endDate.AddDays(1).AddMilliseconds(-1);
+                    if (today < Query.EndDate)
+                        return today.AddDays(1).AddMilliseconds(-1);
+
+                    return Query.EndDate;
                 }
             }
         }

@@ -33,6 +33,13 @@ namespace Ether.Core.Data
             return this;
         }
 
+        public VSTSApiUrl ForWorkItemsBatch(string workItemIds)
+        {
+            _url.Append($"/{APIsSection}/{WITSection}/{WorkItemsSection}");
+            WithQueryParameter("ids", workItemIds);
+            return this;
+        }
+
         public VSTSApiUrl ForWorkItems(int workItemId)
         {
             _url.Append($"/{APIsSection}/{WITSection}/{WorkItemsSection}/{workItemId}");

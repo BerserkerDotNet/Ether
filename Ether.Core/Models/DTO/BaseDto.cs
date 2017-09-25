@@ -1,11 +1,10 @@
-﻿using MongoDB.Bson.Serialization.Attributes;
-using System;
+﻿using System;
 
 namespace Ether.Core.Models.DTO
 {
-    public class BaseDto: IEquatable<BaseDto>
+    public abstract class BaseDto : IEquatable<BaseDto>
     {
-        public Guid Id { get; set; }
+        public virtual Guid Id { get; set; }
 
         public bool Equals(BaseDto other)
         {

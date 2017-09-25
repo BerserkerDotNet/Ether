@@ -15,6 +15,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
+using Ether.Core.Models.VSTS;
 
 namespace Ether.Core.Data
 {
@@ -31,6 +32,12 @@ namespace Ether.Core.Data
 
             _client = new MongoClient(dbConfig.Value.ConnectionString);
             _database = _client.GetDatabase(dbConfig.Value.DbName);
+
+            var vstsWorkItemsCollection = GetCollectionFor<VSTSWorkItem>();
+            vstsWorkItemsCollection.Indexes.CreateOne(Builders<VSTSWorkItem>.IndexKeys.Ascending(w => w.WorkItemId), new CreateIndexOptions
+            {
+                Unique = true
+            });
         }
 
         public async Task<IEnumerable<T>> GetAllAsync<T>() where T : BaseDto
@@ -68,6 +75,14 @@ namespace Ether.Core.Data
                 .AsQueryable()
                 .Where(predicate)
                 .ToListAsync();
+        }
+
+        public IEnumerable<T> Get<T>(Expression<Func<T, bool>> predicate) where T : BaseDto
+        {
+            return GetCollectionFor<T>()
+               .AsQueryable()
+               .Where(predicate)
+               .ToList();
         }
 
         public async Task<T> GetSingleAsync<T>(Expression<Func<T, bool>> predicate) where T : BaseDto
@@ -115,14 +130,18 @@ namespace Ether.Core.Data
 
         public async Task<bool> CreateOrUpdateAsync<T>(T item) where T : BaseDto
         {
-            var collection = GetCollectionFor<T>();
-            var count = await collection
-               .AsQueryable()
-               .CountAsync(i => i.Id == item.Id);
+            return await CreateOrUpdateAsync(item, i => i.Id == item.Id);
+        }
 
-            if (count > 0)
+        public async Task<bool> CreateOrUpdateAsync<T>(T item, Expression<Func<T, bool>> criteria) 
+            where T : BaseDto
+        {
+            var collection = GetCollectionFor<T>();
+            var existingId = await GetFieldValue(criteria, o => o.Id);
+            if (existingId != Guid.Empty)
             {
-                await collection.FindOneAndReplaceAsync(i => i.Id == item.Id, item);
+                item.Id = existingId;
+                await collection.ReplaceOneAsync(criteria, item);
             }
             else
             {

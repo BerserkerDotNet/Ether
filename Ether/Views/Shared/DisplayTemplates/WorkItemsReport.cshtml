@@ -1,8 +1,11 @@
 ﻿@model WorkItemsReport
 @{
-    var workItems = Model.IndividualReports.SelectMany(r => r.WorkItems)
-        .OrderBy(w => w.Reason);
-    var workItemsByResolution = workItems.GroupBy(w => w.Reason);
+    var workItems = Model.Resolutions
+        .OrderBy(w => w.Resolution)
+        .OrderBy(w => w.Reason)
+        .OrderBy(r => r.MemberEmail);
+
+    var workItemsByReason = Model.Resolutions.GroupBy(w => w.Reason);
  }
 
 <table class="table table-hover table-bordered">
@@ -22,9 +25,9 @@
             <th colspan="2"><strong>Total</strong> - @workItems.Count()</th>
             <td class="success" colspan="3">
                 <ul class="list-inline">
-                    @foreach (var resolution in workItemsByResolution)
+                    @foreach (var byReason in workItemsByReason)
                     {
-                        <li><strong>@resolution.Key</strong> - @resolution.Count()</li>
+                        <li><strong>@byReason.Key</strong> - @byReason.Count()</li>
                     }
                 </ul>
             </td>
@@ -34,11 +37,11 @@
         @foreach (var report in workItems)
         {
             <tr>
-                <td>@report.Type</td>
-                <td>@report.Id</td>
-                <td>@report.Title</td>
+                <td>@report.WorkItemType</td>
+                <td>@report.WorkItemId</td>
+                <td>@report.WorkItemTitle</td>
                 <td width="140">@report.Reason</td>
-                <td>@report.TeamMember</td>
+                <td>@report.MemberName</td>
             </tr>
         }
     </tbody>

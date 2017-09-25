@@ -12,49 +12,67 @@ namespace Ether.Tests
         public const string ResolvedByField = "Microsoft.VSTS.Common.ResolvedBy";
         public const string ReasonField = "System.Reason";
 
+        List<WorkItemUpdate> _updates = new List<WorkItemUpdate>();
         private Dictionary<string, WorkItemUpdate.UpdateValue> _fields = new Dictionary<string, WorkItemUpdate.UpdateValue>();
+        private DateTime _revisedDate = DateTime.MinValue;
 
-        public static ResolvedUpdateBuilder Resolved(TeamMember by = null, string from = "Active")
+        public static UpdateBuilder Create()
+        {
+            return new UpdateBuilder();
+        }
+
+        public UpdateBuilder Resolved(TeamMember by = null, string from = "Active")
         {
             var resolvedBy = by == null ? DefaultUser : $"{by.DisplayName} <{by.Email}>";
-            var builder = new ResolvedUpdateBuilder();
-            builder._fields.Add(StateField, new WorkItemUpdate.UpdateValue { NewValue = "Resolved", OldValue = from });
-            builder._fields.Add(ResolvedByField, new WorkItemUpdate.UpdateValue { NewValue = resolvedBy });
-            return builder;
+            _fields.Add(StateField, new WorkItemUpdate.UpdateValue { NewValue = "Resolved", OldValue = from });
+            _fields.Add(ResolvedByField, new WorkItemUpdate.UpdateValue { NewValue = resolvedBy });
+            return this;
         }
 
-        public static ActivatedUpdateBuilder Activated(string from = "New")
+        public UpdateBuilder Activated(string from = "New")
         {
-            var builder = new ActivatedUpdateBuilder();
-            builder._fields.Add(StateField, new WorkItemUpdate.UpdateValue { NewValue = "Active", OldValue = from });
-            return builder;
+            _fields.Add(StateField, new WorkItemUpdate.UpdateValue { NewValue = "Active", OldValue = from });
+            return this;
         }
 
-        public static WorkItemUpdate GetActivated(DateTime revisedOn, string from = "New")
+        public UpdateBuilder On(DateTime revisedDate)
         {
-            return Activated(from).Build(revisedOn);
+            _revisedDate = revisedDate;
+            return this;
         }
 
-        public static NewUpdateBuilder New(string from = "")
+        public IEnumerable<WorkItemUpdate> GetActivated(DateTime revisedOn, string from = "New")
         {
-            var builder = new NewUpdateBuilder();
-            builder._fields.Add(StateField, new WorkItemUpdate.UpdateValue { NewValue = "New", OldValue = from });
-            return builder;
+            _revisedDate = revisedOn;
+            return Activated(from).Build();
         }
 
-        public static WorkItemUpdate GetNew(DateTime revisedOn, string from = "")
+        public UpdateBuilder New(string from = "")
         {
-            return New(from).Build(revisedOn);
+            _fields.Add(StateField, new WorkItemUpdate.UpdateValue { NewValue = "New", OldValue = from });
+            return this;
         }
 
-        public static UpdateBuilder Repathed(string to)
+        public IEnumerable<WorkItemUpdate> GetNew(DateTime revisedOn, string from = "")
+        {
+            _revisedDate = revisedOn;
+            return New(from).Build();
+        }
+
+        public UpdateBuilder Repathed(string to)
         {
             return new UpdateBuilder();
         }
 
-        public static UpdateBuilder Update()
+        public UpdateBuilder Update()
         {
             return new UpdateBuilder();
+        }
+
+        public UpdateBuilder Because(string reason)
+        {
+            _fields.Add(ReasonField, new WorkItemUpdate.UpdateValue { NewValue = reason });
+            return this;
         }
 
         public UpdateBuilder With(string fieldName, string newValue, string oldValue)
@@ -68,33 +86,30 @@ namespace Ether.Tests
             return this;
         }
 
-        public WorkItemUpdate Build(DateTime revisedDate)
+        public UpdateBuilder Then()
         {
-            return new WorkItemUpdate { Fields = _fields, RevisedDate = revisedDate };
+            AddNewUpdate();
+            Reset();
+            return this; 
         }
 
-        public WorkItemUpdate Build()
+        public IEnumerable<WorkItemUpdate> Build()
         {
-            return Build(DateTime.MinValue);
+            AddNewUpdate();
+            return _updates;
         }
 
-        public class NewUpdateBuilder : UpdateBuilder
-        {
 
+        private void AddNewUpdate()
+        {
+            var wi = new WorkItemUpdate { Fields = _fields, RevisedDate = _revisedDate };
+            _updates.Add(wi);
         }
 
-        public class ActivatedUpdateBuilder : UpdateBuilder
+        private void Reset()
         {
-
-        }
-
-        public class ResolvedUpdateBuilder : UpdateBuilder
-        {
-            public ResolvedUpdateBuilder Because(string reason)
-            {
-                _fields.Add(ReasonField, new WorkItemUpdate.UpdateValue { NewValue = reason });
-                return this;
-            }
+            _revisedDate = DateTime.MinValue;
+            _fields = new Dictionary<string, WorkItemUpdate.UpdateValue>();
         }
     }
 }

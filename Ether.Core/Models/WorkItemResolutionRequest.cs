@@ -6,10 +6,7 @@ namespace Ether.Core.Models
 {
     public class WorkItemResolutionRequest
     {
-        public int WorkItemId { get; set; }
-        public string WorkItemType { get; set; }
-
-        public IEnumerable<WorkItemUpdate> WorkItemUpdates { get; set; }
+        public VSTSWorkItem WorkItem { get; set; }
         public IEnumerable<TeamMember> Team { get; set; }
     }
 }

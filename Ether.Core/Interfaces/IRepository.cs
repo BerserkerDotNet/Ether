@@ -17,6 +17,8 @@ namespace Ether.Core.Interfaces
 
         Task<IEnumerable<T>> GetAsync<T>(Expression<Func<T, bool>> predicate) where T : BaseDto;
 
+        IEnumerable<T> Get<T>(Expression<Func<T, bool>> predicate) where T : BaseDto;
+
         Task<T> GetSingleAsync<T>(Expression<Func<T, bool>> predicate) where T : BaseDto;
 
         Task<TProjection> GetFieldValue<TType, TProjection>(Expression<Func<TType, bool>> predicate, Expression<Func<TType, TProjection>> projection) where TType : BaseDto;
@@ -26,6 +28,8 @@ namespace Ether.Core.Interfaces
         Task<bool> CreateAsync<T>(T item) where T : BaseDto;
 
         Task<bool> CreateOrUpdateAsync<T>(T item) where T : BaseDto;
+
+        Task<bool> CreateOrUpdateAsync<T>(T item, Expression<Func<T, bool>> criteria) where T : BaseDto;
 
         Task<bool> DeleteAsync<T>(Guid id) where T : BaseDto;
     }

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Bson.Serialization.Options;
+using System;
 using System.Collections.Generic;
 
 namespace Ether.Core.Models.VSTS
@@ -7,6 +9,7 @@ namespace Ether.Core.Models.VSTS
     {
         public DateTime RevisedDate { get; set; }
 
+        [BsonDictionaryOptions(DictionaryRepresentation.ArrayOfDocuments)]
         public Dictionary<string, UpdateValue> Fields { get; set; }
 
         public UpdateValue Reason => this["System.Reason"];
@@ -28,7 +31,7 @@ namespace Ether.Core.Models.VSTS
             }
         }
 
-        public struct UpdateValue
+        public class UpdateValue
         {
             public string NewValue { get; set; }
             public string OldValue { get; set; }

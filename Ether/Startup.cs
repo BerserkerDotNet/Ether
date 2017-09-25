@@ -10,6 +10,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using FluentScheduler;
+using Ether.Jobs;
+using Ether.Core.Reporters.Classifiers;
 
 namespace Ether
 {
@@ -43,15 +46,23 @@ namespace Ether
                 o.Filters.Add<CurrentMenuIndicatorFilter>();
             }).AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<Startup>());
             services.AddSingleton<IRepository, MongoRepository>();
-            services.AddScoped<IVSTSClient, VSTSClient>();
+            services.AddSingleton<IVSTSClient, VSTSClient>();
+            services.AddSingleton<DIFriendlyJobFactory>();
+            services.AddSingleton<WorkItemsFetchJob>();
+           
             services.AddScoped(typeof(IAll<>), typeof(DataManager<>));
             services.AddScoped<IReporter, PullRequestsReporter>();
             services.AddScoped<IReporter, WorkItemsReporter>();
+            services.AddScoped<IWorkItemsClassifier, ResolvedWorkItemsClassifier>();
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-           
+            var registry = new Registry();
+            registry.Schedule<WorkItemsFetchJob>().ToRunNow().AndEvery(1).Hours();
+            JobManager.JobFactory = app.ApplicationServices.GetService<DIFriendlyJobFactory>();
+            JobManager.Initialize(registry);
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

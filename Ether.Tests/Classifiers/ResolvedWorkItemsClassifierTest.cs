@@ -2,10 +2,10 @@
 using Ether.Core.Models.DTO;
 using Ether.Core.Models.VSTS;
 using Ether.Core.Reporters.Classifiers;
+using Ether.Tests.Data;
 using FluentAssertions;
 using NUnit.Framework;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -29,6 +29,24 @@ namespace Ether.Tests.Classifiers
                 .ShouldThrow<ArgumentNullException>();
         }
 
+        [Test]
+        public void ShouldReturnNoneIfWorkItemIsNull()
+        {
+            var result = _classifier.Classify(new WorkItemResolutionRequest());
+
+            result.Should().NotBeNull();
+            result.IsNone.Should().BeTrue();
+        }
+
+        [Test]
+        public void ShouldReturnNoneIfTeamIsNull()
+        {
+            var result = _classifier.Classify(new WorkItemResolutionRequest { WorkItem = new VSTSWorkItem() });
+
+            result.Should().NotBeNull();
+            result.IsNone.Should().BeTrue();
+        }
+
         [TestCase("")]
         [TestCase(null)]
         [TestCase("Foo")]
@@ -36,10 +54,10 @@ namespace Ether.Tests.Classifiers
         [TestCase("231")]
         public void ShouldReturnNoneIfUnexpectedOrEmptyType(string type)
         {
-            var result = _classifier.Classify(new WorkItemResolutionRequest
-            {
-                WorkItemType = type
-            });
+            var workItem = new VSTSWorkItem { Fields = new Dictionary<string, string>() };
+            workItem.Fields.Add(VSTSFieldNames.WorkItemType, type);
+
+            var result = _classifier.Classify(new WorkItemResolutionRequest { WorkItem = workItem });
 
             result.Should().NotBeNull();
             result.IsNone.Should().BeTrue();
@@ -48,11 +66,11 @@ namespace Ether.Tests.Classifiers
         [Test]
         public void ShouldReturnNoneIfEmptyHistoryItems()
         {
-            var result = _classifier.Classify(new WorkItemResolutionRequest
-            {
-                WorkItemType = "Bug",
-                WorkItemUpdates = Enumerable.Empty<WorkItemUpdate>()
-            });
+            var workItem = new VSTSWorkItem { Fields = new Dictionary<string, string>() };
+            workItem.Fields.Add(VSTSFieldNames.WorkItemType, "Bug");
+            workItem.Updates = Enumerable.Empty<WorkItemUpdate>();
+
+            var result = _classifier.Classify(new WorkItemResolutionRequest { WorkItem = workItem });
 
             result.Should().NotBeNull();
             result.IsNone.Should().BeTrue();
@@ -61,15 +79,14 @@ namespace Ether.Tests.Classifiers
         [Test]
         public void ShouldReturnNoneIfNoMatchingHistoryItems()
         {
-            var result = _classifier.Classify(new WorkItemResolutionRequest
-            {
-                WorkItemType = "Bug",
-                WorkItemUpdates = new[]
-                {
-                    UpdateBuilder.GetActivated(revisedOn: DateTime.MinValue),
-                    UpdateBuilder.GetNew(revisedOn: DateTime.MinValue)
-                }
-            });
+            var workItem = new VSTSWorkItem { Fields = new Dictionary<string, string>() };
+            workItem.Fields.Add(VSTSFieldNames.WorkItemType, "Bug");
+            workItem.Updates = UpdateBuilder.Create()
+                .Activated()
+                .Then().New()
+                .Build();
+
+            var result = _classifier.Classify(new WorkItemResolutionRequest { WorkItem = workItem });
 
             result.Should().NotBeNull();
             result.IsNone.Should().BeTrue();
@@ -78,17 +95,14 @@ namespace Ether.Tests.Classifiers
         [Test]
         public void ShouldReturnNoneIfResolvedNotByTheTeam()
         {
-            var result = _classifier.Classify(new WorkItemResolutionRequest
-            {
-                WorkItemType = "Bug",
-                Team = ResolvedTestsDataProvider.FakeTeam,
-                WorkItemUpdates = new[]
-                {
-                    UpdateBuilder.Resolved(new TeamMember{DisplayName="Not a member", Email="not@team.com" })
-                        .Because("Reasons")
-                        .Build()
-                }
-            });
+            var workItem = new VSTSWorkItem { Fields = new Dictionary<string, string>() };
+            workItem.Fields.Add(VSTSFieldNames.WorkItemType, "Bug");
+            workItem.Updates = UpdateBuilder.Create()
+                .Resolved(new TeamMember { DisplayName = "Not a member", Email = "not@team.com" })
+                .Because("Reasons")
+                .Build();
+
+            var result = _classifier.Classify(new WorkItemResolutionRequest { WorkItem = workItem, Team = ResolvedTestsDataProvider.FakeTeam });
 
             result.Should().NotBeNull();
             result.IsNone.Should().BeTrue();
@@ -97,17 +111,13 @@ namespace Ether.Tests.Classifiers
         [Test]
         public void ShouldReturnNoneIfMovedToResolvedFromClosed()
         {
-            var result = _classifier.Classify(new WorkItemResolutionRequest
-            {
-                WorkItemType = "Bug",
-                Team = ResolvedTestsDataProvider.FakeTeam,
-                WorkItemUpdates = new[]
-                {
-                    UpdateBuilder.Resolved(ResolvedTestsDataProvider.FakeTeam.ElementAt(0), from: "Closed")
-                        .Because("Reasons")
-                        .Build()
-                }
-            });
+            var workItem = new VSTSWorkItem { Fields = new Dictionary<string, string>() };
+            workItem.Fields.Add(VSTSFieldNames.WorkItemType, "Bug");
+            workItem.Updates = UpdateBuilder.Create().Resolved(ResolvedTestsDataProvider.FakeTeam.ElementAt(0), from: "Closed")
+                .Because("Reasons")
+                .Build();
+
+            var result = _classifier.Classify(new WorkItemResolutionRequest { WorkItem = workItem, Team = ResolvedTestsDataProvider.FakeTeam });
 
             result.Should().NotBeNull();
             result.IsNone.Should().BeTrue();
@@ -116,15 +126,11 @@ namespace Ether.Tests.Classifiers
         [Test]
         public void ShouldReturnNoneIfStateIsNotSet()
         {
-            var result = _classifier.Classify(new WorkItemResolutionRequest
-            {
-                WorkItemType = "Bug",
-                Team = ResolvedTestsDataProvider.FakeTeam,
-                WorkItemUpdates = new[]
-                {
-                    UpdateBuilder.Update().Build()
-                }
-            });
+            var workItem = new VSTSWorkItem { Fields = new Dictionary<string, string>() };
+            workItem.Fields.Add(VSTSFieldNames.WorkItemType, "Bug");
+            workItem.Updates = UpdateBuilder.Create().Update().Build();
+
+            var result = _classifier.Classify(new WorkItemResolutionRequest { WorkItem = workItem, Team = ResolvedTestsDataProvider.FakeTeam });
 
             result.Should().NotBeNull();
             result.IsNone.Should().BeTrue();
@@ -133,64 +139,28 @@ namespace Ether.Tests.Classifiers
         [Test]
         public void ShouldReturnNoneIfResolvedbyIsNotSet()
         {
-            var result = _classifier.Classify(new WorkItemResolutionRequest
-            {
-                WorkItemType = "Bug",
-                Team = ResolvedTestsDataProvider.FakeTeam,
-                WorkItemUpdates = new[]
-                {
-                    UpdateBuilder.Resolved()
-                        .With(UpdateBuilder.ResolvedByField, new WorkItemUpdate.UpdateValue())
-                        .Build()
-                }
-            });
+            var workItem = new VSTSWorkItem { Fields = new Dictionary<string, string>() };
+            workItem.Fields.Add(VSTSFieldNames.WorkItemType, "Bug");
+            workItem.Updates = UpdateBuilder.Create().Resolved()
+                .With(UpdateBuilder.ResolvedByField, new WorkItemUpdate.UpdateValue())
+                .Build();
+
+            var result = _classifier.Classify(new WorkItemResolutionRequest { WorkItem = workItem, Team = ResolvedTestsDataProvider.FakeTeam });
 
             result.Should().NotBeNull();
             result.IsNone.Should().BeTrue();
         }
 
         [Test, TestCaseSource(typeof(ResolvedTestsDataProvider), nameof(ResolvedTestsDataProvider.GetTestCasesForResolved))]
-        public void ShouldReturnResolvedResolution(WorkItemResolutionRequest request, string expectedReason, DateTime expectedResolutionDate, string expectedTeamMember)
+        public void ShouldReturnResolvedResolution(WorkItemResolutionRequest request, string expectedReason, DateTime expectedResolutionDate, TeamMember expectedTeamMember)
         {
             var result = _classifier.Classify(request);
             result.Should().NotBeNull();
             result.Resolution.Should().Be("Resolved");
             result.Reason.Should().Be(expectedReason);
             result.ResolutionDate.Should().BeCloseTo(expectedResolutionDate);
-            result.TeamMember.Should().Be(expectedTeamMember);
-        }
-
-        public static class ResolvedTestsDataProvider
-        {
-            public static IEnumerable GetTestCasesForResolved()
-            {
-                return new[] { GetSimpleCannotReproduce(FakeTeam) };
-            }
-
-            public static IEnumerable<TeamMember> FakeTeam => Enumerable.Range(1, 3)
-                .Select(i => new TeamMember { TeamName = $"Member {i}", Email = $"member{i}@foo.com" })
-                .ToList();
-
-            private static TestCaseData GetSimpleCannotReproduce(IEnumerable<TeamMember> team)
-            {
-                const string CannotReproduce = "Cannot Reproduce";
-                var expectedTeamMember = $"{team.ElementAt(0).DisplayName} <{team.ElementAt(0).Email}>";
-                var revisedDate = DateTime.UtcNow.AddDays(-4);
-                var request = new WorkItemResolutionRequest
-                {
-                    WorkItemId = 0,
-                    WorkItemType = "Bug",
-                    Team = team,
-                    WorkItemUpdates = new[]
-                    {
-                        UpdateBuilder.Resolved(team.ElementAt(0))
-                            .Because(CannotReproduce)
-                            .Build(revisedDate)
-                    }
-                };
-                return new TestCaseData(request, CannotReproduce, revisedDate, expectedTeamMember)
-                    .SetName(nameof(ResolvedWorkItemsClassifierTest.ShouldReturnResolvedResolution) + "OnSimpleCannotReproduce");
-            }
+            result.MemberEmail.Should().Be(expectedTeamMember.Email);
+            result.MemberName.Should().Be(expectedTeamMember.DisplayName);
         }
     }
 }
