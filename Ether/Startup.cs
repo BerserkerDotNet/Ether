@@ -59,7 +59,7 @@ namespace Ether
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             var registry = new Registry();
-            registry.Schedule<WorkItemsFetchJob>().ToRunNow().AndEvery(1).Hours();
+            registry.Schedule<WorkItemsFetchJob>().ToRunNow().AndEvery(1).Days();
             JobManager.JobFactory = app.ApplicationServices.GetService<DIFriendlyJobFactory>();
             JobManager.Initialize(registry);
 
