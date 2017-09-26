@@ -48,18 +48,19 @@ namespace Ether
             services.AddSingleton<IRepository, MongoRepository>();
             services.AddSingleton<IVSTSClient, VSTSClient>();
             services.AddSingleton<DIFriendlyJobFactory>();
-            services.AddSingleton<WorkItemsFetchJob>();
-           
+
             services.AddScoped(typeof(IAll<>), typeof(DataManager<>));
             services.AddScoped<IReporter, PullRequestsReporter>();
             services.AddScoped<IReporter, WorkItemsReporter>();
             services.AddScoped<IWorkItemsClassifier, ResolvedWorkItemsClassifier>();
+
+            services.AddTransient<WorkItemsFetchJob>();
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             var registry = new Registry();
-            registry.Schedule<WorkItemsFetchJob>().ToRunNow().AndEvery(1).Days();
+            registry.Schedule<WorkItemsFetchJob>().ToRunNow().AndEvery(1).Hours();
             JobManager.JobFactory = app.ApplicationServices.GetService<DIFriendlyJobFactory>();
             JobManager.Initialize(registry);
 

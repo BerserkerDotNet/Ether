@@ -6,6 +6,9 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Ether.Core.Interfaces;
 using Ether.Core.Models.DTO;
+using FluentScheduler;
+using Ether.Jobs;
+using Ether.Extensions;
 
 namespace Ether.Controllers
 {
@@ -77,9 +80,31 @@ namespace Ether.Controllers
             return RedirectToAction(nameof(TeamMembers));
         }
 
+        [HttpPost]
         public async Task<IActionResult> DeleteMember(Guid id)
         {
              await _repository.DeleteAsync<TeamMember>(id);
+            return RedirectToAction(nameof(TeamMembers));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ResetWorkItems(Guid id)
+        {
+            var user = await _repository.GetSingleAsync<TeamMember>(t => t.Id == id);
+            if (user != null)
+            {
+                user.LastFetchDate = DateTime.MinValue;
+                user.RelatedWorkItemIds = Enumerable.Empty<int>();
+                await _repository.CreateOrUpdateAsync(user);
+                var job = HttpContext.RequestServices.GetService(typeof(WorkItemsFetchJob)) as WorkItemsFetchJob;
+                if (job!=null)
+                {
+                    job.SpecificUser = user;
+                    JobManager.AddJob(job, s => s.ToRunNow());
+                }
+                TempData.WithSuccess($"Work items for {user.DisplayName} have been cleared.");
+            }
+
             return RedirectToAction(nameof(TeamMembers));
         }
 

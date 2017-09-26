@@ -41,25 +41,29 @@ namespace Ether.Jobs
 
             try
             {
-                var members = _repository.GetAll<TeamMember>();
+                var members = GetMembers();
                 var projects = _repository.Get<VSTSProject>(p => !p.DoesNotHaveWorkItems);
                 foreach (var member in members)
                 {
-                    try
-                    {
-                        _logger.LogInformation("Starting to fetch workitems for '{0}'", member.Email);
-                        FetchWorkItemsFor(member, projects)
-                            .GetAwaiter().GetResult();
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex, "Failed to fetch workitems for '{0}'", member.Email);
-                    }
+                    RunFor(member, projects).GetAwaiter().GetResult();
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Failed to fetch workitems.");
+            }
+        }
+
+        private async Task RunFor(TeamMember member, IEnumerable<VSTSProject> projects)
+        {
+            try
+            {
+                _logger.LogInformation("Starting to fetch workitems for '{0}'", member.Email);
+                await FetchWorkItemsFor(member, projects);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to fetch workitems for '{0}'", member.Email);
             }
         }
 
@@ -147,6 +151,16 @@ namespace Ether.Jobs
 
             _logger.LogInformation("Finished fetching updates");
         }
+
+        private IEnumerable<TeamMember> GetMembers()
+        {
+            if (SpecificUser != null)
+                return new[] { SpecificUser };
+
+            return _repository.GetAll<TeamMember>();
+        }
+
+        public TeamMember SpecificUser { get; set; }
     }
 
     public struct ItemsQuery

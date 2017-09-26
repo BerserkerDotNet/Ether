@@ -247,6 +247,28 @@ namespace Ether.Tests.JobTests
                     It.Is<Expression<Func<VSTSWorkItem, bool>>>(e => CheckExpressionForWorkItemSave(e))), Times.Exactly(itemsCount));
         }
 
+        [Test]
+        public void ShouldRunJobOnlyForSpecifiedUser()
+        {
+            const string lastFetch = "07/10/2017";
+            var lastFetchDate = DateTime.Parse(lastFetch);
+            var user1 = new TeamMember { Email = "foo@bar.com", LastFetchDate = lastFetchDate };
+            var user2 = new TeamMember { Email = "baz@fiz.com", LastFetchDate = lastFetchDate };
+            var expectedUser = new TeamMember { Email = "specific@bar.com", LastFetchDate = lastFetchDate };
+            CreateSetupForRelatedWorkitems(user1, user2, lastFetch);
+
+            _job.SpecificUser = expectedUser;
+            _job.Execute();
+
+            user1.LastFetchDate.Should().BeCloseTo(lastFetchDate);
+            user2.LastFetchDate.Should().BeCloseTo(lastFetchDate);
+            expectedUser.LastFetchDate.Should().BeCloseTo(DateTime.UtcNow);
+
+            _repositoryMock.Verify();
+            _repositoryMock.Verify(r => r.CreateOrUpdateAsync(It.Is<TeamMember>(u=>u.Email == expectedUser.Email)), Times.Once());
+            _vstsClientMock.Verify(c => c.ExecutePost<WorkItemsQueryResponse>(It.IsAny<string>(), It.IsAny<ItemsQuery>()), Times.Exactly(1));
+        }
+
         private bool CheckExpressionForWorkItemSave(Expression<Func<VSTSWorkItem, bool>> e)
         {
             var body = e.Body as BinaryExpression;
