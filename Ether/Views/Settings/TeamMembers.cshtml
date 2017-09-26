@@ -39,7 +39,7 @@
                 <td>@member.Email</td>
                 <td>@member.TeamName</td>
                 <td>
-                    <div><strong>WorkItems:</strong> @member.RelatedWorkItemIds.Count()</div>
+                    <div><strong>WorkItems:</strong> @(member.RelatedWorkItemIds == null ? 0: member.RelatedWorkItemIds.Count())</div>
                     <div><strong>LastFetch:</strong> @member.LastFetchDate.ToString("G")</div>
                     <form class="form-inline" asp-action="ResetWorkItems" method="post">
                         <input type="hidden" value="@member.Id" name="Id" />
