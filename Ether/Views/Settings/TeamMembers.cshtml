@@ -30,6 +30,7 @@
             <th>Name</th>
             <th>Email</th>
             <th>TeamName</th>
+            <th>Work items</th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -40,6 +41,10 @@
                 <td>@member.DisplayName</td>
                 <td>@member.Email</td>
                 <td>@member.TeamName</td>
+                <td>
+                    <div><strong>WorkItems:</strong> @member.RelatedWorkItemIds.Count()</div>
+                    <div><strong>LastFetch:</strong> @member.LastFetchDate.ToString("G")</div>
+                </td>
                 <td width="150">
                     <form class="form-inline" asp-action="DeleteMember" method="post">
                         <a asp-action="EditMember" asp-route-id="@member.Id" class="btn btn-primary">Edit</a>

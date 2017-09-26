@@ -99,8 +99,8 @@ namespace Ether.Tests.JobTests
 
             _job.Execute();
 
-            user1.LastFetchDate.Should().BeCloseTo(DateTime.UtcNow.Date);
-            user2.LastFetchDate.Should().BeCloseTo(DateTime.UtcNow.Date);
+            user1.LastFetchDate.Should().BeCloseTo(DateTime.UtcNow);
+            user2.LastFetchDate.Should().BeCloseTo(DateTime.UtcNow);
 
             user1.RelatedWorkItemIds.Should().BeEquivalentTo(new[] { 1, 2, 3 });
             user2.RelatedWorkItemIds.Should().BeEquivalentTo(new[] { 4, 5 });
@@ -129,6 +129,32 @@ namespace Ether.Tests.JobTests
             _repositoryMock.Verify();
             _repositoryMock.Verify(r => r.CreateOrUpdateAsync(It.IsAny<TeamMember>()), Times.Exactly(2));
             _vstsClientMock.Verify(c => c.ExecutePost<WorkItemsQueryResponse>(It.IsAny<string>(), It.IsAny<ItemsQuery>()), Times.Exactly(2));
+        }
+
+        [Test]
+        public void ShouldQueryOnlyChangedWorkItems()
+        {
+            const string lastFetch = "07/10/2017";
+            var lastFetchDate = DateTime.Parse(lastFetch);
+            var user = new TeamMember { Email = "baz@fiz.com", LastFetchDate = lastFetchDate, RelatedWorkItemIds = new[] { 1, 2, 3 } };
+            var recentlyChangedWorkItems = new[] { new WorkItemLink { Id = 4 }, new WorkItemLink { Id = 5 } };
+
+            _configurationMock.SetupGet(c => c.Value).Returns(new VSTSConfiguration { AccessToken = "foo", InstanceName = "bar" });
+            _repositoryMock.Setup(r => r.GetAll<TeamMember>()).Returns(new[] { user });
+            _repositoryMock.Setup(r => r.Get(It.IsAny<Expression<Func<VSTSProject, bool>>>()))
+                .Returns(new[] { new VSTSProject { Name = "Foo" } })
+                .Verifiable();
+            _repositoryMock.Setup(r => r.CreateOrUpdateAsync(It.IsAny<TeamMember>()))
+                .Returns(Task.FromResult(true));
+            _vstsClientMock.Setup(c => c.ExecutePost<WorkItemsQueryResponse>(It.IsAny<string>(), It.IsAny<ItemsQuery>()))
+                .Returns(Task.FromResult(new WorkItemsQueryResponse { WorkItems = recentlyChangedWorkItems }));
+            _vstsClientMock.Setup(c => c.ExecuteGet<ValueResponse<VSTSWorkItem>>(It.IsAny<string>()))
+                .Returns(Task.FromResult(new ValueResponse<VSTSWorkItem> { Value = new VSTSWorkItem[0] }));
+
+            _job.Execute();
+
+            user.RelatedWorkItemIds.Should().HaveCount(5);
+            _vstsClientMock.Verify(c => c.ExecuteGet<ValueResponse<VSTSWorkItem>>(It.Is<string>(s => CheckForCorrectIds(s, "ids=4,5"))), Times.Once());
         }
 
         [Test]
@@ -257,6 +283,17 @@ namespace Ether.Tests.JobTests
                 }));
             _vstsClientMock.Setup(c => c.ExecuteGet<ValueResponse<VSTSWorkItem>>(It.IsAny<string>()))
                 .Returns(Task.FromResult(new ValueResponse<VSTSWorkItem> { Value = new VSTSWorkItem[0] }));
+        }
+
+        private bool CheckForCorrectIds(string url, string expectedIds)
+        {
+            var uri = new Uri(url);
+            var idsSection = uri.Query
+                .TrimStart('?')
+                .Split('&')
+                .SingleOrDefault(q => q.StartsWith("ids"));
+
+            return string.Equals(expectedIds, idsSection, StringComparison.OrdinalIgnoreCase);
         }
     }
 }

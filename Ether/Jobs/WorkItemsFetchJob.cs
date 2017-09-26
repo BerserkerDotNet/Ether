@@ -65,19 +65,19 @@ namespace Ether.Jobs
 
         private async Task FetchWorkItemsFor(TeamMember member, IEnumerable<VSTSProject> projects)
         {
-            await FetchRelatedWorkItems(member, projects);
+            var changedWorkItems = await FetchRelatedWorkItems(member, projects);
             _logger.LogInformation("Fetched related workitem ids, total count is {0}", member.RelatedWorkItemIds.Count());
 
-            var workItems = await GetWorkItems(member);
-            _logger.LogInformation("Fetched related workitems, total count is {0}", member.RelatedWorkItemIds.Count());
+            var workItems = await GetWorkItems(changedWorkItems);
+            _logger.LogInformation("Fetched changed workitems, total count is {0}", workItems.Count());
             await FetchUpdatesAndSave(workItems);
 
-            member.LastFetchDate = DateTime.UtcNow.Date;
+            member.LastFetchDate = DateTime.UtcNow;
             await _repository.CreateOrUpdateAsync(member);
             _logger.LogInformation("Workitems fetch for '{0}' completed", member.Email);
         }
 
-        private async Task FetchRelatedWorkItems(TeamMember member, IEnumerable<VSTSProject> projects)
+        private async Task<IEnumerable<int>> FetchRelatedWorkItems(TeamMember member, IEnumerable<VSTSProject> projects)
         {
             var date = member.LastFetchDate == DateTime.MinValue ? DateTime.UtcNow.AddYears(-10) : member.LastFetchDate;
             var queryText = string.Format(WorkItemsQuery, member.Email, date.ToString("MM/dd/yyyy"));
@@ -95,13 +95,19 @@ namespace Ether.Jobs
                 ids.AddRange(response.WorkItems.Select(r => r.Id));
             }
             if (member.RelatedWorkItemIds != null)
-                ids.AddRange(member.RelatedWorkItemIds);
-            member.RelatedWorkItemIds = ids.Distinct();
+            {
+                member.RelatedWorkItemIds = member.RelatedWorkItemIds.Union(ids).Distinct();
+            }
+            else
+            {
+                member.RelatedWorkItemIds = ids;
+            }
+            return ids;
         }
 
-        private async Task<IEnumerable<VSTSWorkItem>> GetWorkItems(TeamMember member)
+        private async Task<IEnumerable<VSTSWorkItem>> GetWorkItems(IEnumerable<int> changedWorkItems)
         {
-            var count = (decimal)member.RelatedWorkItemIds.Count();
+            var count = (decimal)changedWorkItems.Count();
             const int maxIdsPerRequest = 200;
             const string fieldsString = "System.Id,System.WorkItemType,System.Title,System.AreaPath,System.ChangedDate,System.State,System.Reason," +
                 "System.CreatedDate,Microsoft.VSTS.Common.ResolvedDate,Microsoft.VSTS.Common.ClosedDate,Microsoft.VSTS.Common.StateChangeDate";
@@ -111,7 +117,7 @@ namespace Ether.Jobs
             for (int i = 0; i < iterations; i++)
             {
                 _logger.LogInformation("Starting iteration {0}", i);
-                var idsToQuery = string.Join(',', member.RelatedWorkItemIds.Skip(i * maxIdsPerRequest).Take(maxIdsPerRequest));
+                var idsToQuery = string.Join(',', changedWorkItems.Skip(i * maxIdsPerRequest).Take(maxIdsPerRequest));
                 var wiQuery = VSTSApiUrl.Create(_config.Value.InstanceName)
                     .ForWorkItemsBatch(idsToQuery)
                     .WithQueryParameter("fields", fieldsString)
@@ -126,9 +132,9 @@ namespace Ether.Jobs
 
         private async Task FetchUpdatesAndSave(IEnumerable<VSTSWorkItem> workItems)
         {
+            _logger.LogInformation("Starting to fetch updates");
             foreach (var wi in workItems)
             {
-                _logger.LogInformation("Fetching updates for {0}", wi.WorkItemId);
                 var url = VSTSApiUrl.Create(_config.Value.InstanceName)
                     .ForWorkItems(wi.WorkItemId)
                     .WithSection("updates")
@@ -138,6 +144,8 @@ namespace Ether.Jobs
                 wi.Updates = updates.Value;
                 await _repository.CreateOrUpdateAsync(wi, i => i.WorkItemId == wi.WorkItemId);
             }
+
+            _logger.LogInformation("Finished fetching updates");
         }
     }
 
