@@ -1,4 +1,5 @@
-﻿using MongoDB.Bson.Serialization.Attributes;
+﻿using Ether.Core.Constants;
+using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Bson.Serialization.Options;
 using System;
 using System.Collections.Generic;
@@ -15,6 +16,7 @@ namespace Ether.Core.Models.VSTS
         public UpdateValue Reason => this["System.Reason"];
         public UpdateValue AreaPath => this["System.AreaPath"];
         public UpdateValue ResolvedBy => this["Microsoft.VSTS.Common.ResolvedBy"];
+        public UpdateValue ClosedBy => this[VSTSFieldNames.ClosedBy];
         public UpdateValue AssignedTo => this["System.AssignedTo"];
         public UpdateValue State => this["System.State"];
         public UpdateValue WorkItemType => this["System.WorkItemType"];

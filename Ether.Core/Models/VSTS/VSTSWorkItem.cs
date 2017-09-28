@@ -1,4 +1,5 @@
-﻿using Ether.Core.Models.DTO;
+﻿using Ether.Core.Constants;
+using Ether.Core.Models.DTO;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Bson.Serialization.Options;
 using Newtonsoft.Json;
@@ -46,11 +47,5 @@ namespace Ether.Core.Models.VSTS
 
             return result;
         }
-    }
-
-    public static class VSTSFieldNames
-    {
-        public const string WorkItemType = "System.WorkItemType";
-        public const string WorkItemCreatedDate = "System.CreatedDate";
     }
 }

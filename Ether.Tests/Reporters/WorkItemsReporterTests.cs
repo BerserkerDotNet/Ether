@@ -1,4 +1,5 @@
 ﻿using Ether.Core.Configuration;
+using Ether.Core.Constants;
 using Ether.Core.Interfaces;
 using Ether.Core.Models;
 using Ether.Core.Models.DTO;

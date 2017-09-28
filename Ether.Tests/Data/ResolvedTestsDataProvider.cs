@@ -1,4 +1,5 @@
-﻿using Ether.Core.Models;
+﻿using Ether.Core.Constants;
+using Ether.Core.Models;
 using Ether.Core.Models.DTO;
 using Ether.Core.Models.VSTS;
 using Ether.Tests.Classifiers;
@@ -10,11 +11,11 @@ using System.Linq;
 
 namespace Ether.Tests.Data
 {
-    public static class ResolvedTestsDataProvider
+    public static class ResolvedWorkItemsDataProvider
     {
         public static IEnumerable GetTestCasesForResolved()
         {
-            return new[] { GetSimpleCannotReproduce(), GetResolvedMultipleTimes() };
+            return new[] { GetSimpleCannotReproduce(), GetResolvedMultipleTimes(), GetVerifiedTask() };
         }
 
         public static IEnumerable<TeamMember> FakeTeam => Enumerable.Range(1, 3)
@@ -25,7 +26,6 @@ namespace Ether.Tests.Data
         {
             const string CannotReproduce = "Cannot Reproduce";
             var teamMember = FakeTeam.ElementAt(0);
-            var expectedTeamMember = $"{teamMember.DisplayName} <{teamMember.Email}>";
             var revisedDate = DateTime.UtcNow.AddDays(-4);
             var updates = UpdateBuilder.Create()
                         .Resolved(teamMember)
@@ -60,15 +60,35 @@ namespace Ether.Tests.Data
                 .Because("Bad Reasons")
                 .On(DateTime.UtcNow.AddDays(-2))
                 .Build();
-            var request = GetRequest(updates);
+            var request = GetRequest(updates, WorkItemTypes.Task);
             return new TestCaseData(request, Reasons, expectedRevisedDate, teamMember)
                 .SetName(nameof(ResolvedWorkItemsClassifierTest.ShouldReturnResolvedResolution) + "OnMultipleResolutions");
         }
 
-        private static WorkItemResolutionRequest GetRequest(IEnumerable<WorkItemUpdate> updates)
+        private static TestCaseData GetVerifiedTask()
+        {
+            const string Reasons = "Reasons";
+            var teamMember = FakeTeam.ElementAt(0);
+            var expectedTeamMember = $"{teamMember.DisplayName} <{teamMember.Email}>";
+            var expectedRevisedDate = DateTime.UtcNow.AddDays(-3);
+            var updates = UpdateBuilder.Create()
+                .New()
+                .Then().Activated()
+                .Then().Resolved(by: teamMember)
+                .Because(Reasons)
+                .On(expectedRevisedDate)
+                .Then().Closed(by: teamMember)
+                .On(DateTime.UtcNow)
+                .Build();
+            var request = GetRequest(updates, WorkItemTypes.Task);
+            return new TestCaseData(request, Reasons, expectedRevisedDate, teamMember)
+                .SetName(nameof(ResolvedWorkItemsClassifierTest.ShouldReturnResolvedResolution) + "OnVerifiedTask");
+        }
+
+        private static WorkItemResolutionRequest GetRequest(IEnumerable<WorkItemUpdate> updates, string type = WorkItemTypes.Bug)
         {
             var workItem = new VSTSWorkItem { Fields = new Dictionary<string, string>(), WorkItemId = 0 };
-            workItem.Fields.Add(VSTSFieldNames.WorkItemType, "Bug");
+            workItem.Fields.Add(VSTSFieldNames.WorkItemType, type);
             workItem.Updates = updates;
 
             return new WorkItemResolutionRequest

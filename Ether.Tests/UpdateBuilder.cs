@@ -10,6 +10,7 @@ namespace Ether.Tests
         public const string DefaultUser = "Foo <foo@bar.com>";
         public const string StateField = "System.State";
         public const string ResolvedByField = "Microsoft.VSTS.Common.ResolvedBy";
+        public const string ClosedByField = "Microsoft.VSTS.Common.ClosedBy";
         public const string ReasonField = "System.Reason";
 
         List<WorkItemUpdate> _updates = new List<WorkItemUpdate>();
@@ -27,6 +28,20 @@ namespace Ether.Tests
             _fields.Add(StateField, new WorkItemUpdate.UpdateValue { NewValue = "Resolved", OldValue = from });
             _fields.Add(ResolvedByField, new WorkItemUpdate.UpdateValue { NewValue = resolvedBy });
             return this;
+        }
+
+        public UpdateBuilder Closed(TeamMember by = null, string from = "Resolved", string reason = "Fixed")
+        {
+            var closedBy = by == null ? DefaultUser : $"{by.DisplayName} <{by.Email}>";
+            _fields.Add(StateField, new WorkItemUpdate.UpdateValue { NewValue = "Closed", OldValue = from });
+            _fields.Add(ClosedByField, new WorkItemUpdate.UpdateValue { NewValue = closedBy });
+            _fields.Add(ReasonField, new WorkItemUpdate.UpdateValue { NewValue = reason });
+            return this;
+        }
+
+        public UpdateBuilder ClosedFromActive(TeamMember by = null, string from = "Active", string reason = "Fixed")
+        {
+            return Closed(by, from, reason);
         }
 
         public UpdateBuilder Activated(string from = "New")
