@@ -15,7 +15,7 @@ namespace Ether.Tests.Data
     {
         public static IEnumerable GetTestCasesForResolved()
         {
-            return new[] { GetSimpleCannotReproduce(), GetResolvedMultipleTimes(), GetVerifiedTask() };
+            return new[] { GetSimpleCannotReproduce(), GetResolvedMultipleTimes(), GetVerifiedTask(), TestCorrectChangedDate() };
         }
 
         public static IEnumerable<TeamMember> FakeTeam => Enumerable.Range(1, 3)
@@ -35,6 +35,21 @@ namespace Ether.Tests.Data
             var request = GetRequest(updates);
             return new TestCaseData(request, CannotReproduce, revisedDate, teamMember)
                 .SetName(nameof(ResolvedWorkItemsClassifierTest.ShouldReturnResolvedResolution) + "OnSimpleCannotReproduce");
+        }
+
+        private static TestCaseData TestCorrectChangedDate()
+        {
+            const string CannotReproduce = "Cannot Reproduce";
+            var teamMember = FakeTeam.ElementAt(0);
+            var changedDate = DateTime.UtcNow.AddDays(-4);
+            var updates = UpdateBuilder.Create()
+                        .Resolved(teamMember)
+                        .Because(CannotReproduce)
+                        .On(DateTime.MaxValue, changedDate)
+                        .Build();
+            var request = GetRequest(updates);
+            return new TestCaseData(request, CannotReproduce, changedDate, teamMember)
+                .SetName(nameof(ResolvedWorkItemsClassifierTest.ShouldReturnResolvedResolution) + "WithCorrectChangedDate");
         }
 
         private static TestCaseData GetResolvedMultipleTimes()

@@ -41,7 +41,7 @@ namespace Ether.Core.Reporters
             {
                 var rs = from c in _classifiers
                          let r = c.Classify(new WorkItemResolutionRequest { WorkItem = workItem, Team = Input.Members })
-                         where !r.IsNone && r.ResolutionDate >= Input.Query.StartDate && r.ResolutionDate <= Input.ActualEndDate
+                         where !r.IsNone && IsInRange(r)
                          select r;
 
                 resolutions.AddRange(rs);
@@ -60,6 +60,12 @@ namespace Ether.Core.Reporters
             var relatedItems =  await _repository.GetAsync<VSTSWorkItem>(w => workItemsToFetch.Contains(w.WorkItemId));
 
             return relatedItems.Where(w => !w.CreatedDate.HasValue || w.CreatedDate <= endDate);
+        }
+
+        private bool IsInRange(WorkItemResolution r)
+        {
+            return (r.ResolutionDate >= Input.Query.StartDate && r.ResolutionDate <= Input.ActualEndDate)
+                || r.ResolutionDate == VSTSMaxDate;
         }
     }
 }

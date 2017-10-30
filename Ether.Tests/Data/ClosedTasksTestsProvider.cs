@@ -15,7 +15,7 @@ namespace Ether.Tests.Data
     {
         public static IEnumerable GetTestCasesForClosedTasks()
         {
-            return new TestCaseData[] { SimpleClosed(), SimpleFullCycleClosed(), MultipleClosedUpdates(), MultipleClosedUpdates() };
+            return new TestCaseData[] { SimpleClosed(), SimpleFullCycleClosed(), MultipleClosedUpdates(), MultipleClosedUpdates(), WithCorrectDate() };
         }
 
         public static IEnumerable GetTestCasesForNotClosedTasks()
@@ -38,6 +38,19 @@ namespace Ether.Tests.Data
                         .Build();
             var request = GetRequest(updates);
             return new TestCaseData(request, revisedDate, teamMember)
+                .SetName($"{nameof(ClosedTasksWorkItemsClassifierTests.ShouldReturnClosedResolution)}On{nameof(SimpleClosed)}");
+        }
+
+        private static TestCaseData WithCorrectDate()
+        {
+            var teamMember = FakeTeam.ElementAt(0);
+            var changedDate = DateTime.UtcNow.AddDays(-2);
+            var updates = UpdateBuilder.Create()
+                        .ClosedFromActive(by: teamMember)
+                        .On(DateTime.MaxValue, changedDate)
+                        .Build();
+            var request = GetRequest(updates);
+            return new TestCaseData(request, changedDate, teamMember)
                 .SetName($"{nameof(ClosedTasksWorkItemsClassifierTests.ShouldReturnClosedResolution)}On{nameof(SimpleClosed)}");
         }
 

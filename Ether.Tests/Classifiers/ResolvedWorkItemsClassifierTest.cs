@@ -113,7 +113,7 @@ namespace Ether.Tests.Classifiers
             result.Should().NotBeNull();
             result.Resolution.Should().Be("Resolved");
             result.Reason.Should().Be(expectedReason);
-            result.ResolutionDate.Should().BeCloseTo(expectedResolutionDate);
+            result.ResolutionDate.Should().BeCloseTo(expectedResolutionDate, precision: 1000);
             result.MemberEmail.Should().Be(expectedTeamMember.Email);
             result.MemberName.Should().Be(expectedTeamMember.DisplayName);
         }
@@ -170,7 +170,7 @@ namespace Ether.Tests.Classifiers
             result.Should().NotBeNull();
             result.Resolution.Should().Be("Closed");
             result.Reason.Should().Be("Fixed");
-            result.ResolutionDate.Should().BeCloseTo(expectedResolutionDate);
+            result.ResolutionDate.Should().BeCloseTo(expectedResolutionDate, 1000);
             result.MemberEmail.Should().Be(expectedTeamMember.Email);
             result.MemberName.Should().Be(expectedTeamMember.DisplayName);
         }

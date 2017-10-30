@@ -53,6 +53,7 @@ namespace Ether
             services.AddScoped<IReporter, PullRequestsReporter>();
             services.AddScoped<IReporter, WorkItemsReporter>();
             services.AddScoped<IWorkItemsClassifier, ResolvedWorkItemsClassifier>();
+            services.AddScoped<IWorkItemsClassifier, ClosedTasksWorkItemsClassifier>();
 
             services.AddTransient<WorkItemsFetchJob>();
         }

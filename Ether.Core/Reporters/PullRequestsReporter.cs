@@ -40,11 +40,10 @@ namespace Ether.Core.Reporters
                         .ForPullRequests(project.Name, repo.Name)
                         .WithQueryParameter("creatorId", member.Id.ToString())
                         .WithQueryParameter("status", "Completed")
-                        .Top(100)
                         .Build();
                     var prsResponse = await _client.ExecuteGet<PRResponse>(prsUrl);
                     var prs = prsResponse.Value
-                        .Where(p => p.CreationDate >= Input.Query.StartDate && p.CreationDate <= Input.Query.EndDate).ToList();
+                        .Where(p => p.ClosedDate >= Input.Query.StartDate && p.ClosedDate <= Input.Query.EndDate).ToList();
 
                     foreach (var pr in prs)
                     {
@@ -95,6 +94,7 @@ namespace Ether.Core.Reporters
             public int PullRequestId { get; set; }
             public string Author { get; set; }
             public DateTime CreationDate { get; set; }
+            public DateTime ClosedDate { get; set; }
             public string Title { get; set; }
 
             public int Iterations { get; set; }

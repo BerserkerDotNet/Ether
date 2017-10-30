@@ -21,6 +21,7 @@ namespace Ether.Core.Models.VSTS
         public UpdateValue State => this["System.State"];
         public UpdateValue WorkItemType => this["System.WorkItemType"];
         public UpdateValue Title => this["System.Title"];
+        public DateTime ChangedDate => DateTime.Parse(this["System.ChangedDate"].NewValue);
 
         public UpdateValue this[string key]
         {

@@ -12,6 +12,7 @@ namespace Ether.Tests
         public const string ResolvedByField = "Microsoft.VSTS.Common.ResolvedBy";
         public const string ClosedByField = "Microsoft.VSTS.Common.ClosedBy";
         public const string ReasonField = "System.Reason";
+        public const string ChangedDateField = "System.ChangedDate";
 
         List<WorkItemUpdate> _updates = new List<WorkItemUpdate>();
         private Dictionary<string, WorkItemUpdate.UpdateValue> _fields = new Dictionary<string, WorkItemUpdate.UpdateValue>();
@@ -50,9 +51,13 @@ namespace Ether.Tests
             return this;
         }
 
-        public UpdateBuilder On(DateTime revisedDate)
+        public UpdateBuilder On(DateTime revisedDate, DateTime? changedDate = null)
         {
+            if (changedDate == null)
+                changedDate = revisedDate;
+
             _revisedDate = revisedDate;
+            _fields.Add(ChangedDateField, new WorkItemUpdate.UpdateValue { NewValue = changedDate.Value.ToString("s") });
             return this;
         }
 

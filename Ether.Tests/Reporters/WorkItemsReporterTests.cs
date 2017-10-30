@@ -243,6 +243,7 @@ namespace Ether.Tests.Reporters
         public async Task ShouldIgnoreWorkItemsThatAreNotInAQueryRange()
         {
             var utcNow = DateTime.UtcNow;
+            var vstsMaxDate = DateTime.Parse("1/1/9999 12:00:00 AM");
             var workitems = new[]
             {
                 GetWorkItemWithDate(createdDate: null),
@@ -276,7 +277,7 @@ namespace Ether.Tests.Reporters
             result.As<WorkItemsReport>()
                 .Resolutions.Should().HaveCount(1);
             result.As<WorkItemsReport>()
-                .Resolutions.Select(r=>r.WorkItemId)
+                .Resolutions.Select(r => r.WorkItemId)
                 .ShouldBeEquivalentTo(new[] { workitems[2].WorkItemId });
             result.As<WorkItemsReport>()
                 .TotalResolved.Should().Be(1);
