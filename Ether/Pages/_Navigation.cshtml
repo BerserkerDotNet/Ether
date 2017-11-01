@@ -6,21 +6,21 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand" asp-controller="Home" asp-action="Index">Ether Reports</a>
+        <a class="navbar-brand" asp-page="Index">Ether Reports</a>
     </div>
     <nav class="collapse navbar-collapse" id="mainNavigation">
         <ul class="nav navbar-nav">
-            <li class="@ActiveCSSClass("Home")"><a asp-controller="Home" asp-action="Index">Home @ActiveAccessibilityMarker("Home") </a></li>
-            <li class="@ActiveCSSClass("Reports")"><a asp-controller="Reports" asp-action="Index">Reports @ActiveAccessibilityMarker("Reports")</a></li>
-            <li class="@ActiveCSSClass("Profiles")"><a asp-controller="Profiles" asp-action="Index">Profiles @ActiveAccessibilityMarker("Profiles")</a></li>
+            <li class="@ActiveCSSClass("Home")"><a asp-page="Index">Home @ActiveAccessibilityMarker("Home") </a></li>
+            <li class="@ActiveCSSClass("Reports")"><a asp-page="/Reports/Index">Reports @ActiveAccessibilityMarker("Reports")</a></li>
+            <li class="@ActiveCSSClass("Profiles")"><a asp-page="/Profiles/Index">Profiles @ActiveAccessibilityMarker("Profiles")</a></li>
             <li role="presentation" class="dropdown @ActiveCSSClass("Settings")">
                 <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
                     Settings @ActiveAccessibilityMarker("Settings") <span class="caret"></span>
                 </a>
                 <ul class="dropdown-menu">
-                    <li><a asp-controller="Settings" asp-action="TeamMembers">Team Members</a></li>
-                    <li><a asp-controller="Settings" asp-action="Projects">Projects</a></li>
-                    <li><a asp-controller="Settings" asp-action="Repositories">Repositories</a></li>
+                    <li><a asp-page="/Settings/TeamMembers">Team Members</a></li>
+                    <li><a asp-page="/Settings/Projects">Projects</a></li>
+                    <li><a asp-page="/Settings/Repositories">Repositories</a></li>
                 </ul>
             </li>
         </ul>

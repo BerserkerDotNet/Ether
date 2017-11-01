@@ -1,0 +1,26 @@
+﻿@page
+@model Ether.Pages.Settings.EditRepositoryModel
+@inject IAll<VSTSProject> Projects
+@{
+    ViewData["Title"] = "Edit Repository";
+    var allProjects = Projects.Value.Select(p => new SelectListItem { Text = p.Name, Value = p.Id.ToString() });
+}
+
+<h2>Edit Repository</h2>
+
+<form asp-page="EditRepository" method="post">
+    <div asp-validation-summary="All" class="text-danger"></div>
+    <div class="form-group">
+        <label asp-for="Repository.Name">Name:</label>
+        <input asp-for="Repository.Name" class="form-control" />
+        <span asp-validation-for="Repository.Name" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Repository.Project">Project:</label>
+        <select asp-for="Repository.Project" asp-items="@allProjects" class="form-control"></select>
+        <span asp-validation-for="Repository.Project" class="text-danger"></span>
+    </div>
+    <input asp-for="Repository.Id" type="hidden" />
+    <button type="submit" class="btn btn-success">Save</button>
+    <a asp-page="Repositories" class="btn btn-danger">Cancel</a>
+</form>

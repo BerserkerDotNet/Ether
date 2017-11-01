@@ -1,4 +1,6 @@
-﻿@inject IEnumerable<IReporter> Reporters
+﻿@page
+@model Ether.Pages.Home.IndexModel
+@inject IEnumerable<IReporter> Reporters
 @inject IAll<Profile> Profiles
 
 @{
@@ -6,37 +8,36 @@
     var allProfiles = Profiles.Value.Select(p => new SelectListItem { Text = p.Name, Value = p.Id.ToString() });
     var allReporters = Reporters.Select(r => new SelectListItem { Text = r.Name, Value = r.Id.ToString() });
 }
-@model ReportViewModel
 
 <h2>@ViewData["Title"]</h2>
 
-<form asp-action="Report" method="post">
+<form asp-page-handler="Report" method="post">
     <div asp-validation-summary="All" class="text-danger"></div>
     <div class="form-group">
-        <label asp-for="Profile">Profile:</label>
-        <select asp-for="Profile" asp-items="@allProfiles" class="form-control"></select>
-        <span asp-validation-for="Profile" class="text-danger"></span>
+        <label asp-for="ReportRequest.Profile">Profile:</label>
+        <select asp-for="ReportRequest.Profile" asp-items="@allProfiles" class="form-control"></select>
+        <span asp-validation-for="ReportRequest.Profile" class="text-danger"></span>
     </div>
     <div class="form-group">
-        <label asp-for="Report">Report:</label>
-        <select asp-for="Report" asp-items="@allReporters" class="form-control"></select>
-        <span asp-validation-for="Report" class="text-danger"></span>
+        <label asp-for="ReportRequest.Report">Report:</label>
+        <select asp-for="ReportRequest.Report" asp-items="@allReporters" class="form-control"></select>
+        <span asp-validation-for="ReportRequest.Report" class="text-danger"></span>
     </div>
     <div class="row">
         <div class="col-md-6">
             <div class="form-group">
-                <label id="StartDateLabel" asp-for="StartDate">Start date:</label>
+                <label id="StartDateLabel" asp-for="ReportRequest.StartDate">Start date:</label>
                 <div id="StartDateDiv"></div>
-                <input asp-for="StartDate" type="hidden" />
-                <span asp-validation-for="StartDate" class="text-danger"></span>
+                <input id="StartDate" asp-for="ReportRequest.StartDate" type="hidden" />
+                <span asp-validation-for="ReportRequest.StartDate" class="text-danger"></span>
             </div>
         </div>
         <div class="col-md-6">
             <div class="form-group">
-                <label id="EndDateLabel" asp-for="EndDate">End date:</label>
+                <label id="EndDateLabel" asp-for="ReportRequest.EndDate">End date:</label>
                 <div id="EndDateDiv"></div>
-                <input asp-for="EndDate" type="hidden" />
-                <span asp-validation-for="EndDate" class="text-danger"></span>
+                <input id="EndDate" asp-for="ReportRequest.EndDate" type="hidden" />
+                <span asp-validation-for="ReportRequest.EndDate" class="text-danger"></span>
             </div>
         </div>
     </div>

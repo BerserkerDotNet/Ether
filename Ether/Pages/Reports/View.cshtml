@@ -1,0 +1,7 @@
+﻿@page
+@model Ether.Pages.Reports.ViewModel
+<h2>Report</h2>
+
+@Html.DisplayFor(m => m.Report, Model.Report.GetType().Name)
+
+<a asp-page="Index" class="btn btn-primary">Back to list</a>

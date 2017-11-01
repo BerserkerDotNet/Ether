@@ -1,4 +1,5 @@
-﻿@model IEnumerable<ProfileViewModel>
+﻿@page
+@model Ether.Pages.Profiles.IndexModel
 @inject IAll<VSTSRepository> Repositories
 @inject IAll<TeamMember> TeamMembers
 @{
@@ -15,7 +16,7 @@
             <td></td>
             <td></td>
             <td class="text-right">
-                <a asp-action="Edit" class="btn btn-success">Add new</a>
+                <a asp-page="Edit" class="btn btn-success">Add new</a>
             </td>
         </tr>
         <tr>
@@ -26,15 +27,15 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var profile in Model)
+        @foreach (var profile in Model.Profiles)
         {
             <tr>
                 <td>@profile.Name</td>
-                <td>@string.Join(", ", Repositories.Value.Where(r=> profile.Repositories.Contains(r.Id)).Select(r=> r.Name))</td>
-                <td>@string.Join(", ", TeamMembers.Value.Where(m=> profile.Members.Contains(m.Id)).Select(m=>m.DisplayName))</td>
+                <td>@string.Join(", ", Repositories.Value.Where(r => profile.Repositories.Contains(r.Id)).Select(r => r.Name))</td>
+                <td>@string.Join(", ", TeamMembers.Value.Where(m => profile.Members.Contains(m.Id)).Select(m => m.DisplayName))</td>
                 <td width="150">
-                    <form class="form-inline" asp-action="Delete" method="post">
-                        <a asp-action="Edit" asp-route-id="@profile.Id" class="btn btn-primary">Edit</a>
+                    <form class="form-inline" asp-page-handler="Delete" method="post">
+                        <a asp-page="Edit" asp-route-id="@profile.Id" class="btn btn-primary">Edit</a>
                         <input type="hidden" value="@profile.Id" name="Id" />
                         <button type="submit" class="btn btn-danger">Delete</button>
                     </form>

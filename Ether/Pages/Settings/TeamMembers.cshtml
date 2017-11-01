@@ -1,11 +1,12 @@
-﻿@model TeamMembersViewModel
+﻿@page
+@model Ether.Pages.Settings.TeamMembersModel
 @{
     ViewData["Title"] = "Team Members";
 }
 
 <h2>Team Members</h2>
 
-<form asp-action="TeamMembers" method="get" id="filterForm">
+<form method="get" id="filterForm">
     <fieldset>
         <legend>Show only:</legend>
         @foreach (var team in Model.AllTeams)
@@ -20,7 +21,7 @@
     <thead>
         <tr>
             <td class="text-right" colspan="5">
-                <a asp-action="EditMember" class="btn btn-success">Add new</a>
+                <a asp-page="EditMember" class="btn btn-success">Add new</a>
             </td>
         </tr>
         <tr>
@@ -39,16 +40,16 @@
                 <td>@member.Email</td>
                 <td>@member.TeamName</td>
                 <td>
-                    <div><strong>WorkItems:</strong> @(member.RelatedWorkItemIds == null ? 0: member.RelatedWorkItemIds.Count())</div>
+                    <div><strong>WorkItems:</strong> @(member.RelatedWorkItemIds == null ? 0 : member.RelatedWorkItemIds.Count())</div>
                     <div><strong>LastFetch:</strong> @member.LastFetchDate.ToString("G")</div>
-                    <form class="form-inline" asp-action="ResetWorkItems" method="post">
+                    <form class="form-inline" asp-page-handler="ResetWorkitems" method="post">
                         <input type="hidden" value="@member.Id" name="Id" />
                         <input type="submit" value="Reset" />
                     </form>
                 </td>
                 <td width="150">
-                    <form class="form-inline" asp-action="DeleteMember" method="post">
-                        <a asp-action="EditMember" asp-route-id="@member.Id" class="btn btn-primary">Edit</a>
+                    <form class="form-inline" asp-page-handler="Delete" method="post">
+                        <a asp-page="EditMember" asp-route-id="@member.Id" class="btn btn-primary">Edit</a>
                         <input type="hidden" value="@member.Id" name="Id" />
                         <button type="submit" class="btn btn-danger">Delete</button>
                     </form>

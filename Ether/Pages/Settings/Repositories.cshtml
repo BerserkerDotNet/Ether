@@ -1,4 +1,5 @@
-﻿@model IEnumerable<VSTSRepository>
+﻿@page
+@model Ether.Pages.Settings.RepositoriesModel
 @inject IAll<VSTSProject> Projects
 @{
     ViewData["Title"] = "Repositories";
@@ -13,7 +14,7 @@
             <td></td>
             <td></td>
             <td class="text-right">
-                <a asp-action="EditRepository" class="btn btn-success">Add new</a>
+                <a asp-page="EditRepository" class="btn btn-success">Add new</a>
             </td>
         </tr>
         <tr>
@@ -23,15 +24,15 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var repo in Model)
+        @foreach (var repo in Model.Repositories)
         {
             var project = Projects.Value.Single(p => p.Id == repo.Project);
             <tr>
                 <td>@repo.Name</td>
                 <td>@project.Name</td>
                 <td width="150">
-                    <form class="form-inline" asp-action="DeleteRepository" method="post">
-                        <a asp-action="EditRepository" asp-route-id="@repo.Id" class="btn btn-primary">Edit</a>
+                    <form class="form-inline" asp-page-handler="Delete" method="post">
+                        <a asp-page="EditRepository" asp-route-id="@repo.Id" class="btn btn-primary">Edit</a>
                         <input type="hidden" value="@repo.Id" name="Id" />
                         <button type="submit" class="btn btn-danger">Delete</button>
                     </form>

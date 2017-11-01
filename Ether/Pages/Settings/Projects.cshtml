@@ -1,5 +1,5 @@
-﻿@model IEnumerable<VSTSProject>
-
+﻿@page
+@model Ether.Pages.Settings.ProjectsModel
 @{
     ViewData["Title"] = "Projects";
 }
@@ -13,7 +13,7 @@
             <td></td>
             <td></td>
             <td class="text-right">
-                <a asp-action="EditProject" class="btn btn-success">Add new</a>
+                <a asp-page="EditProject" class="btn btn-success">Add new</a>
             </td>
         </tr>
         <tr>
@@ -23,14 +23,14 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var project in Model)
+        @foreach (var project in Model.Projects)
         {
             <tr>
                 <td>@project.Name</td>
                 <td>@project.DoesNotHaveWorkItems</td>
                 <td width="150">
-                    <form class="form-inline" asp-action="DeleteProject" method="post">
-                        <a asp-action="EditProject" asp-route-id="@project.Id" class="btn btn-primary">Edit</a>
+                    <form class="form-inline" asp-page-handler="Delete" method="post">
+                        <a asp-page="EditProject" asp-route-id="@project.Id" class="btn btn-primary">Edit</a>
                         <input type="hidden" value="@project.Id" name="Id" />
                         <button type="submit" class="btn btn-danger">Delete</button>
                     </form>

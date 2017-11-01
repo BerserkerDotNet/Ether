@@ -44,7 +44,12 @@ namespace Ether
             services.AddMvc(o =>
             {
                 o.Filters.Add<CurrentMenuIndicatorFilter>();
-            }).AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<Startup>());
+            })
+            .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<Startup>())
+            .AddRazorPagesOptions(options => 
+            {
+                options.Conventions.AddPageRoute("/Home/Index", "");
+            });
             services.AddSingleton<IRepository, MongoRepository>();
             services.AddSingleton<IVSTSClient, VSTSClient>();
             services.AddSingleton<DIFriendlyJobFactory>();

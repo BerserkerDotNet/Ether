@@ -1,4 +1,5 @@
-﻿@model IEnumerable<ReportResult>
+﻿@page
+@model Ether.Pages.Reports.IndexModel
 @{
     ViewData["Title"] = "Reports";
 }
@@ -23,7 +24,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var report in Model)
+        @foreach (var report in Model.Reports)
         {
             <tr>
                 <td>@report.ReportName</td>
@@ -32,8 +33,8 @@
                 <td>@report.StartDate.ToString("MM/dd/yyyy")</td>
                 <td>@report.EndDate.ToString("MM/dd/yyyy")</td>
                 <td width="150">
-                    <form class="form-inline" asp-action="Delete" method="post">
-                        <a asp-action="View" asp-route-id="@report.Id" class="btn btn-primary">View</a>
+                    <form class="form-inline" asp-page-handler="Delete" method="post">
+                        <a asp-page="View" asp-route-id="@report.Id" class="btn btn-primary">View</a>
                         <input type="hidden" value="@report.Id" name="Id" />
                         <button type="submit" class="btn btn-danger">Delete</button>
                     </form>
@@ -43,3 +44,16 @@
     </tbody>
 </table>
 
+@section Scripts{
+
+    <script>
+        $(document).ready(function () {
+            $('.btn-danger').click(function (e) {
+                var name = $(this).parents('tr').children("td:first").text();
+                if (!confirm("Are you sure you want to delete profile '" + name + "'?")) {
+                    e.preventDefault();
+                }
+             });
+        });
+    </script>
+}
