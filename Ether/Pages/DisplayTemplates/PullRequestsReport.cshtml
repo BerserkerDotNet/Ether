@@ -11,6 +11,18 @@
             <th>Code quality (%)</th>
         </tr>
     </thead>
+    <tbody>
+        @foreach (var report in Model.IndividualReports)
+        {
+            <tr>
+                <td>@report.TeamMember</td>
+                <td>@report.TotalPRs</td>
+                <td>@report.TotalIterations</td>
+                <td>@report.AverageIterations</td>
+                <td>@report.CodeQuality</td>
+            </tr>
+        }
+    </tbody>
     <tfoot>
         <tr class="active">
             <th>Total PRs:</th>
@@ -25,16 +37,4 @@
             <td class="success">@Model.CodeQuality</td>
         </tr>
     </tfoot>
-    <tbody>
-        @foreach (var report in Model.IndividualReports)
-        {
-            <tr>
-                <td>@report.TeamMember</td>
-                <td>@report.TotalPRs</td>
-                <td>@report.TotalIterations</td>
-                <td>@report.AverageIterations</td>
-                <td>@report.CodeQuality</td>
-            </tr>
-        }
-    </tbody>
 </table>

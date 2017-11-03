@@ -19,6 +19,18 @@
             <th>Resolved by</th>
         </tr>
     </thead>
+    <tbody>
+        @foreach (var report in workItems)
+        {
+            <tr>
+                <td>@report.WorkItemType</td>
+                <td>@report.WorkItemId</td>
+                <td>@report.WorkItemTitle</td>
+                <td width="140">@report.Reason</td>
+                <td>@report.MemberName</td>
+            </tr>
+        }
+    </tbody>
     <tfoot>
 
         <tr class="active">
@@ -33,17 +45,5 @@
             </td>
         </tr>
     </tfoot>
-    <tbody>
-        @foreach (var report in workItems)
-        {
-            <tr>
-                <td>@report.WorkItemType</td>
-                <td>@report.WorkItemId</td>
-                <td>@report.WorkItemTitle</td>
-                <td width="140">@report.Reason</td>
-                <td>@report.MemberName</td>
-            </tr>
-        }
-    </tbody>
 </table>
 
