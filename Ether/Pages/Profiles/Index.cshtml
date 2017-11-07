@@ -12,10 +12,7 @@
     <caption>Available profiles</caption>
     <thead>
         <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td class="text-right">
+            <td colspan="4" class="text-right">
                 <a asp-page="Edit" class="btn btn-success">Add new</a>
             </td>
         </tr>
@@ -30,7 +27,7 @@
         @foreach (var profile in Model.Profiles)
         {
             <tr>
-                <td>@profile.Name</td>
+                <td style="white-space:nowrap">@profile.Name</td>
                 <td>@string.Join(", ", Repositories.Value.Where(r => profile.Repositories.Contains(r.Id)).Select(r => r.Name))</td>
                 <td>@string.Join(", ", TeamMembers.Value.Where(m => profile.Members.Contains(m.Id)).Select(m => m.DisplayName))</td>
                 <td width="150">

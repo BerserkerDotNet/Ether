@@ -23,7 +23,8 @@
     </div>
     <div class="form-group">
         <fieldset>
-            <legend>Repositories</legend>
+            <legend>Select repositories</legend>
+            
             @foreach (var repo in Repositories.Value)
             {
                 <label for="repo-@repo.Id">@repo.Name</label>
@@ -33,23 +34,18 @@
         <span asp-validation-for="Profile.Repositories" class="text-danger"></span>
     </div>
     <div class="form-group">
-        @foreach (var team in membersByTeam)
-        {
-            <div class="form-group">
-                <fieldset>
-                    <legend>@team.Key</legend>
-                    @foreach (var member in team)
-                    {
-                        <label for="member-@member.Id">@member.DisplayName</label>
-                        <input type="checkbox" name="Profile.Members" value="@member.Id" id="member-@member.Id" @(Model.Profile.Members != null && Model.Profile.Members.Contains(member.Id) ? "checked" : "") />
-                    }
-                </fieldset>
-            </div>
-        }
+        <fieldset>
+            <legend>Select members</legend>
+            @foreach (var member in TeamMembers.Value)
+            {
+                <label for="member-@member.Id">@member.DisplayName</label>
+                <input type="checkbox" name="Profile.Members" value="@member.Id" id="member-@member.Id" @(Model.Profile.Members != null && Model.Profile.Members.Contains(member.Id) ? "checked" : "") />
+            }
+        </fieldset>
         <span asp-validation-for="Profile.Members" class="text-danger"></span>
     </div>
 
-    <input asp-for="Profile.Id" type="hidden" />
+  <input asp-for="Profile.Id" type="hidden" />
     <button type="submit" class="btn btn-success">Save</button>
     <a asp-page="Index" class="btn btn-danger">Cancel</a>
 </form>
@@ -59,7 +55,7 @@
     <script>
         $(document).ready(function () {
             $('input[type="checkbox"]').checkboxradio({
-                icon: false
+                icon: true
             });
          });
     </script>

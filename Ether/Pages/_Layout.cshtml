@@ -19,10 +19,10 @@
         <link rel="stylesheet" href="~/lib/bootstrap/css/bootstrap.css" />
     </environment>
     <environment exclude="Development">
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" 
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
               integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"
               asp-fallback-href="~/lib/bootstrap/css/bootstrap.min.css" asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute">
-        <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.min.css" 
+        <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.min.css"
               integrity="sha384-kcAOn9fN4XSd+TGsNu2OQKSuV5ngOwt7tg73O4EpaD91QXvrfgvf0MR7/2dUjoI6" crossorigin="anonymous"
               asp-fallback-href="~/lib/jquery/jquery-ui.min.css" asp-fallback-test-class="ui-datepicker" asp-fallback-test-property="display" asp-fallback-test-value="none">
     </environment>
@@ -30,6 +30,25 @@
         body {
             padding-top: 70px;
         }
+
+        .navbar.center .navbar-inner {
+            text-align: center;
+        }
+
+        .navbar.center .navbar-inner .nav {
+                display: inline-block;
+                float: none;
+        }
+        .navbar-nav > li > a.footer-item {
+            padding-bottom: 5px;
+            padding-top: 5px;
+        }
+        .footer-text {
+            display:inline-block;
+            font-weight:bold;
+            padding-bottom:5px;
+        }
+
     </style>
 </head>
 <body>
@@ -65,6 +84,23 @@
             </div>
         </div>
     </div>
+    <footer>
+        <div class="navbar navbar-default navbar-fixed-bottom center">
+            <div class="container-fluid">
+                <div class="row navbar-inner">
+                    <ul class="nav navbar-nav">
+                        <li><a class="footer-item" href="https://github.com/BerserkerDotNet/Ether/issues" target="_blank"><img src="~/images/footer/issue.png" alt="Report an issue" title="Report an issue" /></a></li>
+                        <li><a class="footer-item" href="https://github.com/BerserkerDotNet/Ether" target="_blank"><img src="~/images/footer/github.png" alt="GitHub page" title="GitHub page" /></a></li>
+                        <li><a class="footer-item" href="https://twitter.com/BerserkerDotNET" target="_blank"><img src="~/images/footer/twitter.png" alt="Twitter page" title="Twitter page" /></a></li>
+                        <li><a class="footer-item" href="https://www.linkedin.com/in/andrii-snigyr-78b73a67/" target="_blank"><img src="~/images/footer/linkedin.png" alt="LinkedIn profile" title="LinkedIn profile"/></a></li>
+                    </ul>
+                </div>
+                <div class="row navbar-inner">
+                    <span class="footer-text">© 2017 - Andrii Snihyr</span>
+                </div>
+            </div>
+        </div>
+    </footer>
     <environment include="Development">
         <script src="~/lib/jquery/jquery.js"></script>
         <script src="~/lib/jquery/jquery-ui.js"></script>
@@ -77,11 +113,11 @@
                 integrity="sha384-xBuQ/xzmlsLoJpyjoggmTEz8OWUFM0/RC5BsqQBDX2v5cMvDHcMakNTNrHIW2I5f"
                 crossorigin="anonymous"
                 asp-fallback-src="~/lib/jquery/jquery.min.js" asp-fallback-test="window.jQuery"></script>
-        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" 
-                integrity="sha384-Dziy8F2VlJQLMShA6FHWNul/veM9bCkRUaLqr199K94ntO5QUrLJBEbYegdSkkqX" 
+        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"
+                integrity="sha384-Dziy8F2VlJQLMShA6FHWNul/veM9bCkRUaLqr199K94ntO5QUrLJBEbYegdSkkqX"
                 crossorigin="anonymous"
                 asp-fallback-src="~/lib/jquery/jquery-ui.min.js" asp-fallback-test="window.jQuery.ui"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" 
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
                 integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"
                 asp-fallback-src="~/lib/bootstrap/js/bootstrap.min.js" asp-fallback-test="window.jQuery && window.jQuery.fn && window.jQuery.fn.modal"></script>
         <script src="https://ajax.aspnetcdn.com/ajax/jquery.validate/1.14.0/jquery.validate.min.js"
