@@ -9,6 +9,8 @@
             <th>Total iterations</th>
             <th>Avg iterations</th>
             <th>Code quality (%)</th>
+            <th>Total comments</th>
+            <th>Avg comments</th>
         </tr>
     </thead>
     <tbody>
@@ -18,8 +20,10 @@
                 <td>@report.TeamMember</td>
                 <td>@report.TotalPRs</td>
                 <td>@report.TotalIterations</td>
-                <td>@report.AverageIterations</td>
-                <td>@report.CodeQuality</td>
+                <td>@report.AverageIterations.ToString("F2")</td>
+                <td>@report.CodeQuality.ToString("F2")</td>
+                <td>@report.TotalComments</td>
+                <td>@report.AverageComments</td>
             </tr>
         }
     </tbody>
@@ -31,6 +35,10 @@
         <tr class="active">
             <th>Avg iterations:</th>
             <td class="success">@Model.AverageIterations</td>
+        </tr>
+        <tr class="active">
+            <th>Avg comments:</th>
+            <td class="success">@Model.AverageComments</td>
         </tr>
         <tr class="active">
             <th>Code quality:</th>

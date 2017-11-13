@@ -52,8 +52,15 @@ namespace Ether.Core.Reporters
                             .WithSection(pr.PullRequestId.ToString())
                             .WithSection("iterations")
                             .Build();
-                        var iterationsResponse = await _client.ExecuteGet<IterationsResponse>(iterationUrl);
+                        var commentsUrl = VSTSApiUrl.Create(_configuration.InstanceName)
+                            .ForPullRequests(project.Name, repo.Name)
+                            .WithSection(pr.PullRequestId.ToString())
+                            .WithSection("threads")
+                            .Build();
+                        var iterationsResponse = await _client.ExecuteGet<CountBasedResponse>(iterationUrl);
+                        var commentsResponse = await _client.ExecuteGet<CountBasedResponse>(commentsUrl);
                         pr.Iterations = iterationsResponse.Count;
+                        pr.Comments = commentsResponse.Count;
                         pr.Author = member.DisplayName;
                         resultingPrs.Add(pr);
                     }
@@ -74,7 +81,9 @@ namespace Ether.Core.Reporters
                 individualReport.TeamMember = personResult.Key;
                 individualReport.TotalPRs = personResult.Count();
                 individualReport.TotalIterations = personResult.Aggregate(0, (x, p) => x += p.Iterations);
+                individualReport.TotalComments = personResult.Aggregate(0, (x, p) => x += p.Comments);
                 individualReport.AverageIterations = (double)individualReport.TotalIterations / (double)individualReport.TotalPRs;
+                individualReport.AverageComments = (double)individualReport.TotalComments / (double)individualReport.TotalPRs;
                 individualReport.CodeQuality = ((double)individualReport.TotalPRs / individualReport.TotalIterations) * 100;
                 report.IndividualReports.Add(individualReport);
             }
@@ -98,9 +107,10 @@ namespace Ether.Core.Reporters
             public string Title { get; set; }
 
             public int Iterations { get; set; }
+            public int Comments { get; set; }
         }
 
-        private class IterationsResponse
+        private class CountBasedResponse
         {
             public int Count { get; set; }
         }
