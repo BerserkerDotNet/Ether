@@ -1,4 +1,5 @@
 ﻿using Ether.Core.Attributes;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -11,6 +12,8 @@ namespace Ether.Core.Models.DTO.Reports
         public double AverageIterations => IndividualReports.Sum(r => r.AverageIterations) / IndividualReports.Count;
         public double AverageComments => IndividualReports.Sum(r => r.AverageComments) / IndividualReports.Count;
         public double CodeQuality => IndividualReports.Sum(r => r.CodeQuality) / IndividualReports.Count;
+        public TimeSpan AveragePRLifespan => TimeSpan.FromSeconds(IndividualReports.Sum(r => r.AveragePRLifespan.TotalSeconds) / IndividualReports.Count);
+
         public IList<IndividualPRReport> IndividualReports { get; set; }
 
         public class IndividualPRReport
@@ -21,6 +24,7 @@ namespace Ether.Core.Models.DTO.Reports
             public double CodeQuality { get; set; }
             public double AverageIterations { get; set; }
             public double AverageComments { get; set; }
+            public TimeSpan AveragePRLifespan { get; set; }
             public string TeamMember { get; set; }
         }
     }

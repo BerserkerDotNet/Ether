@@ -85,6 +85,7 @@ namespace Ether.Core.Reporters
                 individualReport.AverageIterations = (double)individualReport.TotalIterations / (double)individualReport.TotalPRs;
                 individualReport.AverageComments = (double)individualReport.TotalComments / (double)individualReport.TotalPRs;
                 individualReport.CodeQuality = ((double)individualReport.TotalPRs / individualReport.TotalIterations) * 100;
+                individualReport.AveragePRLifespan = TimeSpan.FromSeconds(personResult.Sum(r => (r.ClosedDate - r.CreationDate).TotalSeconds) / individualReport.TotalPRs);
                 report.IndividualReports.Add(individualReport);
             }
 
