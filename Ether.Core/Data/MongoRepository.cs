@@ -16,6 +16,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
 using Ether.Core.Models.VSTS;
+using MongoDB.Bson.Serialization.Conventions;
 
 namespace Ether.Core.Data
 {
@@ -29,7 +30,10 @@ namespace Ether.Core.Data
             //TODO: Shouldn't be here
             BsonClassMap.RegisterClassMap<PullRequestsReport>();
             BsonClassMap.RegisterClassMap<WorkItemsReport>();
+            var pack = new ConventionPack();
+            pack.Add(new IgnoreExtraElementsConvention(true));
 
+            ConventionRegistry.Register("My Custom Conventions", pack, t => t.FullName.StartsWith("Ether."));
             _client = new MongoClient(dbConfig.Value.ConnectionString);
             _database = _client.GetDatabase(dbConfig.Value.DbName);
 

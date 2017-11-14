@@ -29,6 +29,7 @@
     <style>
         body {
             padding-top: 70px;
+            padding-bottom: 100px;
         }
 
         .navbar.center .navbar-inner {
@@ -55,17 +56,18 @@
     <header class="navbar navbar-default navbar-fixed-top">
         @Html.Partial("_Navigation")
     </header>
-    <div class="container">
-        <div class="row">
-            <div class="col-md-12">
-                @if (configuration.Value.AccessToken == null || configuration.Value.InstanceName == null)
+    <main>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    @if (configuration.Value.AccessToken == null || configuration.Value.InstanceName == null)
                 {
-                    <div class="alert alert-warning" role="alert">
-                        <strong>Warning!</strong> Configuration is not complete, make sure you have both InstanceName and AccessToken environment variables.
-                    </div>
+                        <div class="alert alert-warning" role="alert">
+                            <strong>Warning!</strong> Configuration is not complete, make sure you have both InstanceName and AccessToken environment variables.
+                        </div>
                 }
 
-                @if (!string.IsNullOrEmpty(notification))
+                    @if (!string.IsNullOrEmpty(notification))
                 {
                     var notificationParts = notification.Split('|');
                     if (notificationParts.Count() == 2)
@@ -74,16 +76,17 @@
                         var message = notificationParts[1];
                         var cssClass = type == TempDataExtensions.NotificationError ? "alert-danger" : (type == TempDataExtensions.NotificationWarning ? "alert-warning" : "alert-success");
                         var title = type == TempDataExtensions.NotificationError ? "Oops!" : (type == TempDataExtensions.NotificationWarning ? "Warning!" : "Success!");
-                        <div class="alert @cssClass alert-dismissible" role="alert">
-                            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                            <strong>@title</strong> @message
-                        </div>
+                            <div class="alert @cssClass alert-dismissible" role="alert">
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <strong>@title</strong> @message
+                            </div>
                     }
                 }
-                @RenderBody()
+                    @RenderBody()
+                </div>
             </div>
         </div>
-    </div>
+    </main>
     <footer>
         <div class="navbar navbar-default navbar-fixed-bottom center">
             <div class="container-fluid">
