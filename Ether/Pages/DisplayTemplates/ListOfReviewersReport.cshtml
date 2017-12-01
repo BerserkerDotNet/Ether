@@ -1,0 +1,32 @@
+﻿@model ListOfReviewersReport
+
+<table class="table table-hover table-bordered">
+    <caption>Report on @Model.ProfileName, from @Model.StartDate.ToString("MM/dd/yyyy") to @Model.EndDate.ToString("MM/dd/yyyy")</caption>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Number of pull request voted for</th>
+            <th>Comments left</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var report in Model.IndividualReports.OrderBy(c => c.DisplayName))
+        {
+            <tr>
+                <td>@report.DisplayName</td>
+                <td>@report.NumberOfPRsVoted</td>
+                <td>@report.NumberOfComments</td>
+            </tr>
+        }
+    </tbody>
+    <tfoot>
+        <tr class="active">
+            <th>Total PRs scanned:</th>
+            <td class="success" colspan="2">@Model.NumberOfPullRequests</td>
+        </tr>
+        <tr class="active">
+            <th>Total reviewers:</th>
+            <td class="success" colspan="2">@Model.NumberOfReviewers</td>
+        </tr>
+    </tfoot>
+</table>

@@ -77,9 +77,9 @@ namespace Ether.Core.Data
             return this;
         }
 
-        public string Build()
+        public string Build(string apiVersion = "3.0")
         {
-            _parameters.Add(APIVersion, "3.0");
+            _parameters.Add(APIVersion, apiVersion);
             var queryString = "?" + string.Join("&", _parameters.Select(p => $"{p.Key}={p.Value}"));
             _url.Append(queryString);
             return _url.ToString();

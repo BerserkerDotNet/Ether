@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Ether.Core.Models.VSTS;
 
 namespace Ether.Core.Reporters
 {
@@ -59,8 +60,8 @@ namespace Ether.Core.Reporters
                             .Build();
                         var iterationsResponse = await _client.ExecuteGet<CountBasedResponse>(iterationUrl);
                         var commentsResponse = await _client.ExecuteGet<CountBasedResponse>(commentsUrl);
-                        pr.Iterations = iterationsResponse.Count;
-                        pr.Comments = commentsResponse.Count;
+                        pr.IterationsCount = iterationsResponse.Count;
+                        pr.CommentsCount = commentsResponse.Count;
                         pr.Author = member.DisplayName;
                         resultingPrs.Add(pr);
                     }
@@ -80,40 +81,16 @@ namespace Ether.Core.Reporters
                 var individualReport = new PullRequestsReport.IndividualPRReport();
                 individualReport.TeamMember = personResult.Key;
                 individualReport.TotalPRs = personResult.Count();
-                individualReport.TotalIterations = personResult.Aggregate(0, (x, p) => x += p.Iterations);
-                individualReport.TotalComments = personResult.Aggregate(0, (x, p) => x += p.Comments);
+                individualReport.TotalIterations = personResult.Aggregate(0, (x, p) => x += p.IterationsCount);
+                individualReport.TotalComments = personResult.Aggregate(0, (x, p) => x += p.CommentsCount);
                 individualReport.AverageIterations = (double)individualReport.TotalIterations / (double)individualReport.TotalPRs;
                 individualReport.AverageComments = (double)individualReport.TotalComments / (double)individualReport.TotalPRs;
                 individualReport.CodeQuality = ((double)individualReport.TotalPRs / individualReport.TotalIterations) * 100;
-                individualReport.AveragePRLifespan = TimeSpan.FromSeconds(personResult.Sum(r => (r.ClosedDate - r.CreationDate).TotalSeconds) / individualReport.TotalPRs);
+                individualReport.AveragePRLifespan = TimeSpan.FromSeconds(personResult.Sum(r => (r.ClosedDate.Value - r.CreationDate).TotalSeconds) / individualReport.TotalPRs);
                 report.IndividualReports.Add(individualReport);
             }
 
-
             return report;
-        }
-
-
-        private class PRResponse
-        {
-            public PullRequest[] Value { get; set; }
-        }
-
-        private class PullRequest
-        {
-            public int PullRequestId { get; set; }
-            public string Author { get; set; }
-            public DateTime CreationDate { get; set; }
-            public DateTime ClosedDate { get; set; }
-            public string Title { get; set; }
-
-            public int Iterations { get; set; }
-            public int Comments { get; set; }
-        }
-
-        private class CountBasedResponse
-        {
-            public int Count { get; set; }
         }
     }
 }
