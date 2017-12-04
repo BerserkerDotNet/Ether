@@ -25,7 +25,9 @@ namespace Ether.Tests
         {
             var members = GetMembers(membersCount);
             var projects = new[] { new VSTSProject { Id = Guid.NewGuid() }, new VSTSProject { Id = Guid.NewGuid() } };
-            var repositories = new[] { new VSTSRepository { Id = Guid.NewGuid(), Project = projects[0].Id }, new VSTSRepository { Id = Guid.NewGuid(), Project = projects[0].Id } };
+            var repositories = Enumerable.Range(0, repoCount)
+                .Select(i => new VSTSRepository { Id = Guid.NewGuid(), Project = projects[0].Id })
+                .ToArray();
             var profile = new Profile
             {
                 Id = Guid.NewGuid(),

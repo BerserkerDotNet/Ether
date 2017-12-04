@@ -30,7 +30,7 @@ namespace Ether.Tests.Reporters
         private WorkItemsReporter _reporter;
         private Profile _profile;
         private IEnumerable<TeamMember> _team;
-        private Random _random = new Random(0);
+        private Random _random = new Random();
 
         [SetUp]
         public void SetUp()
@@ -54,7 +54,7 @@ namespace Ether.Tests.Reporters
                 .Returns(Task.FromResult(Enumerable.Empty<VSTSWorkItem>()))
                 .Verifiable();
 
-            var result = await _reporter.ReportAsync(new Core.Models.ReportQuery
+            var result = await _reporter.ReportAsync(new ReportQuery
             {
                 ProfileId = _profile.Id
             });
