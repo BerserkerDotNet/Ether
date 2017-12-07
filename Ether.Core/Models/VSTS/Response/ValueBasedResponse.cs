@@ -2,6 +2,7 @@
 {
     public class ValueBasedResponse<T>
     {
+        public int Count { get; set; }
         public T[] Value { get; set; }
     }
 }

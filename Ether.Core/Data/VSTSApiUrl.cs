@@ -7,6 +7,7 @@ namespace Ether.Core.Data
     public class VSTSApiUrl
     {
         private const string APIsSection = "_apis";
+        private const string IdentitiesSection = "Identities";
         private const string WITSection = "wit";
         private const string WIQLApiSection = "wiql";
         private const string WorkItemsSection = "WorkItems";
@@ -17,14 +18,15 @@ namespace Ether.Core.Data
 
         private StringBuilder _url = new StringBuilder();
         private Dictionary<string, string> _parameters = new Dictionary<string, string>();
-        private VSTSApiUrl(string instance)
+        private VSTSApiUrl(string instance, string subDomain = "")
         {
-            _url.Append($"https://{instance}.visualstudio.com");
+            var name = $"{instance}.{subDomain}".TrimEnd('.');
+            _url.Append($"https://{name}.visualstudio.com");
         }
 
-        public static VSTSApiUrl Create(string instance)
+        public static VSTSApiUrl Create(string instance, string subDomain = "")
         {
-            return new VSTSApiUrl(instance);
+            return new VSTSApiUrl(instance, subDomain);
         }
 
         public VSTSApiUrl ForWIQL(string project)
@@ -56,6 +58,12 @@ namespace Ether.Core.Data
         {
             ForRepository(projectName, repositoryName);
             _url.Append("/pullRequests");
+            return this;
+        }
+
+        public VSTSApiUrl ForIdentities()
+        {
+            _url.Append($"/{APIsSection}/{IdentitiesSection}");
             return this;
         }
 
