@@ -50,8 +50,8 @@ namespace Ether.Pages.Home
                 var report = await reporter.ReportAsync(new ReportQuery
                 {
                     ProfileId = ReportRequest.Profile,
-                    StartDate = ReportRequest.StartDate.Value,
-                    EndDate = ReportRequest.EndDate.Value
+                    StartDate = ReportRequest.StartDate.Value.ToUniversalTime(),
+                    EndDate = ReportRequest.EndDate.Value.ToUniversalTime()
                 });
 
                 return RedirectToPage("/Reports/View", new { Id = report.Id });
