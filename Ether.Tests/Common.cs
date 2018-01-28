@@ -1,10 +1,13 @@
 ﻿using Ether.Core.Configuration;
+using Ether.Core.Constants;
 using Ether.Core.Interfaces;
 using Ether.Core.Models.DTO;
 using Ether.Core.Models.DTO.Reports;
+using Ether.Core.Models.VSTS;
 using Microsoft.Extensions.Options;
 using Moq;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -13,6 +16,7 @@ namespace Ether.Tests
 {
     public static class Common
     {
+        private static Random _random = new Random();
         public static void SetupConfiguration(Mock<IOptions<VSTSConfiguration>> mock, string token = "Foo", string instance = "Bar")
         {
             mock.SetupGet(c => c.Value)
@@ -48,6 +52,17 @@ namespace Ether.Tests
                 .Returns(Task.FromResult(true));
 
             return (profile, members, projects, repositories);
+        }
+
+        public static VSTSWorkItem GetWorkItemWithDate(DateTime? createdDate)
+        {
+            var wi = new VSTSWorkItem { Fields = new Dictionary<string, string>() };
+            wi.Id = Guid.NewGuid();
+            wi.WorkItemId = _random.Next(100_000_000);
+            if (createdDate.HasValue)
+                wi.Fields.Add(VSTSFieldNames.WorkItemCreatedDate, createdDate.Value.ToString("s"));
+
+            return wi;
         }
 
         private static TeamMember[] GetMembers(int count)

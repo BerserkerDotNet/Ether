@@ -21,7 +21,9 @@ namespace Ether.Core.Interfaces
 
         Task<T> GetSingleAsync<T>(Expression<Func<T, bool>> predicate) where T : BaseDto;
 
-        Task<TProjection> GetFieldValue<TType, TProjection>(Expression<Func<TType, bool>> predicate, Expression<Func<TType, TProjection>> projection) where TType : BaseDto;
+        Task<TProjection> GetFieldValueAsync<TType, TProjection>(Expression<Func<TType, bool>> predicate, Expression<Func<TType, TProjection>> projection) where TType : BaseDto;
+
+        TProjection GetFieldValue<TType, TProjection>(Expression<Func<TType, bool>> predicate, Expression<Func<TType, TProjection>> projection) where TType : BaseDto;
 
         Task<object> GetSingleAsync(Guid id, Type itemType);
 
@@ -32,5 +34,7 @@ namespace Ether.Core.Interfaces
         Task<bool> CreateOrUpdateAsync<T>(T item, Expression<Func<T, bool>> criteria) where T : BaseDto;
 
         Task<bool> DeleteAsync<T>(Guid id) where T : BaseDto;
+
+        long Delete<T>(Expression<Func<T, bool>> predicate) where T : BaseDto;
     }
 }

@@ -62,14 +62,12 @@ namespace Ether
             services.AddScoped<IWorkItemsClassifier, ClosedTasksWorkItemsClassifier>();
 
             services.AddTransient<WorkItemsFetchJob>();
+            services.AddTransient<RetentionJob>();
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            var registry = new Registry();
-            registry.Schedule<WorkItemsFetchJob>().ToRunNow().AndEvery(1).Hours();
-            JobManager.JobFactory = app.ApplicationServices.GetService<DIFriendlyJobFactory>();
-            JobManager.Initialize(registry);
+            InitializeJobs(app);
 
             if (env.IsDevelopment())
             {
@@ -90,6 +88,21 @@ namespace Ether
             app.UseResponseCompression();
             app.UseStaticFiles();
             app.UseMvcWithDefaultRoute();
+        }
+
+        private static void InitializeJobs(IApplicationBuilder app)
+        {
+            var registry = new Registry();
+            registry.Schedule<WorkItemsFetchJob>()
+                .ToRunNow()
+                .AndEvery(1)
+                .Hours();
+            registry.Schedule<RetentionJob>()
+                .ToRunNow()
+                .AndEvery(1)
+                .Days();
+            JobManager.JobFactory = app.ApplicationServices.GetService<DIFriendlyJobFactory>();
+            JobManager.Initialize(registry);
         }
     }
 }

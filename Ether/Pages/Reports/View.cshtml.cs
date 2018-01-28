@@ -1,12 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc.RazorPages;
+﻿using Ether.Core.Interfaces;
 using Ether.Core.Models.DTO.Reports;
+using Ether.Extensions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using System;
 using System.Collections.Generic;
-using Ether.Core.Interfaces;
-using System.Threading.Tasks;
 using System.Linq;
-using Ether.Extensions;
+using System.Threading.Tasks;
 
 namespace Ether.Pages.Reports
 {
@@ -28,7 +28,7 @@ namespace Ether.Pages.Reports
             if (!id.HasValue)
                 return RedirectToPage("Index");
 
-            var reporterId = await _repository.GetFieldValue<ReportResult, Guid>(r => r.Id == id.Value, r => r.ReporterId);
+            var reporterId = await _repository.GetFieldValueAsync<ReportResult, Guid>(r => r.Id == id.Value, r => r.ReporterId);
             var reporter = _reporters.SingleOrDefault(r => r.Id == reporterId);
             if (reporter == null)
             {

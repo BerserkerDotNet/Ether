@@ -76,15 +76,15 @@ namespace Ether.Tests.Reporters
             var utcNow = DateTime.UtcNow;
             var workitems = new[]
             {
-                GetWorkItemWithDate(createdDate: null),
-                GetWorkItemWithDate(utcNow.AddDays(-7)),
-                GetWorkItemWithDate(utcNow.AddDays(-10)),
-                GetWorkItemWithDate(createdDate: null),
-                GetWorkItemWithDate(utcNow.AddDays(10)),
-                GetWorkItemWithDate(utcNow.AddDays(5)),
-                GetWorkItemWithDate(utcNow.AddDays(-5)),
-                GetWorkItemWithDate(utcNow.AddDays(-1)),
-                GetWorkItemWithDate(utcNow),
+                Common.GetWorkItemWithDate(createdDate: null),
+                Common.GetWorkItemWithDate(utcNow.AddDays(-7)),
+                Common.GetWorkItemWithDate(utcNow.AddDays(-10)),
+                Common.GetWorkItemWithDate(createdDate: null),
+                Common.GetWorkItemWithDate(utcNow.AddDays(10)),
+                Common.GetWorkItemWithDate(utcNow.AddDays(5)),
+                Common.GetWorkItemWithDate(utcNow.AddDays(-5)),
+                Common.GetWorkItemWithDate(utcNow.AddDays(-1)),
+                Common.GetWorkItemWithDate(utcNow),
             };
             var expectedWorkItems = new[]
             {
@@ -126,9 +126,9 @@ namespace Ether.Tests.Reporters
             var utcNow = DateTime.UtcNow;
             var workitems = new[]
             {
-                GetWorkItemWithDate(createdDate: null),
-                GetWorkItemWithDate(createdDate: null),
-                GetWorkItemWithDate(createdDate: null)
+                Common.GetWorkItemWithDate(createdDate: null),
+                Common.GetWorkItemWithDate(createdDate: null),
+                Common.GetWorkItemWithDate(createdDate: null)
             };
 
             _team.ElementAt(0).RelatedWorkItemIds = workitems.Select(w => w.WorkItemId);
@@ -163,12 +163,12 @@ namespace Ether.Tests.Reporters
             var utcNow = DateTime.UtcNow;
             var workitems = new[]
             {
-                GetWorkItemWithDate(createdDate: null),
-                GetWorkItemWithDate(createdDate: null),
-                GetWorkItemWithDate(createdDate: null),
-                GetWorkItemWithDate(createdDate: null),
-                GetWorkItemWithDate(createdDate: null),
-                GetWorkItemWithDate(createdDate: null)
+                Common.GetWorkItemWithDate(createdDate: null),
+                Common.GetWorkItemWithDate(createdDate: null),
+                Common.GetWorkItemWithDate(createdDate: null),
+                Common.GetWorkItemWithDate(createdDate: null),
+                Common.GetWorkItemWithDate(createdDate: null),
+                Common.GetWorkItemWithDate(createdDate: null)
             };
             var expectedWorkItemsIds = new[] { workitems[0].WorkItemId, workitems[1].WorkItemId, workitems[4].WorkItemId, workitems[5].WorkItemId };
 
@@ -207,9 +207,9 @@ namespace Ether.Tests.Reporters
             var utcNow = DateTime.UtcNow;
             var workitems = new[]
             {
-                GetWorkItemWithDate(createdDate: null),
-                GetWorkItemWithDate(createdDate: null),
-                GetWorkItemWithDate(createdDate: null)
+                Common.GetWorkItemWithDate(createdDate: null),
+                Common.GetWorkItemWithDate(createdDate: null),
+                Common.GetWorkItemWithDate(createdDate: null)
             }.AsEnumerable();
 
             var noneId = workitems.ElementAt(1).WorkItemId;
@@ -246,9 +246,9 @@ namespace Ether.Tests.Reporters
             var vstsMaxDate = DateTime.Parse("1/1/9999 12:00:00 AM");
             var workitems = new[]
             {
-                GetWorkItemWithDate(createdDate: null),
-                GetWorkItemWithDate(createdDate: null),
-                GetWorkItemWithDate(createdDate: null)
+                Common.GetWorkItemWithDate(createdDate: null),
+                Common.GetWorkItemWithDate(createdDate: null),
+                Common.GetWorkItemWithDate(createdDate: null)
             };
 
             _repositoryMock.Setup(r => r.GetAsync(It.IsAny<Expression<Func<VSTSWorkItem, bool>>>()))
@@ -289,7 +289,7 @@ namespace Ether.Tests.Reporters
         public void ShouldReturnCorrectMetadata()
         {
             _reporter.Id.Should().Be(Guid.Parse("54c62ebe-cfef-46d5-b90f-ebb00a1611b7"));
-            _reporter.Name.Should().Be("Work items report");
+            _reporter.Name.Should().Be("Work items report (alpha)");
             _reporter.ReportType.Should().Be(typeof(WorkItemsReport));
         }
 
@@ -298,17 +298,6 @@ namespace Ether.Tests.Reporters
             var date = revisedDate ?? DateTime.UtcNow.AddDays(-2);
             var teamMember = member ?? new TeamMember { Id = Guid.NewGuid(), DisplayName = Guid.NewGuid().ToString(), Email = Guid.NewGuid().ToString() };
             return new WorkItemResolution(workItem, "Resolved", "Because", date, teamMember.Email, teamMember.DisplayName);
-        }
-
-        private VSTSWorkItem GetWorkItemWithDate(DateTime? createdDate)
-        {
-            var wi = new VSTSWorkItem { Fields = new Dictionary<string, string>() };
-            wi.Id = Guid.NewGuid();
-            wi.WorkItemId = _random.Next(100_000_000);
-            if (createdDate.HasValue)
-                wi.Fields.Add(VSTSFieldNames.WorkItemCreatedDate, createdDate.Value.ToString("s"));
-
-            return wi;
         }
 
         private bool IsValidResolutionRequest(WorkItemResolutionRequest request)

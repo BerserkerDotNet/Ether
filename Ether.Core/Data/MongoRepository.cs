@@ -110,13 +110,22 @@ namespace Ether.Core.Data
             return BsonSerializer.Deserialize(item, itemType);
         }
 
-        public async Task<TProjection> GetFieldValue<TType, TProjection>(Expression<Func<TType, bool>> predicate, Expression<Func<TType, TProjection>> projection)
+        public async Task<TProjection> GetFieldValueAsync<TType, TProjection>(Expression<Func<TType, bool>> predicate, Expression<Func<TType, TProjection>> projection)
             where TType : BaseDto
         {
             return await GetCollectionFor<TType>()
                   .Find(predicate)
                   .Project(projection)
                   .SingleOrDefaultAsync();
+        }
+
+        public TProjection GetFieldValue<TType, TProjection>(Expression<Func<TType, bool>> predicate, Expression<Func<TType, TProjection>> projection)
+            where TType : BaseDto
+        {
+            return GetCollectionFor<TType>()
+                  .Find(predicate)
+                  .Project(projection)
+                  .SingleOrDefault();
         }
 
         public async Task<bool> CreateAsync<T>(T item) where T : BaseDto
@@ -142,7 +151,7 @@ namespace Ether.Core.Data
             where T : BaseDto
         {
             var collection = GetCollectionFor<T>();
-            var existingId = await GetFieldValue(criteria, o => o.Id);
+            var existingId = await GetFieldValueAsync(criteria, o => o.Id);
             if (existingId != Guid.Empty)
             {
                 item.Id = existingId;
@@ -160,6 +169,15 @@ namespace Ether.Core.Data
         {
             await GetCollectionFor<T>().FindOneAndDeleteAsync(i => i.Id == id);
             return true;
+        }
+
+        public long Delete<T>(Expression<Func<T, bool>> predicate) 
+            where T : BaseDto
+        {
+            var result = GetCollectionFor<T>()
+                .DeleteMany(predicate);
+
+            return result.DeletedCount;
         }
 
         private string GetCollectionNameFor(Type type)

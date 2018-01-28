@@ -39,6 +39,13 @@ namespace Ether.Jobs
                 return;
             }
 
+            var isDisabled = _repository.GetFieldValue<Settings, bool>(_ => true, s => s.WorkItemsSettings.DisableWorkitemsJob);
+            if (isDisabled)
+            {
+                _logger.LogWarning("Work items job is disabled in the settings.");
+                return;
+            }
+
             try
             {
                 var members = GetMembers();

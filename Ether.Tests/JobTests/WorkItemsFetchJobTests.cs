@@ -35,6 +35,21 @@ namespace Ether.Tests.JobTests
             _loggerMock = new Mock<ILogger<WorkItemsFetchJob>>();
 
             _job = new WorkItemsFetchJob(_repositoryMock.Object, _vstsClientMock.Object, _configurationMock.Object, _loggerMock.Object);
+
+            _repositoryMock.Setup(r => r.GetFieldValue<Settings, bool>(_ => true, s => s.WorkItemsSettings.DisableWorkitemsJob)).Returns(false);
+        }
+
+        [Test]
+        public void ShouldExitIfJobIsDisabled()
+        {
+            _configurationMock.SetupGet(c => c.Value).Returns(new VSTSConfiguration { AccessToken = "foo", InstanceName = "bar" });
+            _repositoryMock.Setup(r => r.GetFieldValue<Settings, bool>(_ => true, s => s.WorkItemsSettings.DisableWorkitemsJob)).Returns(true);
+
+            _job.Execute();
+
+            _loggerMock.Verify(l => l.Log(LogLevel.Warning, 0, It.IsAny<FormattedLogValues>(), null, It.IsAny<Func<object, Exception, string>>()), Times.Once());
+            _repositoryMock.Verify(r => r.GetAll<TeamMember>(), Times.Never());
+            _repositoryMock.Verify(r => r.Get(It.IsAny<Expression<Func<VSTSProject, bool>>>()), Times.Never());
         }
 
         [Test]

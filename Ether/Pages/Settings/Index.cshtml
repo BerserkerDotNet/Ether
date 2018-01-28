@@ -1,0 +1,50 @@
+﻿@page
+@model Ether.Pages.Settings.IndexModel
+@{
+    var retentionOptions = new[]
+    {
+        new SelectListItem {Text = "1 week", Value = TimeSpan.FromDays(7).ToString() } ,
+        new SelectListItem {Text = "2 weeks", Value = TimeSpan.FromDays(14).ToString() } ,
+        new SelectListItem {Text = "1 month", Value = TimeSpan.FromDays(30).ToString() } ,
+        new SelectListItem {Text = "2 months", Value = TimeSpan.FromDays(60).ToString() },
+        new SelectListItem {Text = "3 months", Value = TimeSpan.FromDays(90).ToString() } ,
+        new SelectListItem {Text = "6 months", Value = TimeSpan.FromDays(180).ToString() } ,
+    };
+}
+
+<h2>Settings</h2>
+<form asp-page="Index" method="post">
+    <div asp-validation-summary="All" class="text-danger"></div>
+    <section id="workitems">
+        <h3>Work items</h3>
+        <div class="row">
+            <div class="col-md-3">
+                <div class="form-group">
+                    <div class="form-group">
+                        <input asp-for="Settings.WorkItemsSettings.DisableWorkitemsJob" />
+                        <label asp-for="Settings.WorkItemsSettings.DisableWorkitemsJob">Disable work items job</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Keep workitems not older than</label>
+                    <select asp-for="Settings.WorkItemsSettings.KeepLast" asp-items="@retentionOptions" class="form-control"></select>
+                    <span asp-validation-for="Settings.WorkItemsSettings.KeepLast" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section id="reports">
+        <h3>Reports</h3>
+        <div class="row">
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label>Keep reports not older than</label>
+                    <select asp-for="Settings.ReportsSettings.KeepLast" asp-items="@retentionOptions" class="form-control"></select>
+                    <span asp-validation-for="Settings.ReportsSettings.KeepLast" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+    </section>
+    <input type="submit" class="btn btn-success" value="Save" />
+    <input type="reset" class="btn btn-danger" value="Cancel" />
+</form>

@@ -29,7 +29,7 @@ namespace Ether.Core.Reporters
             _classifiers = classifiers;
         }
 
-        public override string Name => "Work items report";
+        public override string Name => "Work items report (alpha)";
         public override Guid Id => _reporterId;
         public override Type ReportType => typeof(WorkItemsReport);
 
