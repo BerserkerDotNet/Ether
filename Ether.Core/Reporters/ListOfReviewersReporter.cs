@@ -66,13 +66,21 @@ namespace Ether.Core.Reporters
 
         private async Task<List<PullRequest>> GetPullRequests(VSTSRepository repo, VSTSProject project)
         {
+            var pullrequests = new List<PullRequest>();
+            await FetchPullRequests(repo, project, pullrequests);
+            return pullrequests;
+        }
+
+        private async Task FetchPullRequests(VSTSRepository repo, VSTSProject project, List<PullRequest> pullrequests, int startFrom = 0)
+        {
             var sw = Stopwatch.StartNew();
             var prsUrl = VSTSApiUrl.Create(_configuration.InstanceName)
                 .ForPullRequests(project.Name, repo.Name)
                 .WithQueryParameter("status", "all")
+                .WithQueryParameter("$skip", startFrom.ToString())
                 .Build(ApiVersion);
             var prsResponse = await _client.ExecuteGet<PRResponse>(prsUrl);
-            _logger.LogInformation($"Retrieved {prsResponse.Value.Count()} PRs from '{repo.Name}' repository. Operation took: {sw.Elapsed}");
+            _logger.LogInformation($"Retrieved {prsResponse.Value.Count()} PRs from '{repo.Name}' repository. Start position {startFrom}. Operation took: {sw.Elapsed}");
 
             sw.Restart();
             var prs = prsResponse.Value
@@ -80,7 +88,12 @@ namespace Ether.Core.Reporters
                 .ToList();
             sw.Stop();
             _logger.LogInformation($"Filtering PRs took {sw.Elapsed}. Count {prs.Count}");
-            return prs;
+            pullrequests.AddRange(prs);
+
+            if (prs.Any() && prs.Min(p => p.CreationDate) > Input.Query.StartDate)
+            {
+                await FetchPullRequests(repo, project, pullrequests, startFrom + prs.Count);
+            }
         }
 
         private IEnumerable<PullRequestReviewer> GetReviewers(List<PullRequest> pullrequests)

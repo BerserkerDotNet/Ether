@@ -58,6 +58,7 @@ namespace Ether.Pages.Home
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error generating report.");
                 TempData.WithError($"Error while generating report: '{ex.Message}'");
                 return RedirectToAction("Index");
             }

@@ -65,6 +65,30 @@ namespace Ether.Tests.Reporters
         }
 
         [Test]
+        public async Task ShouldFetchCorrectPullrequestsAmount()
+        {
+            const int expectedPRsCount = 100;
+            var listOfPRs = GeneratePullRequests(expectedPRsCount, _team.Take(2))
+                .ToArray();
+            _vstsClientMock.Setup(c => c.ExecuteGet<PRResponse>(It.IsAny<string>()))
+                .Returns<string>(q => Task.FromResult(new PRResponse { Value = listOfPRs.Skip(GetSkipValue(q)).Take(10).ToArray() }));
+            _vstsClientMock.Setup(c => c.ExecuteGet<ValueBasedResponse<PullRequestThread>>(It.IsAny<string>()))
+                .Returns(Task.FromResult(new ValueBasedResponse<PullRequestThread> { Value = new PullRequestThread[0] }));
+
+            var result = await _reporter.ReportAsync(new ReportQuery
+            {
+                ProfileId = _profile.Id,
+                StartDate = DateTime.UtcNow.Subtract(TimeSpan.FromDays(60)),
+                EndDate = DateTime.UtcNow
+            });
+
+            result.Should().NotBeNull();
+            result.As<ListOfReviewersReport>()
+                .NumberOfPullRequests.Should().Be(60);
+            _vstsClientMock.Verify(c => c.ExecuteGet<PRResponse>(It.IsAny<string>()), Times.Exactly(7));
+        }
+
+        [Test]
         public async Task ShouldReturnUniqueListOfReviewersFromPullrequests()
         {
             const int expectedPRsCount = 100;
@@ -72,13 +96,15 @@ namespace Ether.Tests.Reporters
                 .ToArray();
 
             _vstsClientMock.Setup(c => c.ExecuteGet<PRResponse>(It.IsAny<string>()))
-                .Returns(Task.FromResult(new PRResponse { Value = listOfPRs }));
+                .Returns<string>(q => Task.FromResult(new PRResponse { Value = listOfPRs.Skip(GetSkipValue(q)).Take(expectedPRsCount).ToArray() }));
             _vstsClientMock.Setup(c => c.ExecuteGet<ValueBasedResponse<PullRequestThread>>(It.IsAny<string>()))
                 .Returns(Task.FromResult(new ValueBasedResponse<PullRequestThread> { Value = new PullRequestThread[0] }));
 
             var result = await _reporter.ReportAsync(new ReportQuery
             {
-                ProfileId = _profile.Id
+                ProfileId = _profile.Id,
+                StartDate = DateTime.MinValue,
+                EndDate = DateTime.MaxValue
             });
 
             result.Should().NotBeNull();
@@ -141,13 +167,15 @@ namespace Ether.Tests.Reporters
                 .ToArray();
 
             _vstsClientMock.Setup(c => c.ExecuteGet<PRResponse>(It.IsAny<string>()))
-                .Returns(Task.FromResult(new PRResponse { Value = listOfPRs }));
+                .Returns<string>(q => Task.FromResult(new PRResponse { Value = listOfPRs.Skip(GetSkipValue(q)).Take(expectedPRsCount).ToArray() }));
             _vstsClientMock.Setup(c => c.ExecuteGet<ValueBasedResponse<PullRequestThread>>(It.IsAny<string>()))
                 .Returns(Task.FromResult(new ValueBasedResponse<PullRequestThread> { Value = new PullRequestThread[0] }));
 
             var result = await _reporter.ReportAsync(new ReportQuery
             {
-                ProfileId = _profile.Id
+                ProfileId = _profile.Id,
+                StartDate = DateTime.MinValue,
+                EndDate = DateTime.MaxValue
             });
 
             var expectedVotesForMember1 = listOfPRs.SelectMany(p => p.Reviewers)
@@ -305,13 +333,15 @@ namespace Ether.Tests.Reporters
                 .ToArray();
 
             _vstsClientMock.Setup(c => c.ExecuteGet<PRResponse>(It.IsAny<string>()))
-                .Returns(Task.FromResult(new PRResponse { Value = listOfPRs }));
+                .Returns<string>(q => Task.FromResult(new PRResponse { Value = listOfPRs.Skip(GetSkipValue(q)).Take(expectedPRsCount).ToArray() }));
             _vstsClientMock.Setup(c => c.ExecuteGet<ValueBasedResponse<PullRequestThread>>(It.IsAny<string>()))
                 .Returns(Task.FromResult(new ValueBasedResponse<PullRequestThread> { Value = new PullRequestThread[0] }));
 
             var result = await _reporter.ReportAsync(new ReportQuery
             {
-                ProfileId = _profile.Id
+                ProfileId = _profile.Id,
+                StartDate = DateTime.MinValue,
+                EndDate = DateTime.MaxValue
             });
 
             result.Should().NotBeNull();
@@ -361,6 +391,7 @@ namespace Ether.Tests.Reporters
             return Enumerable.Range(0, count).Select(i => new PullRequest
             {
                 PullRequestId = i,
+                CreationDate = DateTime.UtcNow.Subtract(TimeSpan.FromDays(i)),
                 Reviewers = GenerateReviewers(reviewersPool).ToArray()
             });
         }
@@ -378,6 +409,16 @@ namespace Ether.Tests.Reporters
                 new PullRequestReviewer { IsContainer = true, UniqueName = "C1", Vote = 5 },
                 new PullRequestReviewer { IsContainer = true, UniqueName = "C2", Vote = 0 }
             });
+        }
+
+        private int GetSkipValue(string query)
+        {
+            var skipParameter = query.Split('&').SingleOrDefault(p => p.StartsWith("$skip"));
+            if (string.IsNullOrEmpty(skipParameter))
+                return 0;
+
+            var skipValue = skipParameter.Split('=')[1];
+            return int.Parse(skipValue);
         }
     }
 }
