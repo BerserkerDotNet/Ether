@@ -10,6 +10,7 @@ namespace Ether.Core.Data
         private const string IdentitiesSection = "Identities";
         private const string WITSection = "wit";
         private const string WIQLApiSection = "wiql";
+        private const string QueriesApiSection = "queries";
         private const string WorkItemsSection = "WorkItems";
         private const string GITSection = "git";
         private const string RepositoriesSection = "repositories";
@@ -32,6 +33,12 @@ namespace Ether.Core.Data
         public VSTSApiUrl ForWIQL(string project)
         {
             _url.Append($"/{project}/{APIsSection}/{WITSection}/{WIQLApiSection}");
+            return this;
+        }
+
+        public VSTSApiUrl ForQueries(string project, string queryId)
+        {
+            _url.Append($"/{project}/{APIsSection}/{WITSection}/{QueriesApiSection}/{queryId}");
             return this;
         }
 

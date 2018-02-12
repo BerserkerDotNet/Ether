@@ -27,6 +27,8 @@ namespace Ether.Core.Interfaces
 
         Task<object> GetSingleAsync(Guid id, Type itemType);
 
+        Task<T> GetSingleAsync<T>(Guid id) where T : BaseDto;
+
         Task<bool> CreateAsync<T>(T item) where T : BaseDto;
 
         Task<bool> CreateOrUpdateAsync<T>(T item) where T : BaseDto;

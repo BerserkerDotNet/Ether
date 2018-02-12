@@ -110,6 +110,12 @@ namespace Ether.Core.Data
             return BsonSerializer.Deserialize(item, itemType);
         }
 
+        public async Task<T> GetSingleAsync<T>(Guid id)
+            where T : BaseDto
+        {
+            return (T)await GetSingleAsync(id, typeof(T));
+        }
+
         public async Task<TProjection> GetFieldValueAsync<TType, TProjection>(Expression<Func<TType, bool>> predicate, Expression<Func<TType, TProjection>> projection)
             where TType : BaseDto
         {

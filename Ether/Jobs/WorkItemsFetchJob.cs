@@ -190,6 +190,8 @@ namespace Ether.Jobs
 
             public string Url { get; set; }
         }
+
+        public int Count => WorkItems == null ? 0 : WorkItems.Count(); 
     }
 
     public class ValueResponse<T> where T : class, new()
