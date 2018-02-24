@@ -55,7 +55,7 @@ namespace Ether
             services.AddSingleton<DIFriendlyJobFactory>();
 
             services.AddScoped(typeof(IAll<>), typeof(DataManager<>));
-            services.AddScoped<IReporter, PullRequestsReporter>();
+            services.AddScoped<IReporter, CompletedPullRequestsReporter>();
             services.AddScoped<IReporter, WorkItemsReporter>();
             services.AddScoped<IReporter, ListOfReviewersReporter>();
             services.AddScoped<IWorkItemsClassifier, ResolvedWorkItemsClassifier>();

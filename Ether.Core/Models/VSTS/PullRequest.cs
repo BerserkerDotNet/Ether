@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 namespace Ether.Core.Models.VSTS
 {
@@ -14,8 +15,10 @@ namespace Ether.Core.Models.VSTS
         public string Title { get; set; }
         public string Status { get; set; }
         public IEnumerable<PullRequestReviewer> Reviewers { get; set; }
+        public IEnumerable<PullRequestIteration> Iterations { get; set; }
+        public IEnumerable<PullRequestThread> Threads { get; set; }
 
-        public int IterationsCount { get; set; }
-        public int CommentsCount { get; set; }
+        public int IterationsCount => Iterations == null ? 0 : Iterations.Count();
+        public int CommentsCount => Threads == null ? 0 : Threads.Count();
     }
 }

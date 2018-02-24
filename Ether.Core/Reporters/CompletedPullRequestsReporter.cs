@@ -15,25 +15,25 @@ using Ether.Core.Models.DTO;
 
 namespace Ether.Core.Reporters
 {
-    public class PullRequestsReporter : ReporterBase
+    public class CompletedPullRequestsReporter : ReporterBase
     {
         private readonly IVSTSClient _client;
         private static readonly Guid _reporterId = Guid.Parse("e6f4ff5a-a71d-4706-8d34-9227c55c5644");
         private static readonly object _locker = new object();
 
-        public PullRequestsReporter(IVSTSClient client, IRepository repository, IOptions<VSTSConfiguration> configuration, ILogger<PullRequestsReporter> logger)
+        public CompletedPullRequestsReporter(IVSTSClient client, IRepository repository, IOptions<VSTSConfiguration> configuration, ILogger<CompletedPullRequestsReporter> logger)
             :base(repository, configuration, logger)
         {
             _client = client;
         }
 
-        public override string Name => $"Completed Pull Requests report";
+        public override string Name => "Completed Pull Requests report";
 
         public override Guid Id => _reporterId;
 
         public override Type ReportType => typeof(PullRequestsReport);
 
-        protected async override Task<ReportResult> ReportInternal()
+        protected override Task<ReportResult> ReportInternal()
         {
             _logger.LogInformation($"Staring to query pull requests");
             var sw = Stopwatch.StartNew();
@@ -47,7 +47,7 @@ namespace Ether.Core.Reporters
             var report = GetReport(resultingPrs);
             sw.Stop();
             _logger.LogInformation("Finished generating pull request report '{ReportName}'. Time {OperationTime}", report.ReportName, sw.Elapsed);
-            return report;
+            return Task.FromResult<ReportResult>(report);
         }
 
         private void FetchPullrequestsForRepository(List<PullRequest> resultingPrs, VSTSRepository repository, VSTSProject project)
@@ -98,8 +98,8 @@ namespace Ether.Core.Reporters
                 var commentsResponse = _client.ExecuteGet<CountBasedResponse>(commentsUrl)
                     .GetAwaiter()
                     .GetResult();
-                pr.IterationsCount = iterationsResponse.Count;
-                pr.CommentsCount = commentsResponse.Count;
+                //pr.IterationsCount = iterationsResponse.Count;
+                //pr.CommentsCount = commentsResponse.Count;
                 pr.Author = member.DisplayName;
                 lock (_locker)
                 {
@@ -130,6 +130,25 @@ namespace Ether.Core.Reporters
             }
 
             return report;
+        }
+    }
+
+    public class PullRequestsReporter : ReporterBase
+    {
+        public PullRequestsReporter(IRepository repository, IOptions<VSTSConfiguration> configuration, ILogger<PullRequestsReporter> logger) 
+            : base(repository, configuration, logger)
+        {
+        }
+
+        public override string Name => "Pull request report";
+
+        public override Guid Id => Guid.Parse("1a6df0a7-e478-4091-83ea-e391c5f1a1ec");
+
+        public override Type ReportType => typeof(PullRequestsReport);
+
+        protected override Task<ReportResult> ReportInternal()
+        {
+            throw new NotImplementedException();
         }
     }
 }
