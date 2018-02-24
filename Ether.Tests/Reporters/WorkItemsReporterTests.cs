@@ -198,7 +198,8 @@ namespace Ether.Tests.Reporters
             result.As<WorkItemsReport>()
                 .Resolutions
                 .Select(w=>w.WorkItemId)
-                .ShouldBeEquivalentTo(expectedWorkItemsIds);
+                .Should()
+                .BeEquivalentTo(expectedWorkItemsIds);
         }
 
         [Test]
@@ -278,7 +279,7 @@ namespace Ether.Tests.Reporters
                 .Resolutions.Should().HaveCount(1);
             result.As<WorkItemsReport>()
                 .Resolutions.Select(r => r.WorkItemId)
-                .ShouldBeEquivalentTo(new[] { workitems[2].WorkItemId });
+                .Should().BeEquivalentTo(new[] { workitems[2].WorkItemId });
             result.As<WorkItemsReport>()
                 .TotalResolved.Should().Be(1);
             result.As<WorkItemsReport>()

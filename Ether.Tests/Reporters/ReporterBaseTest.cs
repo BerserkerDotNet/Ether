@@ -43,7 +43,8 @@ namespace Ether.Tests.Reporters
 
             var dummy = new DummyReporter(Mock.Of<IRepository>(), _configurationMock.Object, loggerMock.Object);
             dummy.Awaiting(async d => await d.ReportAsync(new ReportQuery()))
-                .ShouldThrow<ArgumentException>("Configuration is missing.");
+                .Should()
+                .Throw<ArgumentException>("Configuration is missing.");
 
             loggerMock.VerifyAll();
         }
@@ -55,7 +56,8 @@ namespace Ether.Tests.Reporters
             Common.SetupConfiguration(_configurationMock);
             var dummy = new DummyReporter(Mock.Of<IRepository>(), _configurationMock.Object, loggerMock.Object);
             dummy.Awaiting(async d => await d.ReportAsync(new ReportQuery()))
-                .ShouldThrow<ArgumentException>("Selected profile was not found.");
+                .Should().
+                Throw<ArgumentException>("Selected profile was not found.");
 
             loggerMock.VerifyAll();
         }

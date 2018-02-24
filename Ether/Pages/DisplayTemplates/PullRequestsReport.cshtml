@@ -5,11 +5,14 @@
     <thead>
         <tr>
             <th>Name</th>
-            <th>Total PRs</th>
-            <th>Total iterations</th>
+            <th>Created</th>
+            <th>Completed</th>
+            <th>Active</th>
+            <th>Abandoned</th>
+            <th>Iterations</th>
             <th>Avg iterations</th>
             <th>Code quality (%)</th>
-            <th>Total comments</th>
+            <th>Comments</th>
             <th>Avg comments</th>
             <th>Avg lifespan (days)</th>
         </tr>
@@ -17,37 +20,44 @@
     <tbody>
         @foreach (var report in Model.IndividualReports)
         {
-            <tr>
-                <td>@report.TeamMember</td>
-                <td>@report.TotalPRs</td>
-                <td>@report.TotalIterations</td>
-                <td>@report.AverageIterations.ToString("F2")</td>
-                <td>@report.CodeQuality.ToString("F2")</td>
-                <td>@report.TotalComments</td>
-                <td>@report.AverageComments</td>
-                <td>@report.AveragePRLifespan.TotalDays.ToString("F2")</td>
-            </tr>
+        <tr>
+            <td>@report.TeamMember</td>
+            <td>@report.Created</td>
+            <td>@report.Completed</td>
+            <td>@report.Active</td>
+            <td>@report.Abandoned</td>
+            <td>@report.TotalIterations</td>
+            <td>@report.AverageIterations.ToString("F2")</td>
+            <td>@report.CodeQuality.ToString("F2")</td>
+            <td>@report.TotalComments</td>
+            <td>@report.AverageComments.ToString("F2")</td>
+            <td>@report.AveragePRLifespan.TotalDays.ToString("F2")</td>
+        </tr>
         }
     </tbody>
     <tfoot>
         <tr class="active">
-            <th>Total PRs:</th>
-            <td class="success" colspan="2">@Model.TotalPRs</td>
+            <th>Total created:</th>
+            <td class="success" colspan="2">@Model.TotalCreated</td>
+            <th colspan="2">Avg iterations:</th>
+            <td class="success" colspan="2">@Model.AverageIterations.ToString("F2")</td>
         </tr>
         <tr class="active">
-            <th>Avg iterations:</th>
-            <td class="success" colspan="2">@Model.AverageIterations</td>
+            <th>Total completed:</th>
+            <td class="success" colspan="2">@Model.TotalCompleted</td>
+            <th colspan="2">Avg comments:</th>
+            <td class="success" colspan="2">@Model.AverageComments.ToString("F2")</td>
         </tr>
         <tr class="active">
-            <th>Avg comments:</th>
-            <td class="success" colspan="2">@Model.AverageComments</td>
+            <th>Total active:</th>
+            <td class="success" colspan="2">@Model.TotalActive</td>
+            <th colspan="2">Code quality:</th>
+            <td class="success" colspan="2">@Model.CodeQuality.ToString("F2")</td>
         </tr>
         <tr class="active">
-            <th>Code quality:</th>
-            <td class="success" colspan="2">@Model.CodeQuality</td>
-        </tr>
-        <tr class="active">
-            <th>Avg lifespan:</th>
+            <th>Total abandoned:</th>
+            <td class="success" colspan="2">@Model.TotalAbandoned</td>
+            <th colspan="2">Avg lifespan:</th>
             <td class="success" colspan="2">@Model.AveragePRLifespan.TotalDays.ToString("F2")</td>
         </tr>
     </tfoot>

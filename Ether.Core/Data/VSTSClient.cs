@@ -7,6 +7,9 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using System.Collections;
+using System.Collections.Generic;
+using Ether.Core.Proxy;
 
 namespace Ether.Core.Data
 {
@@ -14,10 +17,12 @@ namespace Ether.Core.Data
     {
         private const string JsonMimeType = "application/json";
         private readonly VSTSConfiguration _configuration;
+        private readonly IDependencyResolver _resolver;
 
-        public VSTSClient(IOptions<VSTSConfiguration> configuration)
+        public VSTSClient(IOptions<VSTSConfiguration> configuration, IDependencyResolver resolver)
         {
             _configuration = configuration.Value;
+            _resolver = resolver;
         }
 
         public async Task<T> ExecuteGet<T>(string url)
@@ -29,14 +34,16 @@ namespace Ether.Core.Data
                 {
                     response.EnsureSuccessStatusCode();
                     var resultContent = await response.Content.ReadAsStringAsync();
-                    return JsonConvert.DeserializeObject<T>(resultContent);
+                    var converter = _resolver.Resolve<PullRequestProxyJsonConverter>();
+                    return JsonConvert.DeserializeObject<T>(resultContent, converter);
                 }
             }
         }
 
         public Task<T> ExecutePost<T>(string url, object payload)
         {
-            return ExecutePost<T>(url, JsonConvert.SerializeObject(payload));
+            var converter = _resolver.Resolve<PullRequestProxyJsonConverter>();
+            return ExecutePost<T>(url, JsonConvert.SerializeObject(payload, converter));
         }
 
         public async Task<T> ExecutePost<T>(string url, string payload)
@@ -49,7 +56,8 @@ namespace Ether.Core.Data
                 {
                     response.EnsureSuccessStatusCode();
                     var resultContent = await response.Content.ReadAsStringAsync();
-                    return JsonConvert.DeserializeObject<T>(resultContent);
+                    var converter = _resolver.Resolve<PullRequestProxyJsonConverter>();
+                    return JsonConvert.DeserializeObject<T>(resultContent, converter);
                 }
             }
         }

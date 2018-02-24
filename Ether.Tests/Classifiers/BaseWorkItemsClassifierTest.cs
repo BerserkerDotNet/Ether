@@ -25,7 +25,8 @@ namespace Ether.Tests.Classifiers
         public void ShouldThrowExceptionIfRequestIsNull()
         {
             _classifier.Invoking(c => c.Classify(null))
-                .ShouldThrow<ArgumentNullException>();
+                .Should()
+                .Throw<ArgumentNullException>();
         }
 
         [Test]

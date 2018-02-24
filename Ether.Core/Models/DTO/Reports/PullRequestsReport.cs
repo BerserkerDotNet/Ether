@@ -8,7 +8,10 @@ namespace Ether.Core.Models.DTO.Reports
     [DbName(nameof(ReportResult))]
     public class PullRequestsReport : ReportResult
     {
-        public int TotalPRs => IndividualReports.Sum(r => r.TotalPRs);
+        public int TotalCompleted => IndividualReports.Sum(r => r.Completed);
+        public int TotalAbandoned => IndividualReports.Sum(r => r.Abandoned);
+        public int TotalActive => IndividualReports.Sum(r => r.Active);
+        public int TotalCreated => IndividualReports.Sum(r => r.Created);
         public double AverageIterations => IndividualReports.Count == 0 ? 0 : IndividualReports.Sum(r => r.AverageIterations) / IndividualReports.Count;
         public double AverageComments => IndividualReports.Count == 0 ? 0 : IndividualReports.Sum(r => r.AverageComments) / IndividualReports.Count;
         public double CodeQuality => IndividualReports.Count == 0 ? 0 : IndividualReports.Sum(r => r.CodeQuality) / IndividualReports.Count;
@@ -18,7 +21,10 @@ namespace Ether.Core.Models.DTO.Reports
 
         public class IndividualPRReport
         {
-            public int TotalPRs { get; set; }
+            public int Completed { get; set; }
+            public int Created { get; set; }
+            public int Active { get; set; }
+            public int Abandoned { get; set; }
             public int TotalIterations { get; set; }
             public int TotalComments { get; set; }
             public double CodeQuality { get; set; }
@@ -26,6 +32,8 @@ namespace Ether.Core.Models.DTO.Reports
             public double AverageComments { get; set; }
             public TimeSpan AveragePRLifespan { get; set; }
             public string TeamMember { get; set; }
+
+            public int TotalPullRequestsCount => Completed + Active + Abandoned;
         }
     }
 }

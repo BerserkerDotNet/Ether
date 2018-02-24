@@ -44,8 +44,8 @@ namespace Ether.Tests.Reporters
         [Test]
         public async Task ShouldReturnEmptyReportIfNoData()
         {
-            _vstsClientMock.Setup(c => c.ExecuteGet<PRResponse>(It.IsAny<string>()))
-                .Returns(Task.FromResult(new PRResponse { Value = new PullRequest[0] }))
+            _vstsClientMock.Setup(c => c.ExecuteGet<PullRequestsResponse>(It.IsAny<string>()))
+                .Returns(Task.FromResult(new PullRequestsResponse { Value = new PullRequest[0] }))
                 .Verifiable();
 
             var result = await _reporter.ReportAsync(new ReportQuery
@@ -70,8 +70,8 @@ namespace Ether.Tests.Reporters
             const int expectedPRsCount = 100;
             var listOfPRs = GeneratePullRequests(expectedPRsCount, _team.Take(2))
                 .ToArray();
-            _vstsClientMock.Setup(c => c.ExecuteGet<PRResponse>(It.IsAny<string>()))
-                .Returns<string>(q => Task.FromResult(new PRResponse { Value = listOfPRs.Skip(GetSkipValue(q)).Take(10).ToArray() }));
+            _vstsClientMock.Setup(c => c.ExecuteGet<PullRequestsResponse>(It.IsAny<string>()))
+                .Returns<string>(q => Task.FromResult(new PullRequestsResponse { Value = listOfPRs.Skip(GetSkipValue(q)).Take(10).ToArray() }));
             _vstsClientMock.Setup(c => c.ExecuteGet<ValueBasedResponse<PullRequestThread>>(It.IsAny<string>()))
                 .Returns(Task.FromResult(new ValueBasedResponse<PullRequestThread> { Value = new PullRequestThread[0] }));
 
@@ -85,7 +85,7 @@ namespace Ether.Tests.Reporters
             result.Should().NotBeNull();
             result.As<ListOfReviewersReport>()
                 .NumberOfPullRequests.Should().Be(60);
-            _vstsClientMock.Verify(c => c.ExecuteGet<PRResponse>(It.IsAny<string>()), Times.Exactly(7));
+            _vstsClientMock.Verify(c => c.ExecuteGet<PullRequestsResponse>(It.IsAny<string>()), Times.Exactly(7));
         }
 
         [Test]
@@ -95,8 +95,8 @@ namespace Ether.Tests.Reporters
             var listOfPRs = GeneratePullRequests(expectedPRsCount, _team.Take(2))
                 .ToArray();
 
-            _vstsClientMock.Setup(c => c.ExecuteGet<PRResponse>(It.IsAny<string>()))
-                .Returns<string>(q => Task.FromResult(new PRResponse { Value = listOfPRs.Skip(GetSkipValue(q)).Take(expectedPRsCount).ToArray() }));
+            _vstsClientMock.Setup(c => c.ExecuteGet<PullRequestsResponse>(It.IsAny<string>()))
+                .Returns<string>(q => Task.FromResult(new PullRequestsResponse { Value = listOfPRs.Skip(GetSkipValue(q)).Take(expectedPRsCount).ToArray() }));
             _vstsClientMock.Setup(c => c.ExecuteGet<ValueBasedResponse<PullRequestThread>>(It.IsAny<string>()))
                 .Returns(Task.FromResult(new ValueBasedResponse<PullRequestThread> { Value = new PullRequestThread[0] }));
 
@@ -138,8 +138,8 @@ namespace Ether.Tests.Reporters
                 new PullRequestThread.Comment { Author = authors[1] }
             };
 
-            _vstsClientMock.Setup(c => c.ExecuteGet<PRResponse>(It.IsAny<string>()))
-                .Returns(Task.FromResult(new PRResponse { Value = prsList }));
+            _vstsClientMock.Setup(c => c.ExecuteGet<PullRequestsResponse>(It.IsAny<string>()))
+                .Returns(Task.FromResult(new PullRequestsResponse { Value = prsList }));
             _vstsClientMock.Setup(c => c.ExecuteGet<ValueBasedResponse<PullRequestThread>>(It.IsAny<string>()))
                 .Returns(Task.FromResult(new ValueBasedResponse<PullRequestThread> { Value = new[] { new PullRequestThread { Comments = comments } } }));
 
@@ -166,8 +166,8 @@ namespace Ether.Tests.Reporters
             var listOfPRs = GeneratePullRequests(expectedPRsCount, _team.Take(2))
                 .ToArray();
 
-            _vstsClientMock.Setup(c => c.ExecuteGet<PRResponse>(It.IsAny<string>()))
-                .Returns<string>(q => Task.FromResult(new PRResponse { Value = listOfPRs.Skip(GetSkipValue(q)).Take(expectedPRsCount).ToArray() }));
+            _vstsClientMock.Setup(c => c.ExecuteGet<PullRequestsResponse>(It.IsAny<string>()))
+                .Returns<string>(q => Task.FromResult(new PullRequestsResponse { Value = listOfPRs.Skip(GetSkipValue(q)).Take(expectedPRsCount).ToArray() }));
             _vstsClientMock.Setup(c => c.ExecuteGet<ValueBasedResponse<PullRequestThread>>(It.IsAny<string>()))
                 .Returns(Task.FromResult(new ValueBasedResponse<PullRequestThread> { Value = new PullRequestThread[0] }));
 
@@ -222,8 +222,8 @@ namespace Ether.Tests.Reporters
                 new PullRequestThread.Comment { Author = authors[1] }
             };
 
-            _vstsClientMock.Setup(c => c.ExecuteGet<PRResponse>(It.IsAny<string>()))
-                .Returns(Task.FromResult(new PRResponse { Value = prsList }));
+            _vstsClientMock.Setup(c => c.ExecuteGet<PullRequestsResponse>(It.IsAny<string>()))
+                .Returns(Task.FromResult(new PullRequestsResponse { Value = prsList }));
             _vstsClientMock.Setup(c => c.ExecuteGet<ValueBasedResponse<PullRequestThread>>(It.IsAny<string>()))
                 .Returns(Task.FromResult(new ValueBasedResponse<PullRequestThread> { Value = new[] { new PullRequestThread { Comments = commentsSet1 }, new PullRequestThread { Comments = commentsSet2 } } }));
 
@@ -262,8 +262,8 @@ namespace Ether.Tests.Reporters
                 }
             };
 
-            _vstsClientMock.Setup(c => c.ExecuteGet<PRResponse>(It.IsAny<string>()))
-                .Returns(Task.FromResult(new PRResponse { Value = prsList }));
+            _vstsClientMock.Setup(c => c.ExecuteGet<PullRequestsResponse>(It.IsAny<string>()))
+                .Returns(Task.FromResult(new PullRequestsResponse { Value = prsList }));
             _vstsClientMock.Setup(c => c.ExecuteGet<ValueBasedResponse<PullRequestThread>>(It.IsAny<string>()))
                 .Returns(Task.FromResult(new ValueBasedResponse<PullRequestThread> { Value = new PullRequestThread[0] }));
 
@@ -303,8 +303,8 @@ namespace Ether.Tests.Reporters
                 new PullRequestThread.Comment { Author = authors[1], CommentType = "system" }
             };
 
-            _vstsClientMock.Setup(c => c.ExecuteGet<PRResponse>(It.IsAny<string>()))
-                .Returns(Task.FromResult(new PRResponse { Value = prsList }));
+            _vstsClientMock.Setup(c => c.ExecuteGet<PullRequestsResponse>(It.IsAny<string>()))
+                .Returns(Task.FromResult(new PullRequestsResponse { Value = prsList }));
             _vstsClientMock.Setup(c => c.ExecuteGet<ValueBasedResponse<PullRequestThread>>(It.IsAny<string>()))
                 .Returns(Task.FromResult(new ValueBasedResponse<PullRequestThread> { Value = new[] { new PullRequestThread { Comments = comments } } }));
 
@@ -332,8 +332,8 @@ namespace Ether.Tests.Reporters
             var listOfPRs = GeneratePullRequests(expectedPRsCount, theWholeTeam)
                 .ToArray();
 
-            _vstsClientMock.Setup(c => c.ExecuteGet<PRResponse>(It.IsAny<string>()))
-                .Returns<string>(q => Task.FromResult(new PRResponse { Value = listOfPRs.Skip(GetSkipValue(q)).Take(expectedPRsCount).ToArray() }));
+            _vstsClientMock.Setup(c => c.ExecuteGet<PullRequestsResponse>(It.IsAny<string>()))
+                .Returns<string>(q => Task.FromResult(new PullRequestsResponse { Value = listOfPRs.Skip(GetSkipValue(q)).Take(expectedPRsCount).ToArray() }));
             _vstsClientMock.Setup(c => c.ExecuteGet<ValueBasedResponse<PullRequestThread>>(It.IsAny<string>()))
                 .Returns(Task.FromResult(new ValueBasedResponse<PullRequestThread> { Value = new PullRequestThread[0] }));
 
@@ -364,8 +364,8 @@ namespace Ether.Tests.Reporters
                 Reviewers = new[] { new PullRequestReviewer { IsContainer = false, Vote = 5, UniqueName = _team[i < 5 ? 0 : 1].Email } }
             }).ToArray();
 
-            _vstsClientMock.Setup(c => c.ExecuteGet<PRResponse>(It.IsAny<string>()))
-                .Returns(Task.FromResult(new PRResponse { Value = prsList }));
+            _vstsClientMock.Setup(c => c.ExecuteGet<PullRequestsResponse>(It.IsAny<string>()))
+                .Returns(Task.FromResult(new PullRequestsResponse { Value = prsList }));
             _vstsClientMock.Setup(c => c.ExecuteGet<ValueBasedResponse<PullRequestThread>>(It.IsAny<string>()))
                 .Returns(Task.FromResult(new ValueBasedResponse<PullRequestThread> { Value = new PullRequestThread[0] }));
 

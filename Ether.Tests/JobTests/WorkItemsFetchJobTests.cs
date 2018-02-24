@@ -72,7 +72,9 @@ namespace Ether.Tests.JobTests
             _repositoryMock.Setup(r => r.GetAll<TeamMember>()).Throws<Exception>();
             _repositoryMock.Setup(r => r.Get(It.IsAny<Expression<Func<VSTSProject, bool>>>())).Throws<Exception>();
 
-            _job.Invoking(j => j.Execute()).ShouldNotThrow();
+            _job.Invoking(j => j.Execute())
+                .Should()
+                .NotThrow();
 
             _loggerMock.Verify(l => l.Log(LogLevel.Error, 0, It.IsAny<FormattedLogValues>(), It.IsAny<Exception>(), It.IsAny<Func<object, Exception, string>>()), Times.Once());
         }
@@ -82,7 +84,7 @@ namespace Ether.Tests.JobTests
         {
 
             _configurationMock.SetupGet(c => c.Value).Returns((VSTSConfiguration)null);
-            _job.Invoking(j => j.Execute()).ShouldNotThrow();
+            _job.Invoking(j => j.Execute()).Should().NotThrow();
         }
 
         [Test]

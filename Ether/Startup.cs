@@ -13,6 +13,10 @@ using Microsoft.Extensions.Logging;
 using FluentScheduler;
 using Ether.Jobs;
 using Ether.Core.Reporters.Classifiers;
+using Castle.DynamicProxy;
+using Ether.Core.Proxy;
+using Newtonsoft.Json;
+using Ether.Services;
 
 namespace Ether
 {
@@ -52,10 +56,14 @@ namespace Ether
             });
             services.AddSingleton<IRepository, MongoRepository>();
             services.AddSingleton<IVSTSClient, VSTSClient>();
+            services.AddSingleton<IVstsClientRepository, VstsClientRepository>();
             services.AddSingleton<DIFriendlyJobFactory>();
+            services.AddSingleton<ProxyGenerator>();
+            services.AddSingleton<IDependencyResolver, AspNetDependencyResolver>();
+            services.AddSingleton<PullRequestProxyJsonConverter>();
 
             services.AddScoped(typeof(IAll<>), typeof(DataManager<>));
-            services.AddScoped<IReporter, CompletedPullRequestsReporter>();
+            services.AddScoped<IReporter, PullRequestsReporter>();
             services.AddScoped<IReporter, WorkItemsReporter>();
             services.AddScoped<IReporter, ListOfReviewersReporter>();
             services.AddScoped<IWorkItemsClassifier, ResolvedWorkItemsClassifier>();
