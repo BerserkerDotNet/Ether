@@ -12,5 +12,6 @@ namespace Ether.Core.Models.DTO.Reports
         public DateTime DateTaken { get; set; }
         public Guid ReporterId { get; set; }
         public string ReportName { get; set; }
+        public TimeSpan? GeneratedIn { get; set; }
     }
 }

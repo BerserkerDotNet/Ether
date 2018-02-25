@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Ether.Core.Models;
+using System.Diagnostics;
 
 namespace Ether.Core.Reporters
 {
@@ -39,11 +40,14 @@ namespace Ether.Core.Reporters
                 throw new ArgumentException("Configuration is missing.");
             }
 
+            var sw = Stopwatch.StartNew();
             Input = await GetInputData(query);
             _logger.LogWarning("Report requested for {Profile} starting from {StartDate} until {EndDate}", Input.Profile.Name, query.StartDate, Input.ActualEndDate);
 
             var result = await ReportInternal();
             PopulateStandardFields(result);
+            sw.Stop();
+            result.GeneratedIn = sw.Elapsed;
             await _repository.CreateAsync(result);
             return result;
         }
