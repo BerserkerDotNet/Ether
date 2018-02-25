@@ -90,9 +90,10 @@ namespace Ether.Core.Reporters
             var groupedResult = resultingPrs.GroupBy(p => p.CreatedBy);
             var report = new PullRequestsReport();
             report.IndividualReports = new List<PullRequestsReport.IndividualPRReport>(groupedResult.Count());
-            foreach (var personResult in groupedResult)
+
+            Parallel.ForEach(groupedResult, personResult => 
             {
-                _progressReporter.Report($"Aggregating data for {personResult.Key.DisplayName}", GetProgressStep());
+                _progressReporter.Report($"Starting to generate report for {personResult.Key.DisplayName}");
                 var individualReport = new PullRequestsReport.IndividualPRReport();
                 individualReport.TeamMember = GetUserDisplayName(personResult.Key);
                 individualReport.Completed = personResult.Count(IsCompletedPullRequest);
@@ -108,8 +109,15 @@ namespace Ether.Core.Reporters
                     .Sum(r => (r.ClosedDate.Value - r.CreationDate).TotalSeconds) / individualReport.Completed;
                 averagePullRequestLifetime = double.IsNaN(averagePullRequestLifetime) ? 0 : averagePullRequestLifetime;
                 individualReport.AveragePRLifespan = TimeSpan.FromSeconds(averagePullRequestLifetime);
-                report.IndividualReports.Add(individualReport);
-            }
+                lock (_locker)
+                {
+                    report.IndividualReports.Add(individualReport);
+                }
+                _progressReporter.Report($"Finished generating report for {personResult.Key.DisplayName}", GetProgressStep());
+            });
+            report.IndividualReports = report.IndividualReports
+                .OrderBy(r => r.TeamMember)
+                .ToList();
 
             return report;
         }
