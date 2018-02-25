@@ -44,12 +44,15 @@ namespace Ether.Core.Reporters
             foreach (var repository in Input.Repositories)
             {
                 var project = Input.GetProjectFor(repository);
+                await _progressReporter.Report($"Starting to fetch pull requests from {project.Name}/{repository.Name}");
                 var pullrequests = await GetPullRequests(repository, project);
-                await _progressReporter.Report($"Fetched {pullrequests.Count()} pull requests for {project.Name}/{repository.Name}", GetProgressStep());
+                await _progressReporter.Report($"Fetched {pullrequests.Count()} pull requests from {project.Name}/{repository.Name}", GetProgressStep());
                 allPullrequests.AddRange(pullrequests);
+                await _progressReporter.Report($"Extracting reviewers from pull requests in {project.Name}/{repository.Name}");
                 var reviewers = GetAllReviewers(pullrequests);
                 allReviewers.AddRange(reviewers);
                 await _progressReporter.Report($"Found {reviewers.Count()} reviewers in pull requests from {project.Name}/{repository.Name}", GetProgressStep());
+                await _progressReporter.Report($"Extracting comments from pull requests in {project.Name}/{repository.Name}");
                 var comments = GetComments(pullrequests);
                 allComments.AddRange(comments);
                 await _progressReporter.Report($"Found {comments.Count()} comments in pull requests from {project.Name}/{repository.Name}", GetProgressStep());
@@ -97,10 +100,12 @@ namespace Ether.Core.Reporters
             Parallel.ForEach(pullrequests, p => 
             {
                 // Threads are lazy loaded, so need to pre-fetch first and then add to collection
-                var threads = p.Threads.ToList();
+                if (!p.Threads.Any())
+                    return;
+
                 lock (_locker)
                 {
-                    comments.AddRange(threads.SelectMany(t => t.Comments).Where(c => c.CommentType != "system"));
+                    comments.AddRange(p.Threads.SelectMany(t => t.Comments).Where(c => c.CommentType != "system"));
                 }
             });
             sw.Stop();
