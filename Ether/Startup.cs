@@ -17,6 +17,7 @@ using Castle.DynamicProxy;
 using Ether.Core.Proxy;
 using Newtonsoft.Json;
 using Ether.Services;
+using Ether.Hubs;
 
 namespace Ether
 {
@@ -54,6 +55,8 @@ namespace Ether
             {
                 options.Conventions.AddPageRoute("/Home/Index", "");
             });
+            services.AddSignalR();
+
             services.AddSingleton<IRepository, MongoRepository>();
             services.AddSingleton<IVSTSClient, VSTSClient>();
             services.AddSingleton<IVstsClientRepository, VstsClientRepository>();
@@ -61,6 +64,7 @@ namespace Ether
             services.AddSingleton<ProxyGenerator>();
             services.AddSingleton<IDependencyResolver, AspNetDependencyResolver>();
             services.AddSingleton<PullRequestProxyJsonConverter>();
+            services.AddSingleton<IProgressReporter, SignalRProgressReporter>();
 
             services.AddScoped(typeof(IAll<>), typeof(DataManager<>));
             services.AddScoped<IReporter, PullRequestsReporter>();
@@ -68,6 +72,7 @@ namespace Ether
             services.AddScoped<IReporter, ListOfReviewersReporter>();
             services.AddScoped<IWorkItemsClassifier, ResolvedWorkItemsClassifier>();
             services.AddScoped<IWorkItemsClassifier, ClosedTasksWorkItemsClassifier>();
+            services.AddScoped<LiveUpdatesHub>();
 
             services.AddTransient<WorkItemsFetchJob>();
             services.AddTransient<RetentionJob>();
@@ -92,6 +97,11 @@ namespace Ether
                         context.HttpContext.Response.StatusCode);
                 });
             }
+
+            app.UseSignalR(routes => 
+            {
+                routes.MapHub<LiveUpdatesHub>("liveupdates");
+            });
 
             app.UseResponseCompression();
             app.UseStaticFiles();

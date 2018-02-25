@@ -61,27 +61,27 @@
             <div class="row">
                 <div class="col-md-12">
                     @if (configuration.Value.AccessToken == null || configuration.Value.InstanceName == null)
-                {
+                    {
                         <div class="alert alert-warning" role="alert">
                             <strong>Warning!</strong> Configuration is not complete, make sure you have both InstanceName and AccessToken environment variables.
                         </div>
-                }
+                    }
 
                     @if (!string.IsNullOrEmpty(notification))
-                {
-                    var notificationParts = notification.Split('|');
-                    if (notificationParts.Count() == 2)
                     {
-                        var type = notificationParts[0];
-                        var message = notificationParts[1];
-                        var cssClass = type == TempDataExtensions.NotificationError ? "alert-danger" : (type == TempDataExtensions.NotificationWarning ? "alert-warning" : "alert-success");
-                        var title = type == TempDataExtensions.NotificationError ? "Oops!" : (type == TempDataExtensions.NotificationWarning ? "Warning!" : "Success!");
+                        var notificationParts = notification.Split('|');
+                        if (notificationParts.Count() == 2)
+                        {
+                            var type = notificationParts[0];
+                            var message = notificationParts[1];
+                            var cssClass = type == TempDataExtensions.NotificationError ? "alert-danger" : (type == TempDataExtensions.NotificationWarning ? "alert-warning" : "alert-success");
+                            var title = type == TempDataExtensions.NotificationError ? "Oops!" : (type == TempDataExtensions.NotificationWarning ? "Warning!" : "Success!");
                             <div class="alert @cssClass alert-dismissible" role="alert">
                                 <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                                 <strong>@title</strong> @message
                             </div>
+                        }
                     }
-                }
                     @RenderBody()
                 </div>
             </div>
@@ -95,7 +95,7 @@
                         <li><a class="footer-item" href="https://github.com/BerserkerDotNet/Ether/issues" target="_blank"><img src="~/images/footer/issue.png" alt="Report an issue" title="Report an issue" /></a></li>
                         <li><a class="footer-item" href="https://github.com/BerserkerDotNet/Ether" target="_blank"><img src="~/images/footer/github.png" alt="GitHub page" title="GitHub page" /></a></li>
                         <li><a class="footer-item" href="https://twitter.com/BerserkerDotNET" target="_blank"><img src="~/images/footer/twitter.png" alt="Twitter page" title="Twitter page" /></a></li>
-                        <li><a class="footer-item" href="https://www.linkedin.com/in/andrii-snigyr-78b73a67/" target="_blank"><img src="~/images/footer/linkedin.png" alt="LinkedIn profile" title="LinkedIn profile"/></a></li>
+                        <li><a class="footer-item" href="https://www.linkedin.com/in/andrii-snigyr-78b73a67/" target="_blank"><img src="~/images/footer/linkedin.png" alt="LinkedIn profile" title="LinkedIn profile" /></a></li>
                     </ul>
                 </div>
                 <div class="row navbar-inner">

@@ -16,13 +16,15 @@ namespace Ether.Core.Reporters
     public class PullRequestsReporter : ReporterBase
     {
         private readonly IVstsClientRepository _vstsRepository;
+        private readonly IProgressReporter _progressReporter;
         private static readonly Guid _reporterId = Guid.Parse("e6f4ff5a-a71d-4706-8d34-9227c55c5644");
         private static readonly object _locker = new object();
 
-        public PullRequestsReporter(IVstsClientRepository vstsRepository, IRepository repository, IOptions<VSTSConfiguration> configuration, ILogger<PullRequestsReporter> logger)
+        public PullRequestsReporter(IVstsClientRepository vstsRepository, IRepository repository, IProgressReporter progressReporter, IOptions<VSTSConfiguration> configuration, ILogger<PullRequestsReporter> logger)
             :base(repository, configuration, logger)
         {
             _vstsRepository = vstsRepository;
+            _progressReporter = progressReporter;
         }
 
         public override string Name => "Pull Requests report";
@@ -36,6 +38,8 @@ namespace Ether.Core.Reporters
             _logger.LogInformation($"Staring to query pull requests");
             var sw = Stopwatch.StartNew();
             var resultingPrs = new List<PullRequest>();
+            _progressReporter.Report("Starting to collect data");
+
             Parallel.ForEach(Input.Repositories, repositoryInfo =>
             {
                 var project = Input.GetProjectFor(repositoryInfo);
@@ -54,6 +58,7 @@ namespace Ether.Core.Reporters
             var totalTime = TimeSpan.FromMilliseconds(0);
             Parallel.ForEach(Input.Members, member => 
             {
+                _progressReporter.Report($"Looking for {member.DisplayName} pull requests in {projectName}/{repositoryName}");
                 var pullRequestsQuery = PullRequestQuery.New(Input.Query.StartDate)
                     .WithFilter(IsPullRequestMatch)
                     .WithParameter("creatorId", member.Id.ToString())
@@ -65,6 +70,7 @@ namespace Ether.Core.Reporters
                 totalTime += sw.Elapsed;
                 sw.Restart();
 
+                _progressReporter.Report($"Found {pullRequests.Count()} pull requests from {member.DisplayName} in {projectName}/{repositoryName}.", GetProgressStep());
                 lock (_locker)
                 {
                     resultingPrs.AddRange(pullRequests);
@@ -86,6 +92,7 @@ namespace Ether.Core.Reporters
             report.IndividualReports = new List<PullRequestsReport.IndividualPRReport>(groupedResult.Count());
             foreach (var personResult in groupedResult)
             {
+                _progressReporter.Report($"Aggregating data for {personResult.Key.DisplayName}", GetProgressStep());
                 var individualReport = new PullRequestsReport.IndividualPRReport();
                 individualReport.TeamMember = GetUserDisplayName(personResult.Key);
                 individualReport.Completed = personResult.Count(IsCompletedPullRequest);
@@ -134,6 +141,12 @@ namespace Ether.Core.Reporters
                 return user.DisplayName;
 
             return memeber.DisplayName;
+        }
+
+        private float GetProgressStep()
+        {
+            var totalSteps = (Input.Repositories.Count() * Input.Members.Count()) + Input.Members.Count();
+            return 100.0F / totalSteps;
         }
     }
 }

@@ -43,26 +43,70 @@
     </div>
     <button id="generateReportBtn" type="submit" class="btn btn-success">Create a report</button>
 </form>
+
 <div id="loadingModal" class="modal fade" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">Reporting</h4>
+                <h4 class="modal-title">Generating report</h4>
             </div>
             <div class="modal-body">
                 <div class="progress">
-                    <div class="progress-bar progress-bar-success progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+                    <div id="progressBar" class="progress-bar progress-bar-success progress-bar-striped active" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
                         <span class="sr-only">Your report is being generated, please wait&hellip;</span>
                     </div>
                 </div>
-                <p>Your report is being generated, please wait&hellip;</p>
+                <p >Your report is being generated, please wait&hellip;</p>
+                <textarea id="progressReport" readonly style="resize:none; width:100%; height:100px;"></textarea>
             </div>
-         </div><!-- /.modal-content -->
+        </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 @section Scripts{
+    <script type="text/javascript" src="~/lib/signalr/signalr-client-1.0.0-alpha2-final.min.js"></script>
     <script>
         $(document).ready(function () {
+            configureDateSelectors();
+            var currentProgress = 0;
+            $('form').submit(function (e) {
+                if ($(this).valid()) {
+                    currentProgress = 0;
+                    $('#loadingModal').modal({
+                        keyboard: false,
+                        backdrop: 'static'
+                    });
+                }
+            });
+
+            var connection = new signalR.HubConnection('/liveupdates');
+            connection.on('update', function (message, moveProgressBy) {
+                console.log('received: ' + message + '; progress update: ' + moveProgressBy);
+                var reportArea = $('#progressReport');
+                reportArea.append(message + '\n');
+                reportArea.scrollTop(reportArea[0].scrollHeight);
+                var totalWidth = $('.progress').width();
+                var moveBy = (totalWidth * moveProgressBy) / 100;
+                var bar = $('#progressBar');
+                currentProgress = currentProgress + moveBy;
+                bar.width(currentProgress);
+                var currentPercent = Math.round((currentProgress * 100) / totalWidth);
+                bar.attr('aria-valuenow', currentPercent);
+                bar.text(currentPercent + '%')
+                console.log('Total width: ' + totalWidth + '; moveBy: '+moveBy +'; updated width: ' + currentProgress);
+            });
+
+            connection.start();
+
+        });
+        function setSelectedStartDate(date) {
+            $('#StartDateLabel').text('Start date (' + date + '):');
+        }
+
+        function setSelectedEndDate(date) {
+            $('#EndDateLabel').text('End date (' + date + '):');
+        }
+
+        function configureDateSelectors() {
             var commonOptions = {
                 changeMonth: true,
                 changeYear: true,
@@ -88,25 +132,9 @@
                 }
             }, commonOptions);
             var endDate = $('#EndDateDiv').datepicker(endDateOptions);
-
-            $('form').submit(function (e) {
-                if ($(this).valid()) {
-                    $('#loadingModal').modal({
-                        keyboard: false,
-                        backdrop: 'static'
-                    });
-                }
-            });
-
             setSelectedStartDate(startDate.datepicker("getDate").toLocaleDateString());
             setSelectedEndDate(endDate.datepicker("getDate").toLocaleDateString());
-        });
-        function setSelectedStartDate(date) {
-            $('#StartDateLabel').text('Start date (' + date + '):');
         }
 
-        function setSelectedEndDate(date) {
-            $('#EndDateLabel').text('End date (' + date + '):');
-        }
     </script>
 }

@@ -19,11 +19,13 @@ namespace Ether.Core.Reporters
         private static readonly Guid _reporterId = Guid.Parse("c196c2e9-ac21-48bb-ab03-afd7437900db");
         private static readonly object _locker = new object();
         private readonly IVstsClientRepository _vstsRepository;
+        private readonly IProgressReporter _progressReporter;
 
-        public ListOfReviewersReporter(IVstsClientRepository vstsRepository, IRepository repository, IOptions<VSTSConfiguration> configuration, ILogger<ListOfReviewersReporter> logger) 
+        public ListOfReviewersReporter(IVstsClientRepository vstsRepository, IRepository repository, IProgressReporter progressReporter, IOptions<VSTSConfiguration> configuration, ILogger<ListOfReviewersReporter> logger) 
             : base(repository, configuration, logger)
         {
             _vstsRepository = vstsRepository;
+            _progressReporter = progressReporter;
         }
 
         public override string Name => "List of reviewers report";
@@ -38,13 +40,19 @@ namespace Ether.Core.Reporters
             var allPullrequests = new List<PullRequest>();
             var allComments = new List<PullRequestThread.Comment>();
             var swTotal = Stopwatch.StartNew();
+            await _progressReporter.Report("Starting to collect data");
             foreach (var repository in Input.Repositories)
             {
                 var project = Input.GetProjectFor(repository);
                 var pullrequests = await GetPullRequests(repository, project);
+                await _progressReporter.Report($"Fetched {pullrequests.Count()} pull requests for {project.Name}/{repository.Name}", GetProgressStep());
                 allPullrequests.AddRange(pullrequests);
-                allReviewers.AddRange(GetAllReviewers(pullrequests));
-                allComments.AddRange(GetComments(pullrequests));
+                var reviewers = GetAllReviewers(pullrequests);
+                allReviewers.AddRange(reviewers);
+                await _progressReporter.Report($"Found {reviewers.Count()} reviewers in pull requests from {project.Name}/{repository.Name}", GetProgressStep());
+                var comments = GetComments(pullrequests);
+                allComments.AddRange(comments);
+                await _progressReporter.Report($"Found {comments.Count()} comments in pull requests from {project.Name}/{repository.Name}", GetProgressStep());
             }
 
             var sw = Stopwatch.StartNew();
@@ -102,6 +110,7 @@ namespace Ether.Core.Reporters
 
         private ListOfReviewersReport CreateReport(List<VSTSUser> resultingReviewers, List<PullRequest> resultingPrs, List<PullRequestThread.Comment> allComments)
         {
+            _progressReporter.Report("Generating report");
             var sw = Stopwatch.StartNew();
             var result = new ListOfReviewersReport();
             result.IndividualReports = new List<ListOfReviewersReport.IndividualReviewerReport>(resultingReviewers.Count);
@@ -123,6 +132,13 @@ namespace Ether.Core.Reporters
             sw.Stop();
             _logger.LogInformation($"Report created in {sw.Elapsed}");
             return result;
+        }
+
+        private float GetProgressStep()
+        {
+            const int numberOfNotificationsLogged = 3;
+            var totalSteps = Input.Repositories.Count() * numberOfNotificationsLogged;
+            return 100.0F / totalSteps;
         }
     }
 }
