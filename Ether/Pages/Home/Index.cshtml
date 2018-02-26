@@ -78,7 +78,7 @@
                 }
             });
 
-            var connection = new signalR.HubConnection('/liveupdates');
+            var connection = new signalR.HubConnection('/liveupdates', { transport: signalR.TransportType.LongPolling});
             connection.on('update', function (message, moveProgressBy) {
                 console.log('received: ' + message + '; progress update: ' + moveProgressBy);
                 var reportArea = $('#progressReport');
