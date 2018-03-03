@@ -16,7 +16,7 @@ namespace Ether.Services
 
         public async Task Report(string message, float moveProgressBy = 0)
         {
-            await _hub.Clients.All.InvokeAsync("update", message, moveProgressBy);
+            await _hub.Clients.All.SendAsync("update", message, moveProgressBy);
         }
     }
 }

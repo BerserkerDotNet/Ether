@@ -18,6 +18,14 @@ using Ether.Core.Proxy;
 using Newtonsoft.Json;
 using Ether.Services;
 using Ether.Hubs;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Server.HttpSys;
+using Microsoft.AspNetCore.Server.IISIntegration;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Authorization;
+using System.Net.Http.Headers;
+using System;
+using System.Text;
 
 namespace Ether
 {
@@ -48,17 +56,22 @@ namespace Ether
             services.AddResponseCompression();
             services.AddMvc(o =>
             {
+                var policy = new AuthorizationPolicyBuilder()
+                    .RequireAuthenticatedUser()
+                    .Build();
+                o.Filters.Add(new AuthorizeFilter(policy));
                 o.Filters.Add<CurrentMenuIndicatorFilter>();
             })
             .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<Startup>())
             .AddRazorPagesOptions(options => 
             {
                 options.Conventions.AddPageRoute("/Home/Index", "");
-            });
+            })
+            .SetCompatibilityVersion(CompatibilityVersion.Latest);
             services.AddSignalR();
 
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<IRepository, MongoRepository>();
-            services.AddSingleton<IVSTSClient, VSTSClient>();
             services.AddSingleton<IVstsClientRepository, VstsClientRepository>();
             services.AddSingleton<DIFriendlyJobFactory>();
             services.AddSingleton<ProxyGenerator>();
@@ -76,6 +89,14 @@ namespace Ether
 
             services.AddTransient<WorkItemsFetchJob>();
             services.AddTransient<RetentionJob>();
+
+            services.AddAuthentication(IISDefaults.AuthenticationScheme);
+            services.AddHttpClient<IVSTSClient, VSTSClient>(client => 
+            {
+                var vstsConfig = _configuration.Get<VSTSConfiguration>();
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes(string.Format("{0}:{1}", "", vstsConfig.AccessToken))));
+            });
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -85,7 +106,6 @@ namespace Ether
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseBrowserLink();
             }
             else
             {
@@ -100,7 +120,7 @@ namespace Ether
 
             app.UseSignalR(routes => 
             {
-                routes.MapHub<LiveUpdatesHub>("liveupdates");
+                routes.MapHub<LiveUpdatesHub>("/liveupdates");
             });
 
             app.UseResponseCompression();

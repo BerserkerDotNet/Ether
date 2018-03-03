@@ -1,42 +1,43 @@
 ﻿using Ether.Core.Interfaces;
-using Ether.Core.Configuration;
-using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using System;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
-using System.Collections;
-using System.Collections.Generic;
 using Ether.Core.Proxy;
+using Microsoft.Extensions.Logging;
 
 namespace Ether.Core.Data
 {
     public class VSTSClient : IVSTSClient
     {
         private const string JsonMimeType = "application/json";
-        private readonly VSTSConfiguration _configuration;
+        private readonly HttpClient _client;
         private readonly IDependencyResolver _resolver;
+        private readonly ILogger<VSTSClient> _logger;
 
-        public VSTSClient(IOptions<VSTSConfiguration> configuration, IDependencyResolver resolver)
+        public VSTSClient(HttpClient client, IDependencyResolver resolver, ILogger<VSTSClient> logger)
         {
-            _configuration = configuration.Value;
+            _client = client;
             _resolver = resolver;
+            _logger = logger;
         }
 
         public async Task<T> ExecuteGet<T>(string url)
         {
-            using (var client = new HttpClient())
+            try
             {
-                AddHeaders(client);
-                using (var response = await client.GetAsync(url))
+                using (var response = await _client.GetAsync(url))
                 {
                     response.EnsureSuccessStatusCode();
                     var resultContent = await response.Content.ReadAsStringAsync();
                     var converter = _resolver.Resolve<PullRequestProxyJsonConverter>();
                     return JsonConvert.DeserializeObject<T>(resultContent, converter);
                 }
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "An error occured while requesting {APIUrl}", url);
+                return default(T);
             }
         }
 
@@ -48,11 +49,10 @@ namespace Ether.Core.Data
 
         public async Task<T> ExecutePost<T>(string url, string payload)
         {
-            using (var client = new HttpClient())
+            try
             {
-                AddHeaders(client);
                 var content = new StringContent(payload, Encoding.UTF8, JsonMimeType);
-                using (var response = await client.PostAsync(url, content))
+                using (var response = await _client.PostAsync(url, content))
                 {
                     response.EnsureSuccessStatusCode();
                     var resultContent = await response.Content.ReadAsStringAsync();
@@ -60,12 +60,11 @@ namespace Ether.Core.Data
                     return JsonConvert.DeserializeObject<T>(resultContent, converter);
                 }
             }
-        }
-
-        private void AddHeaders(HttpClient client)
-        {
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(JsonMimeType));
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes(string.Format("{0}:{1}", "", _configuration.AccessToken))));
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "An error occured while posting to {APIUrl}", url);
+                return default(T);
+            }
         }
     }
 }

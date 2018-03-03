@@ -41,6 +41,11 @@ namespace Ether.Core.Data
                  .WithSection("iterations")
                  .Build(ApiVersion);
             var iterationsResponse = await _client.ExecuteGet<ValueBasedResponse<PullRequestIteration>>(iterationUrl);
+            if (iterationsResponse == null)
+            {
+                _logger.LogWarning("Couldn't fetch iterations from the server. Url: {APIUrl}", iterationUrl);
+                return Enumerable.Empty<PullRequestIteration>();
+            }
 
             return iterationsResponse.Value;
         }
@@ -53,6 +58,11 @@ namespace Ether.Core.Data
                 .WithSection("threads")
                 .Build(ApiVersion);
             var commentsResponse = await _client.ExecuteGet<ValueBasedResponse<PullRequestThread>>(commentsUrl);
+            if (commentsResponse == null)
+            {
+                _logger.LogWarning("Couldn't fetch comments from the server. Url: {APIUrl}", commentsUrl);
+                return Enumerable.Empty<PullRequestThread>();
+            }
 
             return commentsResponse.Value;
         }
@@ -72,6 +82,11 @@ namespace Ether.Core.Data
 
             _logger.LogInformation($"Attempting to retrieve pull requests from {pullRequestsUrl}");
             var prsResponse = await _client.ExecuteGet<PullRequestsResponse>(pullRequestsUrl);
+            if (prsResponse == null)
+            {
+                _logger.LogWarning("Couldn't fetch pull requests from the server. Url: {APIUrl}", pullRequestsUrl);
+                return;
+            }
             _logger.LogInformation($"Retrieved {prsResponse.Value.Count()} PRs from '{repositoryName}' repository. Start position {startFrom}. Operation took: {sw.Elapsed}");
 
             sw.Restart();
@@ -87,6 +102,5 @@ namespace Ether.Core.Data
                 await FetchPullRequests(repositoryName, projectName, pullrequests, query, startFrom + prs.Count);
             }
         }
-
     }
 }
