@@ -4,6 +4,10 @@
     <TargetFramework>netcoreapp2.1</TargetFramework>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>TRACE;NETCOREAPP2_1;DEBUG</DefineConstants>
+  </PropertyGroup>
+
   <ItemGroup>
     <Compile Remove="App_Data\**" />
     <Content Remove="App_Data\**" />

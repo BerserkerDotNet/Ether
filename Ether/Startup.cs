@@ -89,13 +89,15 @@ namespace Ether
 
             services.AddTransient<WorkItemsFetchJob>();
             services.AddTransient<RetentionJob>();
-
-            services.AddAuthentication(IISDefaults.AuthenticationScheme);
+#if DEBUG
+            services.AddAuthentication(HttpSysDefaults.AuthenticationScheme);
+#endif
             services.AddHttpClient<IVSTSClient, VSTSClient>(client => 
             {
                 var vstsConfig = _configuration.Get<VSTSConfiguration>();
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes(string.Format("{0}:{1}", "", vstsConfig.AccessToken))));
+                var parameter = Convert.ToBase64String(Encoding.ASCII.GetBytes(string.Format("{0}:{1}", "", vstsConfig.AccessToken)));
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", parameter);
             });
         }
 
