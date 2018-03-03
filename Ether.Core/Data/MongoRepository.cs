@@ -28,9 +28,9 @@ namespace Ether.Core.Data
         public MongoRepository(IOptions<DbConfig> dbConfig)
         {
             //TODO: Shouldn't be here
-            BsonClassMap.RegisterClassMap<PullRequestsReport>();
-            BsonClassMap.RegisterClassMap<WorkItemsReport>();
-            BsonClassMap.RegisterClassMap<ListOfReviewersReport>();
+            //BsonClassMap.RegisterClassMap<PullRequestsReport>();
+            //BsonClassMap.RegisterClassMap<WorkItemsReport>();
+            //BsonClassMap.RegisterClassMap<ListOfReviewersReport>();
             var pack = new ConventionPack();
             pack.Add(new IgnoreExtraElementsConvention(true));
 

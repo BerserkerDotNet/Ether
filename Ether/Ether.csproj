@@ -4,10 +4,6 @@
     <TargetFramework>netcoreapp2.1</TargetFramework>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <AspNetCoreModuleHostingModel>inprocess</AspNetCoreModuleHostingModel>
-  </PropertyGroup>
-
   <ItemGroup>
     <Compile Remove="App_Data\**" />
     <Content Remove="App_Data\**" />
