@@ -8,6 +8,10 @@
     <DefineConstants>TRACE;NETCOREAPP2_1;DEBUG</DefineConstants>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <AspNetCoreModuleHostingModel>inprocess</AspNetCoreModuleHostingModel>
+  </PropertyGroup>
+
   <ItemGroup>
     <Compile Remove="App_Data\**" />
     <Content Remove="App_Data\**" />
