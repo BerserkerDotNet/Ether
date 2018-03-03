@@ -1,4 +1,4 @@
-﻿using System.IO;
+﻿using System;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 #if DEBUG
@@ -23,8 +23,11 @@ namespace Ether
                     options.MaxConnections = 100;
                     options.MaxRequestBodySize = 30000000;
                 })
+            
+                .UseContentRoot(System.IO.Directory.GetCurrentDirectory())
+#else
+                .UseContentRoot(AppDomain.CurrentDomain.BaseDirectory.Replace(@"\\?\", string.Empty))
 #endif
-                .UseContentRoot(Directory.GetCurrentDirectory())
                 .UseIISIntegration()
                 .UseStartup<Startup>();
     }

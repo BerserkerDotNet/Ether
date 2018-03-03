@@ -1,32 +1,28 @@
-﻿using Ether.Core.Interfaces;
+﻿using Castle.DynamicProxy;
 using Ether.Core.Configuration;
 using Ether.Core.Data;
 using Ether.Core.Filters;
+using Ether.Core.Interfaces;
+using Ether.Core.Proxy;
 using Ether.Core.Reporters;
+using Ether.Core.Reporters.Classifiers;
+using Ether.Hubs;
+using Ether.Jobs;
+using Ether.Services;
+using FluentScheduler;
 using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using FluentScheduler;
-using Ether.Jobs;
-using Ether.Core.Reporters.Classifiers;
-using Castle.DynamicProxy;
-using Ether.Core.Proxy;
-using Newtonsoft.Json;
-using Ether.Services;
-using Ether.Hubs;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Server.HttpSys;
-using Microsoft.AspNetCore.Server.IISIntegration;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc.Authorization;
-using System.Net.Http.Headers;
 using System;
+using System.Net.Http.Headers;
 using System.Text;
-
 namespace Ether
 {
     public class Startup
@@ -90,7 +86,7 @@ namespace Ether
             services.AddTransient<WorkItemsFetchJob>();
             services.AddTransient<RetentionJob>();
 #if DEBUG
-            services.AddAuthentication(HttpSysDefaults.AuthenticationScheme);
+            services.AddAuthentication(Microsoft.AspNetCore.Server.HttpSys.HttpSysDefaults.AuthenticationScheme);
 #endif
             services.AddHttpClient<IVSTSClient, VSTSClient>(client => 
             {
