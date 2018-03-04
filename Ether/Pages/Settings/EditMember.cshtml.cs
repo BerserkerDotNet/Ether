@@ -1,19 +1,21 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using Ether.Core.Configuration;
+using Ether.Core.Data;
+using Ether.Core.Filters;
+using Ether.Core.Interfaces;
+using Ether.Core.Models.DTO;
+using Ether.Core.Models.VSTS.Response;
+using Ether.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Ether.Core.Interfaces;
-using Ether.Models;
-using Ether.Core.Models.DTO;
-using Ether.Core.Data;
-using Ether.Core.Configuration;
-using Microsoft.Extensions.Options;
-using Ether.Core.Models.VSTS.Response;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Ether.Pages.Settings
 {
+    [PageTitle("Edit Member")]
     public class EditMemberModel : PageModel
     {
         private readonly IRepository _repository;

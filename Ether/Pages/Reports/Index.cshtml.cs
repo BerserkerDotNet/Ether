@@ -1,15 +1,17 @@
-﻿using System.Collections.Generic;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Ether.Core.Models.DTO.Reports;
-using System.Threading.Tasks;
+﻿using Ether.Core.Filters;
 using Ether.Core.Interfaces;
-using System.Linq;
-using Microsoft.AspNetCore.Mvc;
-using System;
+using Ether.Core.Models.DTO.Reports;
 using Ether.Extensions;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Ether.Pages.Reports
 {
+    [PageTitle("Reports")]
     public class IndexModel : PageModel
     {
         private readonly IRepository _repository;

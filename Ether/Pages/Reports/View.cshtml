@@ -1,7 +1,28 @@
 ﻿@page
 @model Ether.Pages.Reports.ViewModel
+
 <h2>Report</h2>
+
+<a class="btn btn-default hidden-print pull-right" onclick="window.print();">Print</a>
 
 @Html.DisplayFor(m => m.Report, Model.Report.GetType().Name)
 
-<a asp-page="Index" class="btn btn-primary">Back to list</a>
+<a asp-page="Index" class="btn btn-primary hidden-print">Back to list</a>
+<a asp-page="/Index" class="btn btn-success hidden-print">New report</a>
+
+@section Scripts{ 
+<script>
+    $(document).ready(function () {
+        @{
+            var print = HttpContext.Request.Query["print"].ToString().ToLower();
+            var isPrint = string.IsNullOrEmpty(print) ? "false" : "true";
+        }
+        var isPrint = @isPrint;
+        if (isPrint)
+        {
+            window.print();
+            window.history.back();
+        }
+    });
+</script>
+}

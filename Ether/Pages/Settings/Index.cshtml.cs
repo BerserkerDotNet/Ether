@@ -1,13 +1,13 @@
-﻿using Ether.Core.Interfaces;
+﻿using Ether.Core.Filters;
+using Ether.Core.Interfaces;
 using Ether.Extensions;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Threading.Tasks;
 
 namespace Ether.Pages.Settings
 {
-    [Authorize]
+    [PageTitle("Settings")]
     public class IndexModel : PageModel
     {
         private readonly IRepository _repository;

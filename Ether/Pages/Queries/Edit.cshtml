@@ -2,7 +2,6 @@
 @model Ether.Pages.Queries.EditModel
 @inject IAll<VSTSProject> Projects
 @{
-    ViewData["Title"] = "Edit Query";
     var allProjects = Projects.Value.Select(p => new SelectListItem { Text = p.Name, Value = p.Id.ToString() });
 }
 

@@ -4,9 +4,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Ether.Core.Interfaces;
 using Ether.Core.Models.DTO;
+using Ether.Core.Filters;
 
 namespace Ether.Pages.Settings
 {
+    [PageTitle("Edit Repository")]
     public class EditRepositoryModel : PageModel
     {
         private readonly IRepository _repository;

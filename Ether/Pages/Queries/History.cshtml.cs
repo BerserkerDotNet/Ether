@@ -1,4 +1,5 @@
-﻿using Ether.Core.Interfaces;
+﻿using Ether.Core.Filters;
+using Ether.Core.Interfaces;
 using Ether.Core.Models.DTO;
 using Ether.Extensions;
 using Ether.Models;
@@ -9,6 +10,7 @@ using System.Threading.Tasks;
 
 namespace Ether.Pages.Queries
 {
+    [PageTitle("Query history")]
     public class HistoryModel : PageModel
     {
         private readonly IRepository _repository;

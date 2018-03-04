@@ -1,8 +1,5 @@
 ﻿@page
 @model Ether.Pages.Reports.IndexModel
-@{
-    ViewData["Title"] = "Reports";
-}
 
 <h2>Reports</h2>
 
@@ -32,8 +29,9 @@
                 <td>@report.DateTaken</td>
                 <td>@report.StartDate.ToString("MM/dd/yyyy")</td>
                 <td>@report.EndDate.ToString("MM/dd/yyyy")</td>
-                <td width="150">
+                <td width="220">
                     <form class="form-inline" asp-page-handler="Delete" method="post">
+                        <a asp-page="View" asp-route-id="@report.Id" asp-route-print="true" class="btn btn-success">Print</a>
                         <a asp-page="View" asp-route-id="@report.Id" class="btn btn-primary">View</a>
                         <input type="hidden" value="@report.Id" name="Id" />
                         <button type="submit" class="btn btn-danger">Delete</button>

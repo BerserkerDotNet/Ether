@@ -4,7 +4,6 @@
 @inject IAll<VSTSRepository> Repositories
 
 @{
-    ViewData["Title"] = "Edit Profile";
     var membersByTeam = TeamMembers.Value.GroupBy(m => m.TeamName);
 }
 

@@ -1,4 +1,5 @@
-﻿using Ether.Core.Interfaces;
+﻿using Ether.Core.Filters;
+using Ether.Core.Interfaces;
 using Ether.Core.Models.DTO;
 using Ether.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -8,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace Ether.Pages.Queries
 {
+    [PageTitle("Edit Query")]
     public class EditModel : PageModel
     {
         private readonly IRepository _repository;

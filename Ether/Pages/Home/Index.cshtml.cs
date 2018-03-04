@@ -1,4 +1,5 @@
-﻿using Ether.Core.Interfaces;
+﻿using Ether.Core.Filters;
+using Ether.Core.Interfaces;
 using Ether.Core.Models;
 using Ether.Extensions;
 using Ether.Models;
@@ -12,6 +13,7 @@ using System.Threading.Tasks;
 
 namespace Ether.Pages.Home
 {
+    [PageTitle("New report")]
     public class IndexModel : PageModel
     {
         private readonly IRepository _repository;

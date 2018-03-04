@@ -1,4 +1,5 @@
-﻿using Ether.Core.Interfaces;
+﻿using Ether.Core.Filters;
+using Ether.Core.Interfaces;
 using Ether.Core.Models.DTO.Reports;
 using Ether.Extensions;
 using Microsoft.AspNetCore.Mvc;
@@ -10,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace Ether.Pages.Reports
 {
+    [PageTitle("Report")]
     public class ViewModel : PageModel
     {
         private readonly IRepository _repository;
@@ -23,7 +25,7 @@ namespace Ether.Pages.Reports
 
         public object Report { get; set; }
 
-        public async Task<IActionResult> OnGetAsync(Guid? id)
+        public async Task<IActionResult> OnGetAsync(Guid? id, bool print)
         {
             if (!id.HasValue)
                 return RedirectToPage("Index");

@@ -1,11 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using Ether.Core.Filters;
 using Ether.Core.Interfaces;
 using Ether.Core.Models.DTO;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
 
 namespace Ether.Pages.Queries
 {
+    [PageTitle("Queries")]
     public class IndexModel : PageModel
     {
         private readonly IRepository _repository;
@@ -19,7 +21,6 @@ namespace Ether.Pages.Queries
 
         public void OnGet()
         {
-            ViewData["CurrentMenu"] = "Queries";
             Queries = _repository.GetAll<Query>();
         }
     }

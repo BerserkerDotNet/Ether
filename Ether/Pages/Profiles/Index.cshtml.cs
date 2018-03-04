@@ -1,4 +1,5 @@
-﻿using Ether.Core.Interfaces;
+﻿using Ether.Core.Filters;
+using Ether.Core.Interfaces;
 using Ether.Core.Models.DTO;
 using Ether.Extensions;
 using Ether.Models;
@@ -11,6 +12,7 @@ using System.Threading.Tasks;
 
 namespace Ether.Pages.Profiles
 {
+    [PageTitle("Profiles")]
     public class IndexModel : PageModel
     {
         private readonly IRepository _repository;
