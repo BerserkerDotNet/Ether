@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Ether.Pages.Settings
 {
-    [PageTitle("Settings")]
+    [PageTitle("General")]
     public class IndexModel : PageModel
     {
         private readonly IRepository _repository;

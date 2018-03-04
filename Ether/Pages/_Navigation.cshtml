@@ -1,4 +1,6 @@
-﻿<div class="container">
+﻿@using Ether.Types
+
+<div class="container">
     <div class="navbar-header">
         <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#mainNavigation" aria-expanded="false">
             <span class="sr-only">Toggle navigation</span>
@@ -10,21 +12,27 @@
     </div>
     <nav class="collapse navbar-collapse" id="mainNavigation">
         <ul class="nav navbar-nav">
-            <li class="@ActiveCSSClass("Home")"><a asp-page="/Index">Home @ActiveAccessibilityMarker("Home") </a></li>
-            <li class="@ActiveCSSClass("Reports")"><a asp-page="/Reports/Index">Reports @ActiveAccessibilityMarker("Reports")</a></li>
-            <li class="@ActiveCSSClass("Queries")"><a asp-page="/Queries/Index">Queries @ActiveAccessibilityMarker("Queries")</a></li>
-            <li class="@ActiveCSSClass("Profiles")"><a asp-page="/Profiles/Index">Profiles @ActiveAccessibilityMarker("Profiles")</a></li>
-            <li role="presentation" class="dropdown @ActiveCSSClass("Settings")">
-                <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
-                    Settings @ActiveAccessibilityMarker("Settings") <span class="caret"></span>
-                </a>
-                <ul class="dropdown-menu">
-                    <li><a asp-page="/Settings/Index">General</a></li>
-                    <li><a asp-page="/Settings/TeamMembers">Team Members</a></li>
-                    <li><a asp-page="/Settings/Projects">Projects</a></li>
-                    <li><a asp-page="/Settings/Repositories">Repositories</a></li>
-                </ul>
-            </li>
+            @foreach (var menuItem in EtherMenu.Menu.SubItems)
+            {
+                @if (!(menuItem is MenuContainer))
+                {
+                    <li class="@ActiveCSSClass(menuItem)"><a href="@Url.Page(menuItem.Path)">@menuItem.Title @ActiveAccessibilityMarker(menuItem) </a></li>
+                }
+                else
+                {
+                        <li role="presentation" class="dropdown @ActiveCSSClass(menuItem)">
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                                @menuItem.Title @ActiveAccessibilityMarker(menuItem) <span class="caret"></span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                @foreach (var subMenuItem in menuItem.SubItems)
+                                {
+                                    <li class="@ActiveCSSClass(subMenuItem)"><a href="@Url.Page(subMenuItem.Path)">@subMenuItem.Title @ActiveAccessibilityMarker(subMenuItem)</a></li>
+                                }
+                            </ul>
+                        </li>
+                }
+            }
         </ul>
         <p class="navbar-text navbar-right">Signed in as <a href="#" class="navbar-link">@User.Identity.Name</a></p>
     </nav>
@@ -32,19 +40,20 @@
 
 
 @functions {
-    public Microsoft.AspNetCore.Html.IHtmlContent ActiveAccessibilityMarker(string menu)
+    public Microsoft.AspNetCore.Html.IHtmlContent ActiveAccessibilityMarker(MenuItem menu)
     {
         return IsActive(menu) ? Html.Raw("<span class='sr-only'>(current)</span>") : Html.Raw("");
     }
 
-    public string ActiveCSSClass(string menu)
+    public string ActiveCSSClass(MenuItem menu)
     {
         return IsActive(menu) ? "active" : "";
     }
 
-    private bool IsActive(string menu)
+    private bool IsActive(MenuItem menu)
     {
-        var currentMenu = ViewData["CurrentMenu"] as string;
-        return !string.IsNullOrEmpty(currentMenu) && string.Equals(currentMenu, menu, StringComparison.OrdinalIgnoreCase);
+        var currentMenu = (MenuItem)ViewData["CurrentMenu"] as MenuItem;
+        return currentMenu != null &&
+            (object.Equals(currentMenu, menu) || (currentMenu.Parent != null && object.Equals(currentMenu.Parent, menu)));
     }
 }

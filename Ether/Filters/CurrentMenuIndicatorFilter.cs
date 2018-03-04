@@ -1,5 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Ether.Types;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Ether.Core.Filters
 {
@@ -11,16 +12,12 @@ namespace Ether.Core.Filters
 
         public void OnResultExecuting(ResultExecutingContext context)
         {
-            var viewResult = context.Result as ViewResult;
-            if (viewResult == null || context.Controller == null)
+            var pageResult = context.Result as PageResult;
+            if (pageResult == null || context.Controller == null)
                 return;
 
-            var typeName = context.Controller
-                .GetType()
-                .Name
-                .Replace(nameof(Controller), "");
-
-            viewResult.ViewData["CurrentMenu"] = typeName;
+            var currentMenu = EtherMenu.Menu.Find(context.Controller.GetType());
+            pageResult.ViewData["CurrentMenu"] = currentMenu;
         }
     }
 }

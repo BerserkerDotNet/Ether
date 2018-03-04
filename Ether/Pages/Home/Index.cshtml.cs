@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Ether.Pages.Home
 {
-    [PageTitle("New report")]
+    [PageTitle("Home")]
     public class IndexModel : PageModel
     {
         private readonly IRepository _repository;
