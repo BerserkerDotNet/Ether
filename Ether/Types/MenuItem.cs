@@ -7,10 +7,11 @@ namespace Ether.Types
 {
     public class MenuItem 
     {
-        public MenuItem(Type pageType)
+        public MenuItem(Type pageType, bool isVisible = true)
         {
             PageType = pageType;
             SubItems = new List<MenuItem>();
+            IsVisible = isVisible;
             SetTitle();
         }
 
@@ -25,6 +26,11 @@ namespace Ether.Types
             if (PageType == type)
                 return this;
 
+            return FindChildren(type);
+        }
+
+        public MenuItem FindChildren(Type type)
+        {
             foreach (var subItem in SubItems)
             {
                 var menu = subItem.Find(type);
@@ -62,6 +68,8 @@ namespace Ether.Types
                 return $"/{path}";
             }
         }
+
+        public bool IsVisible { get; }
 
         public Type PageType { get; }
 

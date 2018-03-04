@@ -53,7 +53,13 @@
     private bool IsActive(MenuItem menu)
     {
         var currentMenu = (MenuItem)ViewData["CurrentMenu"] as MenuItem;
-        return currentMenu != null &&
-            (object.Equals(currentMenu, menu) || (currentMenu.Parent != null && object.Equals(currentMenu.Parent, menu)));
+        if (currentMenu == null)
+            return false;
+
+        var isCurrent = object.Equals(currentMenu, menu);
+        var isCurrentParent = currentMenu.Parent != null && object.Equals(currentMenu.Parent, menu);
+        var hasActiveChildren = menu.FindChildren(currentMenu.PageType) != null;
+
+        return isCurrent || isCurrentParent || hasActiveChildren;
     }
 }
