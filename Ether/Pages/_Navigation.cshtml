@@ -1,25 +1,25 @@
 ﻿@using Ether.Types
-
-<div class="container">
-    <div class="navbar-header">
-        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#mainNavigation" aria-expanded="false">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-        </button>
-        <a class="navbar-brand" asp-page="Index">Ether Reports</a>
-    </div>
-    <nav class="collapse navbar-collapse" id="mainNavigation">
-        <ul class="nav navbar-nav">
-            @foreach (var menuItem in EtherMenu.Menu.SubItems)
-            {
-                @if (!(menuItem is MenuContainer))
+<header class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#mainNavigation" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" asp-page="/Index">Ether Reports</a>
+        </div>
+        <nav class="collapse navbar-collapse" id="mainNavigation">
+            <ul class="nav navbar-nav">
+                @foreach (var menuItem in EtherMenu.Menu.SubItems)
                 {
-                    <li class="@ActiveCSSClass(menuItem)"><a href="@Url.Page(menuItem.Path)">@menuItem.Title @ActiveAccessibilityMarker(menuItem) </a></li>
-                }
-                else
-                {
+                    @if (!(menuItem is MenuContainer))
+                    {
+                        <li class="@ActiveCSSClass(menuItem)"><a href="@Url.Page(menuItem.Path)">@menuItem.Title @ActiveAccessibilityMarker(menuItem) </a></li>
+                    }
+                    else
+                    {
                         <li role="presentation" class="dropdown @ActiveCSSClass(menuItem)">
                             <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
                                 @menuItem.Title @ActiveAccessibilityMarker(menuItem) <span class="caret"></span>
@@ -31,35 +31,36 @@
                                 }
                             </ul>
                         </li>
+                    }
                 }
-            }
-        </ul>
-        <p class="navbar-text navbar-right">Signed in as <a href="#" class="navbar-link">@User.Identity.Name</a></p>
-    </nav>
-</div>
+            </ul>
+            <p class="navbar-text navbar-right">Signed in as <a href="#" class="navbar-link">@User.Identity.Name</a></p>
+        </nav>
+    </div>
+</header>
 
 
 @functions {
-    public Microsoft.AspNetCore.Html.IHtmlContent ActiveAccessibilityMarker(MenuItem menu)
-    {
-        return IsActive(menu) ? Html.Raw("<span class='sr-only'>(current)</span>") : Html.Raw("");
-    }
+public Microsoft.AspNetCore.Html.IHtmlContent ActiveAccessibilityMarker(MenuItem menu)
+{
+    return IsActive(menu) ? Html.Raw("<span class='sr-only'>(current)</span>") : Html.Raw("");
+}
 
-    public string ActiveCSSClass(MenuItem menu)
-    {
-        return IsActive(menu) ? "active" : "";
-    }
+public string ActiveCSSClass(MenuItem menu)
+{
+    return IsActive(menu) ? "active" : "";
+}
 
-    private bool IsActive(MenuItem menu)
-    {
-        var currentMenu = (MenuItem)ViewData["CurrentMenu"] as MenuItem;
-        if (currentMenu == null)
-            return false;
+private bool IsActive(MenuItem menu)
+{
+    var currentMenu = (MenuItem)ViewData["CurrentMenu"] as MenuItem;
+    if (currentMenu == null)
+        return false;
 
-        var isCurrent = object.Equals(currentMenu, menu);
-        var isCurrentParent = currentMenu.Parent != null && object.Equals(currentMenu.Parent, menu);
-        var hasActiveChildren = menu.FindChildren(currentMenu.PageType) != null;
+    var isCurrent = object.Equals(currentMenu, menu);
+    var isCurrentParent = currentMenu.Parent != null && object.Equals(currentMenu.Parent, menu);
+    var hasActiveChildren = menu.FindChildren(currentMenu.PageType) != null;
 
-        return isCurrent || isCurrentParent || hasActiveChildren;
-    }
+    return isCurrent || isCurrentParent || hasActiveChildren;
+}
 }
