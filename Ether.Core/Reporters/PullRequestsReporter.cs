@@ -38,7 +38,7 @@ namespace Ether.Core.Reporters
             _logger.LogInformation($"Staring to query pull requests");
             var sw = Stopwatch.StartNew();
             var resultingPrs = new List<PullRequest>();
-            _progressReporter.Report("Starting to collect data");
+            _progressReporter.Report($"Starting to collect data for '{Input.Profile.Name}'");
 
             Parallel.ForEach(Input.Repositories, repositoryInfo =>
             {

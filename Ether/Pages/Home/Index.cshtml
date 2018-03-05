@@ -13,9 +13,16 @@
 <form asp-page-handler="Report" method="post">
     <div asp-validation-summary="All" class="text-danger"></div>
     <div class="form-group">
-        <label asp-for="ReportRequest.Profile">Profile:</label>
-        <select asp-for="ReportRequest.Profile" asp-items="@allProfiles" class="form-control"></select>
-        <span asp-validation-for="ReportRequest.Profile" class="text-danger"></span>
+        <fieldset>
+            <legend>Select profiles</legend>
+
+            @foreach (var profile in Profiles.Value)
+            {
+                <label for="repo-@profile.Id">@profile.Name</label>
+                <input type="checkbox" name="ReportRequest.Profiles" value="@profile.Id" id="repo-@profile.Id" @(Model.ReportRequest.Profiles != null && Model.ReportRequest.Profiles.Contains(profile.Id) ? "checked" : "") />
+            }
+        </fieldset>
+        <span asp-validation-for="ReportRequest.Profiles" class="text-danger"></span>
     </div>
     <div class="form-group">
         <label asp-for="ReportRequest.Report">Report:</label>
@@ -55,7 +62,7 @@
                         <span class="sr-only">Your report is being generated, please wait&hellip;</span>
                     </div>
                 </div>
-                <p >Your report is being generated, please wait&hellip;</p>
+                <p>Your report is being generated, please wait&hellip;</p>
                 <textarea id="progressReport" readonly style="resize:none; width:100%; height:200px;"></textarea>
             </div>
         </div><!-- /.modal-content -->
@@ -65,6 +72,9 @@
     <script type="text/javascript" src="~/lib/signalr/signalr.min.js"></script>
     <script>
         $(document).ready(function () {
+            $('input[type="checkbox"]').checkboxradio({
+                icon: true
+            });
             configureDateSelectors();
             var currentProgress = 0;
             $('form').submit(function (e) {
@@ -77,7 +87,7 @@
                 }
             });
 
-            var connection = new signalR.HubConnection('/liveupdates', { transport: signalR.TransportType.LongPolling});
+            var connection = new signalR.HubConnection('/liveupdates', { transport: signalR.TransportType.LongPolling });
             connection.on('update', function (message, moveProgressBy) {
                 console.log('received: ' + message + '; progress update: ' + moveProgressBy);
                 var reportArea = $('#progressReport');
@@ -91,7 +101,16 @@
                 var currentPercent = Math.round((currentProgress * 100) / totalWidth);
                 bar.attr('aria-valuenow', currentPercent);
                 bar.text(currentPercent + '%')
-                console.log('Total width: ' + totalWidth + '; moveBy: '+moveBy +'; updated width: ' + currentProgress);
+                console.log('Total width: ' + totalWidth + '; moveBy: ' + moveBy + '; updated width: ' + currentProgress);
+            });
+
+            connection.on('reset', function () {
+                console.log('reseting progress');
+                currentProgress = 0;
+                var bar = $('#progressBar');
+                bar.width(currentProgress);
+                bar.attr('aria-valuenow', 0);
+                bar.text(0 + '%')
             });
 
             connection.start();

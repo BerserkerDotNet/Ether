@@ -8,7 +8,8 @@ namespace Ether.Validators
     {
         public ReportViewModelValidator()
         {
-            RuleFor(r => r.Profile).NotNull();
+            RuleFor(r => r.Profiles)
+                .NotEmpty();
             RuleFor(r => r.Report).NotNull();
             RuleFor(r => r.StartDate)
                 .NotNull()

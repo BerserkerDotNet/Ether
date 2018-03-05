@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Ether.Models
 {
     public class ReportViewModel
     {
-        public Guid Profile { get; set; }
+        public IEnumerable<Guid> Profiles { get; set; }
 
         public Guid Report { get; set; }
 

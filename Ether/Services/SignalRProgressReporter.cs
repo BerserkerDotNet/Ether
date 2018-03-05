@@ -18,5 +18,10 @@ namespace Ether.Services
         {
             await _hub.Clients.All.SendAsync("update", message, moveProgressBy);
         }
+
+        public async Task Reset()
+        {
+            await _hub.Clients.All.SendAsync("reset");
+        }
     }
 }

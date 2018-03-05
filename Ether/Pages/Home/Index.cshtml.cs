@@ -1,6 +1,7 @@
 ﻿using Ether.Core.Filters;
 using Ether.Core.Interfaces;
 using Ether.Core.Models;
+using Ether.Core.Models.DTO.Reports;
 using Ether.Extensions;
 using Ether.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -18,12 +19,14 @@ namespace Ether.Pages.Home
     {
         private readonly IRepository _repository;
         private readonly IEnumerable<IReporter> _repoters;
+        private readonly IProgressReporter _progressReporter;
         private readonly ILogger<IndexModel> _logger;
 
-        public IndexModel(IRepository repository, IEnumerable<IReporter> repoters, ILogger<IndexModel> logger)
+        public IndexModel(IRepository repository, IEnumerable<IReporter> repoters, IProgressReporter progressReporter, ILogger<IndexModel> logger)
         {
             _repository = repository;
             _repoters = repoters;
+            _progressReporter = progressReporter;
             _logger = logger;
         }
 
@@ -32,7 +35,7 @@ namespace Ether.Pages.Home
 
         public void OnGet()
         {
-
+            ReportRequest = new ReportViewModel();
         }
 
         public async Task<IActionResult> OnPostReportAsync()
@@ -49,14 +52,22 @@ namespace Ether.Pages.Home
                     return RedirectToPage("Index");
                 }
 
-                var report = await reporter.ReportAsync(new ReportQuery
+                var reports = new List<ReportResult>(ReportRequest.Profiles.Count());
+                foreach (var profile in ReportRequest.Profiles)
                 {
-                    ProfileId = ReportRequest.Profile,
-                    StartDate = ReportRequest.StartDate.Value.ToUniversalTime(),
-                    EndDate = ReportRequest.EndDate.Value.ToUniversalTime()
-                });
+                    await _progressReporter.Reset();
+                    var report = await reporter.ReportAsync(new ReportQuery
+                    {
+                        ProfileId = profile,
+                        StartDate = ReportRequest.StartDate.Value.ToUniversalTime(),
+                        EndDate = ReportRequest.EndDate.Value.ToUniversalTime()
+                    });
+                    reports.Add(report);
+                }
 
-                return RedirectToPage("/Reports/View", new { Id = report.Id });
+                return reports.Count == 1 ?
+                    RedirectToPage("/Reports/View", new { Id = reports.First().Id }) :
+                    RedirectToPage("/Reports/Index");
             }
             catch (Exception ex)
             {
