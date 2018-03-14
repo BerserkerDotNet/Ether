@@ -11,6 +11,7 @@ namespace Ether.Types
             _root = new MenuContainer(string.Empty);
             AddHomeSection();
             AddReportsSection();
+            AddDashboardSection();
             AddQueriesSection();
             AddProfilesSection();
             AddSettingsSection();
@@ -25,14 +26,20 @@ namespace Ether.Types
 
         private static void AddReportsSection()
         {
-            var item = new MenuItem(typeof(Pages.Reports.IndexModel));
+            var item = new MenuItem(typeof(Pages.Reports.IndexModel), icon: "book");
             item.AddSubItem(new MenuItem(typeof(Pages.Reports.ViewModel), isVisible: false));
+            _root.AddSubItem(item);
+        }
+
+        private static void AddDashboardSection()
+        {
+            var item = new MenuItem(typeof(Pages.Dashboard.DashboardModel));
             _root.AddSubItem(item);
         }
 
         private static void AddQueriesSection()
         {
-            var item = new MenuItem(typeof(Pages.Queries.IndexModel));
+            var item = new MenuItem(typeof(Pages.Queries.IndexModel), icon: "database");
             item.AddSubItem(new MenuItem(typeof(Pages.Queries.HistoryModel), isVisible: false));
             item.AddSubItem(new MenuItem(typeof(Pages.Queries.EditModel), isVisible: false));
             _root.AddSubItem(item);
@@ -40,7 +47,7 @@ namespace Ether.Types
 
         private static void AddProfilesSection()
         {
-            var item = new MenuItem(typeof(Pages.Profiles.IndexModel));
+            var item = new MenuItem(typeof(Pages.Profiles.IndexModel), icon: "users");
             item.AddSubItem(new MenuItem(typeof(Pages.Profiles.EditModel), isVisible: false));
             _root.AddSubItem(item);
         }
@@ -68,8 +75,9 @@ namespace Ether.Types
 
         private static void AddSettingsSection()
         {
-            var settingsContainer = new MenuContainer("Settings");
+            var settingsContainer = new MenuContainer("Settings", icon: "cogs");
             settingsContainer.AddSubItem(new MenuItem(typeof(Pages.Settings.IndexModel)));
+            settingsContainer.AddSubItem(new MenuItem(typeof(Pages.Settings.PersonalModel)));
             AddTeamMembersSection(settingsContainer);
             AddProjectsSection(settingsContainer);
             AddRepositoriesSection(settingsContainer);

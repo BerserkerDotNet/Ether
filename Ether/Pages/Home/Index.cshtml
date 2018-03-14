@@ -8,8 +8,6 @@
     var allReporters = Reporters.Select(r => new SelectListItem { Text = r.Name, Value = r.Id.ToString() });
 }
 
-<h2>@ViewData["Title"]</h2>
-
 <form asp-page-handler="Report" method="post">
     <div asp-validation-summary="All" class="text-danger"></div>
     <div class="form-group">
@@ -152,6 +150,5 @@
             setSelectedStartDate(startDate.datepicker("getDate").toLocaleDateString());
             setSelectedEndDate(endDate.datepicker("getDate").toLocaleDateString());
         }
-
     </script>
 }

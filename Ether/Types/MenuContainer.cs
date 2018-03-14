@@ -2,8 +2,8 @@
 {
     public class MenuContainer : MenuItem
     {
-        public MenuContainer(string title) 
-            : base(null)
+        public MenuContainer(string title, string icon = "") 
+            : base(pageType: null, icon: icon)
         {
             Title = title;
         }

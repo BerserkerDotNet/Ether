@@ -1,0 +1,22 @@
+﻿@page
+@model Ether.Pages.Settings.PersonalModel
+@inject IAll<Profile> Profiles
+
+@{
+    var allProfiles = Profiles.Value.Select(p => new SelectListItem { Text = p.Name, Value = p.Id.ToString(), Selected = p.Id == Model.Settings.TeamProfile });
+}
+
+<form asp-page="Personal" method="post">
+    <div asp-validation-summary="All" class="text-danger"></div>
+    <div class="row">
+        <div class="col-md-3">
+            <div class="form-group">
+                <label asp-for="Settings.TeamProfile">My team profile:</label>
+                <select asp-for="Settings.TeamProfile" asp-items="@allProfiles" class="form-control"></select>
+                <span asp-validation-for="Settings.TeamProfile" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+    <input type="submit" class="btn btn-success" value="Save" />
+    <input type="reset" class="btn btn-danger" value="Cancel" />
+</form>

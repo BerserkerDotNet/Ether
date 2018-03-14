@@ -1,44 +1,67 @@
 ﻿@using Ether.Types
-<header class="navbar navbar-default navbar-fixed-top">
-    <div class="container">
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#mainNavigation" aria-expanded="false">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand" asp-page="/Index">Ether Reports</a>
-        </div>
-        <nav class="collapse navbar-collapse" id="mainNavigation">
+
+<header class="main-header">
+    <a href="/" class="logo">
+        <span class="logo-mini"><b>Ether</b></span>
+        <span class="logo-lg"><b>Ether</b> Reports</span>
+    </a>
+    <nav class="navbar navbar-static-top">
+        <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+        </a>
+        <div class="navbar-custom-menu">
             <ul class="nav navbar-nav">
-                @foreach (var menuItem in EtherMenu.Menu.SubItems)
+                <li class="user user-menu">
+                    <a href="#">
+                        <img src="~/images/user.png" class="user-image" alt="User Image">
+                        <span class="hidden-xs">@User.Identity.Name</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+</header>
+<aside class="main-sidebar">
+    <section class="sidebar">
+        <ul class="sidebar-menu" data-widget="tree">
+            <li class="header">MAIN NAVIGATION</li>
+            @foreach (var menuItem in EtherMenu.Menu.SubItems)
+            {
+                @if (!(menuItem is MenuContainer))
                 {
-                    @if (!(menuItem is MenuContainer))
-                    {
-                        <li class="@ActiveCSSClass(menuItem)"><a href="@Url.Page(menuItem.Path)">@menuItem.Title @ActiveAccessibilityMarker(menuItem) </a></li>
-                    }
-                    else
-                    {
-                        <li role="presentation" class="dropdown @ActiveCSSClass(menuItem)">
-                            <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
-                                @menuItem.Title @ActiveAccessibilityMarker(menuItem) <span class="caret"></span>
+                        <li class="@ActiveCSSClass(menuItem)">
+                            <a href="@Url.Page(menuItem.Path)"><i class="fa fa-@menuItem.Icon"></i> <span>@menuItem.Title @ActiveAccessibilityMarker(menuItem)</span> </a>
+                        </li>
+                }
+                else
+                {
+                        <li role="presentation" class="treeview @ActiveCSSClass(menuItem)">
+                            <a href="#">
+                                <i class="fa fa-@menuItem.Icon"></i> <span>@menuItem.Title @ActiveAccessibilityMarker(menuItem)</span>
+                                <span class="pull-right-container">
+                                    <i class="fa fa-angle-left pull-right"></i>
+                                </span>
                             </a>
-                            <ul class="dropdown-menu">
+                            <ul class="treeview-menu">
                                 @foreach (var subMenuItem in menuItem.SubItems)
                                 {
-                                    <li class="@ActiveCSSClass(subMenuItem)"><a href="@Url.Page(subMenuItem.Path)">@subMenuItem.Title @ActiveAccessibilityMarker(subMenuItem)</a></li>
+                                    <li class="@ActiveCSSClass(subMenuItem)"><a href="@Url.Page(subMenuItem.Path)"><i class="fa fa-circle-o"></i>@subMenuItem.Title @ActiveAccessibilityMarker(subMenuItem)</a></li>
                                 }
                             </ul>
                         </li>
-                    }
                 }
-            </ul>
-            <p class="navbar-text navbar-right">Signed in as <a href="#" class="navbar-link">@User.Identity.Name</a></p>
-        </nav>
-    </div>
-</header>
-
+            }
+            <li class="header">LINKS</li>
+            <li><a href="https://github.com/BerserkerDotNet/Ether/issues" target="_blank"><i class="fa fa-bug text-red"></i> <span>Report an issue</span></a></li>
+            <li><a href="https://github.com/BerserkerDotNet/Ether" target="_blank"><i class="fa fa-github"></i> <span>Project page</span></a></li>
+            <li><a href="https://twitter.com/BerserkerDotNET" target="_blank"><i class="fa fa-twitter text-blue"></i> <span>Twitter</span></a></li>
+            <li><a href="https://www.linkedin.com/in/andrii-snigyr-78b73a67/" target="_blank"><i class="fa fa-linkedin text-blue"></i> <span>LinkedIn</span></a></li>
+        </ul>
+    </section>
+</aside>
 
 @functions {
 public Microsoft.AspNetCore.Html.IHtmlContent ActiveAccessibilityMarker(MenuItem menu)

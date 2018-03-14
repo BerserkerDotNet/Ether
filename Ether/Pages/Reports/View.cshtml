@@ -1,8 +1,6 @@
 ﻿@page
 @model Ether.Pages.Reports.ViewModel
 
-<h2>Report</h2>
-
 <a class="btn btn-default hidden-print pull-right" onclick="window.print();">Print</a>
 
 @Html.DisplayFor(m => m.Report, Model.Report.GetType().Name)

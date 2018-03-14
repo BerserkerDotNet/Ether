@@ -7,9 +7,10 @@ namespace Ether.Types
 {
     public class MenuItem 
     {
-        public MenuItem(Type pageType, bool isVisible = true)
+        public MenuItem(Type pageType, string icon = "", bool isVisible = true)
         {
             PageType = pageType;
+            Icon = icon.ToLower();
             SubItems = new List<MenuItem>();
             IsVisible = isVisible;
             SetTitle();
@@ -48,7 +49,13 @@ namespace Ether.Types
 
             var pageTitleAttribute = PageType.CustomAttributes.SingleOrDefault(a => a.AttributeType == typeof(PageTitleAttribute));
             if (pageTitleAttribute != null)
+            {
                 Title = pageTitleAttribute.ConstructorArguments.First().Value.ToString();
+                if (string.IsNullOrEmpty(Icon))
+                {
+                    Icon = Title.ToLower();
+                }
+            }
         }
 
         public string Title { get; protected set; }
@@ -68,6 +75,8 @@ namespace Ether.Types
                 return $"/{path}";
             }
         }
+
+        public string Icon { get; set; }
 
         public bool IsVisible { get; }
 

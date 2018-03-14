@@ -7,24 +7,34 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
           integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"
           asp-fallback-href="~/lib/bootstrap/css/bootstrap.min.css" asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+          integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.min.css"
           integrity="sha384-kcAOn9fN4XSd+TGsNu2OQKSuV5ngOwt7tg73O4EpaD91QXvrfgvf0MR7/2dUjoI6" crossorigin="anonymous"
           asp-fallback-href="~/lib/jquery/jquery-ui.min.css" asp-fallback-test-class="ui-datepicker" asp-fallback-test-property="display" asp-fallback-test-value="none">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/2.4.2/css/AdminLTE.min.css" integrity="sha256-sZVMQjkm0Ho60NDzV4Ot0OTBAK7UcaqkQOxLkTT93kQ=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/2.4.2/css/skins/_all-skins.min.css" integrity="sha256-U2eKBb7w142J6PSkrsgX1d3UM57TgiErTiT9gD1X8iA=" crossorigin="anonymous" />
     <link href="~/css/site.css" rel="stylesheet" />
 </head>
-<body>
-    <partial name="_Navigation" />
-    <main>
-        <div class="container">
-            <div class="row">
-                <div class="col-md-12">
-                    <partial name="_Notifications"/>
-                    @RenderBody()
+<body class="skin-green-light sidebar-mini fixed">
+    <div class="wrapper">
+        <partial name="_Navigation" />
+
+        <main class="content-wrapper">
+            <section class="content-header">
+                <h1>@ViewData["Title"]</h1>
+            </section>
+            <section class="content">
+                <div class="box box-default">
+                    <div class="box-body">
+                        <partial name="_Notifications" />
+                        @RenderBody()
+                    </div>
                 </div>
-            </div>
-        </div>
-    </main>
-    <partial name="_Footer" />
+            </section>
+        </main>
+        <partial name="_Footer" />
+    </div>
     <script src="https://code.jquery.com/jquery-3.2.1.min.js"
             integrity="sha384-xBuQ/xzmlsLoJpyjoggmTEz8OWUFM0/RC5BsqQBDX2v5cMvDHcMakNTNrHIW2I5f"
             crossorigin="anonymous"
@@ -48,6 +58,10 @@
             crossorigin="anonymous"
             integrity="sha384-JrXK+k53HACyavUKOsL+NkmSesD2P+73eDMrbTtTk0h4RmOF8hF8apPlkp26JlyH">
     </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/2.4.2/js/adminlte.min.js" 
+            integrity="sha256-M/+/xbAPBtc0W7JWnReOYF+oPZq4OiOUrlP9qbv7w64=" 
+            crossorigin="anonymous"></script>
 
     @RenderSection("Scripts", required: false)
 </body>
