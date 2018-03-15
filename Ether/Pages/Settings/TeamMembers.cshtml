@@ -1,63 +1,83 @@
 ﻿@page
 @model Ether.Pages.Settings.TeamMembersModel
 
-<form method="get" id="filterForm">
-    <fieldset>
-        <legend>Show only:</legend>
-        @foreach (var team in Model.AllTeams)
-        {
-            var id = team.Replace(' ', '_').ToLower();
-            <label for="team-@id">@team</label>
-            <input type="checkbox" name="Teams" value="@team" id="team-@id" @(Model.Teams.Contains(team) ? "checked" : "") />
+<div class="box box-info">
+    <div class="box-header">
+        <h3 class="box-title">Show only:</h3>
+    </div>
+    <div class="box-body">
+        <form method="get" id="filterForm">
+            <fieldset>
+                @foreach (var team in Model.AllTeams)
+                {
+                    var id = team.Replace(' ', '_').ToLower();
+                    <label for="team-@id">@team</label>
+                    <input type="checkbox" name="Teams" value="@team" id="team-@id" @(Model.Teams.Contains(team) ? "checked" : "") />
+                }
+            </fieldset>
+        </form>
+    </div>
+</div>
+
+<div class="box box-default">
+    <div class="box-header">
+        <h3 class="box-title">List of team members</h3>
+        <a asp-page="EditMember" class="btn btn-success pull-right">Add new</a>
+    </div>
+    <div class="box-body">
+        <table id="teamMembers" class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>TeamName</th>
+                    <th>Work items</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var member in Model.TeamMembers)
+            {
+                <tr>
+                    <td>@member.DisplayName</td>
+                    <td>@member.Email</td>
+                    <td>@member.TeamName</td>
+                    <td>
+                        <div><strong>WorkItems:</strong> @(member.RelatedWorkItemIds == null ? 0 : member.RelatedWorkItemIds.Count())</div>
+                        <div><strong>LastFetch:</strong> @member.LastFetchDate.ToString("G")</div>
+                        <form class="form-inline" asp-page-handler="ResetWorkitems" method="post">
+                            <input type="hidden" value="@member.Id" name="Id" />
+                            <input type="submit" value="Reset" />
+                        </form>
+                    </td>
+                    <td width="150">
+                        <form class="form-inline" asp-page-handler="Delete" method="post">
+                            <a asp-page="EditMember" asp-route-id="@member.Id" class="btn btn-primary">Edit</a>
+                            <input type="hidden" value="@member.Id" name="Id" />
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                        </form>
+                    </td>
+                </tr>
         }
-    </fieldset>
-</form>
-<table class="table table-hover">
-    <thead>
-        <tr>
-            <td class="text-right" colspan="5">
-                <a asp-page="EditMember" class="btn btn-success">Add new</a>
-            </td>
-        </tr>
-        <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>TeamName</th>
-            <th>Work items</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var member in Model.TeamMembers)
-        {
-            <tr>
-                <td>@member.DisplayName</td>
-                <td>@member.Email</td>
-                <td>@member.TeamName</td>
-                <td>
-                    <div><strong>WorkItems:</strong> @(member.RelatedWorkItemIds == null ? 0 : member.RelatedWorkItemIds.Count())</div>
-                    <div><strong>LastFetch:</strong> @member.LastFetchDate.ToString("G")</div>
-                    <form class="form-inline" asp-page-handler="ResetWorkitems" method="post">
-                        <input type="hidden" value="@member.Id" name="Id" />
-                        <input type="submit" value="Reset" />
-                    </form>
-                </td>
-                <td width="150">
-                    <form class="form-inline" asp-page-handler="Delete" method="post">
-                        <a asp-page="EditMember" asp-route-id="@member.Id" class="btn btn-primary">Edit</a>
-                        <input type="hidden" value="@member.Id" name="Id" />
-                        <button type="submit" class="btn btn-danger">Delete</button>
-                    </form>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+            </tbody>
+        </table>
+    </div>
+</div>
 
 @section Scripts{
 
     <script>
         $(document).ready(function () {
+
+            $('#teamMembers').DataTable({
+                'paging': true,
+                'lengthChange': true,
+                'searching': true,
+                'ordering': true,
+                'info': true,
+                'autoWidth': false
+            });
+
             $('input[type="checkbox"]').checkboxradio({
                 icon: false
             });

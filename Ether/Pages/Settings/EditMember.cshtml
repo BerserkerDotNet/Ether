@@ -1,23 +1,30 @@
 ﻿@page
 @model Ether.Pages.Settings.EditMemberModel
 
-<div asp-validation-summary="All" class="text-danger"></div>
-<form asp-page="EditMember" method="post">
-    <div class="form-group">
-        <label asp-for="Member.DisplayName">Display name:</label>
-        <input asp-for="Member.DisplayName" class="form-control" />
-        <span asp-validation-for="Member.DisplayName" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="Member.Email">Email:</label>
-        <input asp-for="Member.Email" class="form-control" />
-        <span asp-validation-for="Member.Email" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="Member.TeamName">Team name:</label>
-        <input asp-for="Member.TeamName" class="form-control" />
-        <span asp-validation-for="Member.TeamName" class="text-danger"></span>
-    </div>
-    <button type="submit" class="btn btn-primary">Save</button>
-    <a asp-page="TeamMembers" class="btn btn-danger">Cancel</a>
-</form>
+<div class="box box-default">
+    <form asp-page="EditMember" method="post">
+        <div class="box-body">
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Member.DisplayName">Display name:</label>
+                <input asp-for="Member.DisplayName" class="form-control" />
+                <span asp-validation-for="Member.DisplayName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Member.Email">Email:</label>
+                <input asp-for="Member.Email" class="form-control" />
+                <span asp-validation-for="Member.Email" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Member.TeamName">Team name:</label>
+                <input asp-for="Member.TeamName" class="form-control" />
+                <span asp-validation-for="Member.TeamName" class="text-danger"></span>
+            </div>
+
+        </div>
+        <div class="box-footer">
+            <button type="submit" class="btn btn-primary">Save</button>
+            <a asp-page="TeamMembers" class="btn btn-danger">Cancel</a>
+        </div>
+    </form>
+</div>

@@ -77,7 +77,6 @@ namespace Ether.Types
         {
             var settingsContainer = new MenuContainer("Settings", icon: "cogs");
             settingsContainer.AddSubItem(new MenuItem(typeof(Pages.Settings.IndexModel)));
-            settingsContainer.AddSubItem(new MenuItem(typeof(Pages.Settings.PersonalModel)));
             AddTeamMembersSection(settingsContainer);
             AddProjectsSection(settingsContainer);
             AddRepositoriesSection(settingsContainer);

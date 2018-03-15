@@ -14,6 +14,7 @@
           asp-fallback-href="~/lib/jquery/jquery-ui.min.css" asp-fallback-test-class="ui-datepicker" asp-fallback-test-property="display" asp-fallback-test-value="none">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/2.4.2/css/AdminLTE.min.css" integrity="sha256-sZVMQjkm0Ho60NDzV4Ot0OTBAK7UcaqkQOxLkTT93kQ=" crossorigin="anonymous" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/2.4.2/css/skins/_all-skins.min.css" integrity="sha256-U2eKBb7w142J6PSkrsgX1d3UM57TgiErTiT9gD1X8iA=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.16/css/jquery.dataTables.css" integrity="sha256-rfdVKxryktsNgqIt1/gXp6UEov0OUXAcZ4hJ9emFy7k=" crossorigin="anonymous" />
     <link href="~/css/site.css" rel="stylesheet" />
 </head>
 <body class="skin-green-light sidebar-mini fixed">
@@ -25,12 +26,8 @@
                 <h1>@ViewData["Title"]</h1>
             </section>
             <section class="content">
-                <div class="box box-default">
-                    <div class="box-body">
-                        <partial name="_Notifications" />
-                        @RenderBody()
-                    </div>
-                </div>
+                <partial name="_Notifications" />
+                @RenderBody()
             </section>
         </main>
         <partial name="_Footer" />
@@ -62,6 +59,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/2.4.2/js/adminlte.min.js" 
             integrity="sha256-M/+/xbAPBtc0W7JWnReOYF+oPZq4OiOUrlP9qbv7w64=" 
             crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.16/js/jquery.dataTables.min.js" integrity="sha256-qcV1wr+bn4NoBtxYqghmy1WIBvxeoe8vQlCowLG+cng=" crossorigin="anonymous"></script>
 
     @RenderSection("Scripts", required: false)
 </body>

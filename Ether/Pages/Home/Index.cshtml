@@ -7,45 +7,48 @@
     var allProfiles = Profiles.Value.Select(p => new SelectListItem { Text = p.Name, Value = p.Id.ToString() });
     var allReporters = Reporters.Select(r => new SelectListItem { Text = r.Name, Value = r.Id.ToString() });
 }
-
-<form asp-page-handler="Report" method="post">
-    <div asp-validation-summary="All" class="text-danger"></div>
-    <div class="form-group">
-        <fieldset>
-            <legend>Select profiles</legend>
-            @foreach (var profile in Profiles.Value)
-            {
-                <label for="repo-@profile.Id">@profile.Name</label>
-                <input type="checkbox" name="ReportRequest.Profiles" value="@profile.Id" id="repo-@profile.Id" @(Model.ReportRequest.Profiles != null && Model.ReportRequest.Profiles.Contains(profile.Id) ? "checked" : "") />
-            }
-        </fieldset>
-        <span asp-validation-for="ReportRequest.Profiles" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="ReportRequest.Report">Report:</label>
-        <select asp-for="ReportRequest.Report" asp-items="@allReporters" class="form-control"></select>
-        <span asp-validation-for="ReportRequest.Report" class="text-danger"></span>
-    </div>
-    <div class="row">
-        <div class="col-md-6">
+<div class="box box-default">
+    <div class="box-body">
+        <form asp-page-handler="Report" method="post">
+            <div asp-validation-summary="All" class="text-danger"></div>
             <div class="form-group">
-                <label id="StartDateLabel" asp-for="ReportRequest.StartDate">Start date:</label>
-                <div id="StartDateDiv"></div>
-                <input id="StartDate" asp-for="ReportRequest.StartDate" type="hidden" />
-                <span asp-validation-for="ReportRequest.StartDate" class="text-danger"></span>
+                <fieldset>
+                    <legend>Select profiles</legend>
+                    @foreach (var profile in Profiles.Value)
+                    {
+                        <label for="repo-@profile.Id">@profile.Name</label>
+                        <input type="checkbox" name="ReportRequest.Profiles" value="@profile.Id" id="repo-@profile.Id" @(Model.ReportRequest.Profiles != null && Model.ReportRequest.Profiles.Contains(profile.Id) ? "checked" : "") />
+                    }
+                </fieldset>
+                <span asp-validation-for="ReportRequest.Profiles" class="text-danger"></span>
             </div>
-        </div>
-        <div class="col-md-6">
             <div class="form-group">
-                <label id="EndDateLabel" asp-for="ReportRequest.EndDate">End date:</label>
-                <div id="EndDateDiv"></div>
-                <input id="EndDate" asp-for="ReportRequest.EndDate" type="hidden" />
-                <span asp-validation-for="ReportRequest.EndDate" class="text-danger"></span>
+                <label asp-for="ReportRequest.Report">Report:</label>
+                <select asp-for="ReportRequest.Report" asp-items="@allReporters" class="form-control"></select>
+                <span asp-validation-for="ReportRequest.Report" class="text-danger"></span>
             </div>
-        </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label id="StartDateLabel" asp-for="ReportRequest.StartDate">Start date:</label>
+                        <div id="StartDateDiv"></div>
+                        <input id="StartDate" asp-for="ReportRequest.StartDate" type="hidden" />
+                        <span asp-validation-for="ReportRequest.StartDate" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label id="EndDateLabel" asp-for="ReportRequest.EndDate">End date:</label>
+                        <div id="EndDateDiv"></div>
+                        <input id="EndDate" asp-for="ReportRequest.EndDate" type="hidden" />
+                        <span asp-validation-for="ReportRequest.EndDate" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <button id="generateReportBtn" type="submit" class="btn btn-success">Create a report</button>
+        </form>
     </div>
-    <button id="generateReportBtn" type="submit" class="btn btn-success">Create a report</button>
-</form>
+</div>
 
 <div id="loadingModal" class="modal fade" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">

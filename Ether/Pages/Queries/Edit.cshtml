@@ -4,25 +4,31 @@
 @{
     var allProjects = Projects.Value.Select(p => new SelectListItem { Text = p.Name, Value = p.Id.ToString() });
 }
+<div class="box box-default">
+    <form asp-page="Edit" method="post">
+        <div class="box-body">
+            <div asp-validation-summary="All"></div>
+            <div class="form-group">
+                <label asp-for="Query.QueryId">Query ID:</label>
+                <input asp-for="Query.QueryId" class="form-control" />
+                <span asp-validation-for="Query.QueryId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Query.Name">Name:</label>
+                <input asp-for="Query.Name" class="form-control" />
+                <span asp-validation-for="Query.Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Query.Project">Project:</label>
+                <select asp-for="Query.Project" asp-items="@allProjects" class="form-control"></select>
+                <span asp-validation-for="Query.Project" class="text-danger"></span>
+            </div>
+            <input asp-for="Query.Id" type="hidden" />
 
-<form asp-page="Edit" method="post">
-    <div asp-validation-summary="All"></div>
-    <div class="form-group">
-        <label asp-for="Query.QueryId">Query ID:</label>
-        <input asp-for="Query.QueryId" class="form-control" />
-        <span asp-validation-for="Query.QueryId" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="Query.Name">Name:</label>
-        <input asp-for="Query.Name" class="form-control" />
-        <span asp-validation-for="Query.Name" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="Query.Project">Project:</label>
-        <select asp-for="Query.Project" asp-items="@allProjects" class="form-control"></select>
-        <span asp-validation-for="Query.Project" class="text-danger"></span>
-    </div>
-    <input asp-for="Query.Id" type="hidden" />
-    <button type="submit" class="btn btn-success">Save</button>
-    <a asp-page="Index" class="btn btn-danger">Cancel</a>
-</form>
+        </div>
+        <div class="box-footer">
+            <button type="submit" class="btn btn-success">Save</button>
+            <a asp-page="Index" class="btn btn-danger">Cancel</a>
+        </div>
+    </form>
+</div>

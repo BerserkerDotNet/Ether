@@ -1,49 +1,59 @@
 ﻿@page
 @model Ether.Pages.Reports.IndexModel
-
-<table class="table">
-    <caption>List of available reports</caption>
-    <thead>
-        <tr>
-            <td colspan="6" class="text-right">
-                <a asp-page="/Index" class="btn btn-success">New</a>
-            </td>
-        </tr>
-        <tr>
-            <th>Report name</th>
-            <th>Profile name</th>
-            <th>Taken</th>
-            <th>Start date</th>
-            <th>End date</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var report in Model.Reports)
-        {
-            <tr>
-                <td>@report.ReportName</td>
-                <td>@report.ProfileName</td>
-                <td>@report.DateTaken</td>
-                <td>@report.StartDate.ToString("MM/dd/yyyy")</td>
-                <td>@report.EndDate.ToString("MM/dd/yyyy")</td>
-                <td width="220">
-                    <form class="form-inline" asp-page-handler="Delete" method="post">
-                        <a asp-page="View" asp-route-id="@report.Id" asp-route-print="true" class="btn btn-success">Print</a>
-                        <a asp-page="View" asp-route-id="@report.Id" class="btn btn-primary">View</a>
-                        <input type="hidden" value="@report.Id" name="Id" />
-                        <button type="submit" class="btn btn-danger">Delete</button>
-                    </form>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
-
+<div class="box box-default">
+    <div class="box-header">
+        <h3 class="box-title">List of available reports</h3>
+        <a asp-page="/Index" class="btn btn-success pull-right">New</a>
+    </div>
+    <div class="box-body">
+        <table class="table" id="reports">
+            <thead>
+                <tr>
+                    <th>Report name</th>
+                    <th>Profile name</th>
+                    <th>Taken</th>
+                    <th>Start date</th>
+                    <th>End date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var report in Model.Reports)
+                {
+                    <tr>
+                        <td>@report.ReportName</td>
+                        <td>@report.ProfileName</td>
+                        <td>@report.DateTaken</td>
+                        <td>@report.StartDate.ToString("MM/dd/yyyy")</td>
+                        <td>@report.EndDate.ToString("MM/dd/yyyy")</td>
+                        <td width="220">
+                            <form class="form-inline" asp-page-handler="Delete" method="post">
+                                <a asp-page="View" asp-route-id="@report.Id" asp-route-print="true" class="btn btn-success">Print</a>
+                                <a asp-page="View" asp-route-id="@report.Id" class="btn btn-primary">View</a>
+                                <input type="hidden" value="@report.Id" name="Id" />
+                                <button type="submit" class="btn btn-danger">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
 @section Scripts{
 
     <script>
         $(document).ready(function () {
+
+            $('#reports').DataTable({
+                'paging': true,
+                'lengthChange': true,
+                'searching': true,
+                'ordering': true,
+                'info': true,
+                'autoWidth': false
+            });
+
             $('.btn-danger').click(function (e) {
                 var name = $(this).parents('tr').children("td:first").text();
                 if (!confirm("Are you sure you want to delete profile '" + name + "'?")) {

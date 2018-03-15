@@ -2,41 +2,42 @@
 @model Ether.Pages.Profiles.IndexModel
 @inject IAll<VSTSRepository> Repositories
 @inject IAll<TeamMember> TeamMembers
-
-<table class="table table-hover">
-    <caption>Available profiles</caption>
-    <thead>
-        <tr>
-            <td colspan="4" class="text-right">
-                <a asp-page="Edit" class="btn btn-success">Add new</a>
-            </td>
-        </tr>
-        <tr>
-            <th>Name</th>
-            <th>Repositories</th>
-            <th>Members</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var profile in Model.Profiles)
-        {
-            <tr>
-                <td style="white-space:nowrap">@profile.Name</td>
-                <td>@string.Join(", ", Repositories.Value.Where(r => profile.Repositories.Contains(r.Id)).Select(r => r.Name))</td>
-                <td>@string.Join(", ", TeamMembers.Value.Where(m => profile.Members.Contains(m.Id)).Select(m => m.DisplayName))</td>
-                <td width="150">
-                    <form class="form-inline" asp-page-handler="Delete" method="post">
-                        <a asp-page="Edit" asp-route-id="@profile.Id" class="btn btn-primary">Edit</a>
-                        <input type="hidden" value="@profile.Id" name="Id" />
-                        <button type="submit" class="btn btn-danger">Delete</button>
-                    </form>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
-
+<div class="box box-default">
+    <div class="box-header">
+        <h3 class="box-title">Available profiles</h3>
+        <a asp-page="Edit" class="btn btn-success pull-right">New</a>
+    </div>
+    <div class="box-body">
+        <table class="table table-hover">
+            <caption></caption>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Repositories</th>
+                    <th>Members</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var profile in Model.Profiles)
+                {
+                    <tr>
+                        <td style="white-space:nowrap">@profile.Name</td>
+                        <td>@string.Join(", ", Repositories.Value.Where(r => profile.Repositories.Contains(r.Id)).Select(r => r.Name))</td>
+                        <td>@string.Join(", ", TeamMembers.Value.Where(m => profile.Members.Contains(m.Id)).Select(m => m.DisplayName))</td>
+                        <td width="150">
+                            <form class="form-inline" asp-page-handler="Delete" method="post">
+                                <a asp-page="Edit" asp-route-id="@profile.Id" class="btn btn-primary">Edit</a>
+                                <input type="hidden" value="@profile.Id" name="Id" />
+                                <button type="submit" class="btn btn-danger">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
 @section Scripts{
 
     <script>
