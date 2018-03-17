@@ -1,37 +1,27 @@
 ﻿@page
 @model Ether.Pages.Reports.ViewModel
-@{
-    var report = Model.Report as ReportResult;
-}
 
-<div class="box box-default">
-    <div class="box-header">
-        <h3 class="box-title">@report.ReportName for '@report.ProfileName'</h3>
-        <a class="btn btn-default hidden-print pull-right" onclick="window.print();">Print</a>
-    </div>
-    <div class="box-body">
-        @Html.DisplayFor(m => m.Report, Model.Report.GetType().Name)
-    </div>
-    <div class="box-footer">
-        <span>Range: @report.StartDate.ToString("MM/dd/yyyy")  - @report.EndDate.ToString("MM/dd/yyyy")</span>
-    </div>
-</div>
+@Html.DisplayFor(m => m.Report, Model.Report.GetType().Name)
+
 <a asp-page="Index" class="btn btn-primary hidden-print">Back to list</a>
 <a asp-page="/Index" class="btn btn-success hidden-print">New report</a>
 
-@section Scripts{ 
-<script>
+@section Scripts{
+
+    <script render="@nameof(ReportResult)">
+    </script>
+
+    <script>
     $(document).ready(function () {
-        @{
-            var print = HttpContext.Request.Query["print"].ToString().ToLower();
-            var isPrint = string.IsNullOrEmpty(print) ? "false" : "true";
-        }
+            @{
+                var print = HttpContext.Request.Query["print"].ToString().ToLower();
+                var isPrint = string.IsNullOrEmpty(print) ? "false" : "true";
+            }
         var isPrint = @isPrint;
-        if (isPrint)
-        {
+        if (isPrint) {
             window.print();
             window.history.back();
         }
     });
-</script>
+    </script>
 }
