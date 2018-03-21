@@ -36,6 +36,28 @@ namespace Ether.Tests.JobTests
             _repository.Setup(r => r.GetSingleAsync<Settings>(_ => true)).Returns(Task.FromResult<Settings>(null));
             _job.Execute();
             _logger.Verify(l => l.Log(LogLevel.Warning, 0, It.IsAny<FormattedLogValues>(), It.IsAny<Exception>(), It.IsAny<Func<object, Exception, string>>()), Times.Once());
+            _repository.Verify(r => r.Delete(It.IsAny<Expression<Func<VSTSWorkItem, bool>>>()), Times.Never());
+        }
+
+        [Test]
+        public void ShouldExitIfNoSpecificSettings()
+        {
+            _repository.Setup(r => r.GetSingleAsync<Settings>(_ => true)).Returns(Task.FromResult(new Settings()));
+            _job.Execute();
+            _repository.Verify(r => r.Delete(It.IsAny<Expression<Func<VSTSWorkItem, bool>>>()), Times.Never());
+        }
+
+        [Test]
+        public void ShouldExitIfKeepLastIsNullSettings()
+        {
+            _repository.Setup(r => r.GetSingleAsync<Settings>(_ => true)).Returns(Task.FromResult(new Settings
+            {
+                WorkItemsSettings = new Settings.WorkItems { KeepLast = null },
+                ReportsSettings = new Settings.Reports { KeepLast = null },
+                PullRequestsSettings = new Settings.PullRequests { KeepLast = null }
+            }));
+            _job.Execute();
+            _repository.Verify(r => r.Delete(It.IsAny<Expression<Func<VSTSWorkItem, bool>>>()), Times.Never());
         }
 
         [Test]

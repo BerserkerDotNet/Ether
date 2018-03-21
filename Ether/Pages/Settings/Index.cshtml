@@ -4,70 +4,91 @@
 @{
     var retentionOptions = new[]
     {
-new SelectListItem {Text = "1 week", Value = TimeSpan.FromDays(7).ToString() } ,
-new SelectListItem {Text = "2 weeks", Value = TimeSpan.FromDays(14).ToString() } ,
-new SelectListItem {Text = "1 month", Value = TimeSpan.FromDays(30).ToString() } ,
-new SelectListItem {Text = "2 months", Value = TimeSpan.FromDays(60).ToString() },
-new SelectListItem {Text = "3 months", Value = TimeSpan.FromDays(90).ToString() } ,
-new SelectListItem {Text = "6 months", Value = TimeSpan.FromDays(180).ToString() } ,
-};
-    var allProfiles = Profiles.Value.Select(p => new SelectListItem { Text = p.Name, Value = p.Id.ToString(), Selected = p.Id == Model.PersonalSettings.TeamProfile });
+        new SelectListItem {Text = "", Value = null},
+        new SelectListItem {Text = "1 week", Value = TimeSpan.FromDays(7).ToString() } ,
+        new SelectListItem {Text = "2 weeks", Value = TimeSpan.FromDays(14).ToString() } ,
+        new SelectListItem {Text = "1 month", Value = TimeSpan.FromDays(30).ToString() } ,
+        new SelectListItem {Text = "2 months", Value = TimeSpan.FromDays(60).ToString() },
+        new SelectListItem {Text = "3 months", Value = TimeSpan.FromDays(90).ToString() } ,
+        new SelectListItem {Text = "6 months", Value = TimeSpan.FromDays(180).ToString() } ,
+    };
+    var allProfiles = Profiles.Value.Select(p => new SelectListItem { Text = p.Name, Value = p.Id.ToString(), Selected = p.Id == Model.Settings.TeamProfile });
 }
-
-<div class="row">
-    <div class="col-md-6">
-        <div class="box box-primary">
-            <div class="box-header">
-                <h3 class="box-title">General</h3>
-            </div>
-            <form asp-page="Index" method="post">
+<form asp-page="Index" method="post">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="box box-primary">
+                <div class="box-header">
+                    <h3 class="box-title">Work items</h3>
+                </div>
                 <div class="box-body">
-                    <div asp-validation-summary="All" class="text-danger"></div>
                     <section id="workitems">
                         <div class="form-group">
-                            <input asp-for="Settings.WorkItemsSettings.DisableWorkitemsJob" />
-                            <label asp-for="Settings.WorkItemsSettings.DisableWorkitemsJob">Disable work items job</label>
+                            <input asp-for="Settings.DisableWorkitemsJob" />
+                            <label asp-for="Settings.DisableWorkitemsJob">Disable work items job</label>
                         </div>
                         <div class="form-group">
                             <label>Keep workitems not older than</label>
-                            <select asp-for="Settings.WorkItemsSettings.KeepLast" asp-items="@retentionOptions" class="form-control"></select>
-                            <span asp-validation-for="Settings.WorkItemsSettings.KeepLast" class="text-danger"></span>
+                            <select asp-for="Settings.KeepLastWorkItems" asp-items="@retentionOptions" class="form-control"></select>
+                            <span asp-validation-for="Settings.KeepLastWorkItems" class="text-danger"></span>
                         </div>
                     </section>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="box box-primary">
+                <div class="box-header">
+                    <h3 class="box-title">Pull requests</h3>
+                </div>
+                <div class="box-body">
+                    <section id="workitems">
+                        <div class="form-group">
+                            <input asp-for="Settings.DisablePullRequestsJob" />
+                            <label asp-for="Settings.DisablePullRequestsJob">Disable pull requests job</label>
+                        </div>
+                        <div class="form-group">
+                            <label>Keep workitems not older than</label>
+                            <select asp-for="Settings.KeepLastPullRequests" asp-items="@retentionOptions" class="form-control"></select>
+                            <span asp-validation-for="Settings.KeepLastPullRequests" class="text-danger"></span>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="box box-primary">
+                <div class="box-header">
+                    <h3 class="box-title">Reports</h3>
+                </div>
+                <div class="box-body">
                     <section id="reports">
                         <div class="form-group">
                             <label>Keep reports not older than</label>
-                            <select asp-for="Settings.ReportsSettings.KeepLast" asp-items="@retentionOptions" class="form-control"></select>
-                            <span asp-validation-for="Settings.ReportsSettings.KeepLast" class="text-danger"></span>
+                            <select asp-for="Settings.KeepLastReports" asp-items="@retentionOptions" class="form-control"></select>
+                            <span asp-validation-for="Settings.KeepLastReports" class="text-danger"></span>
                         </div>
                     </section>
                 </div>
-                <div class="box-footer">
-                    <input type="submit" class="btn btn-success" value="Save" />
-                    <input type="reset" class="btn btn-danger" value="Cancel" />
-                </div>
-            </form>
-        </div>
-    </div>
-    <div class="col-md-6">
-        <div class="box box-success">
-            <div class="box-header">
-                <h3 class="box-title">Personal</h3>
             </div>
-            <form asp-page-handler="Personal" method="post">
+        </div>
+        <div class="col-md-6">
+            <div class="box box-success">
+                <div class="box-header">
+                    <h3 class="box-title">Personal</h3>
+                </div>
                 <div class="box-body">
-                    <div asp-validation-summary="All" class="text-danger"></div>
                     <div class="form-group">
-                        <label asp-for="PersonalSettings.TeamProfile">My team profile:</label>
-                        <select asp-for="PersonalSettings.TeamProfile" asp-items="@allProfiles" class="form-control"></select>
-                        <span asp-validation-for="PersonalSettings.TeamProfile" class="text-danger"></span>
+                        <label asp-for="Settings.TeamProfile">My team profile:</label>
+                        <select asp-for="Settings.TeamProfile" asp-items="@allProfiles" class="form-control"></select>
+                        <span asp-validation-for="Settings.TeamProfile" class="text-danger"></span>
                     </div>
                 </div>
-                <div class="box-footer">
-                    <input type="submit" class="btn btn-success" value="Save" />
-                    <input type="reset" class="btn btn-danger" value="Cancel" />
-                </div>
-            </form>
+            </div>
         </div>
     </div>
-</div>
+    <input type="submit" class="btn btn-success" value="Save" />
+    <input type="reset" class="btn btn-danger" value="Cancel" />
+</form>

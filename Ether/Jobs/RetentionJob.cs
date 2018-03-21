@@ -40,7 +40,10 @@ namespace Ether.Jobs
         {
             try
             {
-                var keepWorkitemsDate = DateTime.UtcNow.Subtract(settings.WorkItemsSettings.KeepLast);
+                if (settings.WorkItemsSettings?.KeepLast == null)
+                    return;
+
+                var keepWorkitemsDate = DateTime.UtcNow.Subtract(settings.WorkItemsSettings.KeepLast.Value);
                 var itemsToDelete = _repository.GetAll<VSTSWorkItem>()
                     .Where(w => w.CreatedDate < keepWorkitemsDate)
                     .Select(w => w.Id)
@@ -59,7 +62,10 @@ namespace Ether.Jobs
         {
             try
             {
-                var keepReportsDate = DateTime.UtcNow.Subtract(settings.ReportsSettings.KeepLast);
+                if (settings.ReportsSettings?.KeepLast == null)
+                    return;
+
+                var keepReportsDate = DateTime.UtcNow.Subtract(settings.ReportsSettings.KeepLast.Value);
                 var deletedReportsCount = _repository.Delete<ReportResult>(w => w.DateTaken < keepReportsDate);
                 _logger.LogWarning("Deleted {NumberOfReports} reports that are older than '{KeepReportsDate}'", deletedReportsCount, keepReportsDate);
             }
@@ -67,6 +73,11 @@ namespace Ether.Jobs
             {
                 _logger.LogError(ex, "Error while cleaning reports.");
             }
+        }
+
+        private void CleanPullRequests(Settings settings)
+        {
+
         }
     }
 }

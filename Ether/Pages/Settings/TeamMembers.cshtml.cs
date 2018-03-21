@@ -1,6 +1,7 @@
 ﻿using Ether.Core.Filters;
 using Ether.Core.Interfaces;
 using Ether.Core.Models.DTO;
+using Ether.Core.Models.VSTS;
 using Ether.Extensions;
 using Ether.Jobs;
 using FluentScheduler;
@@ -69,6 +70,26 @@ namespace Ether.Pages.Settings
                     JobManager.AddJob(job, s => s.ToRunNow());
                 }
                 TempData.WithSuccess($"Work items for {user.DisplayName} have been cleared.");
+            }
+
+            return RedirectToPage("TeamMembers");
+        }
+
+        public async Task<IActionResult> OnPostResetPullRequestsAsync(Guid id)
+        {
+            var user = await _repository.GetSingleAsync<TeamMember>(t => t.Id == id);
+            if (user != null)
+            {
+                user.LastFetchDate = DateTime.MinValue;
+                user.PullRequests = Enumerable.Empty<PullRequest>();
+                await _repository.CreateOrUpdateAsync(user);
+                var job = HttpContext.RequestServices.GetService(typeof(PullRequestsFetchJob)) as PullRequestsFetchJob;
+                if (job != null)
+                {
+                    job.SpecificUser = user;
+                    JobManager.AddJob(job, s => s.ToRunNow());
+                }
+                TempData.WithSuccess($"Pull requests for {user.DisplayName} have been cleared.");
             }
 
             return RedirectToPage("TeamMembers");

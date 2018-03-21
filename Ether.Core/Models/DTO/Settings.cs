@@ -11,17 +11,23 @@ namespace Ether.Core.Models.DTO
 
         public WorkItems WorkItemsSettings { get; set; }
         public Reports ReportsSettings { get; set; }
+        public PullRequests PullRequestsSettings { get; set; }
 
         public class WorkItems
         {
             public bool DisableWorkitemsJob { get; set; }
+            public TimeSpan? KeepLast { get; set; }
+        }
 
-            public TimeSpan KeepLast { get; set; }
+        public class PullRequests
+        {
+            public bool DisablePullRequestsJob { get; set; }
+            public TimeSpan? KeepLast { get; set; }
         }
 
         public class Reports
         {
-            public TimeSpan KeepLast { get; set; }
+            public TimeSpan? KeepLast { get; set; }
         }
     }
 }

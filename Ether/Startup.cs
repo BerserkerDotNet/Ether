@@ -84,6 +84,7 @@ namespace Ether
             services.AddScoped<LiveUpdatesHub>();
 
             services.AddTransient<WorkItemsFetchJob>();
+            services.AddTransient<PullRequestsFetchJob>();
             services.AddTransient<RetentionJob>();
 #if DEBUG
             services.AddAuthentication(Microsoft.AspNetCore.Server.HttpSys.HttpSysDefaults.AuthenticationScheme);
@@ -134,6 +135,10 @@ namespace Ether
                 .ToRunNow()
                 .AndEvery(1)
                 .Hours();
+            registry.Schedule<PullRequestsFetchJob>()
+                .ToRunNow()
+                .AndEvery(1)
+                .Days();
             registry.Schedule<RetentionJob>()
                 .ToRunNow()
                 .AndEvery(1)

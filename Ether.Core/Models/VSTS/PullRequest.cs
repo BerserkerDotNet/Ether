@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Ether.Core.Models.DTO;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -6,7 +7,7 @@ using System.Linq;
 namespace Ether.Core.Models.VSTS
 {
     [DebuggerDisplay("{Status} - {PullRequestId} {Title}")]
-    public class PullRequest
+    public class PullRequest : BaseDto
     {
         public int PullRequestId { get; set; }
         public VSTSUser CreatedBy { get; set; }
@@ -22,6 +23,27 @@ namespace Ether.Core.Models.VSTS
 
         public int IterationsCount => Iterations == null ? 0 : Iterations.Count();
         public int CommentsCount => Threads == null ? 0 : Threads.Count();
+
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as PullRequest);
+        }
+
+        public override bool Equals(BaseDto other)
+        {
+            if (other == null || !(other is PullRequest))
+                return false;
+
+            if (ReferenceEquals(this, other))
+                return true;
+
+            return PullRequestId == ((PullRequest)other).PullRequestId;
+        }
+
+        public override int GetHashCode()
+        {
+            return PullRequestId.GetHashCode();
+        }
     }
 
     public class RepositoryInfo

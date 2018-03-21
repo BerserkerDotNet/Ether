@@ -32,6 +32,7 @@
                     <th>Email</th>
                     <th>TeamName</th>
                     <th>Work items</th>
+                    <th>Pull requests</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -47,14 +48,22 @@
                         <div><strong>LastFetch:</strong> @member.LastFetchDate.ToString("G")</div>
                         <form class="form-inline" asp-page-handler="ResetWorkitems" method="post">
                             <input type="hidden" value="@member.Id" name="Id" />
-                            <input type="submit" value="Reset" />
+                            <input class="btn btn-danger" type="submit" value="Reset" />
+                        </form>
+                    </td>
+                    <td>
+                        <div><strong>Pullrequests:</strong> @(member.PullRequests == null ? 0 : member.PullRequests.Count())</div>
+                        <div><strong>LastFetch:</strong> @member.LastPullRequestsFetchDate.ToString("G")</div>
+                        <form class="form-inline" asp-page-handler="ResetPullRequests" method="post">
+                            <input type="hidden" value="@member.Id" name="Id" />
+                            <input class="btn btn-danger" type="submit" value="Reset" />
                         </form>
                     </td>
                     <td width="150">
                         <form class="form-inline" asp-page-handler="Delete" method="post">
                             <a asp-page="EditMember" asp-route-id="@member.Id" class="btn btn-primary">Edit</a>
                             <input type="hidden" value="@member.Id" name="Id" />
-                            <button type="submit" class="btn btn-danger">Delete</button>
+                            <button class="btn btn-danger" type="submit">Delete</button>
                         </form>
                     </td>
                 </tr>

@@ -43,6 +43,12 @@ namespace Ether.Core.Data
             {
                 Unique = true
             });
+
+            var pullREquestsCollection = GetCollectionFor<PullRequest>();
+            pullREquestsCollection.Indexes.CreateOne(Builders<PullRequest>.IndexKeys.Ascending(w => w.PullRequestId), new CreateIndexOptions
+            {
+                Unique = true
+            });
         }
 
         public async Task<IEnumerable<T>> GetAllAsync<T>() where T : BaseDto

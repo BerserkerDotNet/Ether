@@ -6,7 +6,7 @@ namespace Ether.Core.Models.DTO
     {
         public virtual Guid Id { get; set; }
 
-        public bool Equals(BaseDto other)
+        public virtual bool Equals(BaseDto other)
         {
             if (other == null)
                 return false;
