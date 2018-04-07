@@ -2,10 +2,14 @@
 using Ether.Core.Interfaces;
 using Ether.Core.Models.DTO.Reports;
 using Ether.Extensions;
+using Ether.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using NPOI.SS.UserModel;
+using NPOI.XSSF.UserModel;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -48,6 +52,21 @@ namespace Ether.Pages.Reports
             Report = report;
 
             return Page();
+        }
+
+        public async Task<IActionResult> OnGetToExcelAsync(Guid id)
+        {
+            var report = await _repository.GetSingleAsync<ReportResult>(id);
+            if (report == null)
+            {
+                TempData.WithError($"Couldn't find a report with id '{id}'");
+                return Page();
+            }
+
+            var fileName = $"{report.ReportName}_{report.DateTaken.ToString("yyyy_MM_dd_HH_mm")}.xlsx";
+            var data = ReportToExcelConverter.GetConverter(report.GetType()).Convert(report);
+
+            return File(data, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
         }
     }
 }
