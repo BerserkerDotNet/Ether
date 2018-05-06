@@ -60,7 +60,9 @@ namespace Ether.Pages.Settings
             var user = await _repository.GetSingleAsync<TeamMember>(t => t.Id == id);
             if (user != null)
             {
-                user.LastFetchDate = DateTime.MinValue;
+                var settings = await _repository.GetSingleAsync<Core.Models.DTO.Settings>(_ => true);
+                var keepLastSetting = settings?.WorkItemsSettings?.KeepLast ?? TimeSpan.FromDays(0);
+                user.LastFetchDate = DateTime.UtcNow.Subtract(keepLastSetting);
                 user.RelatedWorkItemIds = Enumerable.Empty<int>();
                 await _repository.CreateOrUpdateAsync(user);
                 var job = HttpContext.RequestServices.GetService(typeof(WorkItemsFetchJob)) as WorkItemsFetchJob;
@@ -80,7 +82,9 @@ namespace Ether.Pages.Settings
             var user = await _repository.GetSingleAsync<TeamMember>(t => t.Id == id);
             if (user != null)
             {
-                user.LastFetchDate = DateTime.MinValue;
+                var settings = await _repository.GetSingleAsync<Core.Models.DTO.Settings>(_ => true);
+                var keepLastSetting = settings?.PullRequestsSettings?.KeepLast ?? TimeSpan.FromDays(0);
+                user.LastFetchDate = DateTime.UtcNow.Subtract(keepLastSetting);
                 user.PullRequests = Enumerable.Empty<PullRequest>();
                 await _repository.CreateOrUpdateAsync(user);
                 var job = HttpContext.RequestServices.GetService(typeof(PullRequestsFetchJob)) as PullRequestsFetchJob;
