@@ -25,6 +25,8 @@ namespace Ether.Core.Interfaces
 
         TProjection GetFieldValue<TType, TProjection>(Expression<Func<TType, bool>> predicate, Expression<Func<TType, TProjection>> projection) where TType : BaseDto;
 
+        Task UpdateFieldValue<T, TField>(T obj, Expression<Func<T, TField>> field, TField value) where T : BaseDto;
+
         Task<object> GetSingleAsync(Guid id, Type itemType);
 
         Task<T> GetSingleAsync<T>(Guid id) where T : BaseDto;

@@ -33,7 +33,6 @@ namespace Ether.Jobs
 
             CleanWorkItems(settings);
             CleanReports(settings);
-
         }
 
         private void CleanWorkItems(Settings settings)
@@ -46,10 +45,25 @@ namespace Ether.Jobs
                 var keepWorkitemsDate = DateTime.UtcNow.Subtract(settings.WorkItemsSettings.KeepLast.Value);
                 var itemsToDelete = _repository.GetAll<VSTSWorkItem>()
                     .Where(w => w.CreatedDate < keepWorkitemsDate)
-                    .Select(w => w.Id)
                     .ToList();
-                var deletedWorkitemsCount = _repository.Delete<VSTSWorkItem>(w => itemsToDelete.Contains(w.Id));
+                var workItemIdsToDelete = itemsToDelete.Select(w => w.WorkItemId).ToList();
+                var recordIdsToDelete = itemsToDelete.Select(w => w.Id).ToList();
 
+                var teamMembers = _repository.GetAll<TeamMember>();
+                foreach (var teamMember in teamMembers)
+                {
+                    if (teamMember.RelatedWorkItemIds == null)
+                        continue;
+
+                    var initialWorkItemsCount = teamMember.RelatedWorkItemIds.Count();
+                    var clearedWorkItems = teamMember.RelatedWorkItemIds.Except(workItemIdsToDelete).ToList();
+                    if (clearedWorkItems.Count != initialWorkItemsCount)
+                    {
+                        _repository.UpdateFieldValue(teamMember, t => t.RelatedWorkItemIds, clearedWorkItems);
+                        _logger.LogInformation("Updating '{TeamMember}' related workitems count from {InitialNumberOfWorkitems} to {CurrentNumberOfWorkitems}",teamMember.Email, initialWorkItemsCount, clearedWorkItems.Count);
+                    }
+                }
+                var deletedWorkitemsCount = _repository.Delete<VSTSWorkItem>(w => recordIdsToDelete.Contains(w.Id));
                 _logger.LogWarning("Deleted {NumberOfWorkitems} workitems that are older than '{KeepWorkitemsDate}'", deletedWorkitemsCount, keepWorkitemsDate);
             }
             catch (Exception ex)

@@ -140,6 +140,14 @@ namespace Ether.Core.Data
                   .SingleOrDefault();
         }
 
+        public async Task UpdateFieldValue<T, TField>(T obj, Expression<Func<T, TField>> field, TField value)
+            where T : BaseDto
+        {
+            var collection = GetCollectionFor<T>();
+            var update = Builders<T>.Update.Set(field, value);
+            await collection.UpdateOneAsync<T>(e => e.Id == obj.Id, update);
+        }
+
         public async Task<bool> CreateAsync<T>(T item) where T : BaseDto
         {
             var collection = GetCollectionFor<T>();

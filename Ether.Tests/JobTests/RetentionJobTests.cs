@@ -3,6 +3,7 @@ using Ether.Core.Models.DTO;
 using Ether.Core.Models.DTO.Reports;
 using Ether.Core.Models.VSTS;
 using Ether.Jobs;
+using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Internal;
 using Moq;
@@ -73,7 +74,7 @@ namespace Ether.Tests.JobTests
                 Common.GetWorkItemWithDate(createdDate: DateTime.UtcNow.Subtract(TimeSpan.FromDays(9)))
             };
             var expectedToBeDeleted = workitems.TakeLast(3).Select(w => w.Id).ToList();
-
+            _repository.Setup(r => r.GetAll<TeamMember>()).Returns(Enumerable.Empty<TeamMember>());
             _repository.Setup(r => r.GetSingleAsync<Settings>(_ => true)).Returns(Task.FromResult(new Settings
             {
                 WorkItemsSettings = new Settings.WorkItems() { KeepLast = TimeSpan.FromDays(7) }
@@ -87,6 +88,53 @@ namespace Ether.Tests.JobTests
             _repository.Verify();
             _logger.Verify(l => l.Log(LogLevel.Warning, 0, It.IsAny<FormattedLogValues>(), It.IsAny<Exception>(), It.IsAny<Func<object, Exception, string>>()), Times.Once());
 
+        }
+
+        [Test]
+        public void ShouldCleanRelatedWorkitems()
+        {
+            var workitems = new[]
+            {
+                Common.GetWorkItemWithDate(createdDate: DateTime.UtcNow),
+                Common.GetWorkItemWithDate(createdDate: DateTime.UtcNow),
+                Common.GetWorkItemWithDate(createdDate: DateTime.UtcNow.Subtract(TimeSpan.FromDays(6))),
+                Common.GetWorkItemWithDate(createdDate: DateTime.UtcNow.Subtract(TimeSpan.FromDays(7))),
+                Common.GetWorkItemWithDate(createdDate: DateTime.UtcNow.Subtract(TimeSpan.FromDays(8))),
+                Common.GetWorkItemWithDate(createdDate: DateTime.UtcNow.Subtract(TimeSpan.FromDays(9)))
+            };
+            var teamMembers = new[]
+            {
+                new TeamMember {Id = Guid.NewGuid(), Email = "foo@bar.com", RelatedWorkItemIds = workitems.Select(w => w.WorkItemId).ToList() },
+                new TeamMember {Id = Guid.NewGuid(), Email = "bla@bar.com", RelatedWorkItemIds = workitems.TakeLast(2).Select(w => w.WorkItemId).ToList() },
+                new TeamMember {Id = Guid.NewGuid(), Email = "buz@bar.com", RelatedWorkItemIds = workitems.Take(3).Select(w => w.WorkItemId).ToList() },
+                new TeamMember {Id = Guid.NewGuid(), Email = "fizz@bar.com", RelatedWorkItemIds = null }
+            };
+
+            var expectedToBeDeleted = workitems.TakeLast(3).Select(w => w.Id).ToList();
+            _repository.Setup(r => r.GetSingleAsync<Settings>(_ => true)).Returns(Task.FromResult(new Settings
+            {
+                WorkItemsSettings = new Settings.WorkItems() { KeepLast = TimeSpan.FromDays(7) }
+            }));
+            _repository.Setup(r => r.GetAll<VSTSWorkItem>()).Returns(workitems);
+            _repository.Setup(r => r.Delete(It.IsAny<Expression<Func<VSTSWorkItem, bool>>>()))
+                .Returns(expectedToBeDeleted.Count);
+            _repository.Setup(r => r.GetAll<TeamMember>()).Returns(teamMembers);
+            _repository.Setup(r => r.UpdateFieldValue(It.Is<TeamMember>(t => teamMembers.Contains(t)), It.IsAny<Expression<Func<TeamMember, IEnumerable<int>>>>(), It.IsAny<IEnumerable<int>>()))
+                .Returns<TeamMember, Expression<Func<TeamMember, IEnumerable<int>>>, IEnumerable<int>>((t, _, v) =>
+                {
+                    teamMembers.Single(m => m.Id == t.Id).RelatedWorkItemIds = v;
+                    return Task.CompletedTask;
+                });
+
+            _job.Execute();
+
+            teamMembers[0].RelatedWorkItemIds.Count().Should().Be(workitems.Count() - expectedToBeDeleted.Count);
+            teamMembers[1].RelatedWorkItemIds.Count().Should().Be(0);
+            teamMembers[2].RelatedWorkItemIds.Count().Should().Be(3);
+            _repository.Verify(r => r.UpdateFieldValue(It.Is<TeamMember>(t => teamMembers.Contains(t)), It.IsAny<Expression<Func<TeamMember, IEnumerable<int>>>>(), It.IsAny<List<int>>()), Times.Exactly(2));
+            _repository.Verify();
+
+            _logger.Verify(l => l.Log(LogLevel.Error, 0, It.IsAny<FormattedLogValues>(), It.IsAny<Exception>(), It.IsAny<Func<object, Exception, string>>()), Times.Never());
         }
 
         [Test]
