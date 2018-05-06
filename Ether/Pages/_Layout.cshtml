@@ -20,7 +20,6 @@
 <body class="skin-green-light sidebar-mini fixed">
     <div class="wrapper">
         <partial name="_Navigation" />
-
         <main class="content-wrapper">
             <section class="content-header">
                 <h1>@ViewData["Title"]</h1>
@@ -60,6 +59,25 @@
             integrity="sha256-M/+/xbAPBtc0W7JWnReOYF+oPZq4OiOUrlP9qbv7w64="
             crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.16/js/jquery.dataTables.min.js" integrity="sha256-qcV1wr+bn4NoBtxYqghmy1WIBvxeoe8vQlCowLG+cng=" crossorigin="anonymous"></script>
+    <script>
+        $(document).on('expanded.pushMenu', function () {
+            document.cookie = "nav=0; path=/";
+        });
+        $(document).on('collapsed.pushMenu', function () {
+            document.cookie = "nav=1; path=/";
+        });
+
+        $(document).ready(function () {
+            var cookies = document.cookie.split(';').map(function (v) {
+                var pair = v.split('=');
+                return { 'name': pair[0].trim(), 'value': pair[1] };
+            });
+            var nav = cookies.filter(function (o) { return o.name === 'nav'; });
+            if (nav.length > 0 && nav[0].value === '1') {
+                $('[data-toggle="push-menu"]').pushMenu('toggle');
+            }
+        });
+    </script>
 
     @RenderSection("Scripts", required: false)
 </body>
