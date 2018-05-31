@@ -42,6 +42,8 @@ namespace Ether.Tests
 
             repositoryMock.Setup(r => r.GetSingleAsync(It.IsAny<Expression<Func<Profile, bool>>>()))
                 .Returns(Task.FromResult(profile));
+            repositoryMock.Setup(r => r.GetSingleAsync<Profile>(It.IsAny<Guid>()))
+                .Returns(Task.FromResult(profile));
             repositoryMock.Setup(r => r.GetAsync(It.IsAny<Expression<Func<TeamMember, bool>>>()))
                 .Returns<Expression<Func<TeamMember, bool>>>(e => Task.FromResult(members.Where(e.Compile())));
             repositoryMock.Setup(r => r.GetAsync(It.IsAny<Expression<Func<VSTSRepository, bool>>>()))

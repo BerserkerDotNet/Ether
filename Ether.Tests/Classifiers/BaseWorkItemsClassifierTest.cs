@@ -2,6 +2,7 @@
 using Ether.Core.Models;
 using Ether.Core.Models.VSTS;
 using Ether.Core.Reporters.Classifiers;
+using Ether.Tests.Infrastructure;
 using FluentAssertions;
 using NUnit.Framework;
 using System;
@@ -104,21 +105,21 @@ namespace Ether.Tests.Classifiers
             result.IsNone.Should().BeTrue();
         }
 
-        private class DummyClassifier : BaseWorkItemsClassifier
+        [Test]
+        public void ShouldReturnErrorResolutionIfException()
         {
-            public const string SupportedType = "Bar";
-            public const string ExpectedResolution = "Dummy";
+            var workItem = new VSTSWorkItem { Fields = new Dictionary<string, string>() };
+            workItem.Fields.Add(VSTSFieldNames.WorkItemType, ExceptionWorkItemClassifier.SupportedType);
+            workItem.Updates = UpdateBuilder.Create().Resolved()
+                .Build();
 
-            public DummyClassifier()
-                : base(SupportedType)
-            {
+            var classifier = new ExceptionWorkItemClassifier();
+            var result = classifier.Classify(new WorkItemResolutionRequest { WorkItem = workItem });
 
-            }
-
-            protected override WorkItemResolution ClassifyInternal(WorkItemResolutionRequest request)
-            {
-                return new WorkItemResolution(request.WorkItem, ExpectedResolution, "Because", DateTime.UtcNow, string.Empty, string.Empty);
-            }
+            result.Should().NotBeNull();
+            result.IsError.Should().BeTrue();
+            result.Reason.Should().Be(ExceptionWorkItemClassifier.ExpectedReason);
         }
+
     }
 }

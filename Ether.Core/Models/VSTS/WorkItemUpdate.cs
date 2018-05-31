@@ -48,6 +48,8 @@ namespace Ether.Core.Models.VSTS
             {
                 return !string.IsNullOrEmpty(OldValue) && string.IsNullOrEmpty(NewValue);
             }
+
+            public bool IsEmpty => string.IsNullOrEmpty(OldValue) && string.IsNullOrEmpty(NewValue);
         }
     }
 }

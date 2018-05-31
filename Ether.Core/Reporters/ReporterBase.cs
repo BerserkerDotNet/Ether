@@ -17,13 +17,13 @@ namespace Ether.Core.Reporters
     {
         protected readonly IRepository _repository;
         protected readonly ILogger<IReporter> _logger;
-        protected readonly VSTSConfiguration _configuration;
+        protected readonly IOptions<VSTSConfiguration> _configuration;
 
         public ReporterBase(IRepository repository, IOptions<VSTSConfiguration> configuration, ILogger<IReporter> logger)
         {
             _repository = repository;
             _logger = logger;
-            _configuration = configuration.Value;
+            _configuration = configuration;
         }
 
         public abstract string Name { get; }
@@ -34,7 +34,7 @@ namespace Ether.Core.Reporters
 
         public async Task<ReportResult> ReportAsync(ReportQuery query)
         {
-            if (string.IsNullOrEmpty(_configuration.AccessToken) || string.IsNullOrEmpty(_configuration.InstanceName))
+            if (string.IsNullOrEmpty(_configuration.Value.AccessToken) || string.IsNullOrEmpty(_configuration.Value.InstanceName))
             {
                 _logger.LogWarning("Attempt to generate report without proper configuration!");
                 throw new ArgumentException("Configuration is missing.");
@@ -67,7 +67,7 @@ namespace Ether.Core.Reporters
 
         private async Task<ReportInput> GetInputData(ReportQuery query)
         {
-            var profile = await _repository.GetSingleAsync<Profile>(p => p.Id == query.ProfileId);
+            var profile = await _repository.GetSingleAsync<Profile>(query.ProfileId);
             if (profile == null)
                 throw new ArgumentException("Selected profile was not found.");
 

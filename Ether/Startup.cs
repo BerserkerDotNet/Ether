@@ -59,7 +59,7 @@ namespace Ether
                 o.Filters.Add<CurrentMenuIndicatorFilter>();
             })
             .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<Startup>())
-            .AddRazorPagesOptions(options => 
+            .AddRazorPagesOptions(options =>
             {
                 options.Conventions.AddPageRoute("/Home/Index", "");
             })
@@ -74,6 +74,7 @@ namespace Ether
             services.AddSingleton<IDependencyResolver, AspNetDependencyResolver>();
             services.AddSingleton<PullRequestProxyJsonConverter>();
             services.AddSingleton<IProgressReporter, SignalRProgressReporter>();
+            services.AddSingleton<IWorkItemClassificationContext, WorkItemClassificationContext>();
 
             services.AddScoped(typeof(IAll<>), typeof(DataManager<>));
             services.AddScoped<IReporter, PullRequestsReporter>();
@@ -89,7 +90,7 @@ namespace Ether
 #if DEBUG
             services.AddAuthentication(Microsoft.AspNetCore.Server.HttpSys.HttpSysDefaults.AuthenticationScheme);
 #endif
-            services.AddHttpClient<IVSTSClient, VSTSClient>(client => 
+            services.AddHttpClient<IVSTSClient, VSTSClient>(client =>
             {
                 var vstsConfig = _configuration.Get<VSTSConfiguration>();
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -118,7 +119,7 @@ namespace Ether
                 });
             }
 
-            app.UseSignalR(routes => 
+            app.UseSignalR(routes =>
             {
                 routes.MapHub<LiveUpdatesHub>("/liveupdates");
             });

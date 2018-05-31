@@ -80,7 +80,7 @@ namespace Ether.Tests.Reporters
             await dummy.ReportAsync(query);
 
             dummy.VerifyInputObject(query, data.profile, data.members.Take(2), data.repositories, data.projects[0]);
-            repositoryMock.Verify(r => r.GetSingleAsync(It.Is<Expression<Func<Profile, bool>>>(e => VerifySelectProfileExpression(e))), Times.Once());
+            repositoryMock.Verify(r => r.GetSingleAsync<Profile>(It.Is<Guid>(e => VerifySelectProfileExpression(e, data.profile))), Times.Once());
             repositoryMock.Verify();
         }
 
@@ -110,18 +110,9 @@ namespace Ether.Tests.Reporters
             repositoryMock.Verify(r => r.CreateAsync(It.IsAny<ReportResult>()), Times.Once());
         }
 
-        private bool VerifySelectProfileExpression(Expression<Func<Profile, bool>> e)
+        private bool VerifySelectProfileExpression(Guid e, Profile profile)
         {
-            var body = e.Body as BinaryExpression;
-            if (body == null)
-                return false;
-
-            var memberLeft = body.Left as MemberExpression;
-            var memberRight = body.Right as MemberExpression;
-            if (memberLeft == null || memberRight == null)
-                return false;
-
-            return memberLeft.Member.Name == nameof(Profile.Id) && memberRight.Member.Name == nameof(ReportQuery.ProfileId);
+            return e == profile.Id;
         }
 
         private Mock<ILogger<T>> GetLoggerMock<T>(LogLevel level = LogLevel.None)

@@ -7,6 +7,7 @@ namespace Ether.Core.Models
     public class WorkItemResolution
     {
         private const string NoneValue = "None";
+        private const string ErrorValue = "Error";
 
         public WorkItemResolution(VSTSWorkItem workitem, string resolution, string reason, DateTime resolutionDate, string memberEmail, string memberName)
         {
@@ -23,15 +24,6 @@ namespace Ether.Core.Models
 
         private WorkItemResolution()
         {
-            WorkItemId = -1;
-            WorkItemTitle = NoneValue;
-            WorkItemType = NoneValue;
-
-            Resolution = NoneValue;
-            Reason = NoneValue;
-            ResolutionDate = DateTime.MinValue;
-            MemberEmail = NoneValue;
-            MemberName = NoneValue;
         }
 
         public int WorkItemId { get; private set; }
@@ -45,6 +37,32 @@ namespace Ether.Core.Models
 
         public bool IsNone => string.Equals(Resolution, NoneValue) && string.Equals(Reason, NoneValue);
 
-        public static WorkItemResolution None => new WorkItemResolution();
+        public bool IsError => WorkItemId == -1 && Resolution.Contains("Exception") && string.Equals(MemberEmail, ErrorValue) && string.Equals(MemberName, ErrorValue);
+
+        public static WorkItemResolution None => new WorkItemResolution
+        {
+            WorkItemId = -1,
+            WorkItemTitle = NoneValue,
+            WorkItemType = NoneValue,
+
+            Resolution = NoneValue,
+            Reason = NoneValue,
+            ResolutionDate = DateTime.MinValue,
+            MemberEmail = NoneValue,
+            MemberName = NoneValue,
+        };
+
+        public static WorkItemResolution GetError(Exception ex) => new WorkItemResolution
+        {
+            WorkItemId = -1,
+            WorkItemTitle = ErrorValue,
+            WorkItemType = ErrorValue,
+
+            Resolution = ex.GetType().ToString(),
+            Reason = ex.Message,
+            ResolutionDate = DateTime.MinValue,
+            MemberEmail = ErrorValue,
+            MemberName = ErrorValue,
+        };
     }
 }

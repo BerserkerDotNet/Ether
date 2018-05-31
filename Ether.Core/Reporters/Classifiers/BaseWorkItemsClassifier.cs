@@ -9,9 +9,6 @@ namespace Ether.Core.Reporters.Classifiers
     {
         private readonly string[] _supportedTypes;
 
-        protected const string ResolvedState = "Resolved";
-        protected const string ClosedState = "Closed";
-
         public BaseWorkItemsClassifier(params string[] supportedTypes)
         {
             _supportedTypes = supportedTypes;
@@ -28,8 +25,15 @@ namespace Ether.Core.Reporters.Classifiers
 
             if (!_supportedTypes.Contains(workItem.WorkItemType))
                 return WorkItemResolution.None;
+            try
+            {
+                return ClassifyInternal(request);
+            }
+            catch (Exception ex)
+            {
+                return WorkItemResolution.GetError(ex);
+            }
 
-            return ClassifyInternal(request);
         }
 
         protected abstract WorkItemResolution ClassifyInternal(WorkItemResolutionRequest request);

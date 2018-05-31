@@ -13,7 +13,7 @@ namespace Ether.Core.Models.VSTS
         [JsonProperty("Id")]
         public int WorkItemId { get; set; }
         public string WorkItemType => this[VSTSFieldNames.WorkItemType];
-        public string Title => this["System.Title"];
+        public string Title => this[VSTSFieldNames.Title];
         public string AreaPath => this["System.AreaPath"];
         public string State => this["System.State"];
         public string Reason => this["System.Reason"];

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using Ether.Core.Types;
 
 namespace Ether.Core.Models.DTO
 {
@@ -17,6 +19,22 @@ namespace Ether.Core.Models.DTO
         {
             public bool DisableWorkitemsJob { get; set; }
             public TimeSpan? KeepLast { get; set; }
+            public IEnumerable<Field> ETAFields { get; set; }
+        }
+
+        public struct Field
+        {
+            public Field(string workItemType, string fieldName, ETAFieldType type)
+            {
+                WorkitemType = workItemType;
+                FieldName = fieldName;
+                FieldType = type;
+            }
+
+            public string WorkitemType { get; }
+            public string FieldName { get; }
+
+            public ETAFieldType FieldType { get; }
         }
 
         public class PullRequests
