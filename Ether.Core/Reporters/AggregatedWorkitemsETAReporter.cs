@@ -101,14 +101,17 @@ namespace Ether.Core.Reporters
                             estimatedByDev = originalEstimate;
 
                         report.TotalEstimated = estimatedByDev;
+                        report.TotalCompleted = completedWork != 0 ? completedWork : (remainingWork != 0 ? remainingWork : originalEstimate);
                     }
                 }
             }
 
             bool IsETAEmpty(VSTSWorkItem wi) =>
-                !wi.Fields.ContainsKey(FieldNameFor(wi.WorkItemType, ETAFieldType.OriginalEstimate)) &&
-                !wi.Fields.ContainsKey(FieldNameFor(wi.WorkItemType, ETAFieldType.CompletedWork)) &&
-                !wi.Fields.ContainsKey(FieldNameFor(wi.WorkItemType, ETAFieldType.RemainingWork));
+                IsNullOrEmpty(wi, FieldNameFor(wi.WorkItemType, ETAFieldType.OriginalEstimate)) &&
+                IsNullOrEmpty(wi, FieldNameFor(wi.WorkItemType, ETAFieldType.CompletedWork)) &&
+                IsNullOrEmpty(wi, FieldNameFor(wi.WorkItemType, ETAFieldType.RemainingWork));
+
+            bool IsNullOrEmpty(VSTSWorkItem wi, string fieldName) => !wi.Fields.ContainsKey(fieldName) || string.IsNullOrEmpty(wi.Fields[fieldName]);
 
             string FieldNameFor(string workItemType, ETAFieldType fieldType) => etaFields.First(f => f.WorkitemType == workItemType && f.FieldType == fieldType).FieldName;
 

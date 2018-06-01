@@ -123,35 +123,7 @@ namespace Ether.Tests.Reporters
         [TestData(membersCount: 2, repositoryCount: 2, projectsCount: 1, RelatedWorkItemsPerMember = 2)]
         public async Task ShouldUseClassifiersToDetermineTheTotalResolvedCount()
         {
-            var workitems = Data.TeamMembers
-                .SelectMany(t => t.RelatedWorkItemIds)
-                .Select(id =>
-                {
-                    var wi = new VSTSWorkItem
-                    {
-                        WorkItemId = id,
-                        Fields = new Dictionary<string, string>()
-                    };
-                    wi.Fields[VSTSFieldNames.WorkItemType] = WorkItemTypes.Bug;
-                    wi.Fields[VSTSFieldNames.Title] = "Bla";
-                    return wi;
-                });
-
-
-            Data.RepositoryMock.Setup(r => r.GetAsync(It.IsAny<Expression<Func<VSTSWorkItem, bool>>>()))
-                .Returns<Expression<Func<VSTSWorkItem, bool>>>(e => Task.FromResult(workitems.Where(e.Compile())));
-            _classificationContextMock.Setup(c => c.Classify(It.IsAny<VSTSWorkItem>(), It.IsAny<ClassificationScope>()))
-                .Returns<VSTSWorkItem, ClassificationScope>((w, _s) =>
-                {
-                    var member = Data.TeamMembers.Single(t => t.RelatedWorkItemIds.Contains(w.WorkItemId));
-                    return new[]
-                    {
-                        new WorkItemResolution(w, WorkItemStates.Resolved, "Because", DateTime.UtcNow, member.Email, "bla"),
-                        new WorkItemResolution(w, WorkItemStates.Closed, "Because", DateTime.UtcNow, member.Email, "bla")
-                    };
-                });
-
-            var report = await Report();
+            var report = await ExecuteReportWithResolutions();
 
             report.IndividualReports.Should().HaveCount(2);
             report.IndividualReports.Should().OnlyContain(r => r.TotalResolved == 2);
@@ -161,33 +133,7 @@ namespace Ether.Tests.Reporters
         [TestData(membersCount: 2, repositoryCount: 2, projectsCount: 1, RelatedWorkItemsPerMember = 2)]
         public async Task ShouldIncrementWithoutETACountIfZeroETA()
         {
-            var workitems = Data.TeamMembers
-                .SelectMany(t => t.RelatedWorkItemIds)
-                .Select(id =>
-                {
-                    var wi = new VSTSWorkItem
-                    {
-                        WorkItemId = id,
-                        Fields = new Dictionary<string, string>()
-                    };
-                    wi.Fields[VSTSFieldNames.WorkItemType] = WorkItemTypes.Bug;
-                    wi.Fields[VSTSFieldNames.Title] = "Bla";
-                    return wi;
-                });
-
-            Data.RepositoryMock.Setup(r => r.GetAsync(It.IsAny<Expression<Func<VSTSWorkItem, bool>>>()))
-                .Returns<Expression<Func<VSTSWorkItem, bool>>>(e => Task.FromResult(workitems.Where(e.Compile())));
-            _classificationContextMock.Setup(c => c.Classify(It.IsAny<VSTSWorkItem>(), It.IsAny<ClassificationScope>()))
-                .Returns<VSTSWorkItem, ClassificationScope>((w, _s) =>
-                {
-                    var member = Data.TeamMembers.Single(t => t.RelatedWorkItemIds.Contains(w.WorkItemId));
-                    return new[]
-                    {
-                        new WorkItemResolution(w, WorkItemStates.Resolved, "Because", DateTime.UtcNow, member.Email, "bla"),
-                    };
-                });
-
-            var report = await Report();
+            var report = await ExecuteReportWithResolutions();
 
             report.IndividualReports.Should().HaveCount(2);
             report.IndividualReports.Should().OnlyContain(r => r.WithoutETA == 2);
@@ -202,6 +148,52 @@ namespace Ether.Tests.Reporters
         [TestCase(null, null, null, 0)]
         [TestData(membersCount: 1, repositoryCount: 2, projectsCount: 1, RelatedWorkItemsPerMember = 1)]
         public async Task ShouldCalculateTotalPlannedETA(int? completed, int? remaining, int? original, int expected)
+        {
+            var report = await ExecuteReportWithResolutions(completed, remaining, expected);
+
+            report.IndividualReports.Should().HaveCount(1);
+            report.IndividualReports.Should().OnlyContain(r => r.TotalEstimated == expected);
+        }
+
+
+        [TestCase(1, 2, 4, 1)]
+        [TestCase(1, 2, null, 1)]
+        [TestCase(1, null, null, 1)]
+        [TestCase(null, 2, null, 2)]
+        [TestCase(null, null, 4, 4)]
+        [TestCase(null, 2, 4, 2)]
+        [TestCase(null, null, null, 0)]
+        [TestData(membersCount: 1, repositoryCount: 2, projectsCount: 1, RelatedWorkItemsPerMember = 1)]
+        public async Task ShouldCalculateTotalCompletedETA(int? completed, int? remaining, int? original, int expected)
+        {
+            var report = await ExecuteReportWithResolutions(completed, remaining, expected);
+
+            report.IndividualReports.Should().HaveCount(1);
+            report.IndividualReports.Should().OnlyContain(r => r.TotalCompleted == expected);
+        }
+
+        [Test]
+        public void ShouldCorrectlyIdentifyActiveTime()
+        {
+            throw new NotImplementedException();
+        }
+
+        private async Task<AggregatedWorkitemsETAReport> Report()
+        {
+            return await _reporter.ReportAsync(Data.GetDefaultQuery()) as AggregatedWorkitemsETAReport;
+        }
+
+        private async Task CheckForEmptyReport()
+        {
+            var report = await Report();
+
+            report.Should().NotBeNull();
+            report.Should().BeOfType<AggregatedWorkitemsETAReport>();
+            report.As<AggregatedWorkitemsETAReport>().IndividualReports.Should().BeEmpty();
+        }
+
+
+        private async Task<AggregatedWorkitemsETAReport> ExecuteReportWithResolutions(int? completed = null, int? remaining = null, int? original = null)
         {
             var workitems = Data.TeamMembers
                 .SelectMany(t => t.RelatedWorkItemIds)
@@ -229,40 +221,11 @@ namespace Ether.Tests.Reporters
                     return new[]
                     {
                         new WorkItemResolution(w, WorkItemStates.Resolved, "Because", DateTime.UtcNow, member.Email, "bla"),
+                        new WorkItemResolution(w, WorkItemStates.Closed, "Because", DateTime.UtcNow, member.Email, "bla")
                     };
                 });
 
-            var report = await Report();
-
-            report.IndividualReports.Should().HaveCount(1);
-            report.IndividualReports.Should().OnlyContain(r => r.TotalEstimated == expected);
-        }
-
-
-        [Test]
-        public void ShouldCalculateTotalCompletedETA()
-        {
-            throw new NotImplementedException();
-        }
-
-        [Test]
-        public void ShouldCorrectlyIdentifyActiveTime()
-        {
-            throw new NotImplementedException();
-        }
-
-        private async Task<AggregatedWorkitemsETAReport> Report()
-        {
-            return await _reporter.ReportAsync(Data.GetDefaultQuery()) as AggregatedWorkitemsETAReport;
-        }
-
-        private async Task CheckForEmptyReport()
-        {
-            var report = await Report();
-
-            report.Should().NotBeNull();
-            report.Should().BeOfType<AggregatedWorkitemsETAReport>();
-            report.As<AggregatedWorkitemsETAReport>().IndividualReports.Should().BeEmpty();
+            return await Report();
         }
 
         private static string FieldNameFor(string workItemType, ETAFieldType fieldType) => ETAFields.First(f => f.WorkitemType == workItemType && f.FieldType == fieldType).FieldName;
