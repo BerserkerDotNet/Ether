@@ -31,6 +31,7 @@ namespace Ether.Core.Data
             BsonClassMap.RegisterClassMap<PullRequestsReport>();
             BsonClassMap.RegisterClassMap<WorkItemsReport>();
             BsonClassMap.RegisterClassMap<ListOfReviewersReport>();
+            BsonClassMap.RegisterClassMap<AggregatedWorkitemsETAReport>();
             var pack = new ConventionPack();
             pack.Add(new IgnoreExtraElementsConvention(true));
 

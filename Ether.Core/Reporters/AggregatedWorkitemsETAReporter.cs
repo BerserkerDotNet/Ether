@@ -19,11 +19,17 @@ namespace Ether.Core.Reporters
     public class AggregatedWorkitemsETAReporter : ReporterBase
     {
         private readonly IWorkItemClassificationContext _classificationContext;
+        private readonly IProgressReporter _progressReporter;
 
-        public AggregatedWorkitemsETAReporter(IRepository repository, IWorkItemClassificationContext classificationContext, IOptions<VSTSConfiguration> configuration, ILogger<AggregatedWorkitemsETAReporter> logger)
+        public AggregatedWorkitemsETAReporter(IRepository repository, 
+            IWorkItemClassificationContext classificationContext,
+            IOptions<VSTSConfiguration> configuration,
+            IProgressReporter progressReporter,
+            ILogger<AggregatedWorkitemsETAReporter> logger)
             : base(repository, configuration, logger)
         {
             _classificationContext = classificationContext;
+            _progressReporter = progressReporter;
         }
 
         public override string Name => "Aggregated workitems ETA report";
@@ -42,14 +48,16 @@ namespace Ether.Core.Reporters
             if (etaFields == null || !etaFields.Any())
                 throw new MissingETASettingsException();
 
+            await _progressReporter.Report("Fetching workitems...");
             var workItemIds = Input.Members.SelectMany(m => m.RelatedWorkItemIds);
             var workitems = await _repository.GetAsync<VSTSWorkItem>(w => workItemIds.Contains(w.WorkItemId));
             if (!workitems.Any())
                 return AggregatedWorkitemsETAReport.Empty;
 
+            await _progressReporter.Report("Looking for work item resolutions...");
             var scope = new ClassificationScope(Input.Members, Input.Query.StartDate, Input.ActualEndDate);
             var resolutions = workitems.SelectMany(w => _classificationContext.Classify(w, scope))
-                .Where(r => r.Resolution == WorkItemStates.Resolved)
+                .Where(r => r.Resolution == WorkItemStates.Resolved || (r.WorkItemType == WorkItemTypes.Task && r.Resolution == WorkItemStates.Closed))
                 .GroupBy(r => r.MemberEmail)
                 .ToDictionary(k => k.Key, v => v.AsEnumerable());
 
@@ -57,6 +65,7 @@ namespace Ether.Core.Reporters
             result.IndividualReports = new List<AggregatedWorkitemsETAReport.IndividualETAReport>(Input.Members.Count());
             foreach (var member in Input.Members)
             {
+                await _progressReporter.Report($"Calculating metrics for {member.DisplayName}", GetProgressStep());
                 var individualReport = GetIndividualReport(member);
                 result.IndividualReports.Add(individualReport);
             }
@@ -67,11 +76,12 @@ namespace Ether.Core.Reporters
             AggregatedWorkitemsETAReport.IndividualETAReport GetIndividualReport(TeamMember member)
             {
                 if (!resolutions.ContainsKey(member.Email))
-                    return AggregatedWorkitemsETAReport.IndividualETAReport.GetEmptyFor(member.Email);
+                    return AggregatedWorkitemsETAReport.IndividualETAReport.GetEmptyFor(member);
 
                 var individualReport = new AggregatedWorkitemsETAReport.IndividualETAReport
                 {
-                    TeamMember = member.Email,
+                    MemberEmail = member.Email,
+                    MemberName = member.DisplayName
                 };
                 PopulateMetrics(member.Email, individualReport);
 
@@ -88,6 +98,7 @@ namespace Ether.Core.Reporters
                     if (IsETAEmpty(workitem))
                     {
                         report.WithoutETA++;
+                        report.CompletedWithoutEstimates += GetActiveDuration(workitem);
                     }
                     else
                     {
@@ -99,10 +110,12 @@ namespace Ether.Core.Reporters
                         if (estimatedByDev == 0)
                             estimatedByDev = originalEstimate;
 
-                        report.TotalEstimated += estimatedByDev;
-                        report.TotalCompleted += completedWork != 0 ? completedWork : (remainingWork != 0 ? remainingWork : originalEstimate);
+                        report.OriginalEstimated += originalEstimate;
+                        report.EstimatedToComplete += estimatedByDev;
+
+                        report.CompletedWithEstimates += GetActiveDuration(workitem);
                     }
-                    report.ActualCompleted += GetActiveDuration(workitem);
+                    
                 }
             }
 
@@ -227,6 +240,11 @@ namespace Ether.Core.Reporters
             }
 
             return businessDays;
+        }
+
+        private float GetProgressStep()
+        {
+            return 100.0F / Input.Members.Count();
         }
     }
 }

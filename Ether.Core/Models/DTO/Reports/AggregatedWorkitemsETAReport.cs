@@ -11,16 +11,26 @@ namespace Ether.Core.Models.DTO.Reports
 
         public class IndividualETAReport
         {
-            public string TeamMember { get; set; }
+            public string MemberEmail { get; set; }
+            public string MemberName { get; set; }
             public int TotalResolved { get; set; }
             public int WithoutETA { get; set; }
-            public float TotalEstimated { get; set; }
-            public float TotalCompleted { get; set; }
-            public float ActualCompleted { get; set; }
-            public float SuccessRatio => TotalEstimated / ActualCompleted;
+            public float OriginalEstimated { get; set; }
+            public float EstimatedToComplete { get; set; }
+            public float CompletedWithEstimates { get; set; }
+            public float CompletedWithoutEstimates { get; set; }
 
-            public static IndividualETAReport GetEmptyFor(string teamMember) => new AggregatedWorkitemsETAReport.IndividualETAReport { TeamMember = teamMember };
+            public float TotalCompleted => CompletedWithEstimates + CompletedWithoutEstimates;
+            public float EstimatedToCompletedRatio => EstimatedToComplete / CompletedWithEstimates;
+
+            public static IndividualETAReport GetEmptyFor(TeamMember teamMember) => 
+                new IndividualETAReport { MemberEmail = teamMember.Email, MemberName = teamMember.DisplayName };
         }
+
+        public int TotalResolved => IndividualReports.Sum(r => r.TotalResolved);
+        public float EstimatedToComplete => IndividualReports.Sum(r => r.EstimatedToComplete);
+        public float CompletedWithEstimates => IndividualReports.Sum(r => r.CompletedWithEstimates);
+        public float EstimatedToCompletedRatio => EstimatedToComplete / CompletedWithEstimates;
 
         public static AggregatedWorkitemsETAReport Empty => new AggregatedWorkitemsETAReport { IndividualReports = Enumerable.Empty<IndividualETAReport>().ToList() };
     }

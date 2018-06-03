@@ -2,24 +2,36 @@ using System;
 using System.Collections;
 using Ether.Core.Constants;
 using Ether.Tests.Infrastructure;
+using Ether.Tests.Reporters;
 using NUnit.Framework;
 
 namespace Ether.Tests.Data
 {
     public static class ETADataProvider
     {
-        public static IEnumerable WorkItemActiveTimeTests() => new TestCaseData[]
+        public static IEnumerable WorkItemActiveTimeTestsNoETA() => new TestCaseData[]
         {
-            SimplePathWithResolved(),
-            SimplePathWithCodeReview(),
-            OnHoldPeriods(),
-            BlockedPeriods(),
-            UnBlockedUponActivationPeriods(),
-            WithoutWeekends(),
-            WithoutCountingMinutes()
+            SimplePathWithResolved(nameof(AggregatedWorkitemsETAReporterTests.ShouldCorrectlyIdentifyActiveTimeWithoutEstimates)),
+            SimplePathWithCodeReview(nameof(AggregatedWorkitemsETAReporterTests.ShouldCorrectlyIdentifyActiveTimeWithoutEstimates)),
+            OnHoldPeriods(nameof(AggregatedWorkitemsETAReporterTests.ShouldCorrectlyIdentifyActiveTimeWithoutEstimates)),
+            BlockedPeriods(nameof(AggregatedWorkitemsETAReporterTests.ShouldCorrectlyIdentifyActiveTimeWithoutEstimates)),
+            UnBlockedUponActivationPeriods(nameof(AggregatedWorkitemsETAReporterTests.ShouldCorrectlyIdentifyActiveTimeWithoutEstimates)),
+            WithoutWeekends(nameof(AggregatedWorkitemsETAReporterTests.ShouldCorrectlyIdentifyActiveTimeWithoutEstimates)),
+            WithoutCountingMinutes(nameof(AggregatedWorkitemsETAReporterTests.ShouldCorrectlyIdentifyActiveTimeWithoutEstimates))
         };
 
-        private static TestCaseData SimplePathWithResolved()
+        public static IEnumerable WorkItemActiveTimeTestsWithETA() => new TestCaseData[]
+        {
+            SimplePathWithResolved(nameof(AggregatedWorkitemsETAReporterTests.ShouldCorrectlyIdentifyActiveTimeWithEstimates)),
+            SimplePathWithCodeReview(nameof(AggregatedWorkitemsETAReporterTests.ShouldCorrectlyIdentifyActiveTimeWithEstimates)),
+            OnHoldPeriods(nameof(AggregatedWorkitemsETAReporterTests.ShouldCorrectlyIdentifyActiveTimeWithEstimates)),
+            BlockedPeriods(nameof(AggregatedWorkitemsETAReporterTests.ShouldCorrectlyIdentifyActiveTimeWithEstimates)),
+            UnBlockedUponActivationPeriods(nameof(AggregatedWorkitemsETAReporterTests.ShouldCorrectlyIdentifyActiveTimeWithEstimates)),
+            WithoutWeekends(nameof(AggregatedWorkitemsETAReporterTests.ShouldCorrectlyIdentifyActiveTimeWithEstimates)),
+            WithoutCountingMinutes(nameof(AggregatedWorkitemsETAReporterTests.ShouldCorrectlyIdentifyActiveTimeWithEstimates))
+        };
+
+        private static TestCaseData SimplePathWithResolved(string testPrefix)
         {
             var activatedOn = new DateTime(2018, 5, 28);
             var resolvedOn = new DateTime(2018, 5, 30);
@@ -30,10 +42,10 @@ namespace Ether.Tests.Data
 
             var expectedDuration = resolvedOn.Subtract(activatedOn).Days;
             return new TestCaseData(updates, expectedDuration)
-                .SetName($"ShouldCorrectlyIdentifyActiveTimeFor{nameof(SimplePathWithResolved)}");
+                .SetName($"{testPrefix}{nameof(SimplePathWithResolved)}");
         }
 
-        private static TestCaseData SimplePathWithCodeReview()
+        private static TestCaseData SimplePathWithCodeReview(string testPrefix)
         {
             var activatedOn = new DateTime(2018, 5, 28);
             var codeReviewDate = new DateTime(2018, 5, 30);
@@ -46,10 +58,10 @@ namespace Ether.Tests.Data
 
             var expectedDuration = codeReviewDate.Subtract(activatedOn).Days;
             return new TestCaseData(updates, expectedDuration)
-                .SetName($"ShouldCorrectlyIdentifyActiveTimeFor{nameof(SimplePathWithCodeReview)}");
+                .SetName($"{testPrefix}{nameof(SimplePathWithCodeReview)}");
         }
 
-        private static TestCaseData OnHoldPeriods()
+        private static TestCaseData OnHoldPeriods(string testPrefix)
         {
             var activatedOn = new DateTime(2018, 5, 28);
             var resolvedOn = new DateTime(2018, 6, 1);
@@ -62,10 +74,10 @@ namespace Ether.Tests.Data
                 .Build();
 
             return new TestCaseData(updates, 2)
-                .SetName($"ShouldCorrectlyIdentifyActiveTimeWith{nameof(OnHoldPeriods)}");
+                .SetName($"{testPrefix}{nameof(OnHoldPeriods)}");
         }
 
-        private static TestCaseData BlockedPeriods()
+        private static TestCaseData BlockedPeriods(string testPrefix)
         {
             var activatedOn = new DateTime(2018, 5, 28);
             var resolvedOn = new DateTime(2018, 6, 1);
@@ -78,10 +90,10 @@ namespace Ether.Tests.Data
                 .Build();
 
             return new TestCaseData(updates, 2)
-                .SetName($"ShouldCorrectlyIdentifyActiveTimeWith{nameof(BlockedPeriods)}");
+                .SetName($"{testPrefix}{nameof(BlockedPeriods)}");
         }
 
-        private static TestCaseData UnBlockedUponActivationPeriods()
+        private static TestCaseData UnBlockedUponActivationPeriods(string testPrefix)
         {
             var activatedOn = new DateTime(2018, 5, 28);
             var resolvedOn = new DateTime(2018, 6, 1);
@@ -95,11 +107,10 @@ namespace Ether.Tests.Data
                 .Build();
 
             return new TestCaseData(updates, 2)
-                .SetName($"ShouldCorrectlyIdentifyActiveTimeWith{nameof(UnBlockedUponActivationPeriods)}");
+                .SetName($"{testPrefix}{nameof(UnBlockedUponActivationPeriods)}");
         }
 
-
-        private static TestCaseData WithoutWeekends()
+        private static TestCaseData WithoutWeekends(string testPrefix)
         {
             var activatedOn = new DateTime(2018, 5, 25);
             var resolvedOn = new DateTime(2018, 6, 6);
@@ -109,10 +120,10 @@ namespace Ether.Tests.Data
                 .Build();
 
             return new TestCaseData(updates, 8)
-                .SetName($"ShouldCorrectlyIdentifyActiveTime{nameof(WithoutWeekends)}");
+                .SetName($"{testPrefix}{nameof(WithoutWeekends)}");
         }
 
-        private static TestCaseData WithoutCountingMinutes()
+        private static TestCaseData WithoutCountingMinutes(string testPrefix)
         {
             var activatedOn = new DateTime(2018, 5, 28, 23, 34, 45);
             var resolvedOn = new DateTime(2018, 6, 6, 01, 23, 45);
@@ -123,7 +134,7 @@ namespace Ether.Tests.Data
 
             var expectedDuration = resolvedOn.Subtract(activatedOn).Days;
             return new TestCaseData(updates, 7)
-                .SetName($"ShouldCorrectlyIdentifyActiveTime{nameof(WithoutCountingMinutes)}");
+                .SetName($"{testPrefix}{nameof(WithoutCountingMinutes)}");
         }
     }
 }

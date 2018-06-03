@@ -4,9 +4,9 @@
         <h3 class="box-title">@Model.ReportName for '@Model.ProfileName'</h3>
         <span class="pull-right">
             <a class="btn btn-default hidden-print" onclick="window.print();"><img src="~/images/print.png" height="24" />Print</a>
-            <a asp-page-handler="ToExcel" asp-route-id="@Model.Id" class="btn btn-default hidden-print">
+            @*<a asp-page-handler="ToExcel" asp-route-id="@Model.Id" class="btn btn-default hidden-print">
                 <img src="~/images/Excel.png" height="24" />Export to Excel
-            </a>
+            </a>*@
         </span>
     </div>
     <div class="box-body">
@@ -16,27 +16,41 @@
                     <th>Name</th>
                     <th>Resolved</th>
                     <th>Without ETA</th>
+                    <th>Original Estimate (Days)</th>
                     <th>Total Estimated (Days)</th>
-                    <th>Total Completed (Days)</th>
-                    <th>Actual Completed (Days)</th>
-                    <th>Ratio</th>
+                    <th>Completed w/Estimates (Days)</th>
+                    <th>Total Completed</th>
+                    <th>Estimated/Completed</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach (var report in Model.IndividualReports)
+                @foreach (var report in Model.IndividualReports.OrderBy(r => r.MemberName))
                 {
-                    <tr>
-                        <td>@report.TeamMember</td>
-                        <td>@report.TotalResolved</td>
-                        <td>@report.WithoutETA</td>
-                        <td>@report.TotalEstimated</td>
-                        <td>@report.TotalCompleted</td>
-                        <td>@report.ActualCompleted</td>
-                        <td>@report.SuccessRatio</td>
-                    </tr>
+                <tr>
+                    <td>@report.MemberName</td>
+                    <td>@report.TotalResolved</td>
+                    <td>@report.WithoutETA</td>
+                    <td>@report.OriginalEstimated</td>
+                    <td>@report.EstimatedToComplete</td>
+                    <td>@report.CompletedWithEstimates</td>
+                    <td>@report.TotalCompleted.ToString("F2")</td>
+                    <td>@report.EstimatedToCompletedRatio.ToString("F2")</td>
+                </tr>
                 }
             </tbody>
             <tfoot>
+                <tr class="active">
+                    <th>Total resolved:</th>
+                    <td class="success" colspan="2">@Model.TotalResolved</td>
+                    <th colspan="2">Estimated To Complete:</th>
+                    <td class="success" colspan="2">@Model.EstimatedToComplete.ToString("F2")</td>
+                </tr>
+                <tr class="active">
+                    <th>Completed With Estimates:</th>
+                    <td class="success" colspan="2">@Model.CompletedWithEstimates.ToString("F2")</td>
+                    <th colspan="2">Estimated/Completed:</th>
+                    <td class="success" colspan="2">@Model.EstimatedToCompletedRatio.ToString("F2")</td>
+                </tr>
             </tfoot>
         </table>
     </div>
