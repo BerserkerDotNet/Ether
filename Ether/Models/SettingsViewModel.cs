@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Ether.Core.Models.DTO;
+using System;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace Ether.Models
 {
@@ -8,6 +11,7 @@ namespace Ether.Models
 
         public bool DisableWorkitemsJob { get; set; }
         public TimeSpan? KeepLastWorkItems { get; set; }
+        public IEnumerable<Settings.Field> ETAFields { get; set; }
 
         public bool DisablePullRequestsJob { get; set; }
         public TimeSpan? KeepLastPullRequests { get; set; }

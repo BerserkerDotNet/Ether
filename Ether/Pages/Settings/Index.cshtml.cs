@@ -1,11 +1,14 @@
-﻿using Ether.Core.Filters;
+﻿using Ether.Core.Constants;
+using Ether.Core.Filters;
 using Ether.Core.Interfaces;
 using Ether.Core.Models.DTO;
+using Ether.Core.Types;
 using Ether.Extensions;
 using Ether.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Ether.Pages.Settings
@@ -33,6 +36,18 @@ namespace Ether.Pages.Settings
             {
                 Settings.DisableWorkitemsJob = generalSettings.WorkItemsSettings?.DisableWorkitemsJob ?? false;
                 Settings.KeepLastWorkItems = generalSettings.WorkItemsSettings?.KeepLast;
+                Settings.ETAFields = generalSettings.WorkItemsSettings?.ETAFields;
+                if (Settings.ETAFields == null || Settings.ETAFields.Any())
+                {
+                    Settings.ETAFields = new[] {
+                        new Core.Models.DTO.Settings.Field(WorkItemTypes.Bug, "Microsoft.VSTS.Scheduling.OriginalEstimate", ETAFieldType.OriginalEstimate),
+                        new Core.Models.DTO.Settings.Field(WorkItemTypes.Bug, "Microsoft.VSTS.Scheduling.CompletedWork", ETAFieldType.CompletedWork),
+                        new Core.Models.DTO.Settings.Field(WorkItemTypes.Bug, "Microsoft.VSTS.Scheduling.RemainingWork", ETAFieldType.RemainingWork),
+                        new Core.Models.DTO.Settings.Field(WorkItemTypes.Task, "Microsoft.VSTS.Scheduling.OriginalEstimate", ETAFieldType.OriginalEstimate),
+                        new Core.Models.DTO.Settings.Field(WorkItemTypes.Task, "Microsoft.VSTS.Scheduling.CompletedWork", ETAFieldType.CompletedWork),
+                        new Core.Models.DTO.Settings.Field(WorkItemTypes.Task, "Microsoft.VSTS.Scheduling.RemainingWork", ETAFieldType.RemainingWork),
+                    };
+                }
 
                 Settings.DisablePullRequestsJob = generalSettings.PullRequestsSettings?.DisablePullRequestsJob ?? false;
                 Settings.KeepLastPullRequests = generalSettings.PullRequestsSettings?.KeepLast;
@@ -51,7 +66,14 @@ namespace Ether.Pages.Settings
         {
             if (!ModelState.IsValid)
                 return Page();
-
+            Settings.ETAFields = new[] {
+                        new Core.Models.DTO.Settings.Field(WorkItemTypes.Bug, "Microsoft.VSTS.Scheduling.OriginalEstimate", ETAFieldType.OriginalEstimate),
+                        new Core.Models.DTO.Settings.Field(WorkItemTypes.Bug, "Microsoft.VSTS.Scheduling.CompletedWork", ETAFieldType.CompletedWork),
+                        new Core.Models.DTO.Settings.Field(WorkItemTypes.Bug, "Microsoft.VSTS.Scheduling.RemainingWork", ETAFieldType.RemainingWork),
+                        new Core.Models.DTO.Settings.Field(WorkItemTypes.Task, "Microsoft.VSTS.Scheduling.OriginalEstimate", ETAFieldType.OriginalEstimate),
+                        new Core.Models.DTO.Settings.Field(WorkItemTypes.Task, "Microsoft.VSTS.Scheduling.CompletedWork", ETAFieldType.CompletedWork),
+                        new Core.Models.DTO.Settings.Field(WorkItemTypes.Task, "Microsoft.VSTS.Scheduling.RemainingWork", ETAFieldType.RemainingWork),
+                    };
             try
             {
                 await SaveGeneralSettings();
@@ -74,7 +96,8 @@ namespace Ether.Pages.Settings
             generalSettings.WorkItemsSettings = new Core.Models.DTO.Settings.WorkItems
             {
                 DisableWorkitemsJob = Settings.DisableWorkitemsJob,
-                KeepLast = Settings.KeepLastWorkItems
+                KeepLast = Settings.KeepLastWorkItems,
+                ETAFields = Settings.ETAFields
             };
             generalSettings.PullRequestsSettings = new Core.Models.DTO.Settings.PullRequests
             {

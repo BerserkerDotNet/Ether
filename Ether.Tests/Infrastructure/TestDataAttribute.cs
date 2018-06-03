@@ -21,11 +21,14 @@ namespace Ether.Tests.Infrastructure
 
         public int RelatedWorkItemsPerMember { get; set; }
 
+        public bool RegisterDummyMember { get; set; }
+
         public void ApplyToTest(Test test)
         {
             test.Properties.Add(TestData.MembersCountKey, _membersCount);
             test.Properties.Add(TestData.RepositoryCountKey, _repositoryCount);
             test.Properties.Add(TestData.ProjectsCountKey, _projectsCount);
+            test.Properties.Add(TestData.RegisterDummyMemberKey, RegisterDummyMember);
 
             if (RelatedWorkItemsPerMember != 0)
             {

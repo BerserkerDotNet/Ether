@@ -6,24 +6,24 @@ namespace Ether.Tests.Infrastructure
 {
     public static class PropertyBagExtensions
     {
-        public static int GetInt(this IPropertyBag properties, string key, int defaultValue = 0)
+        public static T Get<T>(this IPropertyBag properties, string key, T defaultValue = default(T))
         {
             var result = properties.Get(key);
             if (result != null)
-                return (int)result;
+                return (T)result;
 
             return defaultValue;
         }
 
-        public static int GetInt(this TestAdapter adapter, string key, int defaultValue = 0)
+        public static T Get<T>(this TestAdapter adapter, string key, T defaultValue = default(T))
         {
             if (adapter.Properties.ContainsKey(key))
-                return adapter.Properties.GetInt(key, defaultValue);
+                return adapter.Properties.Get<T>(key, defaultValue);
 
             return GetDeep(adapter, key, defaultValue);
         }
 
-        private static int GetDeep(object test, string key, int defaultValue)
+        private static T GetDeep<T>(object test, string key, T defaultValue)
         {
             if (test == null)
                 return defaultValue;
@@ -35,7 +35,7 @@ namespace Ether.Tests.Infrastructure
             var propertiesField = parentValue.GetType().GetProperty("Properties", BindingFlags.Public | BindingFlags.Instance);
             var propertiesValue = propertiesField.GetValue(parentValue) as IPropertyBag;
 
-            return propertiesValue.GetInt(key, defaultValue);
+            return propertiesValue.Get<T>(key, defaultValue);
         }
     }
 

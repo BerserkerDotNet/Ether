@@ -39,7 +39,7 @@ namespace Ether.Core.Reporters
 
             var settings = await _repository.GetSingleAsync<Settings>(_ => true);
             var etaFields = settings?.WorkItemsSettings?.ETAFields;
-            if (etaFields != null && !etaFields.Any())
+            if (etaFields == null || !etaFields.Any())
                 throw new MissingETASettingsException();
 
             var workItemIds = Input.Members.SelectMany(m => m.RelatedWorkItemIds);
@@ -62,7 +62,6 @@ namespace Ether.Core.Reporters
             }
 
             return result;
-
 
             // Local methods
             AggregatedWorkitemsETAReport.IndividualETAReport GetIndividualReport(TeamMember member)
@@ -100,9 +99,10 @@ namespace Ether.Core.Reporters
                         if (estimatedByDev == 0)
                             estimatedByDev = originalEstimate;
 
-                        report.TotalEstimated = estimatedByDev;
-                        report.TotalCompleted = completedWork != 0 ? completedWork : (remainingWork != 0 ? remainingWork : originalEstimate);
+                        report.TotalEstimated += estimatedByDev;
+                        report.TotalCompleted += completedWork != 0 ? completedWork : (remainingWork != 0 ? remainingWork : originalEstimate);
                     }
+                    report.ActualCompleted += GetActiveDuration(workitem);
                 }
             }
 
@@ -117,12 +117,116 @@ namespace Ether.Core.Reporters
 
             float GetEtaValue(VSTSWorkItem wi, ETAFieldType etaType)
             {
-                var value = wi.Fields[FieldNameFor(wi.WorkItemType, etaType)];
+                var fieldName = FieldNameFor(wi.WorkItemType, etaType);
+                if (!wi.Fields.ContainsKey(fieldName))
+                    return 0;
+
+                var value = wi.Fields[fieldName];
                 if (string.IsNullOrEmpty(value))
                     return 0;
 
                 return float.Parse(value);
             }
+        }
+
+        private float GetActiveDuration(VSTSWorkItem wi)
+        {
+            if (wi.Updates == null || !wi.Updates.Any())
+                return 0.0f;
+
+            var activeTime = 0.0F;
+            var isActive = false;
+            DateTime? lastActivated = null;
+            foreach (var update in wi.Updates)
+            {
+                var isActivation = !update.State.IsEmpty && update.State.NewValue == WorkItemStates.Active;
+                var isOnHold = !update.State.IsEmpty && update.State.NewValue == WorkItemStates.New;
+                var isResolved = !update.State.IsEmpty && (update.State.NewValue == WorkItemStates.Resolved || update.State.NewValue == WorkItemStates.Closed);
+                var isCodeReview = !update.Tags.IsEmpty && ContainsCodeReviewTag(update.Tags.NewValue);
+                var isBlocked = !update.Tags.IsEmpty && ContainsBlockedTag(update.Tags.NewValue);
+                var isUnBlocked = !update.Tags.IsEmpty && ContainsBlockedTag(update.Tags.OldValue) && !ContainsBlockedTag(update.Tags.NewValue);
+
+                if (isActivation || isUnBlocked)
+                {
+                    lastActivated = update.ChangedDate;
+                    isActive = true;
+                }
+                else if (isActive && (isOnHold || isBlocked))
+                {
+                    isActive = false;
+                    if (lastActivated != null)
+                        activeTime += CountBusinessDaysBetween(lastActivated.Value,  update.ChangedDate);
+                }
+                else if (isActive && (isResolved || isCodeReview))
+                {
+                    if (lastActivated != null)
+                        activeTime += CountBusinessDaysBetween(lastActivated.Value, update.ChangedDate);
+                    break;
+                }
+            }
+
+            return activeTime;
+        }
+
+        private bool ContainsCodeReviewTag(string tags)
+        {
+            return tags.Split(';')
+                .Select(t => t.Replace(" ", "").ToLower())
+                .Contains("codereview");
+        }
+
+        private bool ContainsBlockedTag(string tags)
+        {
+            if (string.IsNullOrEmpty(tags))
+                return false;
+
+            return tags.Split(';')
+                .Select(t => t.Replace(" ", "").ToLower())
+                .Contains("blocked");
+        }
+
+        public static int CountBusinessDaysBetween(DateTime firstDay, DateTime lastDay, params DateTime[] holidays)
+        {
+            firstDay = firstDay.Date;
+            lastDay = lastDay.Date;
+            if (firstDay > lastDay)
+                throw new ArgumentException("Incorrect last day " + lastDay);
+
+            TimeSpan span = lastDay - firstDay;
+            int businessDays = span.Days;
+            int fullWeekCount = businessDays / 7;
+            // find out if there are weekends during the time exceedng the full weeks
+            if (businessDays > fullWeekCount * 7)
+            {
+                // we are here to find out if there is a 1-day or 2-days weekend
+                // in the time interval remaining after subtracting the complete weeks
+                int firstDayOfWeek = (int)firstDay.DayOfWeek;
+                int lastDayOfWeek = (int)lastDay.DayOfWeek;
+                if (lastDayOfWeek < firstDayOfWeek)
+                    lastDayOfWeek += 7;
+                if (firstDayOfWeek <= 6)
+                {
+                    if (lastDayOfWeek >= 7)// Both Saturday and Sunday are in the remaining time interval
+                        businessDays -= 2;
+                    else if (lastDayOfWeek >= 6)// Only Saturday is in the remaining time interval
+                        businessDays -= 1;
+                }
+                else if (firstDayOfWeek <= 7 && lastDayOfWeek >= 7)// Only Sunday is in the remaining time interval
+                    businessDays -= 1;
+            }
+
+            // subtract the weekends during the full weeks in the interval
+            businessDays -= fullWeekCount + fullWeekCount;
+
+            // subtract the number of bank holidays during the time interval
+            foreach (DateTime holiday in holidays)
+            {
+                DateTime bh = holiday.Date;
+                if (firstDay <= bh && bh <= lastDay)
+                    --businessDays;
+            }
+
+            return businessDays;
         }
     }
 }

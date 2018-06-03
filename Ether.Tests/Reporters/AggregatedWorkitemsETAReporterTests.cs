@@ -64,12 +64,22 @@ namespace Ether.Tests.Reporters
                 workItem.Fields.Add(VSTSFieldNames.WorkItemType, WorkItemTypes.Bug);
                 workItem.Fields.Add(VSTSFieldNames.WorkItemCreatedDate, DateTime.UtcNow.AddDays(-5).ToString());
                 workItem.Updates = UpdateBuilder.Create()
-                    .Activated().Then()
-                    .Resolved(m)
+                    .Activated()
+                    .Then().Resolved(m)
                     .Build();
 
                 return workItem;
             }).ToList();
+            _classificationContextMock.Setup(c => c.Classify(It.IsAny<VSTSWorkItem>(), It.IsAny<ClassificationScope>()))
+                    .Returns<VSTSWorkItem, ClassificationScope>((w, _) =>
+                    {
+                        var member = Data.TeamMembers.Single(t => t.RelatedWorkItemIds.Contains(w.WorkItemId));
+                        return new[]
+                        {
+                            new WorkItemResolution(w, WorkItemStates.Resolved, "Because", DateTime.UtcNow, member.Email, "bla"),
+                            new WorkItemResolution(w, WorkItemStates.Closed, "Because", DateTime.UtcNow, member.Email, "bla")
+                        };
+                    });
             Data.RepositoryMock.Setup(r => r.GetAsync(It.IsAny<Expression<Func<VSTSWorkItem, bool>>>()))
                 .Returns<Expression<Func<VSTSWorkItem, bool>>>(e => Task.FromResult(workitems.Where(e.Compile())));
 
@@ -99,6 +109,17 @@ namespace Ether.Tests.Reporters
         public void ShouldThrowIfNoETASettings()
         {
             var emptySettings = new Settings { WorkItemsSettings = new Settings.WorkItems() { ETAFields = Enumerable.Empty<Settings.Field>() } };
+            Data.RepositoryMock.Setup(r => r.GetSingleAsync(It.IsAny<Expression<Func<Settings, bool>>>())).ReturnsAsync(emptySettings);
+
+            var report = _reporter.Awaiting(r => r.ReportAsync(Data.GetDefaultQuery()))
+                .Should().Throw<MissingETASettingsException>();
+        }
+
+        [Test]
+        [TestData(membersCount: 2, repositoryCount: 1, projectsCount: 1)]
+        public void ShouldThrowIfETASettingsAreNull()
+        {
+            var emptySettings = new Settings { WorkItemsSettings = new Settings.WorkItems() { ETAFields = null } };
             Data.RepositoryMock.Setup(r => r.GetSingleAsync(It.IsAny<Expression<Func<Settings, bool>>>())).ReturnsAsync(emptySettings);
 
             var report = _reporter.Awaiting(r => r.ReportAsync(Data.GetDefaultQuery()))
@@ -172,10 +193,14 @@ namespace Ether.Tests.Reporters
             report.IndividualReports.Should().OnlyContain(r => r.TotalCompleted == expected);
         }
 
-        [Test]
-        public void ShouldCorrectlyIdentifyActiveTime()
+        [Test, TestCaseSource(typeof(ETADataProvider), nameof(ETADataProvider.WorkItemActiveTimeTests))]
+        [TestData(membersCount: 0, RegisterDummyMember = true, RelatedWorkItemsPerMember = 2)]
+        public async Task ShouldCorrectlyIdentifyActiveTime(IEnumerable<WorkItemUpdate> updates, float expectedDuration)
         {
-            throw new NotImplementedException();
+            var report = await ExecuteReportWithResolutions(updates: updates);
+
+            report.IndividualReports.Should().HaveCount(1);
+            report.IndividualReports.Should().OnlyContain(r => r.ActualCompleted == expectedDuration*2);
         }
 
         private async Task<AggregatedWorkitemsETAReport> Report()
@@ -193,7 +218,7 @@ namespace Ether.Tests.Reporters
         }
 
 
-        private async Task<AggregatedWorkitemsETAReport> ExecuteReportWithResolutions(int? completed = null, int? remaining = null, int? original = null)
+        private async Task<AggregatedWorkitemsETAReport> ExecuteReportWithResolutions(int? completed = null, int? remaining = null, int? original = null, IEnumerable<WorkItemUpdate> updates = null)
         {
             var workitems = Data.TeamMembers
                 .SelectMany(t => t.RelatedWorkItemIds)
@@ -206,16 +231,21 @@ namespace Ether.Tests.Reporters
                     };
                     wi.Fields[VSTSFieldNames.WorkItemType] = WorkItemTypes.Bug;
                     wi.Fields[VSTSFieldNames.Title] = "Bla";
-                    wi.Fields[CompletedWorkField] = completed?.ToString();
-                    wi.Fields[RemainingWorkField] = remaining?.ToString();
-                    wi.Fields[OriginalEstimateField] = original?.ToString();
+                    if (completed.HasValue)
+                        wi.Fields[CompletedWorkField] = completed.ToString();
+                    if (remaining.HasValue)
+                        wi.Fields[RemainingWorkField] = remaining?.ToString();
+                    if (original.HasValue)
+                        wi.Fields[OriginalEstimateField] = original?.ToString();
+                    if (updates != null)
+                        wi.Updates = updates;
                     return wi;
-                });
+                }).ToList();
 
             Data.RepositoryMock.Setup(r => r.GetAsync(It.IsAny<Expression<Func<VSTSWorkItem, bool>>>()))
                 .Returns<Expression<Func<VSTSWorkItem, bool>>>(e => Task.FromResult(workitems.Where(e.Compile())));
             _classificationContextMock.Setup(c => c.Classify(It.IsAny<VSTSWorkItem>(), It.IsAny<ClassificationScope>()))
-                .Returns<VSTSWorkItem, ClassificationScope>((w, _s) =>
+                .Returns<VSTSWorkItem, ClassificationScope>((w, _) =>
                 {
                     var member = Data.TeamMembers.Single(t => t.RelatedWorkItemIds.Contains(w.WorkItemId));
                     return new[]

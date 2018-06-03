@@ -21,10 +21,16 @@ namespace Ether.Tests.Infrastructure
         public const string MembersCountKey = "MembersCount";
         public const string RepositoryCountKey = "RepositoryCount";
         public const string ProjectsCountKey = "ProjectsCount";
+        public const string RegisterDummyMemberKey = "RegisterDummy";
+
         public const string RelatedWorkItemsCountKey = "RelatedWorkItemsCount";
         public const string DefaultInstanceName = "Foo";
         public const string DefaultToken = "SecureToken";
         private static readonly Random _random = new Random();
+
+        private static TeamMember _dummyMember = new TeamMember { Id = Guid.NewGuid(), Email = $"dummy@foo.com", DisplayName = $"Dummy member" };
+
+        public static TeamMember DummyMember => _dummyMember;
 
         public IEnumerable<TeamMember> TeamMembers { get; private set; }
 
@@ -84,6 +90,15 @@ namespace Ether.Tests.Infrastructure
                     .ToList();
             }
 
+            return this;
+        }
+
+        public TestData WithDummyUser(bool registerDummy)
+        {
+            if (!registerDummy)
+                return this;
+
+            TeamMembers = TeamMembers.Union(new[] { DummyMember }).ToList();
             return this;
         }
 

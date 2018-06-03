@@ -215,8 +215,9 @@ namespace Ether.Tests.JobTests
         [TestCase(543, 3)]
         public void ShouldFetchWorkitemsInChunksWithNoMoreThan200Items(int itemsCount, int expectedIterations)
         {
-            const string expectedFileds = "System.Id,System.WorkItemType,System.Title,System.AreaPath,System.ChangedDate,System.State,System.Reason," +
-                "System.CreatedDate,Microsoft.VSTS.Common.ResolvedDate,Microsoft.VSTS.Common.ClosedDate,Microsoft.VSTS.Common.StateChangeDate";
+            const string expectedFileds = "System.Id,System.WorkItemType,System.Title,System.AreaPath,System.ChangedDate,System.Tags,System.State,System.Reason," +
+                "System.CreatedDate,Microsoft.VSTS.Common.ResolvedDate,Microsoft.VSTS.Common.ClosedDate,Microsoft.VSTS.Common.StateChangeDate," +
+                "Microsoft.VSTS.Scheduling.OriginalEstimate,Microsoft.VSTS.Scheduling.CompletedWork,Microsoft.VSTS.Scheduling.RemainingWork";
             var expectedWorkItems = Enumerable.Range(1, itemsCount).Select(i => i);
             var workItemsLinks = expectedWorkItems.Select(i => new WorkItemLink { Id = i }).ToArray();
             _configurationMock.SetupGet(c => c.Value).Returns(new VSTSConfiguration { AccessToken = "foo", InstanceName = "bar" });

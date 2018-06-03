@@ -32,6 +32,13 @@
                             <select asp-for="Settings.KeepLastWorkItems" asp-items="@retentionOptions" class="form-control"></select>
                             <span asp-validation-for="Settings.KeepLastWorkItems" class="text-danger"></span>
                         </div>
+                        @*@foreach (var field in Model.Settings.ETAFields)
+                        {
+                            <div class="form-group">
+                                <label>@field.WorkitemType + " - " + @field.FieldType</label>
+                                <input asp-for="Settings.DisableWorkitemsJob" />
+                            </div>
+                        }*@
                     </section>
                 </div>
             </div>

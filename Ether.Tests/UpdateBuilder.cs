@@ -28,6 +28,7 @@ namespace Ether.Tests
             var resolvedBy = by == null ? DefaultUser : $"{by.DisplayName} <{by.Email}>";
             _fields.Add(StateField, new WorkItemUpdate.UpdateValue { NewValue = "Resolved", OldValue = from });
             _fields.Add(ResolvedByField, new WorkItemUpdate.UpdateValue { NewValue = resolvedBy });
+            On(DateTime.UtcNow);
             return this;
         }
 
@@ -37,6 +38,7 @@ namespace Ether.Tests
             _fields.Add(StateField, new WorkItemUpdate.UpdateValue { NewValue = "Closed", OldValue = from });
             _fields.Add(ClosedByField, new WorkItemUpdate.UpdateValue { NewValue = closedBy });
             _fields.Add(ReasonField, new WorkItemUpdate.UpdateValue { NewValue = reason });
+            On(DateTime.UtcNow);
             return this;
         }
 
@@ -48,6 +50,7 @@ namespace Ether.Tests
         public UpdateBuilder Activated(string from = "New")
         {
             _fields.Add(StateField, new WorkItemUpdate.UpdateValue { NewValue = "Active", OldValue = from });
+            On(DateTime.UtcNow);
             return this;
         }
 
@@ -57,7 +60,8 @@ namespace Ether.Tests
                 changedDate = revisedDate;
 
             _revisedDate = revisedDate;
-            _fields.Add(ChangedDateField, new WorkItemUpdate.UpdateValue { NewValue = changedDate.Value.ToString("s") });
+
+            _fields[ChangedDateField] = new WorkItemUpdate.UpdateValue { NewValue = changedDate.Value.ToString("s") };
             return this;
         }
 
@@ -70,6 +74,7 @@ namespace Ether.Tests
         public UpdateBuilder New(string from = "")
         {
             _fields.Add(StateField, new WorkItemUpdate.UpdateValue { NewValue = "New", OldValue = from });
+            On(DateTime.UtcNow);
             return this;
         }
 
@@ -103,6 +108,7 @@ namespace Ether.Tests
         public UpdateBuilder With(string fieldName, WorkItemUpdate.UpdateValue value)
         {
             _fields[fieldName] = value;
+            On(DateTime.UtcNow);
             return this;
         }
 

@@ -120,8 +120,9 @@ namespace Ether.Jobs
         {
             var count = (decimal)changedWorkItems.Count();
             const int maxIdsPerRequest = 200;
-            const string fieldsString = "System.Id,System.WorkItemType,System.Title,System.AreaPath,System.ChangedDate,System.State,System.Reason," +
-                "System.CreatedDate,Microsoft.VSTS.Common.ResolvedDate,Microsoft.VSTS.Common.ClosedDate,Microsoft.VSTS.Common.StateChangeDate";
+            const string fieldsString = "System.Id,System.WorkItemType,System.Title,System.AreaPath,System.ChangedDate,System.Tags,System.State,System.Reason," +
+                "System.CreatedDate,Microsoft.VSTS.Common.ResolvedDate,Microsoft.VSTS.Common.ClosedDate,Microsoft.VSTS.Common.StateChangeDate," +
+                "Microsoft.VSTS.Scheduling.OriginalEstimate,Microsoft.VSTS.Scheduling.CompletedWork,Microsoft.VSTS.Scheduling.RemainingWork";
             var iterations = Math.Ceiling(count / maxIdsPerRequest);
             var wis = new List<VSTSWorkItem>((int)count);
             _logger.LogInformation("Starting workitems fetch. Total count: {0}, iterations needed: {1}", count, iterations);

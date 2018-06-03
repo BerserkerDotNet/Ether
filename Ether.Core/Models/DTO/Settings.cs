@@ -22,7 +22,7 @@ namespace Ether.Core.Models.DTO
             public IEnumerable<Field> ETAFields { get; set; }
         }
 
-        public struct Field
+        public class Field
         {
             public Field(string workItemType, string fieldName, ETAFieldType type)
             {
@@ -31,10 +31,10 @@ namespace Ether.Core.Models.DTO
                 FieldType = type;
             }
 
-            public string WorkitemType { get; }
-            public string FieldName { get; }
+            public string WorkitemType { get; private set; }
+            public string FieldName { get; private set; }
 
-            public ETAFieldType FieldType { get; }
+            public ETAFieldType FieldType { get; private set; }
         }
 
         public class PullRequests

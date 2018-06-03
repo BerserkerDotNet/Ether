@@ -80,6 +80,7 @@ namespace Ether
             services.AddScoped<IReporter, PullRequestsReporter>();
             services.AddScoped<IReporter, WorkItemsReporter>();
             services.AddScoped<IReporter, ListOfReviewersReporter>();
+            services.AddScoped<IReporter, AggregatedWorkitemsETAReporter>();
             services.AddScoped<IWorkItemsClassifier, ResolvedWorkItemsClassifier>();
             services.AddScoped<IWorkItemsClassifier, ClosedTasksWorkItemsClassifier>();
             services.AddScoped<LiveUpdatesHub>();

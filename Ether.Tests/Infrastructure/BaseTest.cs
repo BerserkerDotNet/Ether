@@ -15,11 +15,13 @@ namespace Ether.Tests.Infrastructure
         {
             T data = new T();
             var testAdapter = TestContext.CurrentContext.Test;
-            var membersCount = testAdapter.GetInt(TestData.MembersCountKey);
-            var repositoryCount = testAdapter.GetInt(TestData.RepositoryCountKey);
-            var projectsCount = testAdapter.GetInt(TestData.ProjectsCountKey);
-            var relatedWorkItemsCount = testAdapter.GetInt(TestData.RelatedWorkItemsCountKey);
+            var membersCount = testAdapter.Get<int>(TestData.MembersCountKey);
+            var repositoryCount = testAdapter.Get<int>(TestData.RepositoryCountKey);
+            var projectsCount = testAdapter.Get<int>(TestData.ProjectsCountKey);
+            var relatedWorkItemsCount = testAdapter.Get<int>(TestData.RelatedWorkItemsCountKey);
+            var registerDummy = testAdapter.Get<bool>(TestData.RegisterDummyMemberKey);
             data.WithBasicData(membersCount, repositoryCount, projectsCount)
+                .WithDummyUser(registerDummy)
                 .WithConfiguration()
                 .WithRepositoryMocks()
                 .WithRelatedWorkItems(relatedWorkItemsCount);

@@ -1,0 +1,46 @@
+﻿@model AggregatedWorkitemsETAReport
+<div class="box box-default">
+    <div class="box-header">
+        <h3 class="box-title">@Model.ReportName for '@Model.ProfileName'</h3>
+        <span class="pull-right">
+            <a class="btn btn-default hidden-print" onclick="window.print();"><img src="~/images/print.png" height="24" />Print</a>
+            <a asp-page-handler="ToExcel" asp-route-id="@Model.Id" class="btn btn-default hidden-print">
+                <img src="~/images/Excel.png" height="24" />Export to Excel
+            </a>
+        </span>
+    </div>
+    <div class="box-body">
+        <table class="table table-hover table-bordered">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Resolved</th>
+                    <th>Without ETA</th>
+                    <th>Total Estimated (Days)</th>
+                    <th>Total Completed (Days)</th>
+                    <th>Actual Completed (Days)</th>
+                    <th>Ratio</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var report in Model.IndividualReports)
+                {
+                    <tr>
+                        <td>@report.TeamMember</td>
+                        <td>@report.TotalResolved</td>
+                        <td>@report.WithoutETA</td>
+                        <td>@report.TotalEstimated</td>
+                        <td>@report.TotalCompleted</td>
+                        <td>@report.ActualCompleted</td>
+                        <td>@report.SuccessRatio</td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+            </tfoot>
+        </table>
+    </div>
+    <div class="box-footer">
+        <span>Range: @Model.StartDate.ToString("MM/dd/yyyy") - @Model.EndDate.ToString("MM/dd/yyyy")</span>
+    </div>
+</div>
