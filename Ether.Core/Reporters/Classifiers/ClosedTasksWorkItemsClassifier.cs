@@ -23,7 +23,13 @@ namespace Ether.Core.Reporters.Classifiers
                 return WorkItemResolution.None;
 
             var reason = resolutionUpdate.Reason.NewValue;
+            var assignedToMember = request.Team.SingleOrDefault(m => !resolutionUpdate.AssignedTo.IsEmpty &&
+                !string.IsNullOrEmpty(resolutionUpdate.AssignedTo.OldValue) &&
+                resolutionUpdate.AssignedTo.OldValue.Contains(m.Email));
             var closedByMemeber = request.Team.Single(m => resolutionUpdate.ClosedBy.NewValue.Contains(m.Email));
+            if (assignedToMember != null)
+                closedByMemeber = assignedToMember;
+
             return new WorkItemResolution(request.WorkItem, WorkItemStates.Closed, reason, resolutionUpdate.ChangedDate, closedByMemeber.Email, closedByMemeber.DisplayName);
         }
 

@@ -142,15 +142,15 @@ namespace Ether.Core.Reporters
             }
         }
 
-        private float GetActiveDuration(VSTSWorkItem wi)
+        private float GetActiveDuration(VSTSWorkItem workItem)
         {
-            if (wi.Updates == null || !wi.Updates.Any())
+            if (workItem.Updates == null || !workItem.Updates.Any())
                 return 0.0f;
 
             var activeTime = 0.0F;
             var isActive = false;
             DateTime? lastActivated = null;
-            foreach (var update in wi.Updates)
+            foreach (var update in workItem.Updates)
             {
                 var isActivation = !update.State.IsEmpty && update.State.NewValue == WorkItemStates.Active;
                 var isOnHold = !update.State.IsEmpty && update.State.NewValue == WorkItemStates.New;
@@ -198,7 +198,7 @@ namespace Ether.Core.Reporters
                 .Contains("blocked");
         }
 
-        public static int CountBusinessDaysBetween(DateTime firstDay, DateTime lastDay, params DateTime[] holidays)
+        public static float CountBusinessDaysBetween(DateTime firstDay, DateTime lastDay, params DateTime[] holidays)
         {
             firstDay = firstDay.Date;
             lastDay = lastDay.Date;
@@ -207,6 +207,9 @@ namespace Ether.Core.Reporters
 
             TimeSpan span = lastDay - firstDay;
             int businessDays = span.Days;
+            if (businessDays == 0)
+                return 1;
+
             int fullWeekCount = businessDays / 7;
             // find out if there are weekends during the time exceedng the full weeks
             if (businessDays > fullWeekCount * 7)

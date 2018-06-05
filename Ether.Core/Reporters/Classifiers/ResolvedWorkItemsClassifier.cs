@@ -20,7 +20,13 @@ namespace Ether.Core.Reporters.Classifiers
             if (resolutionUpdate == null)
                 return WorkItemResolution.None;
 
+            var assignedToMember = request.Team.SingleOrDefault(m => !resolutionUpdate.AssignedTo.IsEmpty &&
+                !string.IsNullOrEmpty(resolutionUpdate.AssignedTo.OldValue) &&
+                resolutionUpdate.AssignedTo.OldValue.Contains(m.Email));
             var resolvedByMemeber = request.Team.Single(m => resolutionUpdate.ResolvedBy.NewValue.Contains(m.Email));
+            if (assignedToMember != null)
+                resolvedByMemeber = assignedToMember;
+
             return new WorkItemResolution(request.WorkItem, WorkItemStates.Resolved, resolutionUpdate.Reason.NewValue,
                 resolutionUpdate.ChangedDate, resolvedByMemeber.Email, resolvedByMemeber.DisplayName);
         }

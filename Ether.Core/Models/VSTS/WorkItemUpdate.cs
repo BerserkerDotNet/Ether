@@ -17,7 +17,7 @@ namespace Ether.Core.Models.VSTS
         public UpdateValue AreaPath => this["System.AreaPath"];
         public UpdateValue ResolvedBy => this["Microsoft.VSTS.Common.ResolvedBy"];
         public UpdateValue ClosedBy => this[VSTSFieldNames.ClosedBy];
-        public UpdateValue AssignedTo => this["System.AssignedTo"];
+        public UpdateValue AssignedTo => this[VSTSFieldNames.AssignedTo];
         public UpdateValue State => this["System.State"];
         public UpdateValue WorkItemType => this["System.WorkItemType"];
         public UpdateValue Title => this["System.Title"];

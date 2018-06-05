@@ -15,7 +15,15 @@ namespace Ether.Tests.Data
     {
         public static IEnumerable GetTestCasesForClosedTasks()
         {
-            return new TestCaseData[] { SimpleClosed(), SimpleFullCycleClosed(), MultipleClosedUpdates(), MultipleClosedUpdates(), WithCorrectDate() };
+            return new TestCaseData[]
+            {
+                SimpleClosed(),
+                SimpleFullCycleClosed(),
+                MultipleClosedUpdates(),
+                MultipleClosedUpdates(),
+                WithCorrectDate(),
+                CorrectClosedByIfNeeded()
+            };
         }
 
         public static IEnumerable GetTestCasesForNotClosedTasks()
@@ -33,7 +41,7 @@ namespace Ether.Tests.Data
             var teamMember = FakeTeam.ElementAt(0);
             var revisedDate = DateTime.UtcNow.AddDays(-2);
             var updates = UpdateBuilder.Create()
-                        .ClosedFromActive(by: teamMember)
+                        .ClosedFromActive(by: teamMember).With(VSTSFieldNames.AssignedTo, "foo", null)
                         .On(revisedDate)
                         .Build();
             var request = GetRequest(updates);
@@ -107,6 +115,23 @@ namespace Ether.Tests.Data
             var request = GetRequest(updates);
             return new TestCaseData(request, revisedDate, teamMember)
                 .SetName($"{nameof(ClosedTasksWorkItemsClassifierTests.ShouldReturnClosedResolution)}On{nameof(ClosedByDifferentTeamMembers)}");
+        }
+
+        private static TestCaseData CorrectClosedByIfNeeded()
+        {
+            var teamMember = FakeTeam.ElementAt(0);
+            var resolver = FakeTeam.ElementAt(1);
+            var assignedTo = $"{teamMember.DisplayName} <{teamMember.Email}>";
+            var revisedDate = DateTime.UtcNow.AddDays(-4);
+            var updates = UpdateBuilder.Create()
+                        .New()
+                        .Then().Activated().With(VSTSFieldNames.AssignedTo, assignedTo, "")
+                        .Then().ClosedFromActive(by: resolver).With(VSTSFieldNames.AssignedTo, "", assignedTo)
+                        .On(revisedDate)
+                        .Build();
+            var request = GetRequest(updates);
+            return new TestCaseData(request, revisedDate, teamMember)
+                .SetName($"{nameof(ClosedTasksWorkItemsClassifierTests.ShouldReturnClosedResolution)}On{nameof(CorrectClosedByIfNeeded)}");
         }
 
         #endregion

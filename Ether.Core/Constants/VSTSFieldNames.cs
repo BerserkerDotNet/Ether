@@ -8,5 +8,6 @@
         public const string Title = "System.Title";
         public const string Tags = "System.Tags";
         public const string ChangedDate = "System.ChangedDate";
+        public const string AssignedTo = "System.AssignedTo";
     }
 }

@@ -17,7 +17,8 @@ namespace Ether.Tests.Data
             BlockedPeriods(nameof(AggregatedWorkitemsETAReporterTests.ShouldCorrectlyIdentifyActiveTimeWithoutEstimates)),
             UnBlockedUponActivationPeriods(nameof(AggregatedWorkitemsETAReporterTests.ShouldCorrectlyIdentifyActiveTimeWithoutEstimates)),
             WithoutWeekends(nameof(AggregatedWorkitemsETAReporterTests.ShouldCorrectlyIdentifyActiveTimeWithoutEstimates)),
-            WithoutCountingMinutes(nameof(AggregatedWorkitemsETAReporterTests.ShouldCorrectlyIdentifyActiveTimeWithoutEstimates))
+            WithoutCountingMinutes(nameof(AggregatedWorkitemsETAReporterTests.ShouldCorrectlyIdentifyActiveTimeWithoutEstimates)),
+            IfResolvedOnTheSameDay(nameof(AggregatedWorkitemsETAReporterTests.ShouldCorrectlyIdentifyActiveTimeWithoutEstimates))
         };
 
         public static IEnumerable WorkItemActiveTimeTestsWithETA() => new TestCaseData[]
@@ -28,7 +29,8 @@ namespace Ether.Tests.Data
             BlockedPeriods(nameof(AggregatedWorkitemsETAReporterTests.ShouldCorrectlyIdentifyActiveTimeWithEstimates)),
             UnBlockedUponActivationPeriods(nameof(AggregatedWorkitemsETAReporterTests.ShouldCorrectlyIdentifyActiveTimeWithEstimates)),
             WithoutWeekends(nameof(AggregatedWorkitemsETAReporterTests.ShouldCorrectlyIdentifyActiveTimeWithEstimates)),
-            WithoutCountingMinutes(nameof(AggregatedWorkitemsETAReporterTests.ShouldCorrectlyIdentifyActiveTimeWithEstimates))
+            WithoutCountingMinutes(nameof(AggregatedWorkitemsETAReporterTests.ShouldCorrectlyIdentifyActiveTimeWithEstimates)),
+            IfResolvedOnTheSameDay(nameof(AggregatedWorkitemsETAReporterTests.ShouldCorrectlyIdentifyActiveTimeWithEstimates))
         };
 
         private static TestCaseData SimplePathWithResolved(string testPrefix)
@@ -135,6 +137,20 @@ namespace Ether.Tests.Data
             var expectedDuration = resolvedOn.Subtract(activatedOn).Days;
             return new TestCaseData(updates, 7)
                 .SetName($"{testPrefix}{nameof(WithoutCountingMinutes)}");
+        }
+
+        private static TestCaseData IfResolvedOnTheSameDay(string testPrefix)
+        {
+            var activatedOn = new DateTime(2018, 5, 28, 12, 34, 45);
+            var resolvedOn = new DateTime(2018, 5, 28, 15, 34, 45);
+            var updates = UpdateBuilder.Create()
+                .Activated().On(activatedOn)
+                .Then().Resolved(TestData.DummyMember).On(resolvedOn)
+                .Build();
+
+            var expectedDuration = resolvedOn.Subtract(activatedOn).Days;
+            return new TestCaseData(updates, 1)
+                .SetName($"{testPrefix}{nameof(IfResolvedOnTheSameDay)}");
         }
     }
 }
