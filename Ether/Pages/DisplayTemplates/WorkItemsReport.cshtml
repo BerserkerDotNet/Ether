@@ -38,14 +38,19 @@
             <tfoot>
 
                 <tr class="active">
+                    
                     <th colspan="2"><strong>Total</strong> - @workItems.Count()</th>
-                    <td class="success" colspan="3">
+                    <td class="success" colspan="1">
                         <ul class="list-inline">
                             @foreach (var byReason in workItemsByReason)
                             {
                                 <li><strong>@byReason.Key</strong> - @byReason.Count()</li>
                             }
                         </ul>
+                    </td>
+                    <td colspan="2">
+                        <div><strong>Tasks</strong> - @workItems.Count(w=>w.WorkItemType == "Task")<div>
+                        <div><strong>Bugs</strong> - @workItems.Count(w=>w.WorkItemType == "Bug")<div>
                     </td>
                 </tr>
             </tfoot>
