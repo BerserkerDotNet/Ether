@@ -92,6 +92,8 @@ namespace Ether.Core.Reporters
             {
                 var resolved = resolutions[email];
                 report.TotalResolved = resolved.Count();
+                report.TotalResolvedBugs = resolved.Count(w => string.Equals(w.WorkItemType, "Bug", StringComparison.OrdinalIgnoreCase));
+                report.TotalResolvedTasks = resolved.Count(w => string.Equals(w.WorkItemType, "Task", StringComparison.OrdinalIgnoreCase));
                 foreach (var item in resolved)
                 {
                     var workitem = workitems.Single(w => w.WorkItemId == item.WorkItemId);

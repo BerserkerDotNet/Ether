@@ -14,6 +14,8 @@ namespace Ether.Core.Models.DTO.Reports
             public string MemberEmail { get; set; }
             public string MemberName { get; set; }
             public int TotalResolved { get; set; }
+            public int TotalResolvedBugs { get; set; }
+            public int TotalResolvedTasks { get; set; }
             public int WithoutETA { get; set; }
             public float OriginalEstimated { get; set; }
             public float EstimatedToComplete { get; set; }
