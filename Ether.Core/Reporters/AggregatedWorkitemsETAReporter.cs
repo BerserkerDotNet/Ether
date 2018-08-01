@@ -94,20 +94,21 @@ namespace Ether.Core.Reporters
                 report.TotalResolved = resolved.Count();
                 report.TotalResolvedBugs = resolved.Count(w => string.Equals(w.WorkItemType, "Bug", StringComparison.OrdinalIgnoreCase));
                 report.TotalResolvedTasks = resolved.Count(w => string.Equals(w.WorkItemType, "Task", StringComparison.OrdinalIgnoreCase));
+                report.Details = new List<AggregatedWorkitemsETAReport.IndividualReportDetail>(report.TotalResolved);
                 foreach (var item in resolved)
                 {
                     var workitem = workitems.Single(w => w.WorkItemId == item.WorkItemId);
+                    var timeSpent = GetActiveDuration(workitem);
+                    var originalEstimate = GetEtaValue(workitem, ETAFieldType.OriginalEstimate);
+                    var completedWork = GetEtaValue(workitem, ETAFieldType.CompletedWork);
+                    var remainingWork = GetEtaValue(workitem, ETAFieldType.RemainingWork);
                     if (IsETAEmpty(workitem))
                     {
                         report.WithoutETA++;
-                        report.CompletedWithoutEstimates += GetActiveDuration(workitem);
+                        report.CompletedWithoutEstimates += timeSpent;
                     }
                     else
                     {
-                        var originalEstimate = GetEtaValue(workitem, ETAFieldType.OriginalEstimate);
-                        var completedWork = GetEtaValue(workitem, ETAFieldType.CompletedWork);
-                        var remainingWork = GetEtaValue(workitem, ETAFieldType.RemainingWork);
-
                         var estimatedByDev = completedWork + remainingWork;
                         if (estimatedByDev == 0)
                             estimatedByDev = originalEstimate;
@@ -115,9 +116,18 @@ namespace Ether.Core.Reporters
                         report.OriginalEstimated += originalEstimate;
                         report.EstimatedToComplete += estimatedByDev;
 
-                        report.CompletedWithEstimates += GetActiveDuration(workitem);
+                        report.CompletedWithEstimates += timeSpent;
                     }
-                    
+
+                    report.Details.Add(new AggregatedWorkitemsETAReport.IndividualReportDetail
+                    {
+                        WorkItemId = item.WorkItemId,
+                        WorkItemTitle = item.WorkItemTitle,
+                        WorkItemType = item.WorkItemType,
+                        OriginalEstimate = originalEstimate,
+                        EstimatedToComplete = remainingWork + completedWork,
+                        TimeSpent = timeSpent,
+                    });
                 }
             }
 

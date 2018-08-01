@@ -239,7 +239,6 @@ namespace Ether.Tests.Reporters
             report.IndividualReports.Should().OnlyContain(r => r.OriginalEstimated == expected);
         }
 
-
         [TestCase(1, 2, 4, 3)]
         [TestCase(1, 2, null, 3)]
         [TestCase(1, null, null, 1)]
@@ -260,10 +259,21 @@ namespace Ether.Tests.Reporters
         [TestData(membersCount: 0, RegisterDummyMember = true, RelatedWorkItemsPerMember = 2)]
         public async Task ShouldCorrectlyIdentifyActiveTimeWithEstimates(IEnumerable<WorkItemUpdate> updates, float expectedDuration)
         {
-            var report = await ExecuteReportWithResolutions(original: 1, updates: updates);
+            var report = await ExecuteReportWithResolutions(original: 1, remaining: 5, updates: updates);
 
             report.IndividualReports.Should().HaveCount(1);
-            report.IndividualReports.Should().OnlyContain(r => r.CompletedWithEstimates == expectedDuration*2);
+            report.IndividualReports.Should().OnlyContain(r => r.CompletedWithEstimates == expectedDuration * 2);
+
+            var individualReport = report.IndividualReports.First();
+            individualReport.Details.Should().NotBeNull();
+            individualReport.Details.Should().HaveCount(2);
+            individualReport.Details.All(d => d.OriginalEstimate == 1 &&
+                d.EstimatedToComplete == 5 && 
+                d.TimeSpent == expectedDuration && 
+                d.WorkItemId != 0 && 
+                string.Equals(d.WorkItemType, WorkItemTypes.Bug) && 
+                string.Equals(d.WorkItemTitle, "Bla"))
+            .Should().BeTrue();
         }
 
         [Test, TestCaseSource(typeof(ETADataProvider), nameof(ETADataProvider.WorkItemActiveTimeTestsNoETA))]
@@ -274,6 +284,10 @@ namespace Ether.Tests.Reporters
 
             report.IndividualReports.Should().HaveCount(1);
             report.IndividualReports.Should().OnlyContain(r => r.CompletedWithoutEstimates == expectedDuration * 2);
+
+            var individualReport = report.IndividualReports.First();
+            individualReport.Details.Should().NotBeNull();
+            individualReport.Details.Should().HaveCount(2);
         }
 
         private async Task<AggregatedWorkitemsETAReport> Report()
@@ -289,7 +303,6 @@ namespace Ether.Tests.Reporters
             report.Should().BeOfType<AggregatedWorkitemsETAReport>();
             report.As<AggregatedWorkitemsETAReport>().IndividualReports.Should().BeEmpty();
         }
-
 
         private async Task<AggregatedWorkitemsETAReport> ExecuteReportWithResolutions(int? completed = null, int? remaining = null, int? original = null, IEnumerable<WorkItemUpdate> updates = null)
         {

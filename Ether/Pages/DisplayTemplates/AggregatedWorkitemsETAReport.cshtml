@@ -1,12 +1,15 @@
 ﻿@model AggregatedWorkitemsETAReport
+@{
+    var reports = Model.IndividualReports.OrderBy(r => r.MemberName);
+}
 <div class="box box-default">
     <div class="box-header">
         <h3 class="box-title">@Model.ReportName for '@Model.ProfileName'</h3>
         <span class="pull-right">
             <a class="btn btn-default hidden-print" onclick="window.print();"><img src="~/images/print.png" height="24" />Print</a>
             @*<a asp-page-handler="ToExcel" asp-route-id="@Model.Id" class="btn btn-default hidden-print">
-                <img src="~/images/Excel.png" height="24" />Export to Excel
-            </a>*@
+                    <img src="~/images/Excel.png" height="24" />Export to Excel
+                </a>*@
         </span>
     </div>
     <div class="box-body">
@@ -26,10 +29,10 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var report in Model.IndividualReports.OrderBy(r => r.MemberName))
+                @foreach (var report in reports)
                 {
                     <tr>
-                        <td>@report.MemberName</td>
+                        <td><a href="#@report.MemberEmail">@report.MemberName</a></td>
                         <td>@report.TotalResolved</td>
                         <td>@report.TotalResolvedBugs</td>
                         <td>@report.TotalResolvedTasks</td>
@@ -62,3 +65,64 @@
         <span>Range: @Model.StartDate.ToString("MM/dd/yyyy") - @Model.EndDate.ToString("MM/dd/yyyy")</span>
     </div>
 </div>
+
+@foreach (var report in reports)
+{
+    if (report.Details != null && report.Details.Any())
+    {
+
+        <section id="@report.MemberEmail" class="hidden-print">
+            <div class="box box-info">
+                <div class="box-header">
+                    <h3 class="box-title">Details on '@report.MemberName'</h3>
+                    <div class="box-tools">
+                        <button class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="Collapse"><i class="fa fa-minus"></i></button>
+                        <button class="btn btn-box-tool" data-widget="remove" data-toggle="tooltip" title="Remove"><i class="fa fa-times"></i></button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <table class="table table-hover table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Workitem</th>
+                                <th>Title</th>
+                                <th>Type</th>
+                                <th>Original Estimate (Days)</th>
+                                <th>Total Estimated (Days)</th>
+                                <th>Time Spent (Days)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var detail in report.Details.OrderBy(d => d.WorkItemType))
+                            {
+                                <tr>
+                                    <td>@detail.WorkItemId</td>
+                                    <td>@detail.WorkItemTitle</td>
+                                    <td>@detail.WorkItemType</td>
+                                    <td>@detail.OriginalEstimate</td>
+                                    <td>@detail.EstimatedToComplete</td>
+                                    <td>@detail.TimeSpent</td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot>
+                            <tr class="active">
+                                <th>Total:</th>
+                                <td class="success" colspan="2">@report.TotalResolvedBugs bugs / @report.TotalResolvedTasks tasks</td>
+                                <td class="success">@report.OriginalEstimated</td>
+                                <td class="success">@report.EstimatedToComplete</td>
+                                <td class="success">@report.TotalCompleted</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </section>
+    }
+}
+
+<script capture="@nameof(ReportResult)">
+    $(document).ready(function () {
+        $('.box-info').boxWidget('toggle');
+    });
+</script>

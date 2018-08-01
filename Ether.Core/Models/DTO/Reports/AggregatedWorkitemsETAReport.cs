@@ -9,6 +9,13 @@ namespace Ether.Core.Models.DTO.Reports
     {
         public IList<IndividualETAReport> IndividualReports { get; set; }
 
+        public int TotalResolved => IndividualReports.Sum(r => r.TotalResolved);
+        public float EstimatedToComplete => IndividualReports.Sum(r => r.EstimatedToComplete);
+        public float CompletedWithEstimates => IndividualReports.Sum(r => r.CompletedWithEstimates);
+        public float EstimatedToCompletedRatio => EstimatedToComplete / CompletedWithEstimates;
+
+        public static AggregatedWorkitemsETAReport Empty => new AggregatedWorkitemsETAReport { IndividualReports = Enumerable.Empty<IndividualETAReport>().ToList() };
+
         public class IndividualETAReport
         {
             public string MemberEmail { get; set; }
@@ -22,18 +29,29 @@ namespace Ether.Core.Models.DTO.Reports
             public float CompletedWithEstimates { get; set; }
             public float CompletedWithoutEstimates { get; set; }
 
+            public IList<IndividualReportDetail> Details { get; set; }
+
             public float TotalCompleted => CompletedWithEstimates + CompletedWithoutEstimates;
             public float EstimatedToCompletedRatio => EstimatedToComplete / CompletedWithEstimates;
 
-            public static IndividualETAReport GetEmptyFor(TeamMember teamMember) => 
+            public static IndividualETAReport GetEmptyFor(TeamMember teamMember) =>
                 new IndividualETAReport { MemberEmail = teamMember.Email, MemberName = teamMember.DisplayName };
         }
 
-        public int TotalResolved => IndividualReports.Sum(r => r.TotalResolved);
-        public float EstimatedToComplete => IndividualReports.Sum(r => r.EstimatedToComplete);
-        public float CompletedWithEstimates => IndividualReports.Sum(r => r.CompletedWithEstimates);
-        public float EstimatedToCompletedRatio => EstimatedToComplete / CompletedWithEstimates;
+        public class IndividualReportDetail
+        {
+            public int WorkItemId { get; set; }
 
-        public static AggregatedWorkitemsETAReport Empty => new AggregatedWorkitemsETAReport { IndividualReports = Enumerable.Empty<IndividualETAReport>().ToList() };
+            public string WorkItemTitle { get; set; }
+
+            public string WorkItemType { get; set; }
+
+            public float OriginalEstimate { get; set; }
+
+            public float EstimatedToComplete { get; set; }
+
+            public float TimeSpent { get; set; }
+
+        }
     }
 }
