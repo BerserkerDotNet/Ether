@@ -34,6 +34,11 @@ namespace Ether.Core.Models.DTO.Reports
             public string TeamMember { get; set; }
 
             public int TotalPullRequestsCount => Completed + Active + Abandoned;
+
+            public static IndividualPRReport GetEmptyFor(string userDisplayName)
+            {
+                return new IndividualPRReport { TeamMember = userDisplayName };
+            }
         }
     }
 }

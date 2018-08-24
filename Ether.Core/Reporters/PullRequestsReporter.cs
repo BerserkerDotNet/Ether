@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Ether.Core.Models.VSTS;
 using System.Diagnostics;
 using Ether.Core.Types;
+using Ether.Core.Models.DTO;
 
 namespace Ether.Core.Reporters
 {
@@ -85,41 +86,53 @@ namespace Ether.Core.Reporters
             return IsActivePullRequest(pullRequest) ||
                 (pullRequest.ClosedDate.HasValue && pullRequest.ClosedDate >= Input.Query.StartDate && pullRequest.ClosedDate <= Input.ActualEndDate);
         }
+
         private PullRequestsReport GetReport(List<PullRequest> resultingPrs)
         {
             var groupedResult = resultingPrs.GroupBy(p => p.CreatedBy);
             var report = new PullRequestsReport();
             report.IndividualReports = new List<PullRequestsReport.IndividualPRReport>(groupedResult.Count());
 
-            Parallel.ForEach(groupedResult, personResult => 
+            Parallel.ForEach(Input.Members, member => 
             {
-                _progressReporter.Report($"Starting to generate report for {personResult.Key.DisplayName}");
-                var individualReport = new PullRequestsReport.IndividualPRReport();
-                individualReport.TeamMember = GetUserDisplayName(personResult.Key);
-                individualReport.Completed = personResult.Count(IsCompletedPullRequest);
-                individualReport.Abandoned = personResult.Count(IsAbandonedPullRequest);
-                individualReport.Active = personResult.Count(IsActivePullRequest);
-                individualReport.Created = personResult.Count(IsPullRequestCreatedInPeriod);
-                individualReport.TotalIterations = personResult.AsParallel().Aggregate(0, (x, p) => x += p.IterationsCount);
-                individualReport.TotalComments = personResult.AsParallel().Aggregate(0, (x, p) => x += p.CommentsCount);
-                individualReport.AverageIterations = (double)individualReport.TotalIterations / (double)individualReport.TotalPullRequestsCount;
-                individualReport.AverageComments = (double)individualReport.TotalComments / (double)individualReport.TotalPullRequestsCount;
-                individualReport.CodeQuality = ((double)individualReport.TotalPullRequestsCount / individualReport.TotalIterations) * 100;
-                var averagePullRequestLifetime = personResult.Where(IsCompletedPullRequest)
-                    .Sum(r => (r.ClosedDate.Value - r.CreationDate).TotalSeconds) / individualReport.Completed;
-                averagePullRequestLifetime = double.IsNaN(averagePullRequestLifetime) ? 0 : averagePullRequestLifetime;
-                individualReport.AveragePRLifespan = TimeSpan.FromSeconds(averagePullRequestLifetime);
+                var personResult = groupedResult.SingleOrDefault(r => string.Equals(r.Key.UniqueName, member.Email, StringComparison.OrdinalIgnoreCase));
+                _progressReporter.Report($"Starting to generate report for {member.DisplayName}");
+                var individualReport = personResult == null ? 
+                    PullRequestsReport.IndividualPRReport.GetEmptyFor(member.DisplayName) : 
+                    GetIndividualReport(member, personResult);
+
                 lock (_locker)
                 {
                     report.IndividualReports.Add(individualReport);
                 }
-                _progressReporter.Report($"Finished generating report for {personResult.Key.DisplayName}", GetProgressStep());
+                _progressReporter.Report($"Finished generating report for {member.DisplayName}", GetProgressStep());
             });
             report.IndividualReports = report.IndividualReports
                 .OrderBy(r => r.TeamMember)
                 .ToList();
 
             return report;
+        }
+
+        private PullRequestsReport.IndividualPRReport GetIndividualReport(TeamMember member, IEnumerable<PullRequest> pullRequests)
+        {
+            var individualReport = new PullRequestsReport.IndividualPRReport();
+            individualReport.TeamMember = member.DisplayName;
+            individualReport.Completed = pullRequests.Count(IsCompletedPullRequest);
+            individualReport.Abandoned = pullRequests.Count(IsAbandonedPullRequest);
+            individualReport.Active = pullRequests.Count(IsActivePullRequest);
+            individualReport.Created = pullRequests.Count(IsPullRequestCreatedInPeriod);
+            individualReport.TotalIterations = pullRequests.AsParallel().Aggregate(0, (x, p) => x += p.IterationsCount);
+            individualReport.TotalComments = pullRequests.AsParallel().Aggregate(0, (x, p) => x += p.CommentsCount);
+            individualReport.AverageIterations = (double)individualReport.TotalIterations / (double)individualReport.TotalPullRequestsCount;
+            individualReport.AverageComments = (double)individualReport.TotalComments / (double)individualReport.TotalPullRequestsCount;
+            individualReport.CodeQuality = ((double)individualReport.TotalPullRequestsCount / individualReport.TotalIterations) * 100;
+            var averagePullRequestLifetime = pullRequests.Where(IsCompletedPullRequest)
+                .Sum(r => (r.ClosedDate.Value - r.CreationDate).TotalSeconds) / individualReport.Completed;
+            averagePullRequestLifetime = double.IsNaN(averagePullRequestLifetime) ? 0 : averagePullRequestLifetime;
+            individualReport.AveragePRLifespan = TimeSpan.FromSeconds(averagePullRequestLifetime);
+
+            return individualReport;
         }
 
         private bool IsCompletedPullRequest(PullRequest pullRequest)
@@ -140,15 +153,6 @@ namespace Ether.Core.Reporters
         private bool IsPullRequestCreatedInPeriod(PullRequest pullRequest)
         {
             return pullRequest.CreationDate >= Input.Query.StartDate && pullRequest.CreationDate <= Input.ActualEndDate;
-        }
-
-        private string GetUserDisplayName(VSTSUser user)
-        {
-            var memeber = Input.Members.SingleOrDefault(m => string.Equals(m.Email, user.UniqueName, StringComparison.OrdinalIgnoreCase));
-            if (memeber == null)
-                return user.DisplayName;
-
-            return memeber.DisplayName;
         }
 
         private float GetProgressStep()
