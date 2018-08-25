@@ -6,7 +6,7 @@ namespace Ether.Tests.Infrastructure
 {
     public static class PropertyBagExtensions
     {
-        public static T Get<T>(this IPropertyBag properties, string key, T defaultValue = default(T))
+        public static T Get<T>(this PropertyBagAdapter properties, string key, T defaultValue = default(T))
         {
             var result = properties.Get(key);
             if (result != null)
@@ -35,7 +35,7 @@ namespace Ether.Tests.Infrastructure
             var propertiesField = parentValue.GetType().GetProperty("Properties", BindingFlags.Public | BindingFlags.Instance);
             var propertiesValue = propertiesField.GetValue(parentValue) as IPropertyBag;
 
-            return propertiesValue.Get<T>(key, defaultValue);
+            return new PropertyBagAdapter(propertiesValue).Get<T>(key, defaultValue);
         }
     }
 
