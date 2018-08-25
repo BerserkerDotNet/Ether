@@ -31,12 +31,19 @@ namespace Ether
 
         public Startup(IHostingEnvironment env)
         {
-            _configuration = new ConfigurationBuilder()
-                .SetBasePath(env.ContentRootPath)
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
-                .AddEnvironmentVariables("EtherReport_")
-                .Build();
+            var builder = new ConfigurationBuilder()
+               .SetBasePath(env.ContentRootPath)
+               .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+               .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
+               .AddEnvironmentVariables("EtherReport_");
+                
+            if (env.IsDevelopment())
+            {
+                builder.AddUserSecrets<Startup>();
+            }
+
+            _configuration = builder.Build();
+
         }
 
         public void ConfigureServices(IServiceCollection services)
@@ -74,13 +81,14 @@ namespace Ether
             services.AddSingleton<IDependencyResolver, AspNetDependencyResolver>();
             services.AddSingleton<PullRequestProxyJsonConverter>();
             services.AddSingleton<IProgressReporter, SignalRProgressReporter>();
-            services.AddSingleton<IWorkItemClassificationContext, WorkItemClassificationContext>();
+            
 
             services.AddScoped(typeof(IAll<>), typeof(DataManager<>));
             services.AddScoped<IReporter, PullRequestsReporter>();
             services.AddScoped<IReporter, WorkItemsReporter>();
             services.AddScoped<IReporter, ListOfReviewersReporter>();
             services.AddScoped<IReporter, AggregatedWorkitemsETAReporter>();
+            services.AddScoped<IWorkItemClassificationContext, WorkItemClassificationContext>();
             services.AddScoped<IWorkItemsClassifier, ResolvedWorkItemsClassifier>();
             services.AddScoped<IWorkItemsClassifier, ClosedTasksWorkItemsClassifier>();
             services.AddScoped<LiveUpdatesHub>();
@@ -88,9 +96,6 @@ namespace Ether
             services.AddTransient<WorkItemsFetchJob>();
             services.AddTransient<PullRequestsFetchJob>();
             services.AddTransient<RetentionJob>();
-#if DEBUG
-            services.AddAuthentication(Microsoft.AspNetCore.Server.HttpSys.HttpSysDefaults.AuthenticationScheme);
-#endif
             services.AddHttpClient<IVSTSClient, VSTSClient>(client =>
             {
                 var vstsConfig = _configuration.Get<VSTSConfiguration>();
@@ -107,7 +112,6 @@ namespace Ether
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseBrowserLink();
             }
             else
             {

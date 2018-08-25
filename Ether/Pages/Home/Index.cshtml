@@ -27,23 +27,13 @@
                 <select asp-for="ReportRequest.Report" asp-items="@allReporters" class="form-control"></select>
                 <span asp-validation-for="ReportRequest.Report" class="text-danger"></span>
             </div>
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label id="StartDateLabel" asp-for="ReportRequest.StartDate">Start date:</label>
-                        <div id="StartDateDiv"></div>
-                        <input id="StartDate" asp-for="ReportRequest.StartDate" type="hidden" />
-                        <span asp-validation-for="ReportRequest.StartDate" class="text-danger"></span>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label id="EndDateLabel" asp-for="ReportRequest.EndDate">End date:</label>
-                        <div id="EndDateDiv"></div>
-                        <input id="EndDate" asp-for="ReportRequest.EndDate" type="hidden" />
-                        <span asp-validation-for="ReportRequest.EndDate" class="text-danger"></span>
-                    </div>
-                </div>
+            <div class="form-group">
+                <label for="reportrange">Date range:</label>
+                <input id="reportrange" name="reportrange" class="form-control" />
+                <span asp-validation-for="ReportRequest.StartDate" class="text-danger"></span>
+                <span asp-validation-for="ReportRequest.EndDate" class="text-danger"></span>
+                <input id="StartDate" asp-for="ReportRequest.StartDate" type="hidden" />
+                <input id="EndDate" asp-for="ReportRequest.EndDate" type="hidden" />
             </div>
             <button id="generateReportBtn" type="submit" class="btn btn-success">Create a report</button>
         </form>
@@ -87,7 +77,10 @@
                 }
             });
 
-            var connection = new signalR.HubConnection('/liveupdates', { transport: signalR.TransportType.LongPolling });
+            var connection = new signalR.HubConnectionBuilder()
+                .withUrl('/liveupdates', signalR.HttpTransportType.LongPolling)
+                .build();
+
             connection.on('update', function (message, moveProgressBy) {
                 console.log('received: ' + message + '; progress update: ' + moveProgressBy);
                 var reportArea = $('#progressReport');
@@ -116,42 +109,38 @@
             connection.start();
 
         });
-        function setSelectedStartDate(date) {
-            $('#StartDateLabel').text('Start date (' + date + '):');
-        }
 
-        function setSelectedEndDate(date) {
-            $('#EndDateLabel').text('End date (' + date + '):');
+        function setDateRange(start, end) {
+            $('#StartDate').val(start);
+            $('#EndDate').val(end);
         }
 
         function configureDateSelectors() {
-            var commonOptions = {
-                changeMonth: true,
-                changeYear: true,
-                minDate: "-6M",
-                maxDate: "+1D",
-                numberOfMonths: 2,
-            };
 
-            var startDateOptions = $.extend({
-                defaultDate: "-6D",
-                altField: "#StartDate",
-                onSelect: function (date) {
-                    setSelectedStartDate(date);
-                }
-            }, commonOptions);
-            var startDate = $('#StartDateDiv').datepicker(startDateOptions);
+            var preSelectedStartDate = '@(Model.ReportRequest.StartDate)';
+            var preSelectedEndDate = '@(Model.ReportRequest.EndDate)';
 
-            var endDateOptions = $.extend({
-                defaultDate: "+1D",
-                altField: "#EndDate",
-                onSelect: function (date) {
-                    setSelectedEndDate(date);
-                }
-            }, commonOptions);
-            var endDate = $('#EndDateDiv').datepicker(endDateOptions);
-            setSelectedStartDate(startDate.datepicker("getDate").toLocaleDateString());
-            setSelectedEndDate(endDate.datepicker("getDate").toLocaleDateString());
+            var start = preSelectedStartDate === '' ? moment().subtract(6, 'days').format('MM/DD/YYYY') : moment(preSelectedStartDate).format('MM/DD/YYYY');
+            var end = preSelectedEndDate === '' ? moment().format('MM/DD/YYYY') : moment(preSelectedEndDate).format('MM/DD/YYYY');
+
+            setDateRange(start, end);
+            $('#reportrange').daterangepicker({
+                "autoApply": true,
+                ranges: {
+                    'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                    'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                    'Last Quater': [moment().subtract(3, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+                    'This Month': [moment().startOf('month'), moment().endOf('month')],
+                },
+                "alwaysShowCalendars": true,
+                "startDate": start,
+                "endDate": end,
+                "minDate": moment().subtract(6, 'month'),
+                "maxDate": moment().add(1, 'days'),
+                "opens": "right"
+            }, function (start, end, label) {
+                setDateRange(start.format('MM/DD/YYYY'), end.format('MM/DD/YYYY'));
+            });
         }
     </script>
 }

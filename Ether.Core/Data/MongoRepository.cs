@@ -28,10 +28,10 @@ namespace Ether.Core.Data
         public MongoRepository(IOptions<DbConfig> dbConfig)
         {
             //TODO: Shouldn't be here
-            BsonClassMap.RegisterClassMap<PullRequestsReport>();
-            BsonClassMap.RegisterClassMap<WorkItemsReport>();
-            BsonClassMap.RegisterClassMap<ListOfReviewersReport>();
-            BsonClassMap.RegisterClassMap<AggregatedWorkitemsETAReport>();
+            SafeRegisterClassMap<PullRequestsReport>();
+            SafeRegisterClassMap<WorkItemsReport>();
+            SafeRegisterClassMap<ListOfReviewersReport>();
+            SafeRegisterClassMap<AggregatedWorkitemsETAReport>();
             var pack = new ConventionPack();
             pack.Add(new IgnoreExtraElementsConvention(true));
 
@@ -221,6 +221,14 @@ namespace Ether.Core.Data
         {
             var collectionName = GetCollectionNameFor(type);
             return _database.GetCollection<BsonDocument>(collectionName);
+        }
+
+        private void SafeRegisterClassMap<T>()
+        {
+            if (!BsonClassMap.IsClassMapRegistered(typeof(T)))
+            {
+                BsonClassMap.RegisterClassMap<T>();
+            }
         }
     }
 }

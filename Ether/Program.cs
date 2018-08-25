@@ -15,14 +15,6 @@ namespace Ether
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-#if DEBUG
-                .UseHttpSys(options=> {
-                    options.Authentication.Schemes = AuthenticationSchemes.NTLM;
-                    options.Authentication.AllowAnonymous = true;
-                    options.MaxConnections = 100;
-                    options.MaxRequestBodySize = 30000000;
-                })
-#endif
                 .UseStartup<Startup>();
     }
 }
