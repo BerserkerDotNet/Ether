@@ -24,6 +24,7 @@ namespace Ether.Core.Models.DTO.Reports
             public int TotalResolvedBugs { get; set; }
             public int TotalResolvedTasks { get; set; }
             public int WithoutETA { get; set; }
+            public int WithOriginalEstimate { get; set; }
             public float OriginalEstimated { get; set; }
             public float EstimatedToComplete { get; set; }
             public float CompletedWithEstimates { get; set; }

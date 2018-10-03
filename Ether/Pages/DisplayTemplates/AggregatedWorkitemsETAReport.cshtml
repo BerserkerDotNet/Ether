@@ -21,28 +21,30 @@
                     <th>Resolved bugs</th>
                     <th>Resolved tasks</th>
                     <th>Without ETA</th>
+                    <th>With Original Estimate</th>
                     <th>Original Estimate (Days)</th>
                     <th>Total Estimated (Days)</th>
-                    <th>Completed w/Estimates (Days)</th>
-                    <th>Total Completed</th>
+                    <th>Completed with Estimates (Days)</th>
+                    <th>Total Completed (Days)</th>
                     <th>Estimated/Completed</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach (var report in reports)
                 {
-                    <tr>
-                        <td><a href="#@report.MemberEmail">@report.MemberName</a></td>
-                        <td>@report.TotalResolved</td>
-                        <td>@report.TotalResolvedBugs</td>
-                        <td>@report.TotalResolvedTasks</td>
-                        <td>@report.WithoutETA</td>
-                        <td>@report.OriginalEstimated</td>
-                        <td>@report.EstimatedToComplete</td>
-                        <td>@report.CompletedWithEstimates</td>
-                        <td>@report.TotalCompleted.ToString("F2")</td>
-                        <td>@report.EstimatedToCompletedRatio.ToString("F2")</td>
-                    </tr>
+                <tr>
+                    <td><a href="#@report.MemberEmail">@report.MemberName</a></td>
+                    <td>@report.TotalResolved</td>
+                    <td>@report.TotalResolvedBugs</td>
+                    <td>@report.TotalResolvedTasks</td>
+                    <td>@report.WithoutETA</td>
+                    <td>@report.WithOriginalEstimate</td>
+                    <td>@report.OriginalEstimated</td>
+                    <td>@report.EstimatedToComplete</td>
+                    <td>@report.CompletedWithEstimates</td>
+                    <td>@report.TotalCompleted.ToString("F2")</td>
+                    <td>@report.EstimatedToCompletedRatio.ToString("F2")</td>
+                </tr>
                 }
             </tbody>
             <tfoot>

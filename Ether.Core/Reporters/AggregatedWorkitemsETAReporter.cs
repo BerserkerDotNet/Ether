@@ -113,6 +113,9 @@ namespace Ether.Core.Reporters
                         if (estimatedByDev == 0)
                             estimatedByDev = originalEstimate;
 
+                        if (originalEstimate != 0)
+                            report.WithOriginalEstimate++;
+
                         report.OriginalEstimated += originalEstimate;
                         report.EstimatedToComplete += estimatedByDev;
 

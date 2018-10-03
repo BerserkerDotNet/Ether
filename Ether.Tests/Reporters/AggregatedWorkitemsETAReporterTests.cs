@@ -223,6 +223,18 @@ namespace Ether.Tests.Reporters
             report.IndividualReports.Should().OnlyContain(r => r.WithoutETA == 2);
         }
 
+        [TestCase(null, 0)]
+        [TestCase(1, 2)]
+        [TestCase(3, 2)]
+        [TestData(membersCount: 2, repositoryCount: 2, projectsCount: 1, RelatedWorkItemsPerMember = 2)]
+        public async Task ShouldIncrementWithOriginalEstimateCount(int? originalEstimate, int expected)
+        {
+            var report = await ExecuteReportWithResolutions(original: originalEstimate);
+
+            report.IndividualReports.Should().HaveCount(2);
+            report.IndividualReports.Should().OnlyContain(r => r.WithOriginalEstimate == expected);
+        }
+
         [TestCase(1, 2, 4, 4)]
         [TestCase(1, 2, null, 0)]
         [TestCase(1, null, null, 0)]
