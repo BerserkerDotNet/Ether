@@ -1,0 +1,40 @@
+﻿@page "/"
+@inject HttpClient Http
+@inject Microsoft.AspNetCore.Blazor.Services.IUriHelper UriHelper
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            @if (currentUser == null)
+            {
+                <button class="btn" onclick="@Login">Login</button>
+            }
+            else
+            {
+                <div class="card-header">
+                    <h4 class="card-title">Hello @currentUser!</h4>
+                </div>
+                <div class="card-body">
+                    Welcome to your new app.
+                    <SurveyPrompt Title="How is Blazor working for you?" />
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@functions
+{
+    string currentUser;
+
+    protected override async Task OnInitAsync()
+    {
+        Microsoft.AspNetCore.Blazor.Browser.Http.BrowserHttpMessageHandler.DefaultCredentials = Microsoft.AspNetCore.Blazor.Browser.Http.FetchCredentialsOption.Include;
+        currentUser = await Http.GetStringAsync("http://localhost:5000/api/User/Name");
+    }
+
+    void Login()
+    {
+        UriHelper.NavigateTo("http://localhost:5000/login/Challenge?returnUrl=" + UriHelper.GetAbsoluteUri());
+    }
+}

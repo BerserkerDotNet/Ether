@@ -1,0 +1,16 @@
+@inherits BlazorLayoutComponent
+
+<div class="wrapper">
+    <div class="sidebar">
+        <div class="sidebar-wrapper">
+            <NavMenu />
+        </div>
+    </div>
+    <div class="main-panel">
+        <div class="content">
+            <div class="container-fluid">
+                @Body
+            </div>
+        </div>
+    </div>
+</div>
