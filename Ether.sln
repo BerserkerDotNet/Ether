@@ -3,19 +3,21 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26730.12
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ether", "Ether\Ether.csproj", "{4BA11030-02C1-48D9-A6E7-D9014CBEE19C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ether", "Ether\Ether.csproj", "{4BA11030-02C1-48D9-A6E7-D9014CBEE19C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ether.Api", "Ether.Api\Ether.Api.csproj", "{BD06D355-6F08-45AC-ADC8-2C4B6BC54C23}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ether.Api", "Ether.Api\Ether.Api.csproj", "{BD06D355-6F08-45AC-ADC8-2C4B6BC54C23}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ether.Contracts", "Ether.Contracts\Ether.Contracts.csproj", "{AD08C2E0-50DA-4597-A671-7FC75C65B2C1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ether.Contracts", "Ether.Contracts\Ether.Contracts.csproj", "{AD08C2E0-50DA-4597-A671-7FC75C65B2C1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ether.Vsts", "Ether.Vsts\Ether.Vsts.csproj", "{ADFA09E4-970F-41E1-A399-D546B0F125A0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ether.Vsts", "Ether.Vsts\Ether.Vsts.csproj", "{ADFA09E4-970F-41E1-A399-D546B0F125A0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ether.Tests", "Ether.Tests\Ether.Tests.csproj", "{CD0EC4BA-EC1A-4AF8-925B-7F82BF930E59}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ether.Tests", "Ether.Tests\Ether.Tests.csproj", "{CD0EC4BA-EC1A-4AF8-925B-7F82BF930E59}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{0FC6D5B9-FF3D-43E7-9B4D-31B071286D15}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{F921274A-98FC-4B8E-A143-48928AAD3326}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ether.Core", "Ether.Core\Ether.Core.csproj", "{A098D6D2-6CC9-4B64-9CA6-2CBB541CA619}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -43,6 +45,10 @@ Global
 		{CD0EC4BA-EC1A-4AF8-925B-7F82BF930E59}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CD0EC4BA-EC1A-4AF8-925B-7F82BF930E59}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CD0EC4BA-EC1A-4AF8-925B-7F82BF930E59}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A098D6D2-6CC9-4B64-9CA6-2CBB541CA619}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A098D6D2-6CC9-4B64-9CA6-2CBB541CA619}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A098D6D2-6CC9-4B64-9CA6-2CBB541CA619}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A098D6D2-6CC9-4B64-9CA6-2CBB541CA619}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -53,6 +59,7 @@ Global
 		{AD08C2E0-50DA-4597-A671-7FC75C65B2C1} = {0FC6D5B9-FF3D-43E7-9B4D-31B071286D15}
 		{ADFA09E4-970F-41E1-A399-D546B0F125A0} = {0FC6D5B9-FF3D-43E7-9B4D-31B071286D15}
 		{CD0EC4BA-EC1A-4AF8-925B-7F82BF930E59} = {F921274A-98FC-4B8E-A143-48928AAD3326}
+		{A098D6D2-6CC9-4B64-9CA6-2CBB541CA619} = {0FC6D5B9-FF3D-43E7-9B4D-31B071286D15}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B333D861-D4DA-41A7-8910-EDD627F8C7F4}

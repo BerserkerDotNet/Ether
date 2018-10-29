@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Autofac;
+using Ether.Core.Config;
+using Ether.Vsts.Config;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -40,6 +43,12 @@ namespace Ether.Api
             {
                 c.SwaggerDoc("v1", new Info { Title = "Ether API", Version = "v1" });
             });
+        }
+
+        public void ConfigureContainer(ContainerBuilder builder)
+        {
+            builder.RegisterModule<EtherCoreModule>();
+            builder.RegisterModule<VstsModule>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
