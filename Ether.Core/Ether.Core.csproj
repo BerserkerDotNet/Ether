@@ -37,4 +37,9 @@
   <ItemGroup>
     <ProjectReference Include="..\Ether.Contracts\Ether.Contracts.csproj" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <Folder Include="Types\Handlers\Commands\" />
+    <Folder Include="Types\Handlers\Queries\" />
+  </ItemGroup>
 </Project>

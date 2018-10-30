@@ -53,20 +53,6 @@ namespace Ether.Core.Data
                 typeCollection.Indexes.CreateOne(indexDefinition, new CreateIndexOptions { Unique = true });
 #pragma warning restore CS0618 // Type or member is obsolete
             }
-
-            /*
-            var vstsWorkItemsCollection = GetCollectionFor<VSTSWorkItem>();
-            vstsWorkItemsCollection.Indexes.CreateOne(Builders<VSTSWorkItem>.IndexKeys.Ascending(w => w.WorkItemId), new CreateIndexOptions
-            {
-                Unique = true
-            });
-
-            var pullREquestsCollection = GetCollectionFor<PullRequest>();
-            pullREquestsCollection.Indexes.CreateOne(Builders<PullRequest>.IndexKeys.Ascending(w => w.PullRequestId), new CreateIndexOptions
-            {
-                Unique = true
-            });
-            */
         }
 
         public async Task<IEnumerable<T>> GetAllAsync<T>()
