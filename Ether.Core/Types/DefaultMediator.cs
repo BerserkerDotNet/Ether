@@ -15,13 +15,13 @@ namespace Ether.Core.Types
             _context = context;
         }
 
-        public async Task Execute<TCommand>(TCommand command)
+        public Task Execute<TCommand>(TCommand command)
             where TCommand : ICommand
         {
-            await Execute<TCommand, UnitType>(command);
+            return Execute<TCommand, UnitType>(command);
         }
 
-        public async Task<TResult> Execute<TCommand, TResult>(ICommand<TResult> command)
+        public Task<TResult> Execute<TCommand, TResult>(ICommand<TResult> command)
             where TCommand : ICommand<TResult>
         {
             var handler = _context.Resolve<ICommandHandler<TCommand, TResult>>();
@@ -30,10 +30,10 @@ namespace Ether.Core.Types
                 throw new NotSupportedException($"No handler registered for command '{typeof(TCommand)}' with return type of '{typeof(TResult)}'");
             }
 
-            return await handler.Handle((TCommand)command);
+            return handler.Handle((TCommand)command);
         }
 
-        public async Task<TResult> Request<TQuery, TResult>(IQuery<TResult> query)
+        public Task<TResult> Request<TQuery, TResult>(IQuery<TResult> query)
             where TQuery : IQuery<TResult>
         {
             var handler = _context.Resolve<IQueryHandler<TQuery, TResult>>();
@@ -42,7 +42,7 @@ namespace Ether.Core.Types
                 throw new NotSupportedException($"No handler registered for query '{typeof(TQuery)}' with return type of '{typeof(TResult)}'");
             }
 
-            return await handler.Handle((TQuery)query);
+            return handler.Handle((TQuery)query);
         }
     }
 }

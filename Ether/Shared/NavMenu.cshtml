@@ -1,20 +1,26 @@
-﻿<div class="logo">
+﻿@inject EtherMenuService MenuService
+<div class="logo">
     <a href="/" class="simple-text">
         Ether
     </a>
 </div>
 
 <ul class="nav">
-    <li class="nav-item active">
-        <a class="nav-link" href="/">
-            <i class="oi oi-document"></i>
-            <p>Home</p>
-        </a>
-    </li>
-    <li>
-        <a class="nav-link" href="/about">
-            <i class="oi oi-info"></i>
-            <p>About</p>
-        </a>
-    </li>
+    @foreach (var menu in MenuService.Menu)
+    {
+        <li class="nav-item">
+            <NavLink class="nav-link" href="@(menu.Path)" Match="NavLinkMatch.Prefix">
+                <i class="nc-icon nc-@menu.Icon"></i>
+                <p>@menu.Name</p>
+            </NavLink>
+        </li>
+    }
 </ul>
+
+@functions { 
+
+    protected override async Task OnInitAsync()
+    {
+        await MenuService.LoadMenuAsync();
+    }
+}

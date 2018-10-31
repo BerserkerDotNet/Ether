@@ -1,3 +1,4 @@
+using Ether.Types;
 using Microsoft.AspNetCore.Blazor.Builder;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -7,6 +8,8 @@ namespace Ether
     {
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton<EtherClient>();
+            services.AddSingleton<EtherMenuService>();
         }
 
         public void Configure(IBlazorApplicationBuilder app)

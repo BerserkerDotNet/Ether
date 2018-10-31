@@ -1,5 +1,5 @@
 ﻿@page "/"
-@inject HttpClient Http
+@inject EtherClient Client
 @inject Microsoft.AspNetCore.Blazor.Services.IUriHelper UriHelper
 
 <div class="row">
@@ -29,8 +29,7 @@
 
     protected override async Task OnInitAsync()
     {
-        Microsoft.AspNetCore.Blazor.Browser.Http.BrowserHttpMessageHandler.DefaultCredentials = Microsoft.AspNetCore.Blazor.Browser.Http.FetchCredentialsOption.Include;
-        currentUser = await Http.GetStringAsync("http://localhost:5000/api/User/Name");
+        currentUser = await Client.GetCurrentUserNameAsync();
     }
 
     void Login()

@@ -22,12 +22,16 @@ namespace Ether.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddOptions();
+            services.Configure<DBConfiguration>(Configuration.GetSection("DbConfig"));
+
             services.Configure<IISOptions>(iis =>
             {
                 iis.AuthenticationDisplayName = "Windows";
                 iis.AutomaticAuthentication = false;
             });
 
+            services.AddResponseCompression();
             services.AddIdentityServer(o =>
             {
                 o.UserInteraction.LoginUrl = "/login/challenge";
