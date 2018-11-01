@@ -1,4 +1,5 @@
 ﻿using Autofac;
+using Ether.Contracts.Interfaces;
 using Ether.Contracts.Types;
 using Ether.Vsts.Dto;
 
@@ -13,6 +14,7 @@ namespace Ether.Vsts.Config
 
             builder.RegisterInstance(workItemIndex);
             builder.RegisterInstance(pullRequestIndex);
+            builder.RegisterType<VstsInitialMigration>().As<IMigration>();
 
             base.Load(builder);
         }

@@ -38,4 +38,8 @@
     <None Include="..\StyleCop.ruleset" Link="StyleCop.ruleset" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Ether.ViewModels\Ether.ViewModels.csproj" />
+  </ItemGroup>
+
 </Project>

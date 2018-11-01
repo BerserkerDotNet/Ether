@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Linq;
 using Autofac;
+using Ether.Contracts.Interfaces;
 using Ether.Contracts.Interfaces.CQS;
+using Ether.Core.Data;
 using Ether.Core.Types;
 
 namespace Ether.Core.Config
@@ -18,6 +20,13 @@ namespace Ether.Core.Config
             builder.RegisterAssemblyTypes(assemblies)
                 .AsClosedTypesOf(typeof(ICommandHandler<,>))
                 .AsImplementedInterfaces();
+
+            builder.RegisterType<MongoDbConfigurator>()
+                .As<IDbConfigurator>()
+                .SingleInstance();
+            builder.RegisterType<MongoRepository>()
+                .As<IRepository>()
+                .SingleInstance();
 
             base.Load(builder);
         }

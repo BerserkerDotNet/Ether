@@ -28,8 +28,7 @@ namespace Ether.Api.Controllers
         [Route(nameof(HasMenuAccess))]
         public IActionResult HasMenuAccess(string path, string category)
         {
-            var result = !"Settings".Equals(category);
-            return Ok(result);
+            return Ok(true);
         }
     }
 }

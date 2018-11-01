@@ -1,4 +1,7 @@
-﻿using Autofac;
+﻿using System;
+using Autofac;
+using Ether.Contracts.Interfaces;
+using Ether.Contracts.Types.Configuration;
 using Ether.Core.Config;
 using Ether.Vsts.Config;
 using Microsoft.AspNetCore.Builder;
@@ -23,7 +26,7 @@ namespace Ether.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddOptions();
-            services.Configure<DBConfiguration>(Configuration.GetSection("DbConfig"));
+            services.Configure<DbConfiguration>(Configuration.GetSection("DbConfig"));
 
             services.Configure<IISOptions>(iis =>
             {
@@ -58,6 +61,8 @@ namespace Ether.Api
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            RunMigrations(app);
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -78,6 +83,16 @@ namespace Ether.Api
 
             app.UseAuthentication();
             app.UseMvcWithDefaultRoute();
+        }
+
+        private void RunMigrations(IApplicationBuilder app)
+        {
+            var migrations = app.ApplicationServices.GetServices<IMigration>();
+            foreach (var migration in migrations)
+            {
+                // ToDo: This should be awaited
+                migration.Run();
+            }
         }
     }
 }

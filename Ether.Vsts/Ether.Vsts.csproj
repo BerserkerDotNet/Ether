@@ -26,6 +26,7 @@
 
   <ItemGroup>
     <PackageReference Include="Autofac" Version="4.8.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.1.1" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.0.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
@@ -34,6 +35,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Ether.Contracts\Ether.Contracts.csproj" />
+    <ProjectReference Include="..\Ether.ViewModels\Ether.ViewModels.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Handlers\Commands\" />
   </ItemGroup>
 
 </Project>

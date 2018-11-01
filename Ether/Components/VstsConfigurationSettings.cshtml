@@ -1,0 +1,24 @@
+﻿<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title">Vsts configuration</h4>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label>Instance name:</label>
+                    <input class="form-control" type="text" bind="@VstsDataSource.InstanceName" />
+                </div>
+                <div class="form-group">
+                    <label>Default Token:</label>
+                    <input class="form-control" type="password" bind="@VstsDataSource.DefaultToken" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@functions
+{
+    [Parameter] VstsDataSourceViewModel VstsDataSource { get; set; }
+}

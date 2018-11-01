@@ -179,6 +179,20 @@ namespace Ether.Core.Data
             return true;
         }
 
+        public async Task<bool> CreateIfDoesNotExistsAsync<T>(T item, Expression<Func<T, bool>> criteria)
+            where T : BaseDto
+        {
+            var collection = GetCollectionFor<T>();
+            var existingId = await GetFieldValueAsync<T, Guid>(criteria, o => o.Id);
+            if (existingId != Guid.Empty)
+            {
+                return false;
+            }
+
+            await collection.InsertOneAsync(item);
+            return true;
+        }
+
         public async Task<bool> CreateOrUpdateAsync<T>(T item)
             where T : BaseDto
         {

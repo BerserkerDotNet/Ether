@@ -43,6 +43,9 @@ namespace Ether.Contracts.Interfaces
         Task<bool> CreateAsync<T>(T item)
             where T : BaseDto;
 
+        Task<bool> CreateIfDoesNotExistsAsync<T>(T item, Expression<Func<T, bool>> criteria)
+            where T : BaseDto;
+
         Task<bool> CreateOrUpdateAsync<T>(T item)
             where T : BaseDto;
 

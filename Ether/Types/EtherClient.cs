@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Ether.ViewModels;
+using Microsoft.AspNetCore.Blazor;
 using Microsoft.AspNetCore.Blazor.Browser.Http;
 
 namespace Ether.Types
@@ -25,6 +27,11 @@ namespace Ether.Types
         {
             var result = await _httpClient.GetStringAsync($"User/HasMenuAccess?path={path}&category={category}");
             return bool.Parse(result);
+        }
+
+        public Task<VstsDataSourceViewModel> GetVstsDataSourceConfig()
+        {
+            return _httpClient.GetJsonAsync<VstsDataSourceViewModel>("Settings/VstsDataSourceConfiguration");
         }
     }
 }
