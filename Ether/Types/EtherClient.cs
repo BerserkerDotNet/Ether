@@ -33,5 +33,10 @@ namespace Ether.Types
         {
             return _httpClient.GetJsonAsync<VstsDataSourceViewModel>("Settings/VstsDataSourceConfiguration");
         }
+
+        public Task SaveVstsDataSourceConfig(VstsDataSourceViewModel model)
+        {
+            return _httpClient.PostJsonAsync("Settings/VstsDataSourceConfiguration", model);
+        }
     }
 }

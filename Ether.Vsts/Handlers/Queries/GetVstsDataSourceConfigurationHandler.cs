@@ -7,16 +7,16 @@ using Ether.Vsts.Queries;
 
 namespace Ether.Vsts.Handlers.Queries
 {
-    public class GetVstsDataSourceConfigurationQueryHandler : IQueryHandler<GetVstsDataSourceConfigurationQuery, VstsDataSourceViewModel>
+    public class GetVstsDataSourceConfigurationHandler : IQueryHandler<GetVstsDataSourceConfiguration, VstsDataSourceViewModel>
     {
         private readonly IRepository _repository;
 
-        public GetVstsDataSourceConfigurationQueryHandler(IRepository repository)
+        public GetVstsDataSourceConfigurationHandler(IRepository repository)
         {
             _repository = repository;
         }
 
-        public async Task<VstsDataSourceViewModel> Handle(GetVstsDataSourceConfigurationQuery input)
+        public async Task<VstsDataSourceViewModel> Handle(GetVstsDataSourceConfiguration input)
         {
             var setting = await _repository.GetSingleAsync<VstsDataSourceSettings>(s => s.Type == "Vsts");
             if (setting == null)

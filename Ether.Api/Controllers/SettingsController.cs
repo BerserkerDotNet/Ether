@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Ether.Contracts.Interfaces.CQS;
 using Ether.ViewModels;
+using Ether.Vsts.Commands;
 using Ether.Vsts.Queries;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -24,8 +25,16 @@ namespace Ether.Api.Controllers
         [Route("VstsDataSourceConfiguration")]
         public async Task<IActionResult> GetVstsDataSourceConfiguration()
         {
-            var model = await _mediator.Request<GetVstsDataSourceConfigurationQuery, VstsDataSourceViewModel>(new GetVstsDataSourceConfigurationQuery());
+            var model = await _mediator.Request<GetVstsDataSourceConfiguration, VstsDataSourceViewModel>(new GetVstsDataSourceConfiguration());
             return new JsonResult(model);
+        }
+
+        [HttpPost]
+        [Route("VstsDataSourceConfiguration")]
+        public async Task<ActionResult> SaveVstsDataSourceConfiguration(VstsDataSourceViewModel model)
+        {
+            await _mediator.Execute(new SaveVstsDataSourceConfiguration { Configuration = model });
+            return Ok();
         }
     }
 }

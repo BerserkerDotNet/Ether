@@ -13,6 +13,7 @@
                     <label>Default Token:</label>
                     <input class="form-control" type="password" bind="@VstsDataSource.DefaultToken" />
                 </div>
+                <button class="btn btn-success btn-fill pull-right" onclick="@(() => OnSave(VstsDataSource))">Save</button>
             </div>
         </div>
     </div>
@@ -21,4 +22,6 @@
 @functions
 {
     [Parameter] VstsDataSourceViewModel VstsDataSource { get; set; }
+
+    [Parameter] Func<VstsDataSourceViewModel, Task> OnSave { get; set; }
 }

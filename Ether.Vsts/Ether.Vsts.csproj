@@ -38,8 +38,4 @@
     <ProjectReference Include="..\Ether.ViewModels\Ether.ViewModels.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Handlers\Commands\" />
-  </ItemGroup>
-
 </Project>

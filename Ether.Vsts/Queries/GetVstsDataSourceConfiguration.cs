@@ -3,7 +3,7 @@ using Ether.ViewModels;
 
 namespace Ether.Vsts.Queries
 {
-    public class GetVstsDataSourceConfigurationQuery : IQuery<VstsDataSourceViewModel>
+    public class GetVstsDataSourceConfiguration : IQuery<VstsDataSourceViewModel>
     {
     }
 }

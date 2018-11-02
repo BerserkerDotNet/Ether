@@ -13,14 +13,14 @@ namespace Ether.Tests.Handlers.Queries
     [TestFixture]
     public class GetVstsDataSourceConfigurationQueryHandlerTests
     {
-        private GetVstsDataSourceConfigurationQueryHandler _handler;
+        private GetVstsDataSourceConfigurationHandler _handler;
         private Mock<IRepository> _repositoryMock;
 
         [SetUp]
         public void SetUp()
         {
             _repositoryMock = new Mock<IRepository>(MockBehavior.Strict);
-            _handler = new GetVstsDataSourceConfigurationQueryHandler(_repositoryMock.Object);
+            _handler = new GetVstsDataSourceConfigurationHandler(_repositoryMock.Object);
         }
 
         [Test]
@@ -37,7 +37,7 @@ namespace Ether.Tests.Handlers.Queries
         {
             SetupGetSingle(null);
 
-            var result = await _handler.Handle(new Vsts.Queries.GetVstsDataSourceConfigurationQuery());
+            var result = await _handler.Handle(new Vsts.Queries.GetVstsDataSourceConfiguration());
 
             result.Should().BeNull();
         }
@@ -53,7 +53,7 @@ namespace Ether.Tests.Handlers.Queries
             };
             SetupGetSingle(expected);
 
-            var result = await _handler.Handle(new Vsts.Queries.GetVstsDataSourceConfigurationQuery());
+            var result = await _handler.Handle(new Vsts.Queries.GetVstsDataSourceConfiguration());
 
             result.Should().NotBeNull();
             result.Id.Should().Be(expected.Id);

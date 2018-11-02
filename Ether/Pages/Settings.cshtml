@@ -1,7 +1,7 @@
 ﻿@page "/settings"
 @inject EtherClient Client
 
-<VstsConfigurationSettings VstsDataSource="vstsDataSource">
+<VstsConfigurationSettings VstsDataSource="vstsDataSource" OnSave="Save">
 </VstsConfigurationSettings>
 
 @functions
@@ -10,5 +10,10 @@
     protected override async Task OnInitAsync()
     {
         vstsDataSource = await Client.GetVstsDataSourceConfig();
+    }
+
+    private async Task Save(VstsDataSourceViewModel model)
+    {
+        await Client.SaveVstsDataSourceConfig(model);
     }
 }
