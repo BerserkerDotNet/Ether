@@ -1,5 +1,6 @@
 ﻿using System;
 using Autofac;
+using AutoMapper;
 using Ether.Contracts.Interfaces;
 using Ether.Contracts.Types.Configuration;
 using Ether.Core.Config;
@@ -33,6 +34,13 @@ namespace Ether.Api
                 iis.AuthenticationDisplayName = "Windows";
                 iis.AutomaticAuthentication = false;
             });
+
+            // Auto Mapper Configurations
+            var mappingConfig = new MapperConfiguration(mc =>
+            {
+                mc.AddProfile(new CoreMappingProfile());
+            });
+            services.AddSingleton(mappingConfig.CreateMapper());
 
             services.AddResponseCompression();
             services.AddIdentityServer(o =>

@@ -18,7 +18,7 @@ namespace Ether.Vsts.Handlers.Queries
 
         public async Task<VstsDataSourceViewModel> Handle(GetVstsDataSourceConfiguration input)
         {
-            var setting = await _repository.GetSingleAsync<VstsDataSourceSettings>(s => s.Type == "Vsts");
+            var setting = await _repository.GetSingleAsync<VstsDataSourceSettings>(s => s.Type == Constants.VstsDataSourceType);
             if (setting == null)
             {
                 return null;

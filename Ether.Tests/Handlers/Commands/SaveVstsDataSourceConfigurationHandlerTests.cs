@@ -3,6 +3,7 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Ether.Contracts.Interfaces;
 using Ether.ViewModels;
+using Ether.Vsts;
 using Ether.Vsts.Commands;
 using Ether.Vsts.Dto;
 using Ether.Vsts.Handlers.Commands;
@@ -67,7 +68,7 @@ namespace Ether.Tests.Handlers.Commands
         private bool CheckCriteria(Expression<Func<VstsDataSourceSettings, bool>> criteria)
         {
             var right = ((BinaryExpression)criteria.Body).Right;
-            return string.Equals(((ConstantExpression)right).Value, "Vsts");
+            return string.Equals(((ConstantExpression)right).Value, Constants.VstsDataSourceType);
         }
     }
 }

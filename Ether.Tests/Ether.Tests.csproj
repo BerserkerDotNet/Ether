@@ -27,6 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="7.0.1" />
     <PackageReference Include="FluentAssertions" Version="5.4.2" />
     <PackageReference Include="Moq" Version="4.10.0" />
     <PackageReference Include="nunit" Version="3.10.1" />
@@ -39,6 +40,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Ether.Core\Ether.Core.csproj" />
     <ProjectReference Include="..\Ether.Vsts\Ether.Vsts.csproj" />
   </ItemGroup>
 

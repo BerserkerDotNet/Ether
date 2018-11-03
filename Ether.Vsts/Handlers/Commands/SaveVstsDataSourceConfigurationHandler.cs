@@ -25,7 +25,7 @@ namespace Ether.Vsts.Handlers.Commands
             }
 
             var config = input.Configuration;
-            await _repository.CreateOrUpdateIfAsync(i => i.Type == "Vsts", new VstsDataSourceSettings
+            await _repository.CreateOrUpdateIfAsync(i => i.Type == Constants.VstsDataSourceType, new VstsDataSourceSettings
             {
                 Id = config.Id,
                 DefaultToken = config.DefaultToken,

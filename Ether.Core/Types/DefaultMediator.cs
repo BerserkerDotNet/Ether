@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
 using Autofac;
@@ -70,6 +71,24 @@ namespace Ether.Core.Types
                 ExceptionDispatchInfo.Capture(ex).Throw();
                 throw;
             }
+        }
+
+        public Task<TResult> Request<TQuery, TResult>()
+            where TQuery : IQuery<TResult>, new()
+        {
+            return Request<TQuery, TResult>(new TQuery());
+        }
+
+        public Task<IEnumerable<TResult>> RequestCollection<TQuery, TResult>(IQuery<IEnumerable<TResult>> query)
+            where TQuery : IQuery<IEnumerable<TResult>>
+        {
+            return Request<TQuery, IEnumerable<TResult>>(query);
+        }
+
+        public Task<IEnumerable<TResult>> RequestCollection<TQuery, TResult>()
+            where TQuery : IQuery<IEnumerable<TResult>>, new()
+        {
+            return RequestCollection<TQuery, TResult>(new TQuery());
         }
     }
 }

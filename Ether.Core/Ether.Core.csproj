@@ -26,6 +26,7 @@
   
   <ItemGroup>
     <PackageReference Include="Autofac" Version="4.8.1" />
+    <PackageReference Include="AutoMapper" Version="7.0.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.1.1" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="2.1.1" />
     <PackageReference Include="MongoDB.Driver" Version="2.7.0" />
@@ -37,10 +38,6 @@
   
   <ItemGroup>
     <ProjectReference Include="..\Ether.Contracts\Ether.Contracts.csproj" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <Folder Include="Types\Handlers\Commands\" />
-    <Folder Include="Types\Handlers\Queries\" />
+    <ProjectReference Include="..\Ether.ViewModels\Ether.ViewModels.csproj" />
   </ItemGroup>
 </Project>
