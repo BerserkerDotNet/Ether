@@ -1,6 +1,7 @@
 ﻿using System;
 using Autofac;
 using AutoMapper;
+using Ether.Api.Types;
 using Ether.Contracts.Interfaces;
 using Ether.Contracts.Types.Configuration;
 using Ether.Core.Config;
@@ -53,7 +54,10 @@ namespace Ether.Api
             services.AddAuthentication();
 
             services.AddCors();
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddMvc(o =>
+            {
+                o.Conventions.Add(new NotFoundOnNullResultFilterConvention());
+            }).SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new Info { Title = "Ether API", Version = "v1" });

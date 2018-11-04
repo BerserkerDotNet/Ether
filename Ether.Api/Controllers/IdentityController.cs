@@ -27,15 +27,17 @@ namespace Ether.Api.Controllers
         public async Task<IActionResult> GetAll()
         {
             var result = await _mediator.RequestCollection<GetAllIdentities, IdentityViewModel>();
-            return new JsonResult(result);
+            return Ok(result);
         }
 
         [HttpGet]
         [Route(nameof(GetById))]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(404)]
         public async Task<IActionResult> GetById(Guid id)
         {
             var result = await _mediator.Request<GetIdentityById, IdentityViewModel>();
-            return new JsonResult(result);
+            return Ok(result);
         }
 
         [HttpPost]

@@ -21,7 +21,7 @@ namespace Ether.Api.Controllers
         [Route("Name")]
         public IActionResult GetName()
         {
-            return new JsonResult(User.Identity.Name);
+            return Ok(User.Identity.Name);
         }
 
         [HttpGet]

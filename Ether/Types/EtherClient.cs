@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Ether.ViewModels;
@@ -37,6 +38,21 @@ namespace Ether.Types
         public Task SaveVstsDataSourceConfig(VstsDataSourceViewModel model)
         {
             return _httpClient.PostJsonAsync("Settings/VstsDataSourceConfiguration", model);
+        }
+
+        public Task<IEnumerable<IdentityViewModel>> GetIdentities()
+        {
+            return _httpClient.GetJsonAsync<IEnumerable<IdentityViewModel>>("Identity/GetAll");
+        }
+
+        public Task SaveIdentity(IdentityViewModel model)
+        {
+            return _httpClient.PostJsonAsync("Identity/Save", model);
+        }
+
+        public Task DeleteIdentity(Guid id)
+        {
+            return _httpClient.DeleteAsync($"Identity/Delete?id={id}");
         }
     }
 }

@@ -28,6 +28,7 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="7.0.1" />
+    <PackageReference Include="ExpectedObjects" Version="2.3.4" />
     <PackageReference Include="FluentAssertions" Version="5.4.2" />
     <PackageReference Include="Moq" Version="4.10.0" />
     <PackageReference Include="nunit" Version="3.10.1" />

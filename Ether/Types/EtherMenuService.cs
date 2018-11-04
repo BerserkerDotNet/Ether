@@ -19,7 +19,11 @@ namespace Ether.Types
             Menu = new List<MenuItem>(3);
             await AddItem(new MenuItem("Home", "paper-2", string.Empty, "Reports"));
             await AddItem(new MenuItem("Reports", "single-copy-04", "reports", "Reports"));
-            await AddItem(new MenuItem("Settings", "single-02", "settings", "Settings"));
+
+            // var vstsSettings = new MenuContainer("Vsts", "Vector", "Vsts Settings");
+            // vstsSettings.Children.Add(new MenuItem("Projects", "single-copy-04", "vsts/projects", "Vsts Projects"));
+            // await AddItem(vstsSettings);
+            await AddItem(new MenuItem("Settings", "settings-gear-64", "settings", "Settings"));
         }
 
         private async Task AddItem(MenuItem item)

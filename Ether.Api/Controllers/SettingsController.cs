@@ -26,7 +26,7 @@ namespace Ether.Api.Controllers
         public async Task<IActionResult> GetVstsDataSourceConfiguration()
         {
             var model = await _mediator.Request<GetVstsDataSourceConfiguration, VstsDataSourceViewModel>(new GetVstsDataSourceConfiguration());
-            return new JsonResult(model);
+            return Ok(model);
         }
 
         [HttpPost]

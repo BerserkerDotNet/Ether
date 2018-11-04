@@ -1,14 +1,23 @@
 ﻿@page "/settings"
 @inject EtherClient Client
 
-<VstsConfigurationSettings VstsDataSource="vstsDataSource" OnSave="Save">
-</VstsConfigurationSettings>
+<div class="row">
+    <div class="col-md-6">
+        <Identities Records="identities" Client="Client" />
+    </div>
+        <div class="col-md-6">
+        <VstsConfigurationSettings VstsDataSource="vstsDataSource" OnSave="Save" />
+    </div>
+</div>
 
 @functions
 { 
     private VstsDataSourceViewModel vstsDataSource = new VstsDataSourceViewModel();
+    private IEnumerable<IdentityViewModel> identities = Enumerable.Empty<IdentityViewModel>();
+
     protected override async Task OnInitAsync()
     {
+        identities = await Client.GetIdentities();
         vstsDataSource = await Client.GetVstsDataSourceConfig();
     }
 
