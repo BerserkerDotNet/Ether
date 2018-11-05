@@ -9,7 +9,13 @@
         </div>
         <div class="form-group">
             <label>Default Token:</label>
-            <input class="form-control" type="password" bind="@VstsDataSource.DefaultToken" />
+            <select class="form-control" bind="@DefaultTokenValue">
+                <option>None</option>
+                @foreach (var identity in Identities)
+                {
+                    <option value="@identity.Id">@identity.Name</option>
+                }
+            </select>
         </div>
     </div>
     <div class="card-footer">
@@ -20,7 +26,21 @@
 
 @functions
 {
-[Parameter] VstsDataSourceViewModel VstsDataSource { get; set; }
+    [Parameter] VstsDataSourceViewModel VstsDataSource { get; set; }
 
-[Parameter] Func<VstsDataSourceViewModel, Task> OnSave { get; set; }
+    [Parameter] Func<VstsDataSourceViewModel, Task> OnSave { get; set; }
+
+    [Parameter] IEnumerable<IdentityViewModel> Identities { get; set; }
+
+    private string DefaultTokenValue
+    {
+        get
+        {
+            return VstsDataSource.DefaultToken?.ToString();
+        }
+        set
+        {
+            VstsDataSource.DefaultToken = string.IsNullOrEmpty(value) ? (Guid?)null : (Guid?)Guid.Parse(value);
+        }
+    }
 }

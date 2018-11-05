@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using AutoMapper;
 using Ether.Contracts.Dto;
 using Ether.Contracts.Interfaces;
@@ -44,6 +45,14 @@ namespace Ether.Tests.Handlers
 
             RepositoryMock.Setup(r => r.GetSingleAsync<T>(It.Is<Guid>(e => predicate(e))))
                 .ReturnsAsync(value)
+                .Verifiable();
+        }
+
+        protected void SetupMultiple<T>(IEnumerable<T> values)
+            where T : BaseDto
+        {
+            RepositoryMock.Setup(r => r.GetAllAsync<T>())
+                .ReturnsAsync(values)
                 .Verifiable();
         }
 

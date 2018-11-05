@@ -20,10 +20,27 @@ namespace Ether.Core.Types
             _logger = logger;
         }
 
-        public Task Execute<TCommand>(TCommand command)
+        public async Task Execute<TCommand>(TCommand command)
             where TCommand : ICommand
         {
-            return Execute<TCommand, UnitType>(command);
+            try
+            {
+                _logger.LogInformation($"Executing {typeof(TCommand).Name} command.");
+                var handler = _context.Resolve<ICommandHandler<TCommand>>();
+                if (handler == null)
+                {
+                    throw new NotSupportedException($"No handler registered for command '{typeof(TCommand)}'");
+                }
+
+                await handler.Handle(command);
+                _logger.LogInformation($"Executed {typeof(TCommand).Name} command.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error executing {typeof(TCommand).Name} command.");
+                ExceptionDispatchInfo.Capture(ex).Throw();
+                throw;
+            }
         }
 
         public async Task<TResult> Execute<TCommand, TResult>(ICommand<TResult> command)

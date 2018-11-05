@@ -1,4 +1,5 @@
-﻿using Ether.Contracts.Attributes;
+﻿using System;
+using Ether.Contracts.Attributes;
 using Ether.Contracts.Dto;
 
 namespace Ether.Vsts.Dto
@@ -11,7 +12,7 @@ namespace Ether.Vsts.Dto
         {
         }
 
-        public string DefaultToken { get; set; }
+        public Guid? DefaultToken { get; set; }
 
         public string InstanceName { get; set; }
     }

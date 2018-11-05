@@ -46,7 +46,7 @@ namespace Ether.Tests.Handlers.Commands
             var config = new VstsDataSourceViewModel
             {
                 Id = Guid.NewGuid(),
-                DefaultToken = "Secret",
+                DefaultToken = Guid.NewGuid(),
                 InstanceName = "Fooooo"
             };
             _repositorMock.Setup(r => r.CreateOrUpdateIfAsync(It.Is<Expression<Func<VstsDataSourceSettings, bool>>>(e => CheckCriteria(e)), It.Is<VstsDataSourceSettings>(s => CheckDtoRecord(config, s))))

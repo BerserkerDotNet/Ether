@@ -3,12 +3,11 @@ using System.Threading.Tasks;
 using Ether.Contracts.Dto;
 using Ether.Contracts.Interfaces;
 using Ether.Contracts.Interfaces.CQS;
-using Ether.Contracts.Types;
 using Ether.Core.Types.Commands;
 
 namespace Ether.Core.Types.Handlers.Commands
 {
-    public class DeleteIdentityHandler : ICommandHandler<DeleteIdentity, UnitType>
+    public class DeleteIdentityHandler : ICommandHandler<DeleteIdentity>
     {
         private readonly IRepository _repository;
 
@@ -17,7 +16,7 @@ namespace Ether.Core.Types.Handlers.Commands
             _repository = repository;
         }
 
-        public async Task<UnitType> Handle(DeleteIdentity input)
+        public async Task Handle(DeleteIdentity input)
         {
             if (input == null)
             {
@@ -25,8 +24,6 @@ namespace Ether.Core.Types.Handlers.Commands
             }
 
             await _repository.DeleteAsync<Identity>(input.Id);
-
-            return UnitType.Default;
         }
     }
 }

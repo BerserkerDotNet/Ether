@@ -1,32 +1,32 @@
 ﻿using System;
 using System.Threading.Tasks;
 using AutoMapper;
-using Ether.Contracts.Dto;
 using Ether.Contracts.Interfaces;
 using Ether.Contracts.Interfaces.CQS;
-using Ether.Core.Types.Commands;
+using Ether.Vsts.Commands;
+using Ether.Vsts.Dto;
 
-namespace Ether.Core.Types.Handlers.Commands
+namespace Ether.Vsts.Handlers.Commands
 {
-    public class SaveIdentityHandler : ICommandHandler<SaveIdentity>
+    public class SaveProjectHandler : ICommandHandler<SaveProject>
     {
         private readonly IRepository _repository;
         private readonly IMapper _mapper;
 
-        public SaveIdentityHandler(IRepository repository, IMapper mapper)
+        public SaveProjectHandler(IRepository repository, IMapper mapper)
         {
             _repository = repository;
             _mapper = mapper;
         }
 
-        public async Task Handle(SaveIdentity input)
+        public async Task Handle(SaveProject input)
         {
-            if (input == null || input.Identity == null)
+            if (input == null || input.Project == null)
             {
                 throw new ArgumentNullException(nameof(input));
             }
 
-            var dto = _mapper.Map<Identity>(input.Identity);
+            var dto = _mapper.Map<Project>(input.Project);
             await _repository.CreateOrUpdateAsync(dto);
         }
     }

@@ -6,4 +6,9 @@ namespace Ether.Contracts.Interfaces.CQS
     {
         Task<TResult> Handle(TCommand input);
     }
+
+    public interface ICommandHandler<TCommand>
+    {
+        Task Handle(TCommand input);
+    }
 }

@@ -49,7 +49,7 @@ namespace Ether.Tests.Handlers.Queries
             var expected = new VstsDataSourceSettings
             {
                 Id = Guid.NewGuid(),
-                DefaultToken = "FakeToken",
+                DefaultToken = Guid.NewGuid(),
                 InstanceName = "Dummy"
             };
             SetupGetSingle(expected);

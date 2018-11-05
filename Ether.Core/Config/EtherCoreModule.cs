@@ -20,6 +20,9 @@ namespace Ether.Core.Config
             builder.RegisterAssemblyTypes(assemblies)
                 .AsClosedTypesOf(typeof(ICommandHandler<,>))
                 .AsImplementedInterfaces();
+            builder.RegisterAssemblyTypes(assemblies)
+                .AsClosedTypesOf(typeof(ICommandHandler<>))
+                .AsImplementedInterfaces();
 
             builder.RegisterType<MongoDbConfigurator>()
                 .As<IDbConfigurator>()

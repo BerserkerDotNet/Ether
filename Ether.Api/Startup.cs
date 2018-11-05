@@ -40,6 +40,7 @@ namespace Ether.Api
             var mappingConfig = new MapperConfiguration(mc =>
             {
                 mc.AddProfile(new CoreMappingProfile());
+                mc.AddProfile(new VstsMappingProfile());
             });
             services.AddSingleton(mappingConfig.CreateMapper());
 

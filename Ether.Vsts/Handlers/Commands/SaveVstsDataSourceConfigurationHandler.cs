@@ -2,13 +2,12 @@
 using System.Threading.Tasks;
 using Ether.Contracts.Interfaces;
 using Ether.Contracts.Interfaces.CQS;
-using Ether.Contracts.Types;
 using Ether.Vsts.Commands;
 using Ether.Vsts.Dto;
 
 namespace Ether.Vsts.Handlers.Commands
 {
-    public class SaveVstsDataSourceConfigurationHandler : ICommandHandler<SaveVstsDataSourceConfiguration, UnitType>
+    public class SaveVstsDataSourceConfigurationHandler : ICommandHandler<SaveVstsDataSourceConfiguration>
     {
         private readonly IRepository _repository;
 
@@ -17,7 +16,7 @@ namespace Ether.Vsts.Handlers.Commands
             _repository = repository;
         }
 
-        public async Task<UnitType> Handle(SaveVstsDataSourceConfiguration input)
+        public async Task Handle(SaveVstsDataSourceConfiguration input)
         {
             if (input == null || input.Configuration == null)
             {
@@ -31,8 +30,6 @@ namespace Ether.Vsts.Handlers.Commands
                 DefaultToken = config.DefaultToken,
                 InstanceName = config.InstanceName
             });
-
-            return UnitType.Default;
         }
     }
 }
