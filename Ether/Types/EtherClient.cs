@@ -40,19 +40,34 @@ namespace Ether.Types
             return _httpClient.PostJsonAsync("Settings/VstsDataSourceConfiguration", model);
         }
 
-        public Task<IEnumerable<IdentityViewModel>> GetIdentities()
+        public Task<IEnumerable<T>> GetAll<T>()
         {
-            return _httpClient.GetJsonAsync<IEnumerable<IdentityViewModel>>("Identity/GetAll");
+            return _httpClient.GetJsonAsync<IEnumerable<T>>($"{GetPathFor<T>()}/GetAll");
         }
 
-        public Task SaveIdentity(IdentityViewModel model)
+        public Task Save<T>(T model)
         {
-            return _httpClient.PostJsonAsync("Identity/Save", model);
+            return _httpClient.PostJsonAsync($"{GetPathFor<T>()}/Save", model);
         }
 
-        public Task DeleteIdentity(Guid id)
+        public Task Delete<T>(Guid id)
         {
-            return _httpClient.DeleteAsync($"Identity/Delete?id={id}");
+            return _httpClient.DeleteAsync($"{GetPathFor<T>()}/Delete?id={id}");
+        }
+
+        private string GetPathFor<T>()
+        {
+            var type = typeof(T);
+            if (type == typeof(VstsProjectViewModel))
+            {
+                return "vsts/project";
+            }
+            else if (type == typeof(IdentityViewModel))
+            {
+                return "identity";
+            }
+
+            return string.Empty;
         }
     }
 }

@@ -1855,7 +1855,7 @@ fieldset[disabled] .form-control {
     display: inline-block;
     position: relative;
     cursor: pointer;
-    padding-left: 35px;
+    /*padding-left: 35px;*/
     line-height: 26px;
     margin-bottom: 0;
 }
@@ -1896,12 +1896,12 @@ fieldset[disabled] .form-control {
     cursor: not-allowed;
 }
 
-.form-check input[type="checkbox"],
+/*.form-check input[type="checkbox"],
 .form-check-radio input[type="radio"] {
     opacity: 0;
     position: absolute;
     visibility: hidden;
-}
+}*/
 
 .form-check input[type="checkbox"]:checked+.form-check-sign::after {
     opacity: 1;

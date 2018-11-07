@@ -1,114 +1,61 @@
-﻿@if (isEditing && selectedIdentity != null)
-{<div class="card">
-        <div class="card-header">
-            @if (selectedIdentity.Id == Guid.Empty)
+﻿@inherits EditableTable<IdentityViewModel>
+
+@if (IsEditing)
+{
+    <Card>
+        <Header>
+            @if (EditingItem.Id == Guid.Empty)
             {
                 <h4 class="card-title">New Identity</h4>
             }
             else
             {
-                <h4 class="card-title">Editing '@selectedIdentity.Name'</h4>
+                <h4 class="card-title">Editing '@EditingItem.Name'</h4>
             }
-        </div>
-        <div class="card-body">
+        </Header>
+        <Body>
             <div class="form-group">
                 <label>Name:</label>
-                <input class="form-control" type="text" bind="selectedIdentity.Name" />
+                <input class="form-control" type="text" bind="EditingItem.Name" />
             </div>
             <div class="form-group">
                 <label>Token:</label>
-                <input class="form-control" type="password" bind="selectedIdentity.Token" />
+                <input class="form-control" type="password" bind="EditingItem.Token" />
             </div>
             <div class="form-group">
                 <label>Expiration date:</label>
-                <input class="form-control" type="date" bind="selectedIdentity.ExpirationDate" />
+                <input class="form-control" type="date" bind="EditingItem.ExpirationDate" />
             </div>
-        </div>
-        <div class="card-footer">
+        </Body>
+        <Footer>
             <button class="btn btn-success btn-fill pull-right" onclick="@(() => Save())">Save</button>
             <button class="btn btn-danger btn-fill pull-right" onclick="@(() => Cancel())">Cancel</button>
-        </div>
-    </div>
+        </Footer>
+    </Card>
 }
 else
 {
-    <div class="card">
-        <div class="card-header">
-            <h4 class="card-title">Identities</h4>
-        </div>
-        <div class="card-body">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Expiration Date</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var identity in Records)
-                    {
-                        <tr>
-                            <td>@identity.Name</td>
-                            <td>@identity.ExpirationDate</td>
-                            <td>
-                                <div>
-                                    <button class="btn btn-warning btn-fill" onclick="@(() => Edit(identity))">Edit</button>
-                                    <button class="btn btn-danger btn-fill" onclick="@(() => Delete(identity))">Delete</button>
-                                </div>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-        <div class="card-footer">
-            <button class="btn btn-success btn-fill pull-right" onclick="@(() => New())">New</button>
-        </div>
-    </div>
-}
-
-@functions
-{
-    private bool isEditing = false;
-    private IdentityViewModel selectedIdentity = null;
-
-    [Parameter] IEnumerable<IdentityViewModel> Records { get; set; }
-
-    [Parameter] EtherClient Client { get; set; }
-
-    private void New()
-    {
-        Edit(new IdentityViewModel());
-    }
-
-    private void Edit(IdentityViewModel model)
-    {
-        selectedIdentity = model;
-        isEditing = true;
-    }
-
-    private async Task Save()
-    {
-        await Client.SaveIdentity(selectedIdentity);
-        Records = await Client.GetIdentities();
-        selectedIdentity = null;
-        isEditing = false;
-    }
-
-    private void Cancel()
-    {
-        selectedIdentity = null;
-        isEditing = false;
-    }
-
-    private async Task Delete(IdentityViewModel model)
-    {
-        var delete = await Confirm($"Are you sure you want to delete '{model.Name}'?");
-        if (delete)
-        {
-            await Client.DeleteIdentity(model.Id);
-            Records = await Client.GetIdentities();
-        }
-    }
+    <Card>
+        <Header><h4 class="card-title">Identities</h4></Header>
+        <Body>
+            <DataTable Items="@Items">
+                <TableHeader>
+                    <th>Name</th>
+                    <th>Expiration Date</th>
+                    <th>Actions</th>
+                </TableHeader>
+                <RowTemplate Context="identity">
+                    <td>@identity.Name</td>
+                    <td>@identity.ExpirationDate</td>
+                    <td>
+                        <div>
+                            <button class="btn btn-warning btn-fill" onclick="@(() => Edit(identity))">Edit</button>
+                            <button class="btn btn-danger btn-fill" onclick="@(() => Delete(identity))">Delete</button>
+                        </div>
+                    </td>
+                </RowTemplate>
+            </DataTable>
+        </Body>
+        <Footer><button class="btn btn-success btn-fill pull-right" onclick="@(() => New())">New</button></Footer>
+    </Card>
 }

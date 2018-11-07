@@ -3,7 +3,7 @@
 
 <div class="row">
     <div class="col-md-6">
-        <Identities Records="identities" Client="Client" />
+        <Identities />
     </div>
         <div class="col-md-6">
         <VstsConfigurationSettings VstsDataSource="vstsDataSource" Identities="identities" OnSave="Save" />
@@ -17,7 +17,7 @@
 
     protected override async Task OnInitAsync()
     {
-        identities = await Client.GetIdentities();
+        identities = await Client.GetAll<IdentityViewModel>();
         vstsDataSource = await Client.GetVstsDataSourceConfig();
     }
 

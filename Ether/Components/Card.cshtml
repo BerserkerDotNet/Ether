@@ -1,0 +1,18 @@
+﻿<div class="card">
+    <div class="card-header">
+        @Header
+    </div>
+    <div class="card-body">
+        @Body
+    </div>
+    <div class="card-footer">
+        @Footer
+    </div>
+</div>
+
+@functions
+{
+    [Parameter] RenderFragment Header { get; set; }
+    [Parameter] RenderFragment Body { get; set; }
+    [Parameter] RenderFragment Footer { get; set; }
+}

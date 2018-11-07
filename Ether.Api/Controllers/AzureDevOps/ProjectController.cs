@@ -41,7 +41,7 @@ namespace Ether.Api.Controllers.AzureDevOps
         [Route(nameof(Delete))]
         public Task Delete(Guid id)
         {
-            return Task.CompletedTask;
+            return _mediator.Execute(new DeleteProject { Id = id });
         }
     }
 }
