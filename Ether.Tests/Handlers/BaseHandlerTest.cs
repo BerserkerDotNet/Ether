@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using AutoMapper;
 using Ether.Contracts.Dto;
 using Ether.Contracts.Interfaces;
@@ -22,6 +23,7 @@ namespace Ether.Tests.Handlers
             var mappingConfig = new MapperConfiguration(mc =>
             {
                 mc.AddProfile(new CoreMappingProfile());
+                InitializeMappings(mc);
             });
             Mapper = mappingConfig.CreateMapper();
             RepositoryMock = new Mock<IRepository>(MockBehavior.Strict);
@@ -56,6 +58,14 @@ namespace Ether.Tests.Handlers
                 .Verifiable();
         }
 
+        protected void SetupMultiple<T>(Func<Expression, bool> predicateCheck, IEnumerable<T> values)
+            where T : BaseDto
+        {
+            RepositoryMock.Setup(r => r.GetAsync(It.Is<Expression<Func<T, bool>>>(e => predicateCheck(e))))
+                .ReturnsAsync(values)
+                .Verifiable();
+        }
+
         protected void SetupCreateOrUpdate<T, TModel>(TModel model)
             where T : BaseDto
         {
@@ -79,6 +89,10 @@ namespace Ether.Tests.Handlers
         }
 
         protected virtual void Initialize()
+        {
+        }
+
+        protected virtual void InitializeMappings(IMapperConfigurationExpression config)
         {
         }
     }

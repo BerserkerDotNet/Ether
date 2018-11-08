@@ -1,29 +1,17 @@
 ﻿using System;
-using System.Threading.Tasks;
 using Ether.Contracts.Interfaces;
-using Ether.Contracts.Interfaces.CQS;
 using Ether.Vsts.Commands;
 using Ether.Vsts.Dto;
 
 namespace Ether.Vsts.Handlers.Commands
 {
-    public class DeleteProjectHandler : ICommandHandler<DeleteProject>
+    public class DeleteProjectHandler : DeleteHandler<Project, DeleteProject>
     {
-        private readonly IRepository _repository;
-
         public DeleteProjectHandler(IRepository repository)
+            : base(repository)
         {
-            _repository = repository;
         }
 
-        public async Task Handle(DeleteProject input)
-        {
-            if (input == null)
-            {
-                throw new ArgumentNullException(nameof(input));
-            }
-
-            await _repository.DeleteAsync<Project>(input.Id);
-        }
+        protected override Guid GetId(DeleteProject command) => command.Id;
     }
 }

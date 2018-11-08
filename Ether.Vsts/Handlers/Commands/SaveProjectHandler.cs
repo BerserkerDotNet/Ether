@@ -1,33 +1,26 @@
 ﻿using System;
-using System.Threading.Tasks;
 using AutoMapper;
 using Ether.Contracts.Interfaces;
-using Ether.Contracts.Interfaces.CQS;
 using Ether.Vsts.Commands;
 using Ether.Vsts.Dto;
 
 namespace Ether.Vsts.Handlers.Commands
 {
-    public class SaveProjectHandler : ICommandHandler<SaveProject>
+    public class SaveProjectHandler : SaveHandler<Project, SaveProject>
     {
-        private readonly IRepository _repository;
-        private readonly IMapper _mapper;
-
         public SaveProjectHandler(IRepository repository, IMapper mapper)
+            : base(repository, mapper)
         {
-            _repository = repository;
-            _mapper = mapper;
         }
 
-        public async Task Handle(SaveProject input)
+        protected override void ValidateCommand(SaveProject command)
         {
-            if (input == null || input.Project == null)
+            if (command.Project == null)
             {
-                throw new ArgumentNullException(nameof(input));
+                throw new ArgumentNullException(nameof(command.Project));
             }
-
-            var dto = _mapper.Map<Project>(input.Project);
-            await _repository.CreateOrUpdateAsync(dto);
         }
+
+        protected override object GetData(SaveProject command) => command.Project;
     }
 }

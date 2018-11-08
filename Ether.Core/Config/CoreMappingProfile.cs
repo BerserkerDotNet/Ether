@@ -4,7 +4,7 @@ using Ether.ViewModels;
 
 namespace Ether.Core.Config
 {
-    public class CoreMappingProfile : Profile
+    public class CoreMappingProfile : AutoMapper.Profile
     {
         public CoreMappingProfile()
         {

@@ -1,0 +1,59 @@
+﻿@inherits EditableTable<VstsTeamMemberViewModel>
+
+@if (IsEditing)
+{
+    <Card>
+        <Header>
+            @if (EditingItem.Id == Guid.Empty)
+            {
+                <h4 class="card-title">New member</h4>
+            }
+            else
+            {
+                <h4 class="card-title">Editing '@EditingItem.DisplayName'</h4>
+            }
+        </Header>
+        <Body>
+            <div class="form-group">
+                <label>Display Name:</label>
+                <input class="form-control" type="text" bind="EditingItem.DisplayName" />
+            </div>
+            <div class="form-group">
+                <label>Email:</label>
+                <input class="form-control" type="text" bind="EditingItem.Email" />
+            </div>
+        </Body>
+        <Footer>
+            <button class="btn btn-success btn-fill pull-right" onclick="@(() => Save())">Save</button>
+            <button class="btn btn-danger btn-fill pull-right" onclick="@(() => Cancel())">Cancel</button>
+        </Footer>
+    </Card>
+}
+else
+{
+    <Card>
+        <Header>Team members</Header>
+        <Body>
+            <DataTable Items="@Items">
+                <TableHeader>
+                    <th>Display Name</th>
+                    <th>Email</th>
+                    <th>Actions</th>
+                </TableHeader>
+                <RowTemplate Context="member">
+                    <td>@member.DisplayName</td>
+                    <td>@member.Email</td>
+                    <td>
+                        <div>
+                            <button class="btn btn-warning btn-fill" onclick="@(() => Edit(member))">Edit</button>
+                            <button class="btn btn-danger btn-fill" onclick="@(() => Delete(member))">Delete</button>
+                        </div>
+                    </td>
+                </RowTemplate>
+            </DataTable>
+        </Body>
+        <Footer>
+            <button class="btn btn-success btn-fill pull-right" onclick="@(() => New())">New</button>
+        </Footer>
+    </Card>
+}

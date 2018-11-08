@@ -10,6 +10,11 @@ namespace Ether.Vsts.Config
         {
             CreateMap<Project, VstsProjectViewModel>();
             CreateMap<VstsProjectViewModel, Project>();
+
+            CreateMap<VstsProfile, VstsProfileViewModel>()
+                .ForMember(p => p.Type, o => o.UseValue(Constants.VstsProfileType));
+            CreateMap<VstsProfileViewModel, VstsProfile>()
+                .ForMember(p => p.Type, o => o.UseValue(Constants.VstsProfileType));
         }
     }
 }

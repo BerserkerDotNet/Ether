@@ -1,6 +1,6 @@
 ﻿@typeparam TItem
 
-<table class="table">
+<table class="table" ref="table">
     <thead>
         <tr>@TableHeader</tr>
     </thead>
@@ -17,6 +17,13 @@
 
 @functions
 {
+    private ElementRef table;
+
+    //protected override async Task OnAfterRenderAsync()
+    //{
+    //    await JsUtils.DataTable(table);
+    //}
+
     [Parameter] RenderFragment TableHeader { get; set; }
     [Parameter] RenderFragment<TItem> RowTemplate { get; set; }
     [Parameter] RenderFragment TableFooter { get; set; }

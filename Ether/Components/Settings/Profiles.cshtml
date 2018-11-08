@@ -1,0 +1,122 @@
+﻿@inherits EditableTable<VstsProfileViewModel>
+
+@if (IsEditing)
+{
+    <Card>
+        <Header>
+            @if (EditingItem.Id == Guid.Empty)
+            {
+                <h4 class="card-title">New profile</h4>
+            }
+            else
+            {
+                <h4 class="card-title">Editing '@EditingItem.Name'</h4>
+            }
+        </Header>
+        <Body>
+            <div class="form-group">
+                <label>Name:</label>
+                <input class="form-control" type="text" bind="EditingItem.Name" />
+            </div>
+            <div class="form-group">
+                <label>Type:</label>
+                <input class="form-control" type="text" readonly bind="EditingItem.Type" />
+            </div>
+            <div class="form-group">
+                <label>Members:</label>
+                <select class="form-control" ref="membersSelectRef" multiple onchange="@MembersSelectionChanged">
+                    @foreach (var member in members)
+                    {
+                        @if (EditingItem.Members.Contains(member.Id))
+                        {
+                            <option selected value="@member.Id">@member.DisplayName</option>
+                        }
+                        else
+                        {
+                            <option value="@member.Id">@member.DisplayName</option>
+                        }
+                    }
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Repositories:</label>
+                <select class="form-control" ref="repositoriesSelectRef" multiple onchange="@RepositoriesSelectionChanged">
+                    @foreach (var repository in repositories)
+                    {
+                        @if (EditingItem.Repositories.Contains(repository.Id))
+                        {
+                            <option selected value="@repository.Id">@repository.Name</option>
+                        }
+                        else
+                        {
+                            <option value="@repository.Id">@repository.Name</option>
+                        }
+                    }
+                </select>
+            </div>
+        </Body>
+        <Footer>
+            <button class="btn btn-success btn-fill pull-right" onclick="@(() => Save())">Save</button>
+            <button class="btn btn-danger btn-fill pull-right" onclick="@(() => Cancel())">Cancel</button>
+        </Footer>
+    </Card>
+}
+else
+{
+    <Card>
+        <Header>Profiles</Header>
+        <Body>
+            <DataTable Items="@Items">
+                <TableHeader>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Members</th>
+                    <th>Repositories</th>
+                    <th>Actions</th>
+                </TableHeader>
+                <RowTemplate Context="profile">
+                    <td>@profile.Name</td>
+                    <td>@profile.Type</td>
+                    <td>@profile.Members.Count()</td>
+                    <td>@profile.Repositories.Count()</td>
+                    <td>
+                        <div>
+                            <button class="btn btn-warning btn-fill" onclick="@(() => Edit(profile))">Edit</button>
+                            <button class="btn btn-danger btn-fill" onclick="@(() => Delete(profile))">Delete</button>
+                        </div>
+                    </td>
+                </RowTemplate>
+            </DataTable>
+        </Body>
+        <Footer>
+            <button class="btn btn-success btn-fill pull-right" onclick="@(() => New())">New</button>
+        </Footer>
+    </Card>
+}
+
+@functions
+{
+    ElementRef membersSelectRef;
+    ElementRef repositoriesSelectRef;
+    private IEnumerable<VstsTeamMemberViewModel> members = Enumerable.Empty<VstsTeamMemberViewModel>();
+    private IEnumerable<VstsRepositoryViewModel> repositories = Enumerable.Empty<VstsRepositoryViewModel>();
+
+    protected override async Task OnInitAsync()
+    {
+        await base.OnInitAsync();
+        members = await Client.GetAll<VstsTeamMemberViewModel>();
+        repositories = await Client.GetAll<VstsRepositoryViewModel>();
+    }
+
+    async void MembersSelectionChanged(UIChangeEventArgs e)
+    {
+        var ids = await JsUtils.GetAllSelectedOptions(membersSelectRef);
+        EditingItem.Members = ids.Select(i => Guid.Parse(i));
+    }
+
+    async void RepositoriesSelectionChanged(UIChangeEventArgs e)
+    {
+        var ids = await JsUtils.GetAllSelectedOptions(repositoriesSelectRef);
+        EditingItem.Repositories = ids.Select(i => Guid.Parse(i));
+    }
+}

@@ -10,6 +10,15 @@ namespace Ether.Types
 {
     public class EtherClient
     {
+        private static readonly Dictionary<Type, string> _typeRoutes = new Dictionary<Type, string>(5)
+        {
+            { typeof(VstsProjectViewModel), "vsts/project" },
+            { typeof(VstsRepositoryViewModel), "vsts/repository" },
+            { typeof(VstsTeamMemberViewModel), "vsts/teammember" },
+            { typeof(VstsProfileViewModel), "vsts/profile" },
+            { typeof(IdentityViewModel), "identity" }
+        };
+
         private readonly HttpClient _httpClient;
 
         public EtherClient(HttpClient httpClient)
@@ -57,17 +66,8 @@ namespace Ether.Types
 
         private string GetPathFor<T>()
         {
-            var type = typeof(T);
-            if (type == typeof(VstsProjectViewModel))
-            {
-                return "vsts/project";
-            }
-            else if (type == typeof(IdentityViewModel))
-            {
-                return "identity";
-            }
-
-            return string.Empty;
+            var key = typeof(T);
+            return _typeRoutes.ContainsKey(typeof(T)) ? _typeRoutes[key] : string.Empty;
         }
     }
 }
