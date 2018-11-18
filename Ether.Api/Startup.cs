@@ -1,11 +1,13 @@
 ﻿using System;
 using Autofac;
 using AutoMapper;
+using Ether.Api.Jobs;
 using Ether.Api.Types;
 using Ether.Contracts.Interfaces;
 using Ether.Contracts.Types.Configuration;
 using Ether.Core.Config;
 using Ether.Vsts.Config;
+using Ether.Vsts.Jobs;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -62,6 +64,11 @@ namespace Ether.Api
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new Info { Title = "Ether API", Version = "v1" });
+            });
+
+            services.AddJobs(cfg =>
+            {
+                cfg.RecurrentJob<PullRequestsSyncJob>(TimeSpan.FromMinutes(10));
             });
         }
 

@@ -2,6 +2,9 @@
 using Ether.Contracts.Interfaces;
 using Ether.Contracts.Types;
 using Ether.Vsts.Dto;
+using Ether.Vsts.Interfaces;
+using Ether.Vsts.Jobs;
+using Ether.Vsts.Types;
 
 namespace Ether.Vsts.Config
 {
@@ -15,6 +18,8 @@ namespace Ether.Vsts.Config
             builder.RegisterInstance(workItemIndex);
             builder.RegisterInstance(pullRequestIndex);
             builder.RegisterType<VstsInitialMigration>().As<IMigration>();
+            builder.RegisterType<VstsClientFactory>().As<IVstsClientFactory>();
+            builder.RegisterType<PullRequestsSyncJob>().As<IJob>();
 
             base.Load(builder);
         }

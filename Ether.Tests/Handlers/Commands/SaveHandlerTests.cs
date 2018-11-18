@@ -5,14 +5,13 @@ using Ether.Contracts.Dto;
 using Ether.Contracts.Interfaces;
 using Ether.Contracts.Interfaces.CQS;
 using Ether.ViewModels;
-using Ether.Vsts.Commands;
-using Ether.Vsts.Dto;
 using Ether.Vsts.Handlers.Commands;
 using FluentAssertions;
 using NUnit.Framework;
 
 namespace Ether.Tests.Handlers.Commands
 {
+    [TestFixture]
     public class SaveHandlerTests : BaseHandlerTest
     {
         private SaveFakeCommandHandler _handler;
@@ -32,7 +31,7 @@ namespace Ether.Tests.Handlers.Commands
         }
 
         [Test]
-        public async Task ShouldSaveIdentity()
+        public async Task ShouldSaveModel()
         {
             var expected = new FakeViewModel
             {
@@ -74,14 +73,14 @@ namespace Ether.Tests.Handlers.Commands
             public FakeViewModel Fake { get; set; }
         }
 
-        private class SaveFakeCommandHandler : SaveHandler<Fake, SaveFakeCommand>
+        private class SaveFakeCommandHandler : SaveHandler<FakeViewModel, Fake, SaveFakeCommand>
         {
             public SaveFakeCommandHandler(IRepository repository, IMapper mapper)
                 : base(repository, mapper)
             {
             }
 
-            protected override object GetData(SaveFakeCommand command) => command.Fake;
+            protected override Task<FakeViewModel> GetData(SaveFakeCommand command) => Task.FromResult(command.Fake);
 
             protected override void ValidateCommand(SaveFakeCommand command)
             {

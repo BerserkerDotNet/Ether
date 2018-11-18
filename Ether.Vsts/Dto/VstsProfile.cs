@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Ether.Contracts.Attributes;
 using Ether.Contracts.Dto;
+using VSTS.Net.Types;
 
 namespace Ether.Vsts.Dto
 {
@@ -9,7 +10,7 @@ namespace Ether.Vsts.Dto
     public class VstsProfile : Profile
     {
         public VstsProfile()
-            : base(Constants.VstsProfileType)
+            : base(Constants.VstsType)
         {
         }
 

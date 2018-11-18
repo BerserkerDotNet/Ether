@@ -1,10 +1,9 @@
 ﻿using System;
-using Ether.Contracts.Dto;
-using Ether.Vsts.Types;
+using Ether.ViewModels.Types;
 
-namespace Ether.Vsts.Dto
+namespace Ether.ViewModels
 {
-    public class PullRequest : BaseDto
+    public class VstsPullRequestViewModel
     {
         public int PullRequestId { get; set; }
 
@@ -12,7 +11,7 @@ namespace Ether.Vsts.Dto
 
         public string Author { get; set; }
 
-        public PullRequestState State { get; set; }
+        public VstsPullRequestState State { get; set; }
 
         public int Comments { get; set; }
 
@@ -22,8 +21,8 @@ namespace Ether.Vsts.Dto
 
         public DateTime Created { get; set; }
 
-        public DateTime Completed { get; set; }
+        public DateTime? Completed { get; set; }
 
-        public DateTime LastSync { get; set; }
+        public DateTime? LastSync { get; set; }
     }
 }

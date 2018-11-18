@@ -68,7 +68,7 @@ namespace Ether.Tests.Handlers.Commands
         private bool CheckCriteria(Expression<Func<VstsDataSourceSettings, bool>> criteria)
         {
             var right = ((BinaryExpression)criteria.Body).Right;
-            return string.Equals(((ConstantExpression)right).Value, Constants.VstsDataSourceType);
+            return string.Equals(((ConstantExpression)right).Value, Constants.VstsType);
         }
     }
 }

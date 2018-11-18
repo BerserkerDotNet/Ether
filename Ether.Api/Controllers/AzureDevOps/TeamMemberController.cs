@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Ether.Contracts.Interfaces.CQS;
 using Ether.ViewModels;
 using Ether.Vsts.Commands;
+using Ether.Vsts.Exceptions;
 using Ether.Vsts.Queries;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -34,7 +35,14 @@ namespace Ether.Api.Controllers.AzureDevOps
         [Route(nameof(Save))]
         public Task Save(VstsTeamMemberViewModel model)
         {
-            return _mediator.Execute(new SaveTeamMember { TeamMember = model });
+            try
+            {
+                return _mediator.Execute(new SaveTeamMember { TeamMember = model });
+            }
+            catch (IdentityNotFoundException ex)
+            {
+                return Task.FromResult(BadRequest(ex.Message));
+            }
         }
 
         [HttpDelete]

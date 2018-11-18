@@ -4,10 +4,12 @@ using AutoMapper;
 using Ether.Contracts.Dto;
 using Ether.Contracts.Interfaces;
 using Ether.Contracts.Interfaces.CQS;
+using Ether.ViewModels;
 
 namespace Ether.Vsts.Handlers.Commands
 {
-    public abstract class SaveHandler<TData, TCommand> : ICommandHandler<TCommand>
+    public abstract class SaveHandler<TModel, TData, TCommand> : ICommandHandler<TCommand>
+        where TModel : ViewModelWithId
         where TCommand : ICommand
         where TData : BaseDto
     {
@@ -29,12 +31,13 @@ namespace Ether.Vsts.Handlers.Commands
 
             ValidateCommand(command);
 
-            var dto = _mapper.Map<TData>(GetData(command));
+            var data = await GetData(command);
+            var dto = _mapper.Map<TData>(data);
             await _repository.CreateOrUpdateAsync(dto);
         }
 
         protected abstract void ValidateCommand(TCommand command);
 
-        protected abstract object GetData(TCommand command);
+        protected abstract Task<TModel> GetData(TCommand command);
     }
 }

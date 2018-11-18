@@ -1,12 +1,14 @@
 ﻿using System;
+using System.Threading.Tasks;
 using AutoMapper;
 using Ether.Contracts.Interfaces;
+using Ether.ViewModels;
 using Ether.Vsts.Commands;
 using Ether.Vsts.Dto;
 
 namespace Ether.Vsts.Handlers.Commands
 {
-    public class SaveProjectHandler : SaveHandler<Project, SaveProject>
+    public class SaveProjectHandler : SaveHandler<VstsProjectViewModel, Project, SaveProject>
     {
         public SaveProjectHandler(IRepository repository, IMapper mapper)
             : base(repository, mapper)
@@ -21,6 +23,6 @@ namespace Ether.Vsts.Handlers.Commands
             }
         }
 
-        protected override object GetData(SaveProject command) => command.Project;
+        protected override Task<VstsProjectViewModel> GetData(SaveProject command) => Task.FromResult(command.Project);
     }
 }

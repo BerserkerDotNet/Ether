@@ -22,7 +22,7 @@ namespace Ether.Vsts.Handlers.Queries
 
         public async Task<IEnumerable<VstsProfileViewModel>> Handle(GetAllProfiles input)
         {
-            var result = await _repository.GetAsync<VstsProfile>(p => p.Type == Constants.VstsProfileType);
+            var result = await _repository.GetAsync<VstsProfile>(p => p.Type == Constants.VstsType);
             return _mapper.Map<IEnumerable<VstsProfileViewModel>>(result);
         }
     }

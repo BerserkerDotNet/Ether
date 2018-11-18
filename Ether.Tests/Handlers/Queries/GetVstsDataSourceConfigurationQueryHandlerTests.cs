@@ -82,7 +82,7 @@ namespace Ether.Tests.Handlers.Queries
         private bool VerifyPredicate(Expression<Func<VstsDataSourceSettings, bool>> predicate)
         {
             var right = ((BinaryExpression)predicate.Body).Right;
-            return string.Equals(((ConstantExpression)right).Value, Constants.VstsDataSourceType);
+            return string.Equals(((ConstantExpression)right).Value, Constants.VstsType);
         }
     }
 }

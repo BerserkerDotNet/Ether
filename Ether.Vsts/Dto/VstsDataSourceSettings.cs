@@ -8,7 +8,7 @@ namespace Ether.Vsts.Dto
     public class VstsDataSourceSettings : DataSourceSettings
     {
         public VstsDataSourceSettings()
-            : base(Constants.VstsDataSourceType)
+            : base(Constants.VstsType)
         {
         }
 

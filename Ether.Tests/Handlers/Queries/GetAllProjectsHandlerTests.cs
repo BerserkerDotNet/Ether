@@ -85,7 +85,7 @@ namespace Ether.Tests.Handlers.Queries
         {
             var lExp = (LambdaExpression)exp;
             var right = ((BinaryExpression)lExp.Body).Right;
-            return Equals(((ConstantExpression)right).Value, Constants.VstsProfileType);
+            return Equals(((ConstantExpression)right).Value, Constants.VstsType);
         }
     }
 }

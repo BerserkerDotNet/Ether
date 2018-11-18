@@ -18,9 +18,11 @@ namespace Ether.Vsts.Config
 
         public async Task Run()
         {
-            var isCreated = await _repository.CreateOrUpdateIfAsync(s => s.Type == Constants.VstsDataSourceType, new VstsDataSourceSettings());
-            var message = isCreated ? "created" : "already exists";
-            _logger.LogInformation($"{nameof(VstsDataSourceSettings)} record {message}");
+            await Task.Yield();
+
+            // var isCreated = await _repository.CreateOrUpdateIfAsync(s => s.Type == Constants.VstsType, new VstsDataSourceSettings());
+            // var message = isCreated ? "created" : "already exists";
+            // _logger.LogInformation($"{nameof(VstsDataSourceSettings)} record {message}");
         }
     }
 }

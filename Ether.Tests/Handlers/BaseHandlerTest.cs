@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 using AutoMapper;
 using Ether.Contracts.Dto;
 using Ether.Contracts.Interfaces;
 using Ether.Core.Config;
+using Ether.Vsts.Config;
 using ExpectedObjects;
 using Moq;
 using NUnit.Framework;
@@ -23,6 +26,7 @@ namespace Ether.Tests.Handlers
             var mappingConfig = new MapperConfiguration(mc =>
             {
                 mc.AddProfile(new CoreMappingProfile());
+                mc.AddProfile(new VstsMappingProfile());
                 InitializeMappings(mc);
             });
             Mapper = mappingConfig.CreateMapper();
@@ -66,11 +70,45 @@ namespace Ether.Tests.Handlers
                 .Verifiable();
         }
 
+        protected void SetupMultipleWithPredicate<T>(IEnumerable<T> values)
+             where T : BaseDto
+        {
+            RepositoryMock.Setup(r => r.GetAsync(It.IsAny<Expression<Func<T, bool>>>()))
+                .Returns<Expression<Func<T, bool>>>(e => Task.FromResult(values.Where(e.Compile())))
+                .Verifiable();
+        }
+
+        protected void SetupCreateOrUpdateIf<T>(Func<Expression, bool> predicate, Expression<Func<T, bool>> itemPredicate = null)
+            where T : BaseDto
+        {
+            if (itemPredicate == null)
+            {
+                itemPredicate = _ => true;
+            }
+
+            RepositoryMock.Setup(r => r.CreateOrUpdateIfAsync(It.Is<Expression<Func<T, bool>>>(p => predicate(p)), It.Is(itemPredicate)))
+                .ReturnsAsync(true)
+                .Verifiable();
+        }
+
         protected void SetupCreateOrUpdate<T, TModel>(TModel model)
             where T : BaseDto
         {
             var value = Mapper.Map<T>(model).ToExpectedObject();
             RepositoryMock.Setup(r => r.CreateOrUpdateAsync(It.Is<T>(v => value.Equals(v))))
+                .ReturnsAsync(true)
+                .Verifiable();
+        }
+
+        protected void SetupCreateOrUpdate<T>(Expression<Func<T, bool>> itemPredicate = null)
+            where T : BaseDto
+        {
+            if (itemPredicate == null)
+            {
+                itemPredicate = _ => true;
+            }
+
+            RepositoryMock.Setup(r => r.CreateOrUpdateAsync(It.Is(itemPredicate)))
                 .ReturnsAsync(true)
                 .Verifiable();
         }

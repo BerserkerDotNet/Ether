@@ -1,12 +1,14 @@
 ﻿using System;
+using System.Threading.Tasks;
 using AutoMapper;
 using Ether.Contracts.Interfaces;
+using Ether.ViewModels;
 using Ether.Vsts.Commands;
 using Ether.Vsts.Dto;
 
 namespace Ether.Vsts.Handlers.Commands
 {
-    public class SaveProfileHandler : SaveHandler<VstsProfile, SaveProfile>
+    public class SaveProfileHandler : SaveHandler<VstsProfileViewModel, VstsProfile, SaveProfile>
     {
         public SaveProfileHandler(IRepository repository, IMapper mapper)
             : base(repository, mapper)
@@ -21,6 +23,6 @@ namespace Ether.Vsts.Handlers.Commands
             }
         }
 
-        protected override object GetData(SaveProfile command) => command.Profile;
+        protected override Task<VstsProfileViewModel> GetData(SaveProfile command) => Task.FromResult(command.Profile);
     }
 }
