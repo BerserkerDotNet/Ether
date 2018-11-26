@@ -3,7 +3,7 @@ using Ether.ViewModels.Types;
 
 namespace Ether.ViewModels
 {
-    public class VstsPullRequestViewModel
+    public class PullRequestViewModel
     {
         public int PullRequestId { get; set; }
 
@@ -11,7 +11,9 @@ namespace Ether.ViewModels
 
         public string Author { get; set; }
 
-        public VstsPullRequestState State { get; set; }
+        public Guid AuthorId { get; set; }
+
+        public PullRequestState State { get; set; }
 
         public int Comments { get; set; }
 

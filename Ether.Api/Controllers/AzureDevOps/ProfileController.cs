@@ -25,14 +25,14 @@ namespace Ether.Api.Controllers.AzureDevOps
 
         [HttpGet]
         [Route(nameof(GetAll))]
-        public Task<IEnumerable<VstsProfileViewModel>> GetAll()
+        public Task<IEnumerable<ProfileViewModel>> GetAll()
         {
-            return _mediator.RequestCollection<GetAllProfiles, VstsProfileViewModel>(new GetAllProfiles());
+            return _mediator.RequestCollection<GetAllProfiles, ProfileViewModel>(new GetAllProfiles());
         }
 
         [HttpPost]
         [Route(nameof(Save))]
-        public Task Save(VstsProfileViewModel model)
+        public Task Save(ProfileViewModel model)
         {
             return _mediator.Execute(new SaveProfile { Profile = model });
         }

@@ -12,9 +12,9 @@ namespace Ether.Vsts.Config
             CreateMap<Project, VstsProjectViewModel>();
             CreateMap<VstsProjectViewModel, Project>();
 
-            CreateMap<VstsProfile, VstsProfileViewModel>()
+            CreateMap<VstsProfile, ProfileViewModel>()
                 .ForMember(p => p.Type, o => o.UseValue(Constants.VstsType));
-            CreateMap<VstsProfileViewModel, VstsProfile>()
+            CreateMap<ProfileViewModel, VstsProfile>()
                 .ForMember(p => p.Type, o => o.UseValue(Constants.VstsType));
 
             CreateMap<Repository, RepositoryInfo>()
@@ -24,7 +24,7 @@ namespace Ether.Vsts.Config
             CreateMap<Project, ProjectInfo>()
                 .ForMember(r => r.Identity, o => o.Ignore());
 
-            CreateMap<VstsPullRequestViewModel, PullRequest>()
+            CreateMap<PullRequestViewModel, PullRequest>()
                 .ForMember(p => p.Id, p => p.Ignore());
         }
     }

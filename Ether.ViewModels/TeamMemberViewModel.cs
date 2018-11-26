@@ -1,6 +1,6 @@
 ﻿namespace Ether.ViewModels
 {
-    public class VstsTeamMemberViewModel : ViewModelWithId
+    public class TeamMemberViewModel : ViewModelWithId
     {
         public string Email { get; set; }
 

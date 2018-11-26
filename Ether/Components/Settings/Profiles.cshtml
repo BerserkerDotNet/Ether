@@ -1,4 +1,4 @@
-﻿@inherits EditableTable<VstsProfileViewModel>
+﻿@inherits EditableTable<ProfileViewModel>
 
 @if (IsEditing)
 {
@@ -98,13 +98,13 @@ else
 {
     ElementRef membersSelectRef;
     ElementRef repositoriesSelectRef;
-    private IEnumerable<VstsTeamMemberViewModel> members = Enumerable.Empty<VstsTeamMemberViewModel>();
+    private IEnumerable<TeamMemberViewModel> members = Enumerable.Empty<TeamMemberViewModel>();
     private IEnumerable<VstsRepositoryViewModel> repositories = Enumerable.Empty<VstsRepositoryViewModel>();
 
     protected override async Task OnInitAsync()
     {
         await base.OnInitAsync();
-        members = await Client.GetAll<VstsTeamMemberViewModel>();
+        members = await Client.GetAll<TeamMemberViewModel>();
         repositories = await Client.GetAll<VstsRepositoryViewModel>();
     }
 

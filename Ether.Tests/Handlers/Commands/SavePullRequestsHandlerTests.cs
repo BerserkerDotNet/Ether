@@ -28,7 +28,7 @@ namespace Ether.Tests.Handlers.Commands
         [Test]
         public async Task ShouldNotDoAnythingIfPullRequestsEmpty()
         {
-            await _handler.Handle(new SavePullRequests(Enumerable.Empty<VstsPullRequestViewModel>()));
+            await _handler.Handle(new SavePullRequests(Enumerable.Empty<PullRequestViewModel>()));
 
             RepositoryMock.VerifyNoOtherCalls();
         }
@@ -37,7 +37,7 @@ namespace Ether.Tests.Handlers.Commands
         public async Task ShouldSavePullRequests()
         {
             const int expectedCallsToDB = 5;
-            var pullRequests = Builder<VstsPullRequestViewModel>
+            var pullRequests = Builder<PullRequestViewModel>
                 .CreateListOfSize(expectedCallsToDB)
                 .Build();
             SetupCreateOrUpdateIf<PullRequest>(e => ValidateExpression(e), p => pullRequests.Any(pr => pr.PullRequestId == p.PullRequestId));

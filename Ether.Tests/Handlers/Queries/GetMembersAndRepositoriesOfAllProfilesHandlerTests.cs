@@ -40,11 +40,12 @@ namespace Ether.Tests.Handlers.Queries
                         .Where(p => p.Repositories.Contains(r.Id))
                         .SelectMany(p => p.Members)
                         .Distinct()
-                        .Select(i => Mapper.Map<VstsTeamMemberViewModel>(data.members.Single(m => m.Id == i)))
+                        .Select(i => Mapper.Map<TeamMemberViewModel>(data.members.Single(m => m.Id == i)))
                         .ToArray();
                     var project = data.projects.Single(p => p.Id == r.Project);
                     return new RepositoryInfo
                     {
+                        Id = r.Id,
                         Name = r.Name,
                         Members = members,
                         Project = new ProjectInfo

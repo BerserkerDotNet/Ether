@@ -26,14 +26,14 @@ namespace Ether.Api.Controllers.AzureDevOps
 
         [HttpGet]
         [Route(nameof(GetAll))]
-        public Task<IEnumerable<VstsTeamMemberViewModel>> GetAll()
+        public Task<IEnumerable<TeamMemberViewModel>> GetAll()
         {
-            return _mediator.RequestCollection<GetAllTeamMembers, VstsTeamMemberViewModel>(new GetAllTeamMembers());
+            return _mediator.RequestCollection<GetAllTeamMembers, TeamMemberViewModel>(new GetAllTeamMembers());
         }
 
         [HttpPost]
         [Route(nameof(Save))]
-        public Task Save(VstsTeamMemberViewModel model)
+        public Task Save(TeamMemberViewModel model)
         {
             try
             {

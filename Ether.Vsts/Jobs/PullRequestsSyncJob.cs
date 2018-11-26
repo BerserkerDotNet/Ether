@@ -33,7 +33,7 @@ namespace Ether.Vsts.Jobs
             foreach (var repository in membersAndRepositories)
             {
                 _logger.LogInformation("Fetching pull requests for {Repository}", repository.Name);
-                var pullRequests = await _mediator.RequestCollection<FetchPullRequestsForRepository, VstsPullRequestViewModel>(new FetchPullRequestsForRepository(repository));
+                var pullRequests = await _mediator.RequestCollection<FetchPullRequestsForRepository, PullRequestViewModel>(new FetchPullRequestsForRepository(repository));
                 await _mediator.Execute(new SavePullRequests(pullRequests));
                 _logger.LogInformation("Found {Count} pull requests for {Repository}", pullRequests.Count(), repository.Name);
             }

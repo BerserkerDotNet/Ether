@@ -4,7 +4,7 @@ using Ether.ViewModels;
 
 namespace Ether.Vsts.Queries
 {
-    public class GetAllProfiles : IQuery<IEnumerable<VstsProfileViewModel>>
+    public class GetAllProfiles : IQuery<IEnumerable<ProfileViewModel>>
     {
     }
 }

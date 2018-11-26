@@ -5,6 +5,6 @@ namespace Ether.Vsts.Commands
 {
     public class SaveProfile : ICommand
     {
-        public VstsProfileViewModel Profile { get; set; }
+        public ProfileViewModel Profile { get; set; }
     }
 }

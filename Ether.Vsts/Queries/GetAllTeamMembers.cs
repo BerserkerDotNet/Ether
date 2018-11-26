@@ -4,7 +4,7 @@ using Ether.ViewModels;
 
 namespace Ether.Vsts.Queries
 {
-    public class GetAllTeamMembers : IQuery<IEnumerable<VstsTeamMemberViewModel>>
+    public class GetAllTeamMembers : IQuery<IEnumerable<TeamMemberViewModel>>
     {
     }
 }

@@ -8,7 +8,7 @@ using Ether.Vsts.Dto;
 
 namespace Ether.Vsts.Handlers.Commands
 {
-    public class SaveProfileHandler : SaveHandler<VstsProfileViewModel, VstsProfile, SaveProfile>
+    public class SaveProfileHandler : SaveHandler<ProfileViewModel, VstsProfile, SaveProfile>
     {
         public SaveProfileHandler(IRepository repository, IMapper mapper)
             : base(repository, mapper)
@@ -23,6 +23,6 @@ namespace Ether.Vsts.Handlers.Commands
             }
         }
 
-        protected override Task<VstsProfileViewModel> GetData(SaveProfile command) => Task.FromResult(command.Profile);
+        protected override Task<ProfileViewModel> GetData(SaveProfile command) => Task.FromResult(command.Profile);
     }
 }

@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Ether.ViewModels
 {
-    public class VstsProfileViewModel : ViewModelWithId
+    public class ProfileViewModel : ViewModelWithId
     {
         public string Name { get; set; }
 

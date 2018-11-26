@@ -50,7 +50,7 @@ namespace Ether.Tests.Handlers.Queries
         public async Task ShouldRequestPullRequestsForEveryMember()
         {
             const int expectedMembersCount = 5;
-            var members = Builder<VstsTeamMemberViewModel>.CreateListOfSize(expectedMembersCount)
+            var members = Builder<TeamMemberViewModel>.CreateListOfSize(expectedMembersCount)
                 .Build();
             var pullRequests = members.ToDictionary(k => k.Id, v =>
             {
@@ -84,7 +84,7 @@ namespace Ether.Tests.Handlers.Queries
         public async Task ShouldUseProjectIdentity()
         {
             const int expectedMembersCount = 5;
-            var members = Builder<VstsTeamMemberViewModel>.CreateListOfSize(expectedMembersCount)
+            var members = Builder<TeamMemberViewModel>.CreateListOfSize(expectedMembersCount)
                 .Build();
             var project = Builder<ProjectInfo>.CreateNew()
                 .With(p => p.Identity, Builder<IdentityViewModel>.CreateNew().Build())
@@ -120,19 +120,19 @@ namespace Ether.Tests.Handlers.Queries
                 .SetName($"ShouldReturnEmptyCollectionIfRepositoryNameIsEmpty");
             yield return new TestCaseData(new RepositoryInfo { Name = "Foo", Members = null })
                 .SetName($"ShouldReturnEmptyCollectionIfMembersCollectionIsNull");
-            yield return new TestCaseData(new RepositoryInfo { Name = "Foo", Members = Enumerable.Empty<VstsTeamMemberViewModel>() })
+            yield return new TestCaseData(new RepositoryInfo { Name = "Foo", Members = Enumerable.Empty<TeamMemberViewModel>() })
                 .SetName($"ShouldReturnEmptyCollectionIfMembersCollectionIsEmpty");
-            yield return new TestCaseData(new RepositoryInfo { Name = "Foo", Members = new[] { new VstsTeamMemberViewModel() }, Project = null })
+            yield return new TestCaseData(new RepositoryInfo { Name = "Foo", Members = new[] { new TeamMemberViewModel() }, Project = null })
                 .SetName($"ShouldReturnEmptyCollectionIfProjectInfoIsNull");
-            yield return new TestCaseData(new RepositoryInfo { Name = "Foo", Members = new[] { new VstsTeamMemberViewModel() }, Project = new ProjectInfo { Name = null } })
+            yield return new TestCaseData(new RepositoryInfo { Name = "Foo", Members = new[] { new TeamMemberViewModel() }, Project = new ProjectInfo { Name = null } })
                 .SetName($"ShouldReturnEmptyCollectionIfProjectNameIsNull");
-            yield return new TestCaseData(new RepositoryInfo { Name = "Foo", Members = new[] { new VstsTeamMemberViewModel() }, Project = new ProjectInfo { Name = string.Empty } })
+            yield return new TestCaseData(new RepositoryInfo { Name = "Foo", Members = new[] { new TeamMemberViewModel() }, Project = new ProjectInfo { Name = string.Empty } })
                 .SetName($"ShouldReturnEmptyCollectionIfProjectNameIsEmpty");
         }
 
-        private bool VerifyPullRequestQuery(PullRequestQuery query, IList<VstsTeamMemberViewModel> members)
+        private bool VerifyPullRequestQuery(PullRequestQuery query, IList<TeamMemberViewModel> members)
         {
-            return members.Any(m => m.Id == query.CreatorId) && string.IsNullOrEmpty(query.Status);
+            return members.Any(m => m.Id == query.CreatorId) && string.Equals(query.Status, "all");
         }
 
         private void SetupClient(string token = null)

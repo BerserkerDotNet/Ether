@@ -60,7 +60,7 @@ namespace Ether.Vsts.Handlers.Queries
                     .Where(p => p.Repositories.Contains(r.Id))
                     .SelectMany(m => m.Members)
                     .Distinct()
-                    .Select(i => _mapper.Map<VstsTeamMemberViewModel>(members.SingleOrDefault(m => m.Id == i)))
+                    .Select(i => _mapper.Map<TeamMemberViewModel>(members.SingleOrDefault(m => m.Id == i)))
                     .Where(m => m != null)
                     .ToArray();
 

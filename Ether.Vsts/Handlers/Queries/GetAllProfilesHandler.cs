@@ -9,7 +9,7 @@ using Ether.Vsts.Queries;
 
 namespace Ether.Vsts.Handlers.Queries
 {
-    public class GetAllProfilesHandler : IQueryHandler<GetAllProfiles, IEnumerable<VstsProfileViewModel>>
+    public class GetAllProfilesHandler : IQueryHandler<GetAllProfiles, IEnumerable<ProfileViewModel>>
     {
         private readonly IRepository _repository;
         private readonly IMapper _mapper;
@@ -20,10 +20,10 @@ namespace Ether.Vsts.Handlers.Queries
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<VstsProfileViewModel>> Handle(GetAllProfiles input)
+        public async Task<IEnumerable<ProfileViewModel>> Handle(GetAllProfiles input)
         {
             var result = await _repository.GetAsync<VstsProfile>(p => p.Type == Constants.VstsType);
-            return _mapper.Map<IEnumerable<VstsProfileViewModel>>(result);
+            return _mapper.Map<IEnumerable<ProfileViewModel>>(result);
         }
     }
 }

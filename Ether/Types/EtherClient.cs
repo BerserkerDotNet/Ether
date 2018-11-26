@@ -14,8 +14,8 @@ namespace Ether.Types
         {
             { typeof(VstsProjectViewModel), "vsts/project" },
             { typeof(VstsRepositoryViewModel), "vsts/repository" },
-            { typeof(VstsTeamMemberViewModel), "vsts/teammember" },
-            { typeof(VstsProfileViewModel), "vsts/profile" },
+            { typeof(TeamMemberViewModel), "vsts/teammember" },
+            { typeof(ProfileViewModel), "vsts/profile" },
             { typeof(IdentityViewModel), "identity" }
         };
 

@@ -12,6 +12,8 @@ namespace Ether.Vsts.Dto
 
         public string Author { get; set; }
 
+        public Guid AuthorId { get; set; }
+
         public PullRequestState State { get; set; }
 
         public int Comments { get; set; }

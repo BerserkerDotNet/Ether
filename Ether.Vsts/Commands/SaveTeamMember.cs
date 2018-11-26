@@ -5,6 +5,6 @@ namespace Ether.Vsts.Commands
 {
     public class SaveTeamMember : ICommand
     {
-        public VstsTeamMemberViewModel TeamMember { get; set; }
+        public TeamMemberViewModel TeamMember { get; set; }
     }
 }

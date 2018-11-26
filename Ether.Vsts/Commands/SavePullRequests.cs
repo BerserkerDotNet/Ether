@@ -6,11 +6,11 @@ namespace Ether.Vsts.Commands
 {
     public class SavePullRequests : ICommand
     {
-        public SavePullRequests(IEnumerable<VstsPullRequestViewModel> pullRequests)
+        public SavePullRequests(IEnumerable<PullRequestViewModel> pullRequests)
         {
             PullRequests = pullRequests;
         }
 
-        public IEnumerable<VstsPullRequestViewModel> PullRequests { get; private set; }
+        public IEnumerable<PullRequestViewModel> PullRequests { get; private set; }
     }
 }

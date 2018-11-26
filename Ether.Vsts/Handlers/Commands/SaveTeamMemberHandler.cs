@@ -12,7 +12,7 @@ using VSTS.Net.Interfaces;
 
 namespace Ether.Vsts.Handlers.Commands
 {
-    public class SaveTeamMemberHandler : SaveHandler<VstsTeamMemberViewModel, TeamMember, SaveTeamMember>
+    public class SaveTeamMemberHandler : SaveHandler<TeamMemberViewModel, TeamMember, SaveTeamMember>
     {
         private readonly IVstsClientFactory _clientFactory;
 
@@ -22,7 +22,7 @@ namespace Ether.Vsts.Handlers.Commands
             _clientFactory = clientFactory;
         }
 
-        protected override async Task<VstsTeamMemberViewModel> GetData(SaveTeamMember command)
+        protected override async Task<TeamMemberViewModel> GetData(SaveTeamMember command)
         {
             var client = await _clientFactory.GetIdentityClient();
             var member = command.TeamMember;

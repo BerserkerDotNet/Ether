@@ -1,6 +1,6 @@
 ﻿namespace Ether.ViewModels.Types
 {
-    public enum VstsPullRequestState
+    public enum PullRequestState
     {
         NotSet,
         Active,

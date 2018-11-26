@@ -26,7 +26,7 @@ namespace Ether.Tests.Handlers.Commands
         public async Task ShouldFetchIdentityIdFromVsts()
         {
             const string expectedEmail = "foo@bla.com";
-            var vm = Builder<VstsTeamMemberViewModel>.CreateNew()
+            var vm = Builder<TeamMemberViewModel>.CreateNew()
                 .With(m => m.Email = expectedEmail)
                 .With(m => m.Id = Guid.Empty)
                 .Build();
@@ -50,7 +50,7 @@ namespace Ether.Tests.Handlers.Commands
         public async Task ShouldOverrideTeamMemberId()
         {
             const string expectedEmail = "foo@bla.com";
-            var vm = Builder<VstsTeamMemberViewModel>.CreateNew()
+            var vm = Builder<TeamMemberViewModel>.CreateNew()
                 .With(m => m.Email = expectedEmail)
                 .With(m => m.Id = Guid.NewGuid())
                 .Build();
@@ -74,7 +74,7 @@ namespace Ether.Tests.Handlers.Commands
         public void ShouldThrowExceptionIfNoIdentitiesFound()
         {
             const string expectedEmail = "foo@bla.com";
-            var vm = Builder<VstsTeamMemberViewModel>.CreateNew()
+            var vm = Builder<TeamMemberViewModel>.CreateNew()
                 .With(m => m.Email = expectedEmail)
                 .With(m => m.Id = Guid.NewGuid())
                 .Build();
