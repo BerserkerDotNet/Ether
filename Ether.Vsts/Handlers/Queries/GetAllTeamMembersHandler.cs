@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Ether.Contracts.Interfaces;
+using Ether.Core.Types.Handlers.Queries;
 using Ether.ViewModels;
 using Ether.Vsts.Dto;
 using Ether.Vsts.Queries;

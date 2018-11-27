@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Ether.Contracts.Dto;
+using Ether.Contracts.Dto.Reports;
 using Ether.ViewModels;
 
 namespace Ether.Core.Config
@@ -10,6 +11,7 @@ namespace Ether.Core.Config
         {
             CreateMap<Identity, IdentityViewModel>();
             CreateMap<IdentityViewModel, Identity>();
+            CreateMap<PullRequestsReport, PullRequestReportViewModel>();
         }
     }
 }

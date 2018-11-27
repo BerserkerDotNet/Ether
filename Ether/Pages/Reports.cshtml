@@ -1,3 +1,62 @@
 ﻿@page "/reports"
+@page "/reports/{id:guid}"
+@inject EtherClient Client
+@inject Microsoft.AspNetCore.Blazor.Services.IUriHelper UriHelper
 
-<div>Reports</div>
+@if (!Id.HasValue)
+{
+    <Card>
+        <Header>Reports</Header>
+        <Body>
+            <DataTable Items="reports">
+                <TableHeader>
+                    <th>Name</th>
+                    <th>Taken</th>
+                    <th>Profile</th>
+                    <th>Start</th>
+                    <th>End</th>
+                    <th>Actions</th>
+                </TableHeader>
+                <RowTemplate Context="report">
+                    <td>@report.ReportName</td>
+                    <td>@report.DateTaken</td>
+                    <td>@report.ProfileName</td>
+                    <td>@report.StartDate</td>
+                    <td>@report.EndDate</td>
+                    <td>
+                        <div>
+                            <button class="btn btn-success btn-fill" onclick="@(() => View(report))">View</button>
+                            <button class="btn btn-danger btn-fill" onclick="@(() => Delete(report))">Delete</button>
+                        </div>
+                    </td>
+                </RowTemplate>
+            </DataTable>
+        </Body>
+    </Card>
+}
+else
+{
+    <PullRequestsReport Id="Id.Value"></PullRequestsReport>
+}
+
+@functions
+{
+[Parameter]
+private Guid? Id { get; set; }
+
+private IEnumerable<ReportViewModel> reports = Enumerable.Empty<ReportViewModel>();
+protected override async Task OnInitAsync()
+{
+    reports = await Client.GetAll<ReportViewModel>();
+}
+
+protected void View(ReportViewModel model)
+{
+    UriHelper.NavigateTo($"/reports/{model.Id}");
+}
+
+protected void Delete(ReportViewModel model)
+{
+
+}
+}

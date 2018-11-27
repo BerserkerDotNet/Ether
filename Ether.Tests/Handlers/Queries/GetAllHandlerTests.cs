@@ -6,6 +6,7 @@ using AutoMapper;
 using Ether.Contracts.Dto;
 using Ether.Contracts.Interfaces;
 using Ether.Contracts.Interfaces.CQS;
+using Ether.Core.Types.Handlers.Queries;
 using Ether.ViewModels;
 using Ether.Vsts.Handlers.Queries;
 using FluentAssertions;

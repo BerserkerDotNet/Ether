@@ -16,7 +16,9 @@ namespace Ether.Types
             { typeof(VstsRepositoryViewModel), "vsts/repository" },
             { typeof(TeamMemberViewModel), "vsts/teammember" },
             { typeof(ProfileViewModel), "vsts/profile" },
-            { typeof(IdentityViewModel), "identity" }
+            { typeof(IdentityViewModel), "identity" },
+            { typeof(ReportViewModel), "report" },
+            { typeof(PullRequestReportViewModel), "report" }
         };
 
         private readonly HttpClient _httpClient;
@@ -52,6 +54,11 @@ namespace Ether.Types
         public Task<IEnumerable<T>> GetAll<T>()
         {
             return _httpClient.GetJsonAsync<IEnumerable<T>>($"{GetPathFor<T>()}/GetAll");
+        }
+
+        public Task<T> GetById<T>(Guid id)
+        {
+            return _httpClient.GetJsonAsync<T>($"{GetPathFor<T>()}/GetById?id={id}");
         }
 
         public Task Save<T>(T model)

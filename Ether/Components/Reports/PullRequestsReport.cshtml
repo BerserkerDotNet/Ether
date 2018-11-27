@@ -1,0 +1,74 @@
+﻿@inject EtherClient Client
+
+<Card>
+    <Header>Pull requests report</Header>
+    <Body>
+        <DataTable Items="report.IndividualReports">
+            <TableHeader>
+                <th>Name</th>
+                <th>Created</th>
+                <th>Completed</th>
+                <th>Active</th>
+                <th>Abandoned</th>
+                <th>Iterations</th>
+                <th>Avg iterations</th>
+                <th>Code quality (%)</th>
+                <th>Comments</th>
+                <th>Avg comments</th>
+                <th>Avg lifespan (days)</th>
+            </TableHeader>
+            <RowTemplate Context="individualReport">
+                <td>@individualReport.TeamMember</td>
+                <td>@individualReport.Created</td>
+                <td>@individualReport.Completed</td>
+                <td>@individualReport.Active</td>
+                <td>@individualReport.Abandoned</td>
+                <td>@individualReport.TotalIterations</td>
+                <td>@individualReport.AverageIterations.ToString("F2")</td>
+                <td>@individualReport.CodeQuality.ToString("F2")</td>
+                <td>@individualReport.TotalComments</td>
+                <td>@individualReport.AverageComments.ToString("F2")</td>
+                <td>@individualReport.AveragePRLifespan.TotalDays.ToString("F2")</td>
+            </RowTemplate>
+            <TableFooter>
+                <tr>
+                    <th class="table-active">Total created:</th>
+                    <td class="table-success" colspan="2">@report.TotalCreated</td>
+                    <th class="table-active" colspan="2">Avg iterations:</th>
+                    <td class="table-success" colspan="2">@report.AverageIterations.ToString("F2")</td>
+                </tr>
+                <tr>
+                    <th class="table-active">Total completed:</th>
+                    <td class="table-success" colspan="2">@report.TotalCompleted</td>
+                    <th class="table-active" colspan="2">Avg comments:</th>
+                    <td class="table-success" colspan="2">@report.AverageComments.ToString("F2")</td>
+                </tr>
+                <tr>
+                    <th class="table-active">Total active:</th>
+                    <td class="table-success" colspan="2">@report.TotalActive</td>
+                    <th class="table-active" colspan="2">Code quality:</th>
+                    <td class="table-success" colspan="2">@report.CodeQuality.ToString("F2")</td>
+                </tr>
+                <tr>
+                    <th class="table-active">Total abandoned:</th>
+                    <td class="table-success" colspan="2">@report.TotalAbandoned</td>
+                    <th class="table-active" colspan="2">Avg lifespan:</th>
+                    <td class="table-success" colspan="2">@report.AveragePRLifespan.TotalDays.ToString("F2")</td>
+                </tr>
+            </TableFooter>
+        </DataTable>
+    </Body>
+</Card>
+
+
+@functions
+{
+    [Parameter] Guid Id { get; set; }
+
+    private PullRequestReportViewModel report = new PullRequestReportViewModel();
+
+    protected override async Task OnInitAsync()
+    {
+        report = await Client.GetById<PullRequestReportViewModel>(Id);
+    }
+}

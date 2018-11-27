@@ -5,7 +5,7 @@ using Ether.Contracts.Dto;
 using Ether.Contracts.Interfaces;
 using Ether.Contracts.Interfaces.CQS;
 
-namespace Ether.Vsts.Handlers.Queries
+namespace Ether.Core.Types.Handlers.Queries
 {
     public abstract class GetAllHandler<TData, TModel, TQuery> : IQueryHandler<TQuery, IEnumerable<TModel>>
         where TQuery : IQuery<IEnumerable<TModel>>
