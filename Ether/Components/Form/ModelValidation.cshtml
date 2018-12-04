@@ -1,0 +1,28 @@
+﻿@implements IFormValidator
+@inject ModelValidationService ValidationService
+
+<CascadingValue Value=this>
+        @ChildContent
+</CascadingValue>
+
+@functions{
+    [Parameter] RenderFragment ChildContent { get; set; }
+    [Parameter] IFormHandler Handler { get; set; }
+
+    public event EventHandler<ValidationResult> OnValidated;
+
+    protected override void OnInit()
+    {
+        var msg = Handler == null ? "Handler is null" : "Handler is not null";
+        Handler.SetValidator(this);
+    }
+
+    public bool Validate<T>(T model)
+    {
+        var errors = ValidationService.Validate(model);
+        var validationResult = new ValidationResult(errors);
+        OnValidated?.Invoke(this, validationResult);
+
+        return validationResult.IsValid;
+    }
+}

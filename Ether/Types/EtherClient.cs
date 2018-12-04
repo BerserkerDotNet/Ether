@@ -18,7 +18,8 @@ namespace Ether.Types
             { typeof(ProfileViewModel), "vsts/profile" },
             { typeof(IdentityViewModel), "identity" },
             { typeof(ReportViewModel), "report" },
-            { typeof(PullRequestReportViewModel), "report" }
+            { typeof(PullRequestReportViewModel), "report" },
+            { typeof(GenerateReportViewModel), "report" }
         };
 
         private readonly HttpClient _httpClient;
@@ -69,6 +70,11 @@ namespace Ether.Types
         public Task Delete<T>(Guid id)
         {
             return _httpClient.DeleteAsync($"{GetPathFor<T>()}/Delete?id={id}");
+        }
+
+        public Task<Guid> GenerateReport(GenerateReportViewModel model)
+        {
+            return _httpClient.PostJsonAsync<Guid>($"{GetPathFor<GenerateReportViewModel>()}/Generate", model);
         }
 
         private string GetPathFor<T>()

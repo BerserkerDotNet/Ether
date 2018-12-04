@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Autofac.Features.Indexed;
+using Ether.Contracts.Dto;
 using Ether.Contracts.Dto.Reports;
 using Ether.Contracts.Interfaces;
 using Ether.Core.Types;
@@ -31,20 +32,18 @@ namespace Ether.Tests.Handlers.Commands
         private GeneratePullRequestsReportHandler _handler;
 
         [Test]
-        public void ShouldThrowExceptionIfDataSourceTypeIsNullOrEmpty([Values(null, "")]string dataSourceType)
+        public void ShouldThrowExceptionIfNotSupportedDataSourceType([Values(null, "", "Bla")]string dataSourceType)
         {
-            _handler.Awaiting(h => h.Handle(new GeneratePullRequestsReport { DataSourceType = dataSourceType }))
-                .Should().Throw<ArgumentNullException>();
-        }
+            RepositoryMock.Setup(r => r.GetFieldValueAsync(It.IsAny<Expression<Func<Profile, bool>>>(), It.IsAny<Expression<Func<Profile, string>>>()))
+                .ReturnsAsync(dataSourceType)
+                .Verifiable();
 
-        [Test]
-        public void ShouldThrowExceptionIfNotSupportedDataSourceType()
-        {
-            const string FakeDataSource = "Bla";
             IDataSource ds;
-            _dataSourceProviderMock.Setup(p => p.TryGetValue(FakeDataSource, out ds)).Returns(false);
-            _handler.Awaiting(h => h.Handle(new GeneratePullRequestsReport { DataSourceType = FakeDataSource }))
+            _dataSourceProviderMock.Setup(p => p.TryGetValue(dataSourceType, out ds)).Returns(false);
+            _handler.Awaiting(h => h.Handle(new GeneratePullRequestsReport()))
                 .Should().Throw<ArgumentException>();
+
+            RepositoryMock.Verify();
         }
 
         [Test]
@@ -52,7 +51,7 @@ namespace Ether.Tests.Handlers.Commands
         {
             SetupGetProfile(null);
 
-            _handler.Awaiting(h => h.Handle(new GeneratePullRequestsReport { DataSourceType = DataSourceType, Profile = Guid.NewGuid() }))
+            _handler.Awaiting(h => h.Handle(new GeneratePullRequestsReport { Profile = Guid.NewGuid() }))
                 .Should().Throw<ArgumentException>();
 
             _dataSourceMock.Verify();
@@ -72,7 +71,7 @@ namespace Ether.Tests.Handlers.Commands
             SetupGetMember(members);
             SetupGetPullRequests(Enumerable.Empty<PullRequestViewModel>());
 
-            var command = new GeneratePullRequestsReport { DataSourceType = DataSourceType, Profile = Guid.NewGuid() };
+            var command = new GeneratePullRequestsReport { Profile = Guid.NewGuid() };
             await InvokeAndVerify(command, (report, reportId) =>
             {
                 report.Should().NotBeNull();
@@ -97,7 +96,7 @@ namespace Ether.Tests.Handlers.Commands
             SetupGetMember(members);
             SetupGetPullRequests(Enumerable.Empty<PullRequestViewModel>());
 
-            var command = new GeneratePullRequestsReport { DataSourceType = DataSourceType, Profile = Guid.NewGuid() };
+            var command = new GeneratePullRequestsReport { Profile = Guid.NewGuid() };
             await InvokeAndVerify(command, (report, reportId) =>
             {
                 report.Should().NotBeNull();
@@ -133,7 +132,7 @@ namespace Ether.Tests.Handlers.Commands
             SetupGetMember(members);
             SetupGetPullRequests(pullRequests);
 
-            var command = new GeneratePullRequestsReport { DataSourceType = DataSourceType, Profile = Guid.NewGuid(), Start = start, End = end };
+            var command = new GeneratePullRequestsReport { Profile = Guid.NewGuid(), Start = start, End = end };
             await InvokeAndVerify(command, (report, reportId) =>
             {
                 report.Should().NotBeNull();
@@ -172,7 +171,7 @@ namespace Ether.Tests.Handlers.Commands
             SetupGetMember(members);
             SetupGetPullRequests(Enumerable.Empty<PullRequestViewModel>());
 
-            var command = new GeneratePullRequestsReport { DataSourceType = DataSourceType, Profile = Guid.NewGuid() };
+            var command = new GeneratePullRequestsReport { Profile = Guid.NewGuid() };
             await InvokeAndVerify(command, (report, reportId) =>
             {
                 report.Should().NotBeNull();
@@ -195,6 +194,9 @@ namespace Ether.Tests.Handlers.Commands
             var ds = _dataSourceMock.Object;
             _dataSourceProviderMock = new Mock<IIndex<string, IDataSource>>(MockBehavior.Strict);
             _dataSourceProviderMock.Setup(p => p.TryGetValue(DataSourceType, out ds)).Returns(true);
+            RepositoryMock.Setup(r => r.GetFieldValueAsync(It.IsAny<Expression<Func<Profile, bool>>>(), It.IsAny<Expression<Func<Profile, string>>>()))
+                .ReturnsAsync(DataSourceType)
+                .Verifiable();
 
             _handler = new GeneratePullRequestsReportHandler(_dataSourceProviderMock.Object, RepositoryMock.Object, Mock.Of<ILogger<GeneratePullRequestsReportHandler>>());
         }

@@ -1,14 +1,15 @@
 ﻿using System;
-using Ether.Contracts.Interfaces.CQS;
 
-namespace Ether.Core.Types.Commands
+namespace Ether.ViewModels
 {
-    public class GeneratePullRequestsReport : ICommand<Guid>
+    public class GenerateReportViewModel
     {
         public DateTime Start { get; set; }
 
         public DateTime End { get; set; }
 
         public Guid Profile { get; set; }
+
+        public string ReportType { get; set; }
     }
 }

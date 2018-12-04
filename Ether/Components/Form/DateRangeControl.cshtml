@@ -1,0 +1,32 @@
+﻿@inherits InputItemBase<string>
+
+<ValidatedField PropertyName="@PropertyName" Properties="@Properties" Title="@Title">
+    <input ref="dateRange" class="form-control" />
+</ValidatedField>
+
+@functions{
+
+    private ElementRef dateRange;
+
+    [Parameter] DateTime Start { get; set; }
+    [Parameter] Action<DateTime> StartChanged { get; set; }
+
+    [Parameter] DateTime End { get; set; }
+    [Parameter] Action<DateTime> EndChanged { get; set; }
+
+    protected override async Task OnAfterRenderAsync()
+    {
+        await JsUtils.DateRangePicker(dateRange, new DotNetObjectRef(this));
+    }
+
+    [JSInvokable]
+    public void OnRangeChanged(string start, string end)
+    {
+        Console.WriteLine($"Date ranged changed: {start} - {end}");
+
+        Start = DateTime.Parse(start);
+        StartChanged?.Invoke(Start);
+        End = DateTime.Parse(end);
+        EndChanged?.Invoke(End);
+    }
+}

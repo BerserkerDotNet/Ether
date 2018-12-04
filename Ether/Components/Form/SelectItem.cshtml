@@ -1,0 +1,27 @@
+﻿@typeparam T
+@inherits InputItemBase<T>
+<ValidatedField PropertyName="@PropertyName" Properties="@Properties" Title="@Title">
+    <select class="form-control" onchange="@OnSelectionChanged">
+        @foreach (var option in Options)
+        {
+            if (option.Key == Value.ToString())
+            {
+                <option selected value="@option.Key">@option.Value</option>
+            }
+            else
+            {
+                <option value="@option.Key">@option.Value</option>
+            }
+        }
+    </select>
+</ValidatedField>
+
+@functions{
+
+    [Parameter] Dictionary<string, string> Options { get; set; }
+
+    private void OnSelectionChanged(UIChangeEventArgs e)
+    {
+        Value = (T)Convert.ChangeType(e.Value, typeof(T));
+    }
+}

@@ -10,6 +10,7 @@ namespace Ether
         {
             services.AddSingleton<EtherClient>();
             services.AddSingleton<EtherMenuService>();
+            services.AddSingleton<ModelValidationService>();
         }
 
         public void Configure(IBlazorApplicationBuilder app)

@@ -1,0 +1,17 @@
+﻿@page "/reports/view/{type}/{id:guid}"
+@inject EtherClient Client
+@inject Microsoft.AspNetCore.Blazor.Services.IUriHelper UriHelper
+
+@if (string.Equals(Type, "PullRequestsReport", StringComparison.OrdinalIgnoreCase))
+{
+    <PullRequestsReport Id="Id.Value"></PullRequestsReport>
+}
+
+@functions
+{
+    [Parameter]
+    private Guid? Id { get; set; }
+
+    [Parameter]
+    private string Type { get; set; }
+}

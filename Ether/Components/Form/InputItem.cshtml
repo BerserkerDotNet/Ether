@@ -1,0 +1,26 @@
+﻿@typeparam T
+@inherits InputItemBase<T>
+
+<ValidatedField PropertyName="@PropertyName" Properties="@Properties" Title="@Title">
+    <input type="@Type" class="form-control" bind="InternalValue" />
+</ValidatedField>
+
+@functions{
+
+    [Parameter] string Type { get; set; }
+
+    private string InternalValue
+    {
+        get
+        {
+            if (Value == null)
+                return string.Empty;
+
+            return Value.ToString();
+        }
+        set
+        {
+            Value = (T)Convert.ChangeType(value, typeof(T));
+        }
+    }
+}

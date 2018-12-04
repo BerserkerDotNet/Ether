@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using AutoMapper;
 using Ether.Contracts.Interfaces.CQS;
 using Ether.Core.Types.Commands;
 using Ether.Core.Types.Queries;
@@ -16,19 +17,22 @@ namespace Ether.Api.Controllers
     public class ReportController : ControllerBase
     {
         private readonly IMediator _mediator;
+        private readonly IMapper _mapper;
 
-        public ReportController(IMediator mediator)
+        public ReportController(IMediator mediator, IMapper mapper)
         {
             _mediator = mediator;
+            _mapper = mapper;
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route(nameof(Generate))]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
-        public async Task<IActionResult> Generate(string type, string dataSource, Guid profile, DateTime start, DateTime end)
+        public async Task<IActionResult> Generate(GenerateReportViewModel requestModel)
         {
-            var id = await _mediator.Execute<GeneratePullRequestsReport, Guid>(new GeneratePullRequestsReport { DataSourceType = dataSource, Profile = profile, Start = start, End = end });
+            var request = _mapper.Map<GeneratePullRequestsReport>(requestModel);
+            var id = await _mediator.Execute<GeneratePullRequestsReport, Guid>(request);
             return Ok(id);
         }
 

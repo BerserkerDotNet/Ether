@@ -27,7 +27,7 @@ namespace Ether.Core.Types.Handlers.Queries
                 return null;
             }
 
-            var reportType = _repository.GetFieldValue<ReportResult, string>(r => r.Id == query.Id, r => r.ReportType);
+            var reportType = await _repository.GetFieldValueAsync<ReportResult, string>(r => r.Id == query.Id, r => r.ReportType);
             switch (reportType)
             {
                 case Constants.PullRequestsReportType:

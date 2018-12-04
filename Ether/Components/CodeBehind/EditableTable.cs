@@ -9,9 +9,11 @@ using static Ether.Types.JsUtils;
 
 namespace Ether.Components.CodeBehind
 {
-    public class EditableTable<T> : BlazorComponent
+    public class EditableTable<T> : BlazorComponent, IFormHandler, IDisposable
         where T : ViewModelWithId, new()
     {
+        private IFormValidator _formValidator;
+
         [Inject]
         protected EtherClient Client { get; set; }
 
@@ -20,6 +22,16 @@ namespace Ether.Components.CodeBehind
         protected T EditingItem { get; set; }
 
         protected bool IsEditing { get; set; }
+
+        public void SetValidator(IFormValidator validator)
+        {
+            _formValidator = validator;
+        }
+
+        public void Dispose()
+        {
+            _formValidator = null;
+        }
 
         protected override async Task OnInitAsync()
         {
@@ -52,6 +64,17 @@ namespace Ether.Components.CodeBehind
 
         protected virtual async Task Save()
         {
+            var model = EditingItem as IdentityViewModel;
+            if (model != null)
+            {
+                Console.WriteLine($"Model: {model.Name}; {model.Token}");
+            }
+
+            if (_formValidator != null && !_formValidator.Validate(EditingItem))
+            {
+                return;
+            }
+
             await Client.Save(EditingItem);
             await Refresh();
             FinishEditing();

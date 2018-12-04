@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Autofac.Features.Indexed;
+using Ether.Contracts.Dto;
 using Ether.Contracts.Dto.Reports;
 using Ether.Contracts.Interfaces;
 using Ether.Contracts.Interfaces.CQS;
@@ -27,14 +28,10 @@ namespace Ether.Core.Types.Handlers.Commands
 
         public async Task<Guid> Handle(GeneratePullRequestsReport command)
         {
-            if (command == null || string.IsNullOrEmpty(command.DataSourceType))
+            var dataSourceType = await _repository.GetFieldValueAsync<Profile, string>(p => p.Id == command.Profile, p => p.Type);
+            if (!_dataSources.TryGetValue(dataSourceType, out var dataSource))
             {
-                throw new ArgumentNullException(nameof(command.DataSourceType));
-            }
-
-            if (!_dataSources.TryGetValue(command.DataSourceType, out var dataSource))
-            {
-                throw new ArgumentException($"Data source of type {command.DataSourceType} is not supported.");
+                throw new ArgumentException($"Data source of type {dataSourceType} is not supported.");
             }
 
             var profile = await dataSource.GetProfile(command.Profile);
@@ -43,7 +40,7 @@ namespace Ether.Core.Types.Handlers.Commands
                 throw new ArgumentException("Requested profile is not found.");
             }
 
-            _logger.LogInformation("Starting to generate {DataSource} PullRequest report for {Profile}, range: {Start} {End}", command.DataSourceType, profile.Name, command.Start, command.End);
+            _logger.LogInformation("Starting to generate {DataSource} PullRequest report for {Profile}, range: {Start} {End}", dataSourceType, profile.Name, command.Start, command.End);
 
             var pullRequests = await dataSource.GetPullRequests(p =>
                 (IsCreatedIn(p, command.Start, command.End) || IsCompletedIn(p, command.Start, command.End)) &&

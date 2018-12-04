@@ -6,8 +6,10 @@ using Ether.Api.Types;
 using Ether.Contracts.Interfaces;
 using Ether.Contracts.Types.Configuration;
 using Ether.Core.Config;
+using Ether.ViewModels.Validators;
 using Ether.Vsts.Config;
 using Ether.Vsts.Jobs;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -66,7 +68,10 @@ namespace Ether.Api
             services.AddMvc(o =>
             {
                 o.Conventions.Add(new NotFoundOnNullResultFilterConvention());
-            }).SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            })
+            .SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
+            .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<IdentityViewModelValidator>());
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new Info { Title = "Ether API", Version = "v1" });

@@ -13,7 +13,7 @@ namespace Ether.Contracts.Dto.Reports
             IndividualReports = new List<IndividualPRReport>(individualReportsCount);
         }
 
-        public IList<IndividualPRReport> IndividualReports { get; set; }
+        public List<IndividualPRReport> IndividualReports { get; set; }
 
         public void AddReport(IndividualPRReport report)
         {
