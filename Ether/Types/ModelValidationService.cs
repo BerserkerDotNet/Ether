@@ -12,10 +12,10 @@ namespace Ether.Types
 
         public ModelValidationService()
         {
-            var s = new AssemblyScanner(new[] { typeof(IdentityViewModelValidator), typeof(GenerateReportViewModelValidator) });
-            _validators = s.Select(r => (IValidator)Activator.CreateInstance(r.ValidatorType)).ToArray();
+            var scanner = AssemblyScanner.FindValidatorsInAssemblyContaining<IdentityViewModelValidator>();
+            _validators = scanner.Select(r => (IValidator)Activator.CreateInstance(r.ValidatorType)).ToArray();
 
-            Console.WriteLine($"ModelValidationService - found {_validators.Count()} validators.  {string.Join(",", _validators)}");
+            Console.WriteLine($"ModelValidationService - found {_validators.Count()} validators. {string.Join(",", _validators)}");
         }
 
         public Dictionary<string, IEnumerable<string>> Validate<T>(T model)
