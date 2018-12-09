@@ -6,6 +6,8 @@ namespace Ether.Contracts.Dto
     {
         public virtual Guid Id { get; set; }
 
+        public Guid OwnerId { get; set; }
+
         public virtual bool Equals(BaseDto other)
         {
             if (other == null)

@@ -9,24 +9,12 @@
         <Card>
             <Header>New report</Header>
             <Body>
-                @if (currentUser == null)
-                {
-                    <button class="btn" onclick="@Login">Login</button>
-                }
-                else
-                {
-                    <div class="card-header">
-                        <h4 class="card-title">Hello @currentUser!</h4>
-                    </div>
-                    <div class="card-body">
-                        <ModelValidation Handler="this">
-                            <SelectItem Title="Profile" bind-Value="model.Profile" PropertyName="@nameof(model.Profile)" Options="@profileOptions" />
-                            @* TODO: Return supported report types from API*@
-                            <SelectItem Title="Report type" bind-Value="model.ReportType" PropertyName="@nameof(model.ReportType)" Options="@reportTypes"  />
-                            <DateRangeControl Title="Date range" Properties="@(new[] {nameof(GenerateReportViewModel.Start), nameof(GenerateReportViewModel.End)})" bind-Start="model.Start" bind-End="model.End" />
-                        </ModelValidation>
-                    </div>
-                }
+                <ModelValidation Handler="this">
+                    <SelectItem Title="Profile" bind-Value="model.Profile" PropertyName="@nameof(model.Profile)" Options="@profileOptions" />
+                    @* TODO: Return supported report types from API*@
+                    <SelectItem Title="Report type" bind-Value="model.ReportType" PropertyName="@nameof(model.ReportType)" Options="@reportTypes" />
+                    <DateRangeControl Title="Date range" Properties="@(new[] {nameof(GenerateReportViewModel.Start), nameof(GenerateReportViewModel.End)})" bind-Start="model.Start" bind-End="model.End" />
+                </ModelValidation>
             </Body>
             <Footer>
                 <button class="btn btn-success btn-fill pull-right" onclick="@(() => Create())">Create a report</button>
@@ -38,7 +26,6 @@
 @functions
 {
     private IFormValidator formValidator;
-    private string currentUser;
     private IEnumerable<ProfileViewModel> profiles = Enumerable.Empty<ProfileViewModel>();
     private GenerateReportViewModel model = new GenerateReportViewModel {ReportType  = "PullRequestsReport" };
 
@@ -48,8 +35,6 @@
 
     protected override async Task OnInitAsync()
     {
-        // TODO: Handle if already initialized?
-        currentUser = await Client.GetCurrentUserNameAsync();
         profiles = await Client.GetAll<ProfileViewModel>();
 
         profileOptions = profiles.ToDictionary(k => k.Id.ToString(), v => $"{v.Name} ({v.Type})");
@@ -71,10 +56,5 @@
 
         var reportId = await Client.GenerateReport(model);
         UriHelper.NavigateTo($"/reports/view/{model.ReportType}/{reportId}");
-    }
-
-    void Login()
-    {
-        UriHelper.NavigateTo("http://localhost:5000/login/Challenge?returnUrl=" + UriHelper.GetAbsoluteUri());
     }
 }

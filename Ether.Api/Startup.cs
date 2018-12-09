@@ -10,6 +10,8 @@ using Ether.ViewModels.Validators;
 using Ether.Vsts.Config;
 using Ether.Vsts.Jobs;
 using FluentValidation.AspNetCore;
+using IdentityServer4.Services;
+using IdentityServer4.Validation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -39,12 +41,7 @@ namespace Ether.Api
 
             services.AddOptions();
             services.Configure<DbConfiguration>(Configuration.GetSection("DbConfig"));
-
-            services.Configure<IISOptions>(iis =>
-            {
-                iis.AuthenticationDisplayName = "Windows";
-                iis.AutomaticAuthentication = false;
-            });
+            services.Configure<ADConfiguration>(Configuration.GetSection("ADConfig"));
 
             // Auto Mapper Configurations
             var mappingConfig = new MapperConfiguration(mc =>
@@ -55,14 +52,21 @@ namespace Ether.Api
             services.AddSingleton(mappingConfig.CreateMapper());
 
             services.AddResponseCompression();
-            services.AddIdentityServer(o =>
-            {
-                o.UserInteraction.LoginUrl = "/login/challenge";
-            })
+            services.AddIdentityServer()
+                .AddDeveloperSigningCredential()
                 .AddInMemoryApiResources(Config.GetApiResources())
                 .AddInMemoryClients(Config.GetClients());
 
-            services.AddAuthentication();
+            services.AddAuthentication("Bearer")
+                .AddIdentityServerAuthentication(options =>
+            {
+                options.Authority = "http://localhost:5000";
+                options.RequireHttpsMetadata = false;
+                options.ApiName = "api";
+            });
+
+            services.AddTransient<IResourceOwnerPasswordValidator, ADPasswordValidator>();
+            services.AddTransient<IProfileService, ProfileServiceWithCustomClaims>();
 
             services.AddCors();
             services.AddMvc(o =>

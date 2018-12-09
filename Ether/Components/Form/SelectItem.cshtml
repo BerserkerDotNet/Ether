@@ -1,6 +1,6 @@
 ﻿@typeparam T
 @inherits InputItemBase<T>
-<ValidatedField PropertyName="@PropertyName" Properties="@Properties" Title="@Title">
+<ValidatedField Properties="@Properties" Title="@Title">
     <select class="form-control" onchange="@OnSelectionChanged">
         @foreach (var option in Options)
         {

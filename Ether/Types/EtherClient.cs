@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using Ether.ViewModels;
+using IdentityModel.Client;
 using Microsoft.AspNetCore.Blazor;
 using Microsoft.AspNetCore.Blazor.Browser.Http;
+using Microsoft.AspNetCore.Blazor.Services;
+using Microsoft.JSInterop;
 
 namespace Ether.Types
 {
@@ -23,58 +27,141 @@ namespace Ether.Types
         };
 
         private readonly HttpClient _httpClient;
+        private readonly IUriHelper _navigation;
 
-        public EtherClient(HttpClient httpClient)
+        public EtherClient(HttpClient httpClient, IUriHelper navigation)
         {
             BrowserHttpMessageHandler.DefaultCredentials = FetchCredentialsOption.Include;
             _httpClient = httpClient;
+            this._navigation = navigation;
             httpClient.BaseAddress = new Uri("http://localhost:5000/api/");
         }
 
-        public Task<string> GetCurrentUserNameAsync()
+        public void SetAccessToken(string token)
         {
-            return _httpClient.GetStringAsync("User/Name");
+            _httpClient.SetBearerToken(token);
+        }
+
+        public async Task<UserViewModel> GetCurrentUserAsync()
+        {
+            return await HttpGet<UserViewModel>("User/GetUser");
         }
 
         public async Task<bool> IsUserHasAccess(string path, string category)
         {
-            var result = await _httpClient.GetStringAsync($"User/HasMenuAccess?path={path}&category={category}");
-            return bool.Parse(result);
+            try
+            {
+                return await HttpGet<bool>($"User/HasMenuAccess?path={path}&category={category}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return false;
+            }
         }
 
         public Task<VstsDataSourceViewModel> GetVstsDataSourceConfig()
         {
-            return _httpClient.GetJsonAsync<VstsDataSourceViewModel>("Settings/VstsDataSourceConfiguration");
+            return HttpGet<VstsDataSourceViewModel>("Settings/VstsDataSourceConfiguration");
         }
 
         public Task SaveVstsDataSourceConfig(VstsDataSourceViewModel model)
         {
-            return _httpClient.PostJsonAsync("Settings/VstsDataSourceConfiguration", model);
+            return HttpPost("Settings/VstsDataSourceConfiguration", model);
         }
 
         public Task<IEnumerable<T>> GetAll<T>()
         {
-            return _httpClient.GetJsonAsync<IEnumerable<T>>($"{GetPathFor<T>()}/GetAll");
+            return HttpGet<IEnumerable<T>>($"{GetPathFor<T>()}/GetAll");
         }
 
         public Task<T> GetById<T>(Guid id)
         {
-            return _httpClient.GetJsonAsync<T>($"{GetPathFor<T>()}/GetById?id={id}");
+            return HttpGet<T>($"{GetPathFor<T>()}/GetById?id={id}");
         }
 
         public Task Save<T>(T model)
         {
-            return _httpClient.PostJsonAsync($"{GetPathFor<T>()}/Save", model);
+            return HttpPost($"{GetPathFor<T>()}/Save", model);
         }
 
         public Task Delete<T>(Guid id)
         {
-            return _httpClient.DeleteAsync($"{GetPathFor<T>()}/Delete?id={id}");
+            return HttpDelete($"{GetPathFor<T>()}/Delete?id={id}");
         }
 
         public Task<Guid> GenerateReport(GenerateReportViewModel model)
         {
-            return _httpClient.PostJsonAsync<Guid>($"{GetPathFor<GenerateReportViewModel>()}/Generate", model);
+            return HttpPost<Guid>($"{GetPathFor<GenerateReportViewModel>()}/Generate", model);
+        }
+
+        public async Task<AccessToken> RequestAccessToken(LoginViewModel model)
+        {
+            var tokenResponse = await _httpClient.RequestPasswordTokenAsync(new PasswordTokenRequest
+            {
+                Address = "http://localhost:5000/connect/token",
+                ClientId = "EtherBlazorClient",
+                UserName = model.UserName,
+                Password = model.Password,
+                Scope = "api"
+            });
+
+            if (tokenResponse.IsError)
+            {
+                Console.WriteLine(tokenResponse.Error);
+                throw new Exception(tokenResponse.Error);
+            }
+
+            SetAccessToken(tokenResponse.AccessToken);
+            return new AccessToken(tokenResponse.AccessToken, TimeSpan.FromSeconds(tokenResponse.ExpiresIn));
+        }
+
+        private async Task<T> HttpGet<T>(string url)
+        {
+            var response = await _httpClient.GetAsync(url);
+            VerifyResponseStatusCode(response);
+
+            var content = await response.Content.ReadAsStringAsync();
+            return Json.Deserialize<T>(content);
+        }
+
+        private Task HttpPost(string url, object payload)
+        {
+            return HttpPostInternal(url, payload);
+        }
+
+        private async Task<T> HttpPost<T>(string url, object payload)
+        {
+            var response = await HttpPostInternal(url, payload);
+            var content = await response.Content.ReadAsStringAsync();
+            return Json.Deserialize<T>(content);
+        }
+
+        private async Task<HttpResponseMessage> HttpPostInternal(string url, object payload)
+        {
+            var json = Json.Serialize(payload);
+            var response = await _httpClient.PostAsync(url, new StringContent(json, Encoding.UTF8, "application/json"));
+            VerifyResponseStatusCode(response);
+
+            return response;
+        }
+
+        private async Task HttpDelete(string url)
+        {
+            var response = await _httpClient.DeleteAsync(url);
+            VerifyResponseStatusCode(response);
+        }
+
+        private void VerifyResponseStatusCode(HttpResponseMessage response)
+        {
+            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                _navigation.NavigateTo(Routes.LoginExpiredSession);
+            }
+            else if (!response.IsSuccessStatusCode)
+            {
+                throw new Exception($"{response.StatusCode} {response.ReasonPhrase}");
+            }
         }
 
         private string GetPathFor<T>()

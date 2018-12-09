@@ -11,10 +11,10 @@ namespace Ether.Components.CodeBehind
         protected string Title { get; set; }
 
         [Parameter]
-        protected string PropertyName { get; set; }
+        protected bool NoLabel { get; set; }
 
         [Parameter]
-        protected string[] Properties { get; set; }
+        protected string PropertyName { get; set; }
 
         [Parameter]
         protected T Value
@@ -34,5 +34,7 @@ namespace Ether.Components.CodeBehind
 
         [Parameter]
         protected Action<T> ValueChanged { get; set; }
+
+        protected string[] Properties => new[] { PropertyName };
     }
 }

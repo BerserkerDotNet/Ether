@@ -21,6 +21,18 @@ window.BlazorComponents.Utils = {
     },
     succeedValidation: function (id) {
         $('#' + id).children(':input').removeClass('is-invalid', 'was-validated');
+    },
+    buttonState: function (btn, state) {
+        var button = $(btn);
+        if (state === 'loading') {
+            var loadingText = button.data('loading-text');
+            button.html(loadingText);
+            button.attr('disabled', true);
+        } else {
+            var loadingText = button.data('normal-text');
+            button.html(loadingText);
+            button.removeAttr('disabled');
+        }
     }
 };
 

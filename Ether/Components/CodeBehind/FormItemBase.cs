@@ -19,7 +19,7 @@ namespace Ether.Components.CodeBehind
         protected string Title { get; set; }
 
         [Parameter]
-        protected string PropertyName { get; set; }
+        protected bool NoLabel { get; set; }
 
         [Parameter]
         protected string[] Properties { get; set; }
@@ -34,16 +34,23 @@ namespace Ether.Components.CodeBehind
 
         protected override void OnInit()
         {
-            if (Properties == null)
-            {
-                Properties = new[] { PropertyName };
-            }
+            Console.WriteLine($"Properties set to {string.Join(",", Properties)}");
 
             ContainerForm.OnValidated += OnValidated;
         }
 
         private async void OnValidated(object sender, ValidationResult result)
         {
+            if (Properties != null)
+            {
+                Console.WriteLine($"V Properties set to {string.Join(",", Properties)}, S: {sender}");
+            }
+            else
+            {
+                Console.WriteLine($"V Properties set to null, S: {sender}");
+                return;
+            }
+
             if (result.IsValid || !result.Errors.Keys.Any(k => Properties.Contains(k)))
             {
                 await JsUtils.SucceedValidation(Id);

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Ether.Types
+﻿namespace Ether.Types
 {
     public class MenuItem
     {

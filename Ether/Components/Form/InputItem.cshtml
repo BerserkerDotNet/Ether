@@ -1,8 +1,8 @@
 ﻿@typeparam T
 @inherits InputItemBase<T>
 
-<ValidatedField PropertyName="@PropertyName" Properties="@Properties" Title="@Title">
-    <input type="@Type" class="form-control" bind="InternalValue" />
+<ValidatedField Properties="@Properties" Title="@Title" NoLabel="@NoLabel">
+    <input type="@Type" class="form-control" bind="InternalValue" placeholder="@Title" />
 </ValidatedField>
 
 @functions{

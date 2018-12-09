@@ -1,7 +1,10 @@
 ﻿@inherits FormItemBase
 
 <div id="@Id" class="form-group">
-    <label>@Title</label>
+    @if (!NoLabel)
+    {
+        <label>@Title</label>
+    }
     @ChildContent
     <div class="invalid-feedback">
         <span>@ErrorMessage</span>

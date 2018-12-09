@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using IdentityServer4.Models;
 
 namespace Ether.Api
@@ -20,14 +21,12 @@ namespace Ether.Api
                 new Client
                 {
                     ClientId = "EtherBlazorClient",
-                    AllowedGrantTypes = GrantTypes.ResourceOwnerPasswordAndClientCredentials,
-                    ClientSecrets =
-                    {
-                        new Secret("secret".Sha256())
-                    },
-                    AllowedScopes = { "api" },
+                    AllowedGrantTypes = GrantTypes.ResourceOwnerPassword,
+                    AllowedScopes = { "api", "openid" },
+                    RequireClientSecret = false,
                     AllowedCorsOrigins = new[] { "http://localhost:57796" },
-                    RedirectUris = { "http://localhost:57796" }
+                    RedirectUris = { "http://localhost:57796" },
+                    AccessTokenLifetime = (int)TimeSpan.FromDays(30).TotalSeconds
                 }
             };
         }

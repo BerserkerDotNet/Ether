@@ -1,12 +1,14 @@
 ﻿@inherits InputItemBase<string>
 
-<ValidatedField PropertyName="@PropertyName" Properties="@Properties" Title="@Title">
+<ValidatedField Properties="@Properties" Title="@Title">
     <input ref="dateRange" class="form-control" />
 </ValidatedField>
 
 @functions{
 
     private ElementRef dateRange;
+
+    [Parameter] new string[] Properties { get; set; }
 
     [Parameter] DateTime Start { get; set; }
     [Parameter] Action<DateTime> StartChanged { get; set; }

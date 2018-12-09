@@ -17,10 +17,10 @@ namespace Ether.Types
         public async Task LoadMenuAsync()
         {
             Menu = new List<MenuItem>(3);
-            await AddItem(new MenuItem("Home", "paper-2", string.Empty, "Reports"));
-            await AddItem(new MenuItem("Reports", "single-copy-04", "reports", "Reports"));
-            await AddItem(new MenuItem("Azure DevOps", "vector", "azure-devops", "AzureDevOps Settings"));
-            await AddItem(new MenuItem("Settings", "settings-gear-64", "settings", "Settings"));
+            await AddItem(new MenuItem("Home", "home", string.Empty, "Reports"));
+            await AddItem(new MenuItem("Reports", "pie-chart", "reports", "Reports"));
+            await AddItem(new MenuItem("Azure DevOps", "cloud-upload", "azure-devops", "AzureDevOps Settings"));
+            await AddItem(new MenuItem("Settings", "cogs", "settings", "Settings"));
         }
 
         private async Task AddItem(MenuItem item)

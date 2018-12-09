@@ -10,7 +10,7 @@
     {
         <li class="nav-item">
             <NavLink class="nav-link" href="@(menu.Path)" Match="NavLinkMatch.Prefix">
-                <i class="nc-icon nc-@menu.Icon"></i>
+                <i class="fa fa-@menu.Icon"></i>
                 <p>@menu.Name</p>
             </NavLink>
         </li>
@@ -21,6 +21,13 @@
 
     protected override async Task OnInitAsync()
     {
+        Console.WriteLine("Initializing menu");
         await MenuService.LoadMenuAsync();
+    }
+
+    protected override void OnAfterRender()
+    {
+        Console.WriteLine("Rendering menu");
+        base.OnAfterRender();
     }
 }
