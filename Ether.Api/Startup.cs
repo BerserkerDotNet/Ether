@@ -104,7 +104,7 @@ namespace Ether.Api
             }
 
             app.UseStaticFiles();
-            app.UseCors(b => b.AllowAnyOrigin()
+            app.UseCors(b => b.WithOrigins("http://localhost:57797")
                              .AllowAnyHeader()
                              .AllowAnyMethod()
                              .AllowCredentials());

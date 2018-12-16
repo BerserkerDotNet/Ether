@@ -23,7 +23,12 @@ namespace Ether.Core.Types.Handlers.Queries
         public async Task<IEnumerable<TModel>> Handle(TQuery query)
         {
             var result = await _repository.GetAllAsync<TData>();
-            return _mapper.Map<IEnumerable<TModel>>(result);
+            return PostProcessData(_mapper.Map<IEnumerable<TModel>>(result));
+        }
+
+        protected virtual IEnumerable<TModel> PostProcessData(IEnumerable<TModel> data)
+        {
+            return data;
         }
     }
 }

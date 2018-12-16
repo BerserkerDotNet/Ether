@@ -14,7 +14,7 @@ namespace Ether.Types
 {
     public class EtherClient
     {
-        private static readonly Dictionary<Type, string> _typeRoutes = new Dictionary<Type, string>(5)
+        private static readonly Dictionary<Type, string> _typeRoutes = new Dictionary<Type, string>(9)
         {
             { typeof(VstsProjectViewModel), "vsts/project" },
             { typeof(VstsRepositoryViewModel), "vsts/repository" },
@@ -23,7 +23,8 @@ namespace Ether.Types
             { typeof(IdentityViewModel), "identity" },
             { typeof(ReportViewModel), "report" },
             { typeof(PullRequestReportViewModel), "report" },
-            { typeof(GenerateReportViewModel), "report" }
+            { typeof(GenerateReportViewModel), "report" },
+            { typeof(JobLogViewModel), "joblogs" }
         };
 
         private readonly HttpClient _httpClient;

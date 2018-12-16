@@ -13,9 +13,9 @@ namespace Ether.Vsts.Config
             CreateMap<VstsProjectViewModel, Project>();
 
             CreateMap<VstsProfile, ProfileViewModel>()
-                .ForMember(p => p.Type, o => o.UseValue(Constants.VstsType));
+                .ForMember(p => p.Type, o => o.MapFrom(_ => Constants.VstsType));
             CreateMap<ProfileViewModel, VstsProfile>()
-                .ForMember(p => p.Type, o => o.UseValue(Constants.VstsType));
+                .ForMember(p => p.Type, o => o.MapFrom(_ => Constants.VstsType));
 
             CreateMap<Repository, RepositoryInfo>()
                 .ForMember(r => r.Project, o => o.Ignore())

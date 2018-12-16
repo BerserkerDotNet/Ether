@@ -43,6 +43,11 @@ namespace Ether.Types
             return JSRuntime.Current.InvokeAsync<string>("window.BlazorComponents.Utils.buttonState", btn, state);
         }
 
+        public static Task Print()
+        {
+            return JSRuntime.Current.InvokeAsync<object>("window.BlazorComponents.Utils.print");
+        }
+
         public static Task DateRangePicker(ElementRef element, DotNetObjectRef component)
         {
             return JSRuntime.Current.InvokeAsync<object>("window.BlazorComponents.DateRangePicker.init", element, component);

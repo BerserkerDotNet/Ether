@@ -160,6 +160,45 @@ namespace Ether.Tests.Handlers.Commands
         }
 
         [Test]
+        public async Task ShouldHandlePullRequestCompletedInFuture()
+        {
+            var start = DateTime.Now.AddDays(-11);
+            var end = DateTime.Now;
+            var member = Builder<TeamMemberViewModel>.CreateNew()
+                .Build();
+            var memberIds = new[] { member.Id };
+            var repositories = new[] { Guid.NewGuid() };
+            var profile = Builder<ProfileViewModel>.CreateNew()
+                .With(p => p.Members = new[] { member.Id })
+                .With(p => p.Repositories = repositories)
+                .Build();
+
+            var pullRequest = GetCompletedPullRequest(member.Id, repositories[0], end.AddHours(5), end.AddHours(5), createdInThePast: true);
+
+            SetupGetProfile(profile);
+            SetupGetMember(new[] { member });
+            SetupGetPullRequests(new[] { pullRequest });
+
+            var command = new GeneratePullRequestsReport { Profile = Guid.NewGuid(), Start = start, End = end };
+            await InvokeAndVerify(command, (report, reportId) =>
+            {
+                report.Should().NotBeNull();
+                var firstMemberReport = report.IndividualReports.First();
+
+                firstMemberReport.Created.Should().Be(1);
+                firstMemberReport.Active.Should().Be(0);
+                firstMemberReport.Completed.Should().Be(0);
+                firstMemberReport.Abandoned.Should().Be(0);
+                firstMemberReport.TotalIterations.Should().Be(1);
+                firstMemberReport.TotalComments.Should().Be(2);
+                firstMemberReport.AveragePRLifespan.Should().Be(TimeSpan.Zero);
+            });
+
+            _dataSourceMock.VerifyAll();
+            RepositoryMock.Verify();
+        }
+
+        [Test]
         public async Task ShouldSetReportMetadata()
         {
             var members = Enumerable.Empty<TeamMemberViewModel>();

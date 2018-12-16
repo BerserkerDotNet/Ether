@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using Ether.Api.Attributes;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.Internal;
 
@@ -17,7 +18,7 @@ namespace Ether.Api.Types
 
         private bool IsApiController(ControllerModel controller)
         {
-            if (controller.Attributes.OfType<IApiBehaviorMetadata>().Any())
+            if (controller.Attributes.OfType<ApiControllerAttribute>().Any())
             {
                 return true;
             }
@@ -25,7 +26,7 @@ namespace Ether.Api.Types
             return controller
                 .ControllerType
                 .GetCustomAttributes(inherit: true)
-                .OfType<IApiBehaviorMetadata>()
+                .OfType<ApiControllerAttribute>()
                 .Any();
         }
     }

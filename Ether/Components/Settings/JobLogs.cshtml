@@ -1,0 +1,32 @@
+﻿@inherits EditableTable<JobLogViewModel>
+
+<Card>
+    <Header><h4 class="card-title">Job logs</h4></Header>
+    <Body>
+        <DataTable Items="@Items" PageSize="5">
+            <TableHeader>
+                <th>Type</th>
+                <th>Result</th>
+                <th>Completed On</th>
+                <th>Execution time</th>
+                <th>Message</th>
+            </TableHeader>
+            <RowTemplate Context="log">
+                <td>@log.JobType</td>
+                <td>@log.Result</td>
+                <td>@log.CompletedOn</td>
+                <td>@log.ExecutionTime</td>
+                <td>@log.Message</td>
+            </RowTemplate>
+        </DataTable>
+    </Body>
+    <Footer><button class="btn btn-success btn-fill pull-right" onclick="@(() => Refresh())">Refresh</button></Footer>
+</Card>
+
+@functions
+{ 
+    protected override void OnRecordsLoaded()
+    {
+        Items = Items.OrderByDescending(r => r.CompletedOn).ToArray();
+    }
+}

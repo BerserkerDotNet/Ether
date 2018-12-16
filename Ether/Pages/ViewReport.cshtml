@@ -1,17 +1,59 @@
 ﻿@page "/reports/view/{type}/{id:guid}"
 @inject EtherClient Client
-@inject Microsoft.AspNetCore.Blazor.Services.IUriHelper UriHelper
+@inject IUriHelper UriHelper
+<Card>
+    <Header>
+        @reportDisplayName
+        <div class="pull-right d-print-none">
+            <button class="btn btn-fill btn-default" onclick="@Print">Print</button>
+            <button class="btn btn-fill btn-info" onclick="@NewReport">New report</button>
+            <button class="btn btn-fill btn-success" onclick="@BackToList">Back to list</button>
+        </div>
+    </Header>
+    <Body>
+        @componentToRender
+    </Body>
+    <Footer>
 
-@if (string.Equals(Type, "PullRequestsReport", StringComparison.OrdinalIgnoreCase))
-{
-    <PullRequestsReport Id="Id.Value"></PullRequestsReport>
-}
-
+    </Footer>
+</Card>
 @functions
 {
+    private string reportDisplayName = string.Empty;
+    RenderFragment componentToRender;
+
     [Parameter]
     private Guid? Id { get; set; }
 
     [Parameter]
     private string Type { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        if (string.Equals(Type, "PullRequestsReport", StringComparison.OrdinalIgnoreCase))
+        {
+            reportDisplayName = "Pull requests report";
+            componentToRender = b =>
+            {
+                b.OpenComponent<Ether.Components.Reports.PullRequestsReport>(1);
+                b.AddAttribute(2, "Id", Id.Value);
+                b.CloseComponent();
+            };
+        }
+    }
+
+    protected void BackToList()
+    {
+        UriHelper.NavigateTo("/reports");
+    }
+
+    protected void NewReport()
+    {
+        UriHelper.NavigateTo("/");
+    }
+
+    protected void Print()
+    {
+        JsUtils.Print();
+    }
 }

@@ -33,6 +33,9 @@ window.BlazorComponents.Utils = {
             button.html(loadingText);
             button.removeAttr('disabled');
         }
+    },
+    print: function () {
+        window.print();
     }
 };
 

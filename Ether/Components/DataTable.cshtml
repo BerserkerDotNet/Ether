@@ -1,31 +1,60 @@
 ﻿@typeparam TItem
 
-<table class="table" ref="table">
+<table class="table">
     <thead>
         <tr>@TableHeader</tr>
     </thead>
     <tbody>
-        @foreach (var item in Items)
+        @foreach (var item in Items.Skip(PageSize * (currentPage-1)).Take(PageSize))
         {
             <tr>@RowTemplate(item)</tr>
         }
     </tbody>
     <tfoot>
         @TableFooter
+        @if (itemsCount > PageSize)
+        {
+            <tr>
+                <td colspan="100">
+                    <div class="pull-right">
+                        <button class="btn btn-simple" disabled="@(currentPage == 1)" onclick="@(() => PrevPage())">Prev</button>
+                        <span>@currentPage of @totalPages</span>
+                        <button class="btn btn-simple" disabled="@(currentPage >= totalPages)" onclick="@(() => NextPage())">Next</button>
+                    </div>
+                </td>
+            </tr>
+        }
     </tfoot>
 </table>
 
 @functions
 {
-    private ElementRef table;
+    private int currentPage = 1;
+    private int totalPages = 0;
+    private int itemsCount = 0;
 
-    //protected override async Task OnAfterRenderAsync()
-    //{
-    //    await JsUtils.DataTable(table);
-    //}
-
+    [Parameter] int PageSize { get; set; } = 10;
     [Parameter] RenderFragment TableHeader { get; set; }
     [Parameter] RenderFragment<TItem> RowTemplate { get; set; }
     [Parameter] RenderFragment TableFooter { get; set; }
     [Parameter] IEnumerable<TItem> Items { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        itemsCount = Items.Count();
+        totalPages = (int)Math.Ceiling(itemsCount / (decimal)PageSize);
+    }
+
+    protected void NextPage()
+    {
+        currentPage++;
+        StateHasChanged();
+    }
+
+    protected void PrevPage()
+    {
+        currentPage--;
+        StateHasChanged();
+    }
 }

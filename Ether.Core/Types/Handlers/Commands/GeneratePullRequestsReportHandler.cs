@@ -75,7 +75,7 @@ namespace Ether.Core.Types.Handlers.Commands
                 individualReport.TotalIterations = memberPullRequests.Sum(p => p.Iterations);
                 individualReport.TotalComments = memberPullRequests.Sum(p => p.Comments);
                 var averagePullRequestLifetime = memberPullRequests
-                    .Where(IsCompletedPullRequest)
+                    .Where(p => IsCompletedPullRequest(p) && IsCompletedIn(p, command.Start, command.End))
                     .Sum(r => (r.Completed.Value - r.Created).TotalSeconds) / individualReport.Completed;
                 averagePullRequestLifetime = double.IsNaN(averagePullRequestLifetime) ? 0 : averagePullRequestLifetime;
                 individualReport.AveragePRLifespan = TimeSpan.FromSeconds(averagePullRequestLifetime);

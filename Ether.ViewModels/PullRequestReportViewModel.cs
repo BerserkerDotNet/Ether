@@ -47,11 +47,11 @@ namespace Ether.ViewModels
 
             public TimeSpan AveragePRLifespan { get; set; }
 
-            public double CodeQuality => ((double)TotalPullRequestsCount / TotalIterations) * 100;
+            public double CodeQuality => TotalIterations == 0 ? 0 : ((double)TotalPullRequestsCount / TotalIterations) * 100;
 
-            public double AverageIterations => TotalIterations / (double)TotalPullRequestsCount;
+            public double AverageIterations => TotalPullRequestsCount == 0 ? 0 : TotalIterations / (double)TotalPullRequestsCount;
 
-            public double AverageComments => TotalComments / (double)TotalPullRequestsCount;
+            public double AverageComments => TotalPullRequestsCount == 0 ? 0 : TotalComments / (double)TotalPullRequestsCount;
 
             public int TotalPullRequestsCount => Completed + Active + Abandoned;
 

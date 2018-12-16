@@ -28,7 +28,8 @@
 
         Start = DateTime.Parse(start);
         StartChanged?.Invoke(Start);
-        End = DateTime.Parse(end);
+        var endDate = DateTime.Parse(end);
+        End = endDate.AddDays(1).AddMilliseconds(-1);
         EndChanged?.Invoke(End);
     }
 }

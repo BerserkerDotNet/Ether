@@ -5,6 +5,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Ether.Contracts.Interfaces;
+using Ether.Contracts.Interfaces.CQS;
+using Ether.Core.Types;
+using Ether.Core.Types.Commands;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -63,6 +66,7 @@ namespace Ether.Api.Jobs
             {
                 var job = (IJob)scope.ServiceProvider.GetService(configuration.JobType);
                 var jobName = configuration.JobType.Name;
+                var mediator = scope.ServiceProvider.GetService<IMediator>();
                 var sw = new Stopwatch();
                 while (!cancellationToken.IsCancellationRequested)
                 {
@@ -71,10 +75,12 @@ namespace Ether.Api.Jobs
                     {
                         _logger.LogInformation($"Executing '{jobName}'");
                         await job.Execute();
+                        await mediator.Execute(ReportJobCompleted.GetSuccessful(jobName, sw.Elapsed));
                     }
                     catch (Exception ex)
                     {
                         _logger.LogError(ex, $"Error while executing '{configuration.JobType.Name}'");
+                        await mediator.Execute(ReportJobCompleted.GetFailed(jobName, ex.Message, sw.Elapsed));
                     }
 
                     sw.Stop();

@@ -95,9 +95,14 @@ namespace Ether.Components.CodeBehind
             }
         }
 
-        private async Task Refresh()
+        protected virtual void OnRecordsLoaded()
+        {
+        }
+
+        protected virtual async Task Refresh()
         {
             Items = await Client.GetAll<T>();
+            OnRecordsLoaded();
             StateHasChanged();
         }
     }

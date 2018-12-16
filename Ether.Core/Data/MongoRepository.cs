@@ -25,17 +25,11 @@ namespace Ether.Core.Data
 
         public MongoRepository(IOptions<DbConfiguration> dbConfig, IDbConfigurator dbConfigurator)
         {
-            // TODO: Shouldn't be here
-
             foreach (var registration in dbConfigurator.Registrations)
             {
                 SafeRegisterClassMap(registration.TypeToRegister);
             }
 
-            // SafeRegisterClassMap<PullRequestsReport>();
-            // SafeRegisterClassMap<WorkItemsReport>();
-            // SafeRegisterClassMap<ListOfReviewersReport>();
-            // SafeRegisterClassMap<AggregatedWorkitemsETAReport>();
             var pack = new ConventionPack();
             pack.Add(new IgnoreExtraElementsConvention(true));
 
@@ -158,7 +152,8 @@ namespace Ether.Core.Data
             where T : BaseDto
         {
             var collection = GetCollectionFor<T>();
-            var update = Builders<T>.Update.Set(field, value);
+            var update = Builders<T>.Update
+                .Set(field, value);
             await collection.UpdateOneAsync<T>(e => e.Id == obj.Id, update);
         }
 
