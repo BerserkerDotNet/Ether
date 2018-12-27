@@ -84,6 +84,7 @@ namespace Ether.Api
             services.AddJobs(cfg =>
             {
                 cfg.RecurrentJob<PullRequestsSyncJob>(TimeSpan.FromMinutes(10));
+                cfg.RecurrentJob<WorkItemsSyncJob>(TimeSpan.FromDays(1));
             });
         }
 

@@ -5,7 +5,7 @@ namespace Ether.Contracts.Interfaces
 {
     public interface IDbConfigurator
     {
-        IEnumerable<ClassMapRegistration> Registrations { get; }
+        IEnumerable<IClassMapRegistration> Registrations { get; }
 
         IEnumerable<DbIndexDescriptor> Indexes { get; }
     }

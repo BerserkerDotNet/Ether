@@ -1,6 +1,5 @@
 ﻿using System.Threading.Tasks;
 using Ether.Contracts.Interfaces;
-using Ether.Vsts.Dto;
 using Microsoft.Extensions.Logging;
 
 namespace Ether.Vsts.Config

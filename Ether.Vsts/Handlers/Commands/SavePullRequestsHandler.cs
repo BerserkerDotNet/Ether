@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Ether.Contracts.Interfaces;
 using Ether.Contracts.Interfaces.CQS;
-using Ether.Contracts.Types;
 using Ether.Vsts.Commands;
 using Ether.Vsts.Dto;
 

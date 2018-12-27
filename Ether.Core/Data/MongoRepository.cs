@@ -27,7 +27,7 @@ namespace Ether.Core.Data
         {
             foreach (var registration in dbConfigurator.Registrations)
             {
-                SafeRegisterClassMap(registration.TypeToRegister);
+                registration.Register();
             }
 
             var pack = new ConventionPack();

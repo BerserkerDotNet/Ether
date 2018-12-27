@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Ether.Contracts.Interfaces.CQS;
 using Ether.Core.Types.Queries;
 using Ether.ViewModels;
@@ -30,8 +31,13 @@ namespace Ether.Vsts.Types
                 throw new AzureDevopsConfigurationIsMissingException();
             }
 
-            var identity = await _mediator.Request<GetIdentityById, IdentityViewModel>(new GetIdentityById { Id = config.DefaultToken.Value });
-            Client = VstsClient.Get(new OnlineUrlBuilderFactory(config.InstanceName), identity.Token);
+            if (string.IsNullOrEmpty(token))
+            {
+                var identity = await _mediator.Request<GetIdentityById, IdentityViewModel>(new GetIdentityById { Id = config.DefaultToken.Value });
+                token = identity.Token;
+            }
+
+            Client = VstsClient.Get(new OnlineUrlBuilderFactory(config.InstanceName), token);
 
             return Client;
         }
@@ -44,6 +50,19 @@ namespace Ether.Vsts.Types
 
         public async Task<IVstsPullRequestsClient> GetPullRequestsClient(string token = null)
         {
+            var client = await GetClient(token);
+            return client;
+        }
+
+        public async Task<IVstsWorkItemsClient> GetWorkItemsClient(Guid? identityId)
+        {
+            var token = string.Empty;
+            if (identityId.HasValue)
+            {
+                var identity = await _mediator.Request<GetIdentityById, IdentityViewModel>(new GetIdentityById { Id = identityId.Value });
+                token = identity.Token;
+            }
+
             var client = await GetClient(token);
             return client;
         }

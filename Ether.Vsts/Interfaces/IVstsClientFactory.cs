@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using VSTS.Net.Interfaces;
 
 namespace Ether.Vsts.Interfaces
@@ -10,5 +11,7 @@ namespace Ether.Vsts.Interfaces
         Task<IVstsPullRequestsClient> GetPullRequestsClient(string token = null);
 
         Task<IVstsIdentityClient> GetIdentityClient(string token = null);
+
+        Task<IVstsWorkItemsClient> GetWorkItemsClient(Guid? identityId);
     }
 }

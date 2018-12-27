@@ -17,9 +17,11 @@ namespace Ether.Vsts.Config
 
             builder.RegisterInstance(workItemIndex);
             builder.RegisterInstance(pullRequestIndex);
+            builder.RegisterType<VstsClassMapRegistration>().As<IClassMapRegistration>();
             builder.RegisterType<VstsInitialMigration>().As<IMigration>();
             builder.RegisterType<VstsClientFactory>().As<IVstsClientFactory>();
             builder.RegisterType<PullRequestsSyncJob>().As<IJob>();
+            builder.RegisterType<WorkItemsSyncJob>().As<IJob>();
             builder.RegisterType<VstsDataSource>().Keyed<IDataSource>(Constants.VstsType);
 
             base.Load(builder);
