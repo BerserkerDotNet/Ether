@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Ether.Contracts.Interfaces;
@@ -30,12 +31,24 @@ namespace Ether.Vsts.Handlers.Commands
                 return;
             }
 
-            var relatedIds = command.Workitems.Select(w => w.WorkitemId).ToArray();
-            await _repository.UpdateFieldValue(new TeamMember { Id = command.Member.Id }, m => m.RelatedWorkItems, relatedIds);
+            var member = await _repository.GetSingleAsync<TeamMember>(command.Member.Id);
+            var relatedIds = member.RelatedWorkItems
+                .Union(command.Workitems.Select(w => w.WorkitemId))
+                .Distinct()
+                .ToArray();
+            await _repository.UpdateFieldValue(member, m => m.RelatedWorkItems, relatedIds);
+            await _repository.UpdateFieldValue(member, m => m.LastWorkitemsFetchDate, DateTime.UtcNow);
             foreach (var workItemModel in command.Workitems)
             {
-                var workItem = new WorkItem { CurrentState = workItemModel.WorkItem, Updates = workItemModel.Updates, WorkItemId = workItemModel.WorkitemId };
-                await _repository.CreateOrUpdateAsync(workItem, w => w.CurrentState.Id == workItemModel.WorkitemId);
+                try
+                {
+                    var workItem = new WorkItem { CurrentState = workItemModel.WorkItem, Updates = workItemModel.Updates, WorkItemId = workItemModel.WorkitemId };
+                    await _repository.CreateOrUpdateIfAsync(w => w.CurrentState.Id == workItemModel.WorkitemId, workItem);
+                }
+                catch (Exception)
+                {
+                    // TODO: Log error
+                }
             }
         }
     }

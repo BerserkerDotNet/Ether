@@ -15,7 +15,7 @@ namespace Ether.Vsts.Handlers.Commands
         {
         }
 
-        protected override Task<VstsRepositoryViewModel> GetData(SaveRepository command) => Task.FromResult(command.Repository);
+        protected override Task<VstsRepositoryViewModel> FixViewModel(SaveRepository command) => Task.FromResult(command.Repository);
 
         protected override void ValidateCommand(SaveRepository command)
         {

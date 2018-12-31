@@ -1,4 +1,5 @@
-﻿using Ether.Contracts.Dto;
+﻿using System;
+using Ether.Contracts.Dto;
 
 namespace Ether.Vsts.Dto
 {
@@ -9,5 +10,7 @@ namespace Ether.Vsts.Dto
         public string DisplayName { get; set; }
 
         public int[] RelatedWorkItems { get; set; }
+
+        public DateTime? LastWorkitemsFetchDate { get; set; }
     }
 }

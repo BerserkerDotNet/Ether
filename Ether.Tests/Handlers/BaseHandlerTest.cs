@@ -10,6 +10,7 @@ using Ether.Core.Config;
 using Ether.Vsts.Config;
 using ExpectedObjects;
 using Moq;
+using Moq.Language.Flow;
 using NUnit.Framework;
 
 namespace Ether.Tests.Handlers
@@ -89,6 +90,17 @@ namespace Ether.Tests.Handlers
             RepositoryMock.Setup(r => r.CreateOrUpdateIfAsync(It.Is<Expression<Func<T, bool>>>(p => predicate(p)), It.Is(itemPredicate)))
                 .ReturnsAsync(true)
                 .Verifiable();
+        }
+
+        protected ISetup<IRepository, Task<bool>> SetupCreateOrUpdateIfManual<T>(Func<Expression, bool> predicate, Expression<Func<T, bool>> itemPredicate = null)
+            where T : BaseDto
+        {
+            if (itemPredicate == null)
+            {
+                itemPredicate = _ => true;
+            }
+
+            return RepositoryMock.Setup(r => r.CreateOrUpdateIfAsync(It.Is<Expression<Func<T, bool>>>(p => predicate(p)), It.Is(itemPredicate)));
         }
 
         protected void SetupCreateOrUpdate<T, TModel>(TModel model)

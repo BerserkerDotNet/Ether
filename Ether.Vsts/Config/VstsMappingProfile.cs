@@ -26,6 +26,9 @@ namespace Ether.Vsts.Config
 
             CreateMap<PullRequestViewModel, PullRequest>()
                 .ForMember(p => p.Id, p => p.Ignore());
+
+            CreateMap<TeamMemberViewModel, TeamMember>()
+                .ForMember(r => r.RelatedWorkItems, p => p.Ignore());
         }
     }
 }

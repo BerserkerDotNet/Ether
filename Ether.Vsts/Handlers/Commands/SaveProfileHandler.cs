@@ -23,6 +23,6 @@ namespace Ether.Vsts.Handlers.Commands
             }
         }
 
-        protected override Task<ProfileViewModel> GetData(SaveProfile command) => Task.FromResult(command.Profile);
+        protected override Task<ProfileViewModel> FixViewModel(SaveProfile command) => Task.FromResult(command.Profile);
     }
 }

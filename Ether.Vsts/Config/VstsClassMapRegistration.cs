@@ -22,6 +22,8 @@ namespace Ether.Vsts.Config
                 cm.AutoMap();
                 cm.MapMember(c => c.Fields).SetSerializer(new DictionaryInterfaceImplementerSerializer<Dictionary<string, WorkItemFieldUpdate>>(DictionaryRepresentation.ArrayOfDocuments));
             });
+
+            BsonClassMap.RegisterClassMap<WorkItemFieldUpdate>();
         }
     }
 }

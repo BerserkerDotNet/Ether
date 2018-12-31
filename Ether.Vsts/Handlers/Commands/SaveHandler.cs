@@ -13,14 +13,15 @@ namespace Ether.Vsts.Handlers.Commands
         where TCommand : ICommand
         where TData : BaseDto
     {
-        private readonly IRepository _repository;
-        private readonly IMapper _mapper;
-
         public SaveHandler(IRepository repository, IMapper mapper)
         {
-            this._repository = repository;
-            this._mapper = mapper;
+            Repository = repository;
+            Mapper = mapper;
         }
+
+        protected IRepository Repository { get; private set; }
+
+        protected IMapper Mapper { get; private set; }
 
         public async Task Handle(TCommand command)
         {
@@ -31,13 +32,13 @@ namespace Ether.Vsts.Handlers.Commands
 
             ValidateCommand(command);
 
-            var data = await GetData(command);
-            var dto = _mapper.Map<TData>(data);
-            await _repository.CreateOrUpdateAsync(dto);
+            var data = await FixViewModel(command);
+            var dto = Mapper.Map<TData>(data);
+            await Repository.CreateOrUpdateAsync(dto);
         }
 
         protected abstract void ValidateCommand(TCommand command);
 
-        protected abstract Task<TModel> GetData(TCommand command);
+        protected abstract Task<TModel> FixViewModel(TCommand command);
     }
 }

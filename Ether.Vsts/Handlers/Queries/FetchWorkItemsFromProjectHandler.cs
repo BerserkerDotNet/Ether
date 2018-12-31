@@ -25,7 +25,7 @@ namespace Ether.Vsts.Handlers.Queries
             "System.AreaPath",
             "System.ChangedDate",
             "System.Tags",
-            "System.State",
+            Constants.WorkItemStateField,
             "System.Reason",
             "System.CreatedDate",
             "Microsoft.VSTS.Common.ResolvedDate",
@@ -51,11 +51,16 @@ namespace Ether.Vsts.Handlers.Queries
 
             var client = await _clientFactory.GetClient();
 
-            var wiQuery = string.Format(WorkItemsQueryTemplate, query.Member.Email, DateTime.UtcNow.AddYears(-10).ToString("MM/dd/yyyy"));
+            var lastFetchDate = query.Member.LastWorkitemsFetchDate.HasValue ? query.Member.LastWorkitemsFetchDate.Value : DateTime.UtcNow.AddYears(-10);
+            var wiQuery = string.Format(WorkItemsQueryTemplate, query.Member.Email, lastFetchDate.ToString("MM/dd/yyyy"));
             var queryResult = await client.ExecuteFlatQueryAsync(wiQuery);
             var ids = queryResult.WorkItems.Select(w => w.Id).ToArray();
-            var workItems = await client.GetWorkItemsAsync(ids, fields: _workItemFields);
+            if (!ids.Any())
+            {
+                return Enumerable.Empty<WorkItemViewModel>();
+            }
 
+            var workItems = await client.GetWorkItemsAsync(ids, fields: _workItemFields);
             var result = new List<WorkItemViewModel>(workItems.Count());
             foreach (var workItem in workItems)
             {

@@ -23,6 +23,6 @@ namespace Ether.Vsts.Handlers.Commands
             }
         }
 
-        protected override Task<VstsProjectViewModel> GetData(SaveProject command) => Task.FromResult(command.Project);
+        protected override Task<VstsProjectViewModel> FixViewModel(SaveProject command) => Task.FromResult(command.Project);
     }
 }

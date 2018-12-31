@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Ether.ViewModels;
@@ -38,6 +39,7 @@ namespace Ether.Tests.Handlers.Commands
                 .ReturnsAsync(identities)
                 .Verifiable();
 
+            SetupGetRelatedWorkitems(new int[0]);
             SetupCreateOrUpdate<TeamMember>(m => m.Id == identities.ElementAt(0).Id);
 
             await _handler.Handle(new SaveTeamMember { TeamMember = vm });
@@ -58,11 +60,38 @@ namespace Ether.Tests.Handlers.Commands
                 .All()
                 .With(i => i.IsActive = true)
                 .Build();
-            _vstsIdentityClientMock.Setup(m => m.GetIdentitiesAsync(expectedEmail, true, "General", default(CancellationToken)))
+            _vstsIdentityClientMock.Setup(m => m.GetIdentitiesAsync(expectedEmail, true, "General", It.IsAny<CancellationToken>()))
                 .ReturnsAsync(identities)
                 .Verifiable();
 
+            SetupGetRelatedWorkitems(null);
             SetupCreateOrUpdate<TeamMember>(m => m.Id == identities.ElementAt(0).Id);
+
+            await _handler.Handle(new SaveTeamMember { TeamMember = vm });
+
+            RepositoryMock.Verify();
+            _vstsIdentityClientMock.Verify();
+        }
+
+        [Test]
+        public async Task ShouldNotOverrideRelatedWorkItems()
+        {
+            const string expectedEmail = "foo@bla.com";
+            var vm = Builder<TeamMemberViewModel>.CreateNew()
+                .With(m => m.Email = expectedEmail)
+                .With(m => m.Id = Guid.NewGuid())
+                .Build();
+            var identities = Builder<VSTS.Net.Models.Identity.Identity>.CreateListOfSize(3)
+                .All()
+                .With(i => i.IsActive = true)
+                .Build();
+            var relatedWorkitems = Builder<int>.CreateListOfSize(10).Build().ToArray();
+            _vstsIdentityClientMock.Setup(m => m.GetIdentitiesAsync(expectedEmail, true, "General", It.IsAny<CancellationToken>()))
+                .ReturnsAsync(identities)
+                .Verifiable();
+
+            SetupGetRelatedWorkitems(relatedWorkitems);
+            SetupCreateOrUpdate<TeamMember>(m => m.Id == identities.ElementAt(0).Id && m.RelatedWorkItems == relatedWorkitems);
 
             await _handler.Handle(new SaveTeamMember { TeamMember = vm });
 
@@ -96,6 +125,12 @@ namespace Ether.Tests.Handlers.Commands
                 .ReturnsAsync(_vstsIdentityClientMock.Object);
 
             _handler = new SaveTeamMemberHandler(RepositoryMock.Object, factoryMock.Object, Mapper);
+        }
+
+        private void SetupGetRelatedWorkitems(int[] relatedWorkitems)
+        {
+            RepositoryMock.Setup(r => r.GetFieldValueAsync(It.IsAny<Expression<Func<TeamMember, bool>>>(), It.IsAny<Expression<Func<TeamMember, int[]>>>()))
+                .ReturnsAsync(relatedWorkitems);
         }
     }
 }

@@ -80,7 +80,7 @@ namespace Ether.Tests.Handlers.Commands
             {
             }
 
-            protected override Task<FakeViewModel> GetData(SaveFakeCommand command) => Task.FromResult(command.Fake);
+            protected override Task<FakeViewModel> FixViewModel(SaveFakeCommand command) => Task.FromResult(command.Fake);
 
             protected override void ValidateCommand(SaveFakeCommand command)
             {

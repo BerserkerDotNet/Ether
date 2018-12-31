@@ -1,29 +1,33 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Ether.Contracts.Interfaces;
-using Ether.ViewModels;
+using Ether.Contracts.Interfaces.CQS;
 using Ether.Vsts.Commands;
 using Ether.Vsts.Dto;
 using Ether.Vsts.Exceptions;
 using Ether.Vsts.Interfaces;
-using VSTS.Net.Interfaces;
+using static Ether.Contracts.Types.NullUtil;
 
 namespace Ether.Vsts.Handlers.Commands
 {
-    public class SaveTeamMemberHandler : SaveHandler<TeamMemberViewModel, TeamMember, SaveTeamMember>
+    public class SaveTeamMemberHandler : ICommandHandler<SaveTeamMember>
     {
+        private readonly IRepository _repository;
         private readonly IVstsClientFactory _clientFactory;
+        private readonly IMapper _mapper;
 
         public SaveTeamMemberHandler(IRepository repository, IVstsClientFactory clientFactory, IMapper mapper)
-            : base(repository, mapper)
         {
+            _repository = repository;
             _clientFactory = clientFactory;
+            _mapper = mapper;
         }
 
-        protected override async Task<TeamMemberViewModel> GetData(SaveTeamMember command)
+        public async Task Handle(SaveTeamMember command)
         {
+            CheckIfArgumentNull(command.TeamMember, nameof(command.TeamMember));
+
             var client = await _clientFactory.GetIdentityClient();
             var member = command.TeamMember;
             var identities = await client.GetIdentitiesAsync(member.Email, onlyActive: true);
@@ -34,15 +38,10 @@ namespace Ether.Vsts.Handlers.Commands
 
             member.Id = identities.First().Id;
 
-            return command.TeamMember;
-        }
-
-        protected override void ValidateCommand(SaveTeamMember command)
-        {
-            if (command.TeamMember == null)
-            {
-                throw new ArgumentNullException(nameof(command.TeamMember));
-            }
+            var relatedWorkitems = await _repository.GetFieldValueAsync<TeamMember, int[]>(t => t.Id == member.Id, t => t.RelatedWorkItems);
+            var dto = _mapper.Map<TeamMember>(member);
+            dto.RelatedWorkItems = relatedWorkitems;
+            await _repository.CreateOrUpdateAsync(dto);
         }
     }
 }
