@@ -147,14 +147,22 @@ namespace Ether.Jobs
             _logger.LogInformation("Starting to fetch updates");
             foreach (var wi in workItems)
             {
-                var url = VSTSApiUrl.Create(_config.Value.InstanceName)
-                    .ForWorkItems(wi.WorkItemId)
-                    .WithSection("updates")
-                    .Build();
+                try
+                {
+                    var url = VSTSApiUrl.Create(_config.Value.InstanceName)
+                        .ForWorkItems(wi.WorkItemId)
+                        .WithSection("updates")
+                        .Build();
 
-                var updates = await _client.ExecuteGet<ValueResponse<WorkItemUpdate>>(url);
-                wi.Updates = updates.Value;
-                await _repository.CreateOrUpdateAsync(wi, i => i.WorkItemId == wi.WorkItemId);
+                    var updates = await _client.ExecuteGet<ValueResponse<WorkItemUpdate>>(url);
+                    wi.Updates = updates.Value;
+                    await _repository.CreateOrUpdateAsync(wi, i => i.WorkItemId == wi.WorkItemId);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Error updating workitem {WorkItemId}", wi.WorkItemId);
+                    // TODO: Skipping ivalid workitems for now. Consider filtering updates to only include relevant fields.
+                }
             }
 
             _logger.LogInformation("Finished fetching updates");
