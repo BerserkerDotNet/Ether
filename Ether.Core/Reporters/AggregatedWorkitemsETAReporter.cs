@@ -18,6 +18,9 @@ namespace Ether.Core.Reporters
 {
     public class AggregatedWorkitemsETAReporter : ReporterBase
     {
+        private const string OnHoldTag = "onhold";
+        private const string BlockedTag = "blocked";
+        private const string CodeReviewTag = "codereview";
         private readonly IWorkItemClassificationContext _classificationContext;
         private readonly IProgressReporter _progressReporter;
 
@@ -170,21 +173,25 @@ namespace Ether.Core.Reporters
                 var isActivation = !update.State.IsEmpty && update.State.NewValue == WorkItemStates.Active;
                 var isOnHold = !update.State.IsEmpty && update.State.NewValue == WorkItemStates.New;
                 var isResolved = !update.State.IsEmpty && (update.State.NewValue == WorkItemStates.Resolved || update.State.NewValue == WorkItemStates.Closed);
-                var isCodeReview = !update.Tags.IsEmpty && ContainsCodeReviewTag(update.Tags.NewValue);
-                var isBlocked = !update.Tags.IsEmpty && ContainsBlockedTag(update.Tags.NewValue);
-                var isUnBlocked = !update.Tags.IsEmpty && ContainsBlockedTag(update.Tags.OldValue) && !ContainsBlockedTag(update.Tags.NewValue);
+                var isCodeReview = !update.Tags.IsEmpty && ContainsTag(update.Tags.NewValue, CodeReviewTag);
+                var isBlocked = !update.Tags.IsEmpty &&
+                    (ContainsTag(update.Tags.NewValue, BlockedTag) || ContainsTag(update.Tags.NewValue, OnHoldTag));
+                var isUnBlocked = !isBlocked && !update.Tags.IsEmpty && 
+                    (ContainsTag(update.Tags.OldValue, BlockedTag) && !ContainsTag(update.Tags.NewValue, BlockedTag) ||
+                    ContainsTag(update.Tags.OldValue, OnHoldTag) && !ContainsTag(update.Tags.NewValue, OnHoldTag));
 
-                if (isActivation || isUnBlocked)
+                if (isActive && (isOnHold || isBlocked))
+                {
+                    isActive = false;
+                    if (lastActivated != null)
+                        activeTime += CountBusinessDaysBetween(lastActivated.Value, update.ChangedDate);
+                }
+                else if ((isActivation && !isBlocked) || isUnBlocked)
                 {
                     lastActivated = update.ChangedDate;
                     isActive = true;
                 }
-                else if (isActive && (isOnHold || isBlocked))
-                {
-                    isActive = false;
-                    if (lastActivated != null)
-                        activeTime += CountBusinessDaysBetween(lastActivated.Value,  update.ChangedDate);
-                }
+               
                 else if (isActive && (isResolved || isCodeReview))
                 {
                     if (lastActivated != null)
@@ -196,21 +203,14 @@ namespace Ether.Core.Reporters
             return activeTime;
         }
 
-        private bool ContainsCodeReviewTag(string tags)
-        {
-            return tags.Split(';')
-                .Select(t => t.Replace(" ", "").ToLower())
-                .Contains("codereview");
-        }
-
-        private bool ContainsBlockedTag(string tags)
+        private bool ContainsTag(string tags, string tag)
         {
             if (string.IsNullOrEmpty(tags))
                 return false;
 
             return tags.Split(';')
                 .Select(t => t.Replace(" ", "").ToLower())
-                .Contains("blocked");
+                .Contains(tag);
         }
 
         public static float CountBusinessDaysBetween(DateTime firstDay, DateTime lastDay, params DateTime[] holidays)

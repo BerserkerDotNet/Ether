@@ -15,6 +15,9 @@ namespace Ether.Tests.Data
             SimplePathWithCodeReview(nameof(AggregatedWorkitemsETAReporterTests.ShouldCorrectlyIdentifyActiveTimeWithoutEstimates)),
             OnHoldPeriods(nameof(AggregatedWorkitemsETAReporterTests.ShouldCorrectlyIdentifyActiveTimeWithoutEstimates)),
             BlockedPeriods(nameof(AggregatedWorkitemsETAReporterTests.ShouldCorrectlyIdentifyActiveTimeWithoutEstimates)),
+            BlockedByOnHoldTagPeriods(nameof(AggregatedWorkitemsETAReporterTests.ShouldCorrectlyIdentifyActiveTimeWithoutEstimates)),
+            MixedUseOfBlockedAndOnHoldTags(nameof(AggregatedWorkitemsETAReporterTests.ShouldCorrectlyIdentifyActiveTimeWithoutEstimates)),
+            UnBlockedByOnHoldTagUponActivationPeriods(nameof(AggregatedWorkitemsETAReporterTests.ShouldCorrectlyIdentifyActiveTimeWithoutEstimates)),
             UnBlockedUponActivationPeriods(nameof(AggregatedWorkitemsETAReporterTests.ShouldCorrectlyIdentifyActiveTimeWithoutEstimates)),
             WithoutWeekends(nameof(AggregatedWorkitemsETAReporterTests.ShouldCorrectlyIdentifyActiveTimeWithoutEstimates)),
             WithoutCountingMinutes(nameof(AggregatedWorkitemsETAReporterTests.ShouldCorrectlyIdentifyActiveTimeWithoutEstimates)),
@@ -27,7 +30,10 @@ namespace Ether.Tests.Data
             SimplePathWithCodeReview(nameof(AggregatedWorkitemsETAReporterTests.ShouldCorrectlyIdentifyActiveTimeWithEstimates)),
             OnHoldPeriods(nameof(AggregatedWorkitemsETAReporterTests.ShouldCorrectlyIdentifyActiveTimeWithEstimates)),
             BlockedPeriods(nameof(AggregatedWorkitemsETAReporterTests.ShouldCorrectlyIdentifyActiveTimeWithEstimates)),
+            BlockedByOnHoldTagPeriods(nameof(AggregatedWorkitemsETAReporterTests.ShouldCorrectlyIdentifyActiveTimeWithEstimates)),
+            MixedUseOfBlockedAndOnHoldTags(nameof(AggregatedWorkitemsETAReporterTests.ShouldCorrectlyIdentifyActiveTimeWithEstimates)),
             UnBlockedUponActivationPeriods(nameof(AggregatedWorkitemsETAReporterTests.ShouldCorrectlyIdentifyActiveTimeWithEstimates)),
+            UnBlockedByOnHoldTagUponActivationPeriods(nameof(AggregatedWorkitemsETAReporterTests.ShouldCorrectlyIdentifyActiveTimeWithEstimates)),
             WithoutWeekends(nameof(AggregatedWorkitemsETAReporterTests.ShouldCorrectlyIdentifyActiveTimeWithEstimates)),
             WithoutCountingMinutes(nameof(AggregatedWorkitemsETAReporterTests.ShouldCorrectlyIdentifyActiveTimeWithEstimates)),
             IfResolvedOnTheSameDay(nameof(AggregatedWorkitemsETAReporterTests.ShouldCorrectlyIdentifyActiveTimeWithEstimates))
@@ -95,6 +101,22 @@ namespace Ether.Tests.Data
                 .SetName($"{testPrefix}{nameof(BlockedPeriods)}");
         }
 
+        private static TestCaseData BlockedByOnHoldTagPeriods(string testPrefix)
+        {
+            var activatedOn = new DateTime(2018, 5, 28);
+            var resolvedOn = new DateTime(2018, 6, 1);
+            var updates = UpdateBuilder.Create()
+                .Activated().On(activatedOn)
+                .Then().With(VSTSFieldNames.Tags, "onhold; tag1; tag2", null).On(activatedOn.AddDays(1))
+                .Then().With(VSTSFieldNames.Tags, "tag1; tag2", "OnHold; tag1; tag2").On(activatedOn.AddDays(2))
+                .Then().With(VSTSFieldNames.Tags, "OnHold; tag1; tag2", null).On(activatedOn.AddDays(3))
+                .Then().Resolved(TestData.DummyMember).On(resolvedOn)
+                .Build();
+
+            return new TestCaseData(updates, 2)
+                .SetName($"{testPrefix}{nameof(BlockedByOnHoldTagPeriods)}");
+        }
+
         private static TestCaseData UnBlockedUponActivationPeriods(string testPrefix)
         {
             var activatedOn = new DateTime(2018, 5, 28);
@@ -110,6 +132,39 @@ namespace Ether.Tests.Data
 
             return new TestCaseData(updates, 2)
                 .SetName($"{testPrefix}{nameof(UnBlockedUponActivationPeriods)}");
+        }
+
+        private static TestCaseData UnBlockedByOnHoldTagUponActivationPeriods(string testPrefix)
+        {
+            var activatedOn = new DateTime(2018, 5, 28);
+            var resolvedOn = new DateTime(2018, 6, 1);
+            var updates = UpdateBuilder.Create()
+                .Activated().On(activatedOn)
+                .Then().With(VSTSFieldNames.Tags, "onhold; tag1; tag2", null).On(activatedOn.AddDays(1))
+                .Then().New().On(activatedOn.AddDays(1))
+                .Then().Activated().With(VSTSFieldNames.Tags, "tag1; tag2", "onhold; tag1; tag2").On(activatedOn.AddDays(2))
+                .Then().With(VSTSFieldNames.Tags, "On Hold; tag1; tag2", "").On(activatedOn.AddDays(3))
+                .Then().Resolved(TestData.DummyMember).On(resolvedOn)
+                .Build();
+
+            return new TestCaseData(updates, 2)
+                .SetName($"{testPrefix}{nameof(UnBlockedByOnHoldTagUponActivationPeriods)}");
+        }
+
+        private static TestCaseData MixedUseOfBlockedAndOnHoldTags(string testPrefix)
+        {
+            var activatedOn = new DateTime(2018, 5, 28);
+            var resolvedOn = new DateTime(2018, 6, 2);
+            var updates = UpdateBuilder.Create()
+                .Activated().On(activatedOn)
+                .Then().With(VSTSFieldNames.Tags, "onhold; tag1; tag2", null).On(activatedOn.AddDays(1))
+                .Then().Activated().With(VSTSFieldNames.Tags, "blocked; tag1; tag2", "onhold; tag1; tag2").On(activatedOn.AddDays(2))
+                .Then().With(VSTSFieldNames.Tags, "tag1; tag2", "blocked; tag1; tag2").On(activatedOn.AddDays(3))
+                .Then().Resolved(TestData.DummyMember).On(resolvedOn)
+                .Build();
+
+            return new TestCaseData(updates, 2)
+                .SetName($"{testPrefix}{nameof(MixedUseOfBlockedAndOnHoldTags)}");
         }
 
         private static TestCaseData WithoutWeekends(string testPrefix)
