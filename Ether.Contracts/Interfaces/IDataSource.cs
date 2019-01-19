@@ -13,5 +13,11 @@ namespace Ether.Contracts.Interfaces
         Task<IEnumerable<PullRequestViewModel>> GetPullRequests(Expression<Func<PullRequestViewModel, bool>> predicate);
 
         Task<TeamMemberViewModel> GetTeamMember(Guid id);
+
+        Task<ETAValues> GetETAValues(WorkItemViewModel workItem);
+
+        Task<IEnumerable<WorkItemViewModel>> GetWorkItemsFor(Guid memberId);
+
+        float GetActiveDuration(WorkItemViewModel workItem);
     }
 }

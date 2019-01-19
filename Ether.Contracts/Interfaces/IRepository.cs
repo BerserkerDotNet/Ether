@@ -29,6 +29,9 @@ namespace Ether.Contracts.Interfaces
         Task<TProjection> GetFieldValueAsync<TType, TProjection>(Expression<Func<TType, bool>> predicate, Expression<Func<TType, TProjection>> projection)
             where TType : BaseDto;
 
+        Task<TProjection> GetFieldValueAsync<TType, TProjection>(Guid id, Expression<Func<TType, TProjection>> projection)
+            where TType : BaseDto;
+
         TProjection GetFieldValue<TType, TProjection>(Expression<Func<TType, bool>> predicate, Expression<Func<TType, TProjection>> projection)
             where TType : BaseDto;
 

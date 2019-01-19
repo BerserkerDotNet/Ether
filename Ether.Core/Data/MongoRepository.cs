@@ -139,6 +139,12 @@ namespace Ether.Core.Data
                   .SingleOrDefaultAsync();
         }
 
+        public Task<TProjection> GetFieldValueAsync<TType, TProjection>(Guid id, Expression<Func<TType, TProjection>> projection)
+            where TType : BaseDto
+        {
+            return GetFieldValueAsync(i => i.Id == id, projection);
+        }
+
         public TProjection GetFieldValue<TType, TProjection>(Expression<Func<TType, bool>> predicate, Expression<Func<TType, TProjection>> projection)
             where TType : BaseDto
         {

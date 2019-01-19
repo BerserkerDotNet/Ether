@@ -1,7 +1,8 @@
 ﻿namespace Ether.Contracts.Types
 {
-    public enum JobExecutionResult
+    public enum JobExecutionState
     {
+        InProgress,
         Successful,
         Failed
     }

@@ -9,7 +9,7 @@ namespace Ether.Contracts.Dto
 
         public DateTime CompletedOn { get; set; }
 
-        public JobExecutionResult Result { get; set; }
+        public JobExecutionState Result { get; set; }
 
         public string Message { get; set; }
 

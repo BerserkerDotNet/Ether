@@ -1,14 +1,6 @@
-﻿using System;
-using Ether.Contracts.Interfaces.CQS;
-
-namespace Ether.Core.Types.Commands
+﻿namespace Ether.Core.Types.Commands
 {
-    public class GeneratePullRequestsReport : ICommand<Guid>
+    public class GeneratePullRequestsReport : GenerateReportCommand
     {
-        public DateTime Start { get; set; }
-
-        public DateTime End { get; set; }
-
-        public Guid Profile { get; set; }
     }
 }

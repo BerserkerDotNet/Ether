@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using Ether.Contracts.Interfaces;
+using Ether.ViewModels;
+using Ether.Vsts.Dto;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Options;
 using MongoDB.Bson.Serialization.Serializers;
-using VSTS.Net.Models.WorkItems;
 
 namespace Ether.Vsts.Config
 {
@@ -17,7 +18,7 @@ namespace Ether.Vsts.Config
                 cm.MapMember(c => c.Fields).SetSerializer(new DictionaryInterfaceImplementerSerializer<Dictionary<string, string>>(DictionaryRepresentation.ArrayOfDocuments));
             });
 
-            BsonClassMap.RegisterClassMap<WorkItemUpdate>(cm =>
+            BsonClassMap.RegisterClassMap<WorkItemUpdateViewModel>(cm =>
             {
                 cm.AutoMap();
                 cm.MapMember(c => c.Fields).SetSerializer(new DictionaryInterfaceImplementerSerializer<Dictionary<string, WorkItemFieldUpdate>>(DictionaryRepresentation.ArrayOfDocuments));

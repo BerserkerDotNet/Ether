@@ -5,6 +5,7 @@ using Ether.Vsts.Dto;
 using Ether.Vsts.Interfaces;
 using Ether.Vsts.Jobs;
 using Ether.Vsts.Types;
+using Ether.Vsts.Types.Classifiers;
 
 namespace Ether.Vsts.Config
 {
@@ -23,6 +24,8 @@ namespace Ether.Vsts.Config
             builder.RegisterType<PullRequestsSyncJob>().As<IJob>();
             builder.RegisterType<WorkItemsSyncJob>().As<IJob>();
             builder.RegisterType<VstsDataSource>().Keyed<IDataSource>(Constants.VstsType);
+            builder.RegisterType<ResolvedWorkItemsClassifier>().As<IWorkItemsClassifier>();
+            builder.RegisterType<ClosedTasksWorkItemsClassifier>().As<IWorkItemsClassifier>();
 
             base.Load(builder);
         }

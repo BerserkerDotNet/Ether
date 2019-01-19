@@ -9,13 +9,22 @@ namespace Ether.Vsts.Config
     {
         public VstsMappingProfile()
         {
-            CreateMap<Project, VstsProjectViewModel>();
-            CreateMap<VstsProjectViewModel, Project>();
+            CreateMap<Project, VstsProjectViewModel>()
+                .ReverseMap();
 
             CreateMap<VstsProfile, ProfileViewModel>()
-                .ForMember(p => p.Type, o => o.MapFrom(_ => Constants.VstsType));
-            CreateMap<ProfileViewModel, VstsProfile>()
-                .ForMember(p => p.Type, o => o.MapFrom(_ => Constants.VstsType));
+                .ForMember(p => p.Type, o => o.MapFrom(_ => Constants.VstsType))
+                .ReverseMap();
+
+            CreateMap<PullRequestViewModel, PullRequest>()
+                .ForMember(p => p.Id, p => p.Ignore());
+
+            CreateMap<TeamMemberViewModel, TeamMember>()
+                .ForMember(r => r.RelatedWorkItems, p => p.Ignore());
+
+            CreateMap<WorkItemViewModel, WorkItem>()
+                .ForMember(m => m.Id, m => m.Ignore())
+                .ReverseMap();
 
             CreateMap<Repository, RepositoryInfo>()
                 .ForMember(r => r.Project, o => o.Ignore())
@@ -23,12 +32,6 @@ namespace Ether.Vsts.Config
 
             CreateMap<Project, ProjectInfo>()
                 .ForMember(r => r.Identity, o => o.Ignore());
-
-            CreateMap<PullRequestViewModel, PullRequest>()
-                .ForMember(p => p.Id, p => p.Ignore());
-
-            CreateMap<TeamMemberViewModel, TeamMember>()
-                .ForMember(r => r.RelatedWorkItems, p => p.Ignore());
         }
     }
 }

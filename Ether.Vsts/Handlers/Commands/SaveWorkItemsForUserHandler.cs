@@ -6,6 +6,7 @@ using Ether.Contracts.Interfaces;
 using Ether.Contracts.Interfaces.CQS;
 using Ether.Vsts.Commands;
 using Ether.Vsts.Dto;
+using Microsoft.Extensions.Logging;
 using static Ether.Contracts.Types.NullUtil;
 
 namespace Ether.Vsts.Handlers.Commands
@@ -14,11 +15,13 @@ namespace Ether.Vsts.Handlers.Commands
     {
         private readonly IRepository _repository;
         private readonly IMapper _mapper;
+        private readonly ILogger<SaveWorkItemsForUserHandler> _logger;
 
-        public SaveWorkItemsForUserHandler(IRepository repository, IMapper mapper)
+        public SaveWorkItemsForUserHandler(IRepository repository, IMapper mapper, ILogger<SaveWorkItemsForUserHandler> logger)
         {
             _repository = repository;
             _mapper = mapper;
+            _logger = logger;
         }
 
         public async Task Handle(SaveWorkItemsForUser command)
@@ -32,22 +35,23 @@ namespace Ether.Vsts.Handlers.Commands
             }
 
             var member = await _repository.GetSingleAsync<TeamMember>(command.Member.Id);
+            member.RelatedWorkItems = member.RelatedWorkItems ?? new int[0];
             var relatedIds = member.RelatedWorkItems
-                .Union(command.Workitems.Select(w => w.WorkitemId))
+                .Union(command.Workitems.Select(w => w.WorkItemId))
                 .Distinct()
                 .ToArray();
             await _repository.UpdateFieldValue(member, m => m.RelatedWorkItems, relatedIds);
             await _repository.UpdateFieldValue(member, m => m.LastWorkitemsFetchDate, DateTime.UtcNow);
             foreach (var workItemModel in command.Workitems)
             {
+                var workItem = _mapper.Map<WorkItem>(workItemModel);
                 try
                 {
-                    var workItem = new WorkItem { CurrentState = workItemModel.WorkItem, Updates = workItemModel.Updates, WorkItemId = workItemModel.WorkitemId };
-                    await _repository.CreateOrUpdateIfAsync(w => w.CurrentState.Id == workItemModel.WorkitemId, workItem);
+                    await _repository.CreateOrUpdateIfAsync(w => w.WorkItemId == workItemModel.WorkItemId, workItem);
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-                    // TODO: Log error
+                    _logger.LogWarning(ex, "Error saving workitem {WorkItemId}.", workItem.WorkItemId);
                 }
             }
         }

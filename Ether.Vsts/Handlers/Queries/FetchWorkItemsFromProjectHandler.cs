@@ -67,8 +67,16 @@ namespace Ether.Vsts.Handlers.Queries
                 var updates = await client.GetWorkItemUpdatesAsync(workItem.Id);
                 var viewModel = new WorkItemViewModel
                 {
-                    WorkItem = workItem,
-                    Updates = updates
+                    WorkItemId = workItem.Id,
+                    Fields = workItem.Fields,
+                    Updates = updates.Select(u => new WorkItemUpdateViewModel
+                    {
+                        WorkItemId = workItem.Id,
+                        Id = u.Id,
+                        Fields = u.Fields == null ?
+                            new Dictionary<string, WorkItemFieldUpdate>() :
+                            u.Fields.ToDictionary(k => k.Key, v => new WorkItemFieldUpdate { OldValue = v.Value.OldValue, NewValue = v.Value.NewValue })
+                    })
                 };
                 result.Add(viewModel);
             }

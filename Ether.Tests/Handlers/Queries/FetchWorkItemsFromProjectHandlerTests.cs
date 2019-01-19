@@ -51,7 +51,10 @@ namespace Ether.Tests.Handlers.Queries
                 .Build();
             var references = workitems.Select(w => new WorkItemReference(w.Id));
             var ids = workitems.Select(w => w.Id).ToArray();
-            var updates = Builder<WorkItemUpdate>.CreateListOfSize(2).Build();
+            var updates = Builder<WorkItemUpdate>.CreateListOfSize(2)
+                .All()
+                .With(u => u.Fields, new System.Collections.Generic.Dictionary<string, VSTS.Net.Models.WorkItems.WorkItemFieldUpdate>())
+                .Build();
 
             _clientMock.Setup(c => c.ExecuteFlatQueryAsync(It.Is<string>(q => ValidateQueryString(q, lastFetchDate)), default(CancellationToken)))
                 .ReturnsAsync(new FlatWorkItemsQueryResult
@@ -69,7 +72,7 @@ namespace Ether.Tests.Handlers.Queries
             var result = await _handler.Handle(new FetchWorkItemsFromProject(teamMember));
 
             result.Should().HaveCount(workitems.Count);
-            result.Should().OnlyContain(vm => workitems.Contains(vm.WorkItem) && vm.Updates.Count() == 2);
+            result.Should().OnlyContain(vm => workitems.Any(w => w.Id == vm.WorkItemId) && vm.Updates.Count() == 2);
 
             _clientFactoryMock.Verify();
             _clientMock.Verify();

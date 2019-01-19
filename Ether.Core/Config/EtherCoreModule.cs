@@ -31,6 +31,8 @@ namespace Ether.Core.Config
                 .As<IRepository>()
                 .SingleInstance();
 
+            builder.RegisterType<WorkItemClassificationContext>().As<IWorkItemClassificationContext>();
+
             base.Load(builder);
         }
     }

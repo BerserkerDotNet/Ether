@@ -30,7 +30,6 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="VSTS.Net" Version="0.2.4-gee5c4aa688" />
   </ItemGroup>
 
 </Project>

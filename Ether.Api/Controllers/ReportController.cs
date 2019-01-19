@@ -31,8 +31,17 @@ namespace Ether.Api.Controllers
         [ProducesResponseType(404)]
         public async Task<IActionResult> Generate(GenerateReportViewModel requestModel)
         {
-            var request = _mapper.Map<GeneratePullRequestsReport>(requestModel);
-            var id = await _mediator.Execute<GeneratePullRequestsReport, Guid>(request);
+            var id = Guid.Empty;
+            switch (requestModel.ReportType)
+            {
+                case "PullRequestsReport":
+                    id = await GenerateReport<GeneratePullRequestsReport>(requestModel);
+                    break;
+                case "AggregatedWorkitemsETAReport":
+                    id = await GenerateReport<GenerateAggregatedWorkitemsETAReport>(requestModel);
+                    break;
+            }
+
             return Ok(id);
         }
 
@@ -54,6 +63,13 @@ namespace Ether.Api.Controllers
         {
             var reports = await _mediator.Request<GetReportById, ReportViewModel>(new GetReportById(id));
             return Ok(reports);
+        }
+
+        private Task<Guid> GenerateReport<T>(GenerateReportViewModel requestModel)
+            where T : GenerateReportCommand
+        {
+            var request = _mapper.Map<T>(requestModel);
+            return _mediator.Execute<T, Guid>(request);
         }
     }
 }

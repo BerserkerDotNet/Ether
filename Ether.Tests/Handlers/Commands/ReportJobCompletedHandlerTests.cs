@@ -12,12 +12,12 @@ namespace Ether.Tests.Handlers.Commands
 {
     public class ReportJobCompletedHandlerTests : BaseHandlerTest
     {
-        private ReportJobCompletedHandler _handler;
+        private ReportJobStateHandler _handler;
 
         [Test]
         public void ShouldThrowExceptionIfJobTypeIsEmpty([Values(null, "")] string jobType)
         {
-            _handler.Awaiting(h => h.Handle(ReportJobCompleted.GetSuccessful(jobType, TimeSpan.Zero)))
+            _handler.Awaiting(h => h.Handle(ReportJobState.GetSuccessful(Guid.NewGuid(), jobType, TimeSpan.Zero)))
                 .Should().Throw<ArgumentNullException>();
         }
 
@@ -27,19 +27,19 @@ namespace Ether.Tests.Handlers.Commands
             const string jobType = "Foo";
             const string message = "Exception";
             var executionTime = TimeSpan.FromMinutes(1);
-            RepositoryMock.Setup(r => r.CreateAsync(It.Is<JobLog>(l
-                => l.JobType == jobType && l.Result == JobExecutionResult.Failed && l.Message == message && l.ExecutionTime == executionTime)))
+            RepositoryMock.Setup(r => r.CreateOrUpdateAsync(It.Is<JobLog>(l
+                => l.JobType == jobType && l.Result == JobExecutionState.Failed && l.Message == message && l.ExecutionTime == executionTime)))
                 .ReturnsAsync(true)
                 .Verifiable();
 
-            await _handler.Handle(ReportJobCompleted.GetFailed(jobType, message, executionTime));
+            await _handler.Handle(ReportJobState.GetFailed(Guid.NewGuid(), jobType, message, executionTime));
 
             RepositoryMock.Verify();
         }
 
         protected override void Initialize()
         {
-            _handler = new ReportJobCompletedHandler(RepositoryMock.Object, Mapper);
+            _handler = new ReportJobStateHandler(RepositoryMock.Object, Mapper);
         }
     }
 }

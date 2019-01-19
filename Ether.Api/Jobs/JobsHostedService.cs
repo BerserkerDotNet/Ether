@@ -70,17 +70,19 @@ namespace Ether.Api.Jobs
                 var sw = new Stopwatch();
                 while (!cancellationToken.IsCancellationRequested)
                 {
+                    var jobId = Guid.NewGuid();
                     sw.Restart();
                     try
                     {
+                        await mediator.Execute(ReportJobState.GetRunning(jobId, jobName));
                         _logger.LogInformation($"Executing '{jobName}'");
                         await job.Execute();
-                        await mediator.Execute(ReportJobCompleted.GetSuccessful(jobName, sw.Elapsed));
+                        await mediator.Execute(ReportJobState.GetSuccessful(jobId, jobName, sw.Elapsed));
                     }
                     catch (Exception ex)
                     {
                         _logger.LogError(ex, $"Error while executing '{configuration.JobType.Name}'");
-                        await mediator.Execute(ReportJobCompleted.GetFailed(jobName, ex.Message, sw.Elapsed));
+                        await mediator.Execute(ReportJobState.GetFailed(jobId, jobName, ex.Message, sw.Elapsed));
                     }
 
                     sw.Stop();
