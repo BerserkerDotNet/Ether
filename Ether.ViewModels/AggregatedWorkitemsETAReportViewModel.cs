@@ -1,21 +1,24 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Ether.Contracts.Attributes;
-using Ether.ViewModels;
 
-namespace Ether.Contracts.Dto.Reports
+namespace Ether.ViewModels
 {
-    [DbName(nameof(ReportResult))]
-    public class AggregatedWorkitemsETAReport : ReportResult
+    public class AggregatedWorkitemsETAReportViewModel : ReportViewModel
     {
-        public AggregatedWorkitemsETAReport(int individualReportsCount)
+        public AggregatedWorkitemsETAReportViewModel()
         {
-            IndividualReports = new List<IndividualETAReport>(individualReportsCount);
+            IndividualReports = Enumerable.Empty<IndividualETAReport>();
         }
 
-        public static AggregatedWorkitemsETAReport Empty => new AggregatedWorkitemsETAReport(0);
+        public IEnumerable<IndividualETAReport> IndividualReports { get; set; }
 
-        public List<IndividualETAReport> IndividualReports { get; set; }
+        public int TotalResolved => IndividualReports.Sum(r => r.TotalResolved);
+
+        public float EstimatedToComplete => IndividualReports.Sum(r => r.EstimatedToComplete);
+
+        public float CompletedWithEstimates => IndividualReports.Sum(r => r.CompletedWithEstimates);
+
+        public float EstimatedToCompletedRatio => EstimatedToComplete / CompletedWithEstimates;
 
         public class IndividualETAReport
         {
@@ -41,10 +44,11 @@ namespace Ether.Contracts.Dto.Reports
 
             public float CompletedWithoutEstimates { get; set; }
 
-            public List<IndividualReportDetail> Details { get; set; }
+            public IEnumerable<IndividualReportDetail> Details { get; set; }
 
-            public static IndividualETAReport GetEmptyFor(TeamMemberViewModel teamMember) =>
-                new IndividualETAReport { MemberEmail = teamMember.Email, MemberName = teamMember.DisplayName };
+            public float TotalCompleted => CompletedWithEstimates + CompletedWithoutEstimates;
+
+            public float EstimatedToCompletedRatio => EstimatedToComplete / CompletedWithEstimates;
         }
 
         public class IndividualReportDetail

@@ -3,9 +3,14 @@ using Autofac;
 using AutoMapper;
 using Ether.Api.Jobs;
 using Ether.Api.Types;
+using Ether.Contracts.Dto.Reports;
 using Ether.Contracts.Interfaces;
 using Ether.Contracts.Types.Configuration;
 using Ether.Core.Config;
+using Ether.Core.Extensions;
+using Ether.Core.Types;
+using Ether.Core.Types.Commands;
+using Ether.ViewModels;
 using Ether.ViewModels.Validators;
 using Ether.Vsts.Config;
 using Ether.Vsts.Jobs;
@@ -80,6 +85,9 @@ namespace Ether.Api
             {
                 c.SwaggerDoc("v1", new Info { Title = "Ether API", Version = "v1" });
             });
+
+            services.AddReporter<GeneratePullRequestsReport, PullRequestsReport, PullRequestReportViewModel>(Constants.PullRequestsReportType, "Pull Requests report");
+            services.AddReporter<GenerateAggregatedWorkitemsETAReport, AggregatedWorkitemsETAReport, AggregatedWorkitemsETAReportViewModel>(Constants.ETAReportType, "Aggregated workitems ETA report");
 
             services.AddJobs(cfg =>
             {

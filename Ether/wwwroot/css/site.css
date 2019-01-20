@@ -1,3 +1,7 @@
 ﻿select.form-control {
     height: auto;
 }
+.btn-link {
+    padding: 0px;
+    vertical-align: super;
+}

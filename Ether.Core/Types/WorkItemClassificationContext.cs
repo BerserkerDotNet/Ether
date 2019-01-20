@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Ether.Contracts.Interfaces;
 using Ether.Contracts.Types;
+using Ether.Core.Types.Commands;
 using Ether.ViewModels;
 
 namespace Ether.Core.Types

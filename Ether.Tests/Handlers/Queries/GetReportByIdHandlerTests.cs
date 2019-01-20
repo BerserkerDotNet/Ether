@@ -3,6 +3,7 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Ether.Contracts.Dto.Reports;
 using Ether.Core.Types;
+using Ether.Core.Types.Commands;
 using Ether.Core.Types.Handlers.Queries;
 using Ether.Core.Types.Queries;
 using Ether.ViewModels;
@@ -16,6 +17,12 @@ namespace Ether.Tests.Handlers.Queries
     [TestFixture]
     public class GetReportByIdHandlerTests : BaseHandlerTest
     {
+        private ReporterDescriptor[] _descriptors = new[]
+        {
+            new ReporterDescriptor(Constants.PullRequestsReportType, typeof(GeneratePullRequestsReport), typeof(PullRequestsReport), typeof(PullRequestReportViewModel), "PR report"),
+            new ReporterDescriptor(Constants.ETAReportType, typeof(GenerateAggregatedWorkitemsETAReport), typeof(AggregatedWorkitemsETAReport), typeof(AggregatedWorkitemsETAReportViewModel), "ETA report")
+        };
+
         private GetReportByIdHandler _handler;
 
         [Test]
@@ -44,29 +51,29 @@ namespace Ether.Tests.Handlers.Queries
         {
             const int expectedNumberOfReports = 5;
             var id = Guid.NewGuid();
-            var individualReports = Builder<PullRequestsReport.IndividualPRReport>
+            var individualReports = Builder<AggregatedWorkitemsETAReport.IndividualETAReport>
                 .CreateListOfSize(expectedNumberOfReports).Build();
-            var report = new PullRequestsReport(expectedNumberOfReports);
+            var report = new AggregatedWorkitemsETAReport(expectedNumberOfReports);
             report.IndividualReports.AddRange(individualReports);
 
             RepositoryMock.Setup(r => r.GetFieldValueAsync(It.IsAny<Expression<Func<ReportResult, bool>>>(), It.IsAny<Expression<Func<ReportResult, string>>>()))
-               .ReturnsAsync(Constants.PullRequestsReportType)
+               .ReturnsAsync(Constants.ETAReportType.ToLower())
                .Verifiable();
-            RepositoryMock.Setup(r => r.GetSingleAsync<PullRequestsReport>(id))
+            RepositoryMock.Setup(r => r.GetSingleAsync(id, It.Is<Type>(t => t == typeof(AggregatedWorkitemsETAReport))))
                 .ReturnsAsync(report)
                 .Verifiable();
 
             var result = await _handler.Handle(new GetReportById(id));
 
             result.Should().NotBeNull();
-            result.Should().BeOfType<PullRequestReportViewModel>();
-            result.As<PullRequestReportViewModel>().IndividualReports.Should().HaveCount(expectedNumberOfReports);
+            result.Should().BeOfType<AggregatedWorkitemsETAReportViewModel>();
+            result.As<AggregatedWorkitemsETAReportViewModel>().IndividualReports.Should().HaveCount(expectedNumberOfReports);
             RepositoryMock.Verify();
         }
 
         protected override void Initialize()
         {
-            _handler = new GetReportByIdHandler(RepositoryMock.Object, Mapper);
+            _handler = new GetReportByIdHandler(RepositoryMock.Object, _descriptors,  Mapper);
         }
     }
 }

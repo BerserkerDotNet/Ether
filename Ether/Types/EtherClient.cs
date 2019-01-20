@@ -23,7 +23,9 @@ namespace Ether.Types
             { typeof(IdentityViewModel), "identity" },
             { typeof(ReportViewModel), "report" },
             { typeof(PullRequestReportViewModel), "report" },
+            { typeof(AggregatedWorkitemsETAReportViewModel), "report" },
             { typeof(GenerateReportViewModel), "report" },
+            { typeof(ReporterDescriptorViewModel), "report" },
             { typeof(JobLogViewModel), "joblogs" }
         };
 
@@ -94,6 +96,11 @@ namespace Ether.Types
         public Task<Guid> GenerateReport(GenerateReportViewModel model)
         {
             return HttpPost<Guid>($"{GetPathFor<GenerateReportViewModel>()}/Generate", model);
+        }
+
+        public Task<IEnumerable<ReporterDescriptorViewModel>> GetReportTypes()
+        {
+            return HttpGet<IEnumerable<ReporterDescriptorViewModel>>($"{GetPathFor<ReporterDescriptorViewModel>()}/types");
         }
 
         public async Task<AccessToken> RequestAccessToken(LoginViewModel model)

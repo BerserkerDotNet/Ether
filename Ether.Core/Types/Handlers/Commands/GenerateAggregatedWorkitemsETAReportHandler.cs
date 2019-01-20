@@ -60,7 +60,7 @@ namespace Ether.Core.Types.Handlers.Commands
                 .GroupBy(r => r.MemberEmail)
                 .ToDictionary(k => k.Key, v => v.AsEnumerable());
 
-            var report = new AggregatedWorkitemsETAReport();
+            var report = new AggregatedWorkitemsETAReport(team.Count());
             report.Id = Guid.NewGuid();
             report.DateTaken = DateTime.UtcNow;
             report.StartDate = command.Start;
@@ -70,7 +70,6 @@ namespace Ether.Core.Types.Handlers.Commands
             report.ReportType = Constants.ETAReportType;
             report.ReportName = Constants.ETAReportName;
 
-            report.IndividualReports = new List<AggregatedWorkitemsETAReport.IndividualETAReport>(team.Count());
             foreach (var member in team)
             {
                 var individualReport = await GetIndividualReport(resolutions, workItems, dataSource, member);

@@ -12,6 +12,7 @@ namespace Ether.Core.Config
             CreateMap<Identity, IdentityViewModel>();
             CreateMap<IdentityViewModel, Identity>();
             CreateMap<PullRequestsReport, PullRequestReportViewModel>();
+            CreateMap<AggregatedWorkitemsETAReport, AggregatedWorkitemsETAReportViewModel>();
             CreateMap<ReportJobState, JobLog>()
                 .ForMember(l => l.Id, o => o.MapFrom(m => m.JobId));
             CreateMap<JobLog, JobLogViewModel>();

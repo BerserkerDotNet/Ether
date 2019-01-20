@@ -29,13 +29,15 @@
     private IEnumerable<ProfileViewModel> profiles = Enumerable.Empty<ProfileViewModel>();
     private GenerateReportViewModel model = new GenerateReportViewModel {ReportType  = "PullRequestsReport" };
 
-    private Dictionary<string, string> reportTypes = new Dictionary<string, string>(1) { { "PullRequestsReport", "Pull Requests report" } };
+    private Dictionary<string, string> reportTypes = new Dictionary<string, string>(0);
 
     private Dictionary<string, string> profileOptions = new Dictionary<string, string>(0);
 
     protected override async Task OnInitAsync()
     {
         profiles = await Client.GetAll<ProfileViewModel>();
+        var reportDescriptors = await Client.GetReportTypes();
+        reportTypes = reportDescriptors.ToDictionary(k => k.UniqueName, v => v.DisplayName);
 
         profileOptions = profiles.ToDictionary(k => k.Id.ToString(), v => $"{v.Name} ({v.Type})");
         // Select first profile

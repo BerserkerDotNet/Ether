@@ -43,25 +43,31 @@ namespace Ether.Core.Types
             }
         }
 
-        public async Task<TResult> Execute<TCommand, TResult>(ICommand<TResult> command)
-            where TCommand : ICommand<TResult>
+        public async Task<TResult> Execute<TResult>(ICommand<TResult> command)
         {
+            var commandName = command.GetType().Name;
             try
             {
-                _logger.LogInformation($"Executing {typeof(TCommand).Name} command.");
-                var handler = _context.Resolve<ICommandHandler<TCommand, TResult>>();
+                _logger.LogInformation($"Executing {commandName} command.");
+                var handlerType = typeof(ICommandHandler<,>).MakeGenericType(command.GetType(), typeof(TResult));
+                var handler = _context.Resolve(handlerType);
                 if (handler == null)
                 {
-                    throw new NotSupportedException($"No handler registered for command '{typeof(TCommand)}' with return type of '{typeof(TResult)}'");
+                    throw new NotSupportedException($"No handler registered for command '{commandName}' with return type of '{typeof(TResult)}'");
                 }
 
-                var result = await handler.Handle((TCommand)command);
-                _logger.LogInformation($"Executed {typeof(TCommand).Name} command.");
+                // Hurray! To the C# type infrance system that is so stupid it can't figure out that GenerateReportCommand is in fact ICommand<TResult>
+                var result = await (Task<TResult>)handler
+                    .GetType()
+                    .GetMethod("Handle")
+                    .Invoke(handler, new[] { command });
+
+                _logger.LogInformation($"Executed {commandName} command.");
                 return result;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error executing {typeof(TCommand).Name} command.");
+                _logger.LogError(ex, $"Error executing {commandName} command.");
                 ExceptionDispatchInfo.Capture(ex).Throw();
                 throw;
             }

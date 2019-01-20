@@ -20,7 +20,6 @@ namespace Ether.Contracts.Interfaces.CQS
         Task Execute<TCommand>(TCommand command)
             where TCommand : ICommand;
 
-        Task<TResult> Execute<TCommand, TResult>(ICommand<TResult> command)
-            where TCommand : ICommand<TResult>;
+        Task<TResult> Execute<TResult>(ICommand<TResult> command);
     }
 }

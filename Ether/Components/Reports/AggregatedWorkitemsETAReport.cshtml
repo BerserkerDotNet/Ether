@@ -1,0 +1,109 @@
+﻿@inject EtherClient Client
+<DataTable Items="report.IndividualReports.OrderBy(r => r.MemberName)">
+    <TableHeader>
+        <th>Name</th>
+        <th>Resolved</th>
+        <th>Resolved bugs</th>
+        <th>Resolved tasks</th>
+        <th>Without ETA</th>
+        <th>With Original Estimate</th>
+        <th>Original Estimate (Days)</th>
+        <th>Total Estimated (Days)</th>
+        <th>Completed with Estimates (Days)</th>
+        <th>Total Completed (Days)</th>
+        <th>Estimated/Completed</th>
+    </TableHeader>
+    <RowTemplate Context="individualReport">
+        <td>
+            @individualReport.MemberName
+            <button class="btn btn-info btn-simple btn-link" onclick="@(() => ShowDetails(individualReport))">
+                <i class="fa fa-question-circle-o" aria-hidden="true"></i>
+            </button>
+        </td>
+        <td>@individualReport.TotalResolved</td>
+        <td>@individualReport.TotalResolvedBugs</td>
+        <td>@individualReport.TotalResolvedTasks</td>
+        <td>@individualReport.WithoutETA</td>
+        <td>@individualReport.WithOriginalEstimate</td>
+        <td>@individualReport.OriginalEstimated</td>
+        <td>@individualReport.EstimatedToComplete</td>
+        <td>@individualReport.CompletedWithEstimates</td>
+        <td>@individualReport.TotalCompleted.ToString("F2")</td>
+        <td>@individualReport.EstimatedToCompletedRatio.ToString("F2")</td>
+    </RowTemplate>
+    <TableFooter>
+        <tr>
+            <th class="table-active">Total resolved:</th>
+            <td class="table-success" colspan="2">@report.TotalResolved</td>
+            <th class="table-active" colspan="2">Estimated To Complete:</th>
+            <td class="table-success" colspan="2">@report.EstimatedToComplete.ToString("F2")</td>
+        </tr>
+        <tr>
+            <th class="table-active">Completed With Estimates:</th>
+            <td class="table-success" colspan="2">@report.CompletedWithEstimates.ToString("F2")</td>
+            <th class="table-active" colspan="2">Estimated/Completed:</th>
+            <td class="table-success" colspan="2">@report.EstimatedToCompletedRatio.ToString("F2")</td>
+        </tr>
+    </TableFooter>
+</DataTable>
+
+@if (detailsReport != null)
+{<Card>
+    <Header>
+        <h3 class="box-title">Details on '@detailsReport.MemberName'</h3>
+        <div class="pull-right d-print-none">
+            <button class="btn btn-fill btn-danger" onclick="@(() => ShowDetails(null))">Close</button>
+        </div>
+    </Header>
+    <Body>
+        <DataTable Items="detailsReport.Details" PageSize="100">
+            <TableHeader>
+                <th>Workitem</th>
+                <th>Title</th>
+                <th>Type</th>
+                <th>Original Estimate (Days)</th>
+                <th>Total Estimated (Days)</th>
+                <th>Time Spent (Days)</th>
+            </TableHeader>
+            <RowTemplate Context="detail">
+                <td>@detail.WorkItemId</td>
+                <td>@detail.WorkItemTitle</td>
+                <td>@detail.WorkItemType</td>
+                <td>@detail.OriginalEstimate</td>
+                <td>@detail.EstimatedToComplete</td>
+                <td>@detail.TimeSpent</td>
+            </RowTemplate>
+            <TableFooter>
+                <tr>
+                    <th class="table-active">Total:</th>
+                    <td class="table-success" colspan="2">@detailsReport.TotalResolvedBugs bugs / @detailsReport.TotalResolvedTasks tasks</td>
+                    <td class="table-success">@detailsReport.OriginalEstimated</td>
+                    <td class="table-success">@detailsReport.EstimatedToComplete</td>
+                    <td class="table-success">@detailsReport.TotalCompleted</td>
+                </tr>
+            </TableFooter>
+        </DataTable>
+    </Body>
+    <Footer></Footer>
+</Card>
+}
+
+@functions
+{
+[Parameter] Guid Id { get; set; }
+
+private AggregatedWorkitemsETAReportViewModel report = new AggregatedWorkitemsETAReportViewModel();
+
+private AggregatedWorkitemsETAReportViewModel.IndividualETAReport detailsReport = null;
+
+protected override async Task OnInitAsync()
+{
+    report = await Client.GetById<AggregatedWorkitemsETAReportViewModel>(Id);
+}
+
+protected void ShowDetails(AggregatedWorkitemsETAReportViewModel.IndividualETAReport report)
+{
+    detailsReport = report;
+    StateHasChanged();
+}
+}

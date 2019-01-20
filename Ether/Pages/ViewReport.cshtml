@@ -33,13 +33,21 @@
         if (string.Equals(Type, "PullRequestsReport", StringComparison.OrdinalIgnoreCase))
         {
             reportDisplayName = "Pull requests report";
-            componentToRender = b =>
-            {
-                b.OpenComponent<Ether.Components.Reports.PullRequestsReport>(1);
-                b.AddAttribute(2, "Id", Id.Value);
-                b.CloseComponent();
-            };
+            componentToRender = b => RenderComponent<Ether.Components.Reports.PullRequestsReport>(b);
         }
+        else if (string.Equals(Type, "AggregatedWorkitemsETAReport", StringComparison.OrdinalIgnoreCase))
+        {
+            reportDisplayName = "Aggregated workitems ETA report";
+            componentToRender = b => RenderComponent<Ether.Components.Reports.AggregatedWorkitemsETAReport>(b);
+        }
+    }
+
+    protected void RenderComponent<T>(Microsoft.AspNetCore.Blazor.RenderTree.RenderTreeBuilder builder)
+        where T : IComponent
+    {
+        builder.OpenComponent<T>(1);
+        builder.AddAttribute(2, "Id", Id.Value);
+        builder.CloseComponent();
     }
 
     protected void BackToList()

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Ether.Contracts.Dto.Reports;
@@ -12,12 +14,14 @@ namespace Ether.Core.Types.Handlers.Queries
     public class GetReportByIdHandler : IQueryHandler<GetReportById, ReportViewModel>
     {
         private readonly IRepository _repository;
+        private readonly IEnumerable<ReporterDescriptor> _reportDescriptors;
         private readonly IMapper _mapper;
 
-        public GetReportByIdHandler(IRepository repository, IMapper mapper)
+        public GetReportByIdHandler(IRepository repository, IEnumerable<ReporterDescriptor> reportDescriptors, IMapper mapper)
         {
-            this._repository = repository;
-            this._mapper = mapper;
+            _repository = repository;
+            _reportDescriptors = reportDescriptors;
+            _mapper = mapper;
         }
 
         public async Task<ReportViewModel> Handle(GetReportById query)
@@ -28,24 +32,14 @@ namespace Ether.Core.Types.Handlers.Queries
             }
 
             var reportType = await _repository.GetFieldValueAsync<ReportResult, string>(r => r.Id == query.Id, r => r.ReportType);
-            switch (reportType)
+            var descriptor = _reportDescriptors.FirstOrDefault(d => string.Equals(d.UniqueName, reportType, StringComparison.OrdinalIgnoreCase));
+            if (descriptor == null)
             {
-                case Constants.PullRequestsReportType:
-                    var report = await _repository.GetSingleAsync<PullRequestsReport>(query.Id);
-                    return _mapper.Map<PullRequestReportViewModel>(report);
+                return null;
             }
 
-            return null;
-        }
-
-        private Type GetTypeFor(string reportType)
-        {
-            if (string.Equals(reportType, Constants.PullRequestsReportType))
-            {
-                return typeof(PullRequestsReport);
-            }
-
-            throw new ArgumentOutOfRangeException($"Report type '{reportType}' is not supported");
+            var report = await _repository.GetSingleAsync(query.Id, descriptor.DtoType);
+            return _mapper.Map(report, descriptor.DtoType, descriptor.ViewModelType) as ReportViewModel;
         }
     }
 }
