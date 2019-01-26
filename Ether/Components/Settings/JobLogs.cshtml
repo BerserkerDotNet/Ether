@@ -1,9 +1,9 @@
-﻿@inherits EditableTable<JobLogViewModel>
-
-<Card>
-    <Header><h4 class="card-title">Job logs</h4></Header>
-    <Body>
-        <DataTable Items="@Items" PageSize="5">
+﻿<EditableTable  TItem="JobLogViewModel"
+    IsReadOnly="true"
+    GridTitle="Job Logs"
+    OnRecordsLoaded="@OnRecordsLoaded">
+    <ListModeContent Context="ctx">
+        <DataTable Items="@ctx.Items" PageSize="8">
             <TableHeader>
                 <th>Type</th>
                 <th>Result</th>
@@ -19,14 +19,13 @@
                 <td>@log.Message</td>
             </RowTemplate>
         </DataTable>
-    </Body>
-    <Footer><button class="btn btn-success btn-fill pull-right" onclick="@(() => Refresh())">Refresh</button></Footer>
-</Card>
+    </ListModeContent>
+</EditableTable>
 
 @functions
 { 
-    protected override void OnRecordsLoaded()
+    protected void OnRecordsLoaded(EditableTableBase<JobLogViewModel> ctx)
     {
-        Items = Items.OrderByDescending(r => r.CompletedOn).ToArray();
+        ctx.Items = ctx.Items.OrderByDescending(r => r.CompletedOn).ToArray();
     }
 }

@@ -1,122 +1,62 @@
-﻿@inherits EditableTable<ProfileViewModel>
+﻿@inject EtherClient Client
 
-@if (IsEditing)
-{
-    <Card>
-        <Header>
-            @if (EditingItem.Id == Guid.Empty)
-            {
-                <h4 class="card-title">New profile</h4>
-            }
-            else
-            {
-                <h4 class="card-title">Editing '@EditingItem.Name'</h4>
-            }
-        </Header>
-        <Body>
-            <div class="form-group">
-                <label>Name:</label>
-                <input class="form-control" type="text" bind="EditingItem.Name" />
-            </div>
-            <div class="form-group">
-                <label>Type:</label>
-                <input class="form-control" type="text" readonly bind="EditingItem.Type" />
-            </div>
-            <div class="form-group">
-                <label>Members:</label>
-                <select class="form-control" ref="membersSelectRef" multiple onchange="@MembersSelectionChanged">
-                    @foreach (var member in members)
-                    {
-                        @if (EditingItem.Members.Contains(member.Id))
-                        {
-                            <option selected value="@member.Id">@member.DisplayName</option>
-                        }
-                        else
-                        {
-                            <option value="@member.Id">@member.DisplayName</option>
-                        }
-                    }
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Repositories:</label>
-                <select class="form-control" ref="repositoriesSelectRef" multiple onchange="@RepositoriesSelectionChanged">
-                    @foreach (var repository in repositories)
-                    {
-                        @if (EditingItem.Repositories.Contains(repository.Id))
-                        {
-                            <option selected value="@repository.Id">@repository.Name</option>
-                        }
-                        else
-                        {
-                            <option value="@repository.Id">@repository.Name</option>
-                        }
-                    }
-                </select>
-            </div>
-        </Body>
-        <Footer>
-            <button class="btn btn-success btn-fill pull-right" onclick="@(() => Save())">Save</button>
-            <button class="btn btn-danger btn-fill pull-right" onclick="@(() => Cancel())">Cancel</button>
-        </Footer>
-    </Card>
-}
-else
-{
-    <Card>
-        <Header>Profiles</Header>
-        <Body>
-            <DataTable Items="@Items">
-                <TableHeader>
-                    <th>Name</th>
-                    <th>Type</th>
-                    <th>Members</th>
-                    <th>Repositories</th>
-                    <th>Actions</th>
-                </TableHeader>
-                <RowTemplate Context="profile">
-                    <td>@profile.Name</td>
-                    <td>@profile.Type</td>
-                    <td>@profile.Members.Count()</td>
-                    <td>@profile.Repositories.Count()</td>
-                    <td>
-                        <div>
-                            <button class="btn btn-warning btn-fill" onclick="@(() => Edit(profile))">Edit</button>
-                            <button class="btn btn-danger btn-fill" onclick="@(() => Delete(profile))">Delete</button>
-                        </div>
-                    </td>
-                </RowTemplate>
-            </DataTable>
-        </Body>
-        <Footer>
-            <button class="btn btn-success btn-fill pull-right" onclick="@(() => New())">New</button>
-        </Footer>
-    </Card>
-}
+<EditableTable TItem="ProfileViewModel"
+    GridTitle="Profiles"
+    ExistingTitle="Editing profile"
+    NewTitle="New profile">
+    <ListModeContent Context="ctx">
+        <DataTable Items="@ctx.Items">
+            <TableHeader>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Members</th>
+                <th>Repositories</th>
+                <th>Actions</th>
+            </TableHeader>
+            <RowTemplate Context="profile">
+                <td>@profile.Name</td>
+                <td>@profile.Type</td>
+                <td>@profile.Members.Count()</td>
+                <td>@profile.Repositories.Count()</td>
+                <td>
+                    <div>
+                        <button class="btn btn-warning btn-fill" onclick="@(() => ctx.Edit(profile))">Edit</button>
+                        <button class="btn btn-danger btn-fill" onclick="@(() => ctx.Delete(profile))">Delete</button>
+                    </div>
+                </td>
+            </RowTemplate>
+        </DataTable>
+    </ListModeContent>
+    <FormModeContent Context="ctx">
+        <ModelValidation Handler="ctx">
+            <InputItem Type="text" Title="Name" PropertyName="@nameof(ctx.EditingItem.Name)" bind-Value="@ctx.EditingItem.Name" />
+            <InputItem Type="text" Title="Type" PropertyName="@nameof(ctx.EditingItem.Type)" bind-Value="@ctx.EditingItem.Type" />
+            <SelectItem Title="Members"
+                        Multiple="true"
+                        bind-Value="ctx.EditingItem.Members"
+                        PropertyName="@nameof(ctx.EditingItem.Members)"
+                        Options="@membersOptions" />
+            <SelectItem Title="Repositories"
+                        Multiple="true"
+                        bind-Value="ctx.EditingItem.Repositories"
+                        PropertyName="@nameof(ctx.EditingItem.Repositories)"
+                        Options="@repositoriesOptions" />
+        </ModelValidation>
+    </FormModeContent>
+</EditableTable>
 
 @functions
 {
-    ElementRef membersSelectRef;
-    ElementRef repositoriesSelectRef;
-    private IEnumerable<TeamMemberViewModel> members = Enumerable.Empty<TeamMemberViewModel>();
-    private IEnumerable<VstsRepositoryViewModel> repositories = Enumerable.Empty<VstsRepositoryViewModel>();
+    private Dictionary<Guid, string> membersOptions = new Dictionary<Guid, string>(0);
+    private Dictionary<Guid, string> repositoriesOptions = new Dictionary<Guid, string>(0);
 
     protected override async Task OnInitAsync()
     {
         await base.OnInitAsync();
-        members = await Client.GetAll<TeamMemberViewModel>();
-        repositories = await Client.GetAll<VstsRepositoryViewModel>();
-    }
+        var members = await Client.GetAll<TeamMemberViewModel>();
+        var repositories = await Client.GetAll<VstsRepositoryViewModel>();
 
-    async void MembersSelectionChanged(UIChangeEventArgs e)
-    {
-        var ids = await JsUtils.GetAllSelectedOptions(membersSelectRef);
-        EditingItem.Members = ids.Select(i => Guid.Parse(i));
-    }
-
-    async void RepositoriesSelectionChanged(UIChangeEventArgs e)
-    {
-        var ids = await JsUtils.GetAllSelectedOptions(repositoriesSelectRef);
-        EditingItem.Repositories = ids.Select(i => Guid.Parse(i));
+        membersOptions = members.ToDictionary(m => m.Id, m => m.DisplayName);
+        repositoriesOptions = repositories.ToDictionary(r => r.Id, r => r.Name);
     }
 }

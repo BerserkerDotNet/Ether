@@ -5,3 +5,7 @@
     padding: 0px;
     vertical-align: super;
 }
+
+.card.card-600 {
+    min-height: 600px;
+}

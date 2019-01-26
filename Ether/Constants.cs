@@ -2,6 +2,6 @@
 {
     public static class Constants
     {
-        public const string NoIdentityLabel = "None";
+        public const string NoneLabel = "None";
     }
 }

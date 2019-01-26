@@ -1,94 +1,55 @@
-﻿@inherits EditableTable<VstsRepositoryViewModel>
-
-@if (IsEditing)
-{
-    <Card>
-        <Header>
-            @if (EditingItem.Id == Guid.Empty)
-            {
-                <h4 class="card-title">New Repository</h4>
-            }
-            else
-            {
-                <h4 class="card-title">Editing '@EditingItem.Name'</h4>
-            }
-        </Header>
-        <Body>
-            <div class="form-group">
-                <label>Name:</label>
-                <input class="form-control" type="text" bind="EditingItem.Name" />
-            </div>
-            <div class="form-group">
-                <label>Project:</label>
-                <select class="form-control" bind="@SelectedProject">
-                    <option value="@Guid.Empty">None</option>
-                    @foreach (var project in projects)
-                    {
-                        <option value="@project.Id">@project.Name</option>
-                    }
-                </select>
-            </div>
-        </Body>
-        <Footer>
-            <button class="btn btn-success btn-fill pull-right" onclick="@(() => Save())">Save</button>
-            <button class="btn btn-danger btn-fill pull-right" onclick="@(() => Cancel())">Cancel</button>
-        </Footer>
-    </Card>
-}
-else
-{
-    <Card>
-        <Header>Repositories</Header>
-        <Body>
-            <DataTable Items="@Items">
-                <TableHeader>
-                    <th>Name</th>
-                    <th>Project</th>
-                    <th>Actions</th>
-                </TableHeader>
-                <RowTemplate Context="repository">
-                    <td>@repository.Name</td>
-                    <td>@GetProjectName(repository.Project)</td>
-                    <td>
-                        <div>
-                            <button class="btn btn-warning btn-fill" onclick="@(() => Edit(repository))">Edit</button>
-                            <button class="btn btn-danger btn-fill" onclick="@(() => Delete(repository))">Delete</button>
-                        </div>
-                    </td>
-                </RowTemplate>
-            </DataTable>
-        </Body>
-        <Footer>
-            <button class="btn btn-success btn-fill pull-right" onclick="@(() => New())">New</button>
-        </Footer>
-    </Card>
-}
+﻿@inject EtherClient Client
+<EditableTable TItem="VstsRepositoryViewModel"
+               GridTitle="Repositories"
+                NewTitle="New Repository"
+                ExistingTitle="Edit Repository">
+    <ListModeContent Context="ctx">
+        <DataTable Items="@ctx.Items">
+            <TableHeader>
+                <th>Name</th>
+                <th>Project</th>
+                <th>Actions</th>
+            </TableHeader>
+            <RowTemplate Context="repository">
+                <td>@repository.Name</td>
+                <td>@GetProjectName(repository.Project)</td>
+                <td>
+                    <div>
+                        <button class="btn btn-warning btn-fill" onclick="@(() => ctx.Edit(repository))">Edit</button>
+                        <button class="btn btn-danger btn-fill" onclick="@(() => ctx.Delete(repository))">Delete</button>
+                    </div>
+                </td>
+            </RowTemplate>
+        </DataTable>
+    </ListModeContent>
+    <FormModeContent Context="ctx">
+        <InputItem Type="text" Title="Name" bind-Value="ctx.EditingItem.Name" PropertyName="@nameof(ctx.EditingItem.Name)" />
+        <SelectItem Title="Project" bind-Value="ctx.EditingItem.Project" PropertyName="@nameof(ctx.EditingItem.Project)" Options="projectsOptions" />
+    </FormModeContent>
+</EditableTable>
 
 @functions
 {
-    private IEnumerable<VstsProjectViewModel> projects = Enumerable.Empty<VstsProjectViewModel>();
+    private Dictionary<Guid, string> projectsOptions = new Dictionary<Guid, string>();
 
     protected override async Task OnInitAsync()
     {
         await base.OnInitAsync();
-        projects = await Client.GetAll<VstsProjectViewModel>();
-    }
-
-    private string SelectedProject
-    {
-        get
+        var projects = await Client.GetAll<VstsProjectViewModel>();
+        projectsOptions.Add(Guid.Empty, Constants.NoneLabel);
+        foreach (var project in projects)
         {
-            return EditingItem.Project.ToString();
-        }
-        set
-        {
-            EditingItem.Project = string.IsNullOrEmpty(value) ? Guid.Empty : Guid.Parse(value);
+            projectsOptions.Add(project.Id, project.Name);
         }
     }
 
     private string GetProjectName(Guid projectId)
     {
-        var project = projects.SingleOrDefault(i => i.Id == projectId);
-        return project == null ? projectId.ToString() : project.Name;
+        if (!projectsOptions.ContainsKey(projectId))
+        {
+            return "N/A";
+        }
+
+        return projectsOptions[projectId];
     }
 }

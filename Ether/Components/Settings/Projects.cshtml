@@ -1,96 +1,57 @@
-﻿@inherits EditableTable<VstsProjectViewModel>
+﻿@inject EtherClient Client
+<EditableTable TItem="VstsProjectViewModel"
+               GridTitle="Projects"
+               NewTitle="New Project"
+               ExistingTitle="Editing Project">
+    <ListModeContent Context="ctx">
+        <DataTable Items="@ctx.Items">
+            <TableHeader>
+                <th>Name</th>
+                <th>Is workitems enabled</th>
+                <th>Identity</th>
+                <th>Actions</th>
+            </TableHeader>
+            <RowTemplate Context="project">
+                <td>@project.Name</td>
+                <td>@project.IsWorkItemsEnabled</td>
+                <td>@GetIdentityName(project.Identity)</td>
+                <td>
+                    <div>
+                        <button class="btn btn-warning btn-fill" onclick="@(() => ctx.Edit(project))">Edit</button>
+                        <button class="btn btn-danger btn-fill" onclick="@(() => ctx.Delete(project))">Delete</button>
+                    </div>
+                </td>
+            </RowTemplate>
+        </DataTable>
+    </ListModeContent>
+    <FormModeContent Context="ctx">
+        <ModelValidation Handler="ctx">
+            <InputItem Type="text" Title="Name" bind-Value="ctx.EditingItem.Name" PropertyName="@nameof(ctx.EditingItem.Name)" />
+            <InputItem Type="checkbox" Title="Is Work Items Enabled" bind-Value="ctx.EditingItem.IsWorkItemsEnabled" PropertyName="@nameof(ctx.EditingItem.IsWorkItemsEnabled)" />
+            <SelectItem Title="Identity" bind-Value="ctx.EditingItem.Identity" PropertyName="@nameof(ctx.EditingItem.Identity)" Options="identitiesOptions" />
+        </ModelValidation>
+    </FormModeContent>
+</EditableTable>
 
-@if (IsEditing)
-{
-    <Card>
-        <Header>
-            @if (EditingItem.Id == Guid.Empty)
-            {
-                <h4 class="card-title">New project</h4>
-            }
-            else
-            {
-                <h4 class="card-title">Editing '@EditingItem.Name'</h4>
-            }
-        </Header>
-        <Body>
-            <div class="form-group">
-                <label>Name:</label>
-                <input class="form-control" type="text" bind="EditingItem.Name" />
-            </div>
-            <div class="form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" type="checkbox" bind="EditingItem.IsWorkItemsEnabled" />
-                    Is Work Items Enabled
-                </label>
-            </div>
-            <div class="form-group">
-                <label>Identity:</label>
-                <select class="form-control" bind="@SelectedIdentity">
-                    <option>None</option>
-                    @foreach (var identity in identities)
-                    {
-                        <option value="@identity.Id">@identity.Name</option>
-                    }
-                </select>
-            </div>
-        </Body>
-        <Footer>
-            <button class="btn btn-success btn-fill pull-right" onclick="@(() => Save())">Save</button>
-            <button class="btn btn-danger btn-fill pull-right" onclick="@(() => Cancel())">Cancel</button>
-        </Footer>
-    </Card>
-}
-else
-{
-    <Card>
-        <Header>Projects</Header>
-        <Body>
-            <DataTable Items="@Items">
-                <TableHeader>
-                    <th>Name</th>
-                    <th>Is workitems enabled</th>
-                    <th>Identity</th>
-                    <th>Actions</th>
-                </TableHeader>
-                <RowTemplate Context="project">
-                    <td>@project.Name</td>
-                    <td>@project.IsWorkItemsEnabled</td>
-                    <td>@GetIdentityName(project.Identity)</td>
-                    <td>
-                        <div>
-                            <button class="btn btn-warning btn-fill" onclick="@(() => Edit(project))">Edit</button>
-                            <button class="btn btn-danger btn-fill" onclick="@(() => Delete(project))">Delete</button>
-                        </div>
-                    </td>
-                </RowTemplate>
-            </DataTable>
-        </Body>
-        <Footer>
-            <button class="btn btn-success btn-fill pull-right" onclick="@(() => New())">New</button>
-        </Footer>
-    </Card>
-}
+@*<div class="form-check">
+    <label class="form-check-label">
+        <input class="form-check-input" type="checkbox" bind="EditingItem.IsWorkItemsEnabled" />
+        Is Work Items Enabled
+    </label>
+</div>*@
 
 @functions
 {
-    private IEnumerable<IdentityViewModel> identities = Enumerable.Empty<IdentityViewModel>();
+    private Dictionary<Guid, string> identitiesOptions = new Dictionary<Guid, string>(10);
 
     protected override async Task OnInitAsync()
     {
         await base.OnInitAsync();
-        identities = await Client.GetAll<IdentityViewModel>();
-    }
-
-    private string SelectedIdentity
-    {
-        get
+        var identities = await Client.GetAll<IdentityViewModel>();
+        identitiesOptions.Add(Guid.Empty, Constants.NoneLabel);
+        foreach (var identity in identities)
         {
-            return EditingItem.Identity?.ToString();
-        }
-        set
-        {
-            EditingItem.Identity = string.IsNullOrEmpty(value) ? (Guid?)null : (Guid?)Guid.Parse(value);
+            identitiesOptions.Add(identity.Id, identity.Name);
         }
     }
 
@@ -98,10 +59,15 @@ else
     {
         if (!identityId.HasValue)
         {
-            return Constants.NoIdentityLabel;
+            return Constants.NoneLabel;
         }
 
-        var identity = identities.SingleOrDefault(i => i.Id == identityId.Value);
-        return identity == null ? identityId.Value.ToString() : identity.Name;
+        if (!identitiesOptions.ContainsKey(identityId.Value))
+        {
+            return "N/A";
+        }
+
+        return identitiesOptions[identityId.Value];
     }
+
 }

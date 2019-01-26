@@ -1,4 +1,4 @@
-﻿<div class="card">
+﻿<div class="card @AdditionalClasses">
     <div class="card-header">
         @Header
     </div>
@@ -15,4 +15,5 @@
     [Parameter] RenderFragment Header { get; set; }
     [Parameter] RenderFragment Body { get; set; }
     [Parameter] RenderFragment Footer { get; set; }
+    [Parameter] string AdditionalClasses { get; set; }
 }

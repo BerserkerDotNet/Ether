@@ -1,0 +1,73 @@
+﻿@typeparam TItem
+@inherits EditableTableBase<TItem>
+
+<Card AdditionalClasses="card-600">
+    <Header>
+        <h4 class="card-title">
+            @if (IsEditing)
+            {
+                @if ((EditingItem as ViewModelWithId).Id == Guid.Empty)
+                {
+                    @NewTitle
+                }
+                else
+                {
+                    @ExistingTitle
+                }
+            }
+            else
+            {
+                @GridTitle
+            }
+        </h4>
+    </Header>
+    <Body>
+        @if (IsLoading)
+        {
+            <div class="text-center" style="padding-top:15%">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
+                <div>Loading...</div>
+            </div>
+        }
+        else if (IsEditing)
+        {
+            @FormModeContent(this)
+        }
+        else
+        {
+            @ListModeContent(this)
+        }
+    </Body>
+    <Footer>
+        @if (IsEditing)
+        {
+            <div class="pull-right">
+                <button class="btn btn-success btn-fill" onclick="@(() => Save())">Save</button>
+                <button class="btn btn-danger btn-fill" onclick="@(() => Cancel())">Cancel</button>
+            </div>
+        }
+        else
+        {
+            <div class="pull-right">
+                @if (!IsReadOnly)
+                {
+                    <button class="btn btn-primary btn-fill" onclick="@(() => New())">New</button>
+                }
+                <button class="btn btn-success btn-fill" onclick="@(() => Refresh())">Refresh</button>
+            </div>
+        }
+</Footer>
+</Card>
+
+@functions{
+    [Parameter] string GridTitle { get; set; }
+    [Parameter] string NewTitle { get; set; }
+    [Parameter] string ExistingTitle { get; set; }
+
+    [Parameter] bool IsReadOnly { get; set; }
+
+    [Parameter] RenderFragment<EditableTableBase<TItem>> ListModeContent { get; set; }
+    [Parameter] RenderFragment<EditableTableBase<TItem>> FormModeContent { get; set; }
+}

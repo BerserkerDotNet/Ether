@@ -1,27 +1,76 @@
 ﻿@typeparam T
+@typeparam TOption
 @inherits InputItemBase<T>
 <ValidatedField Properties="@Properties" Title="@Title">
-    <select class="form-control" onchange="@OnSelectionChanged">
-        @foreach (var option in Options)
-        {
-            if (option.Key == Value.ToString())
+    @if (Multiple)
+    {
+        <select ref="multiSelectElement" multiple class="form-control" onchange="@OnSelectionChanged">
+            @foreach (var option in Options)
             {
-                <option selected value="@option.Key">@option.Value</option>
+                if (!isInitialized && MultipleValue.Contains(option.Key))
+                {
+                    <option selected value="@option.Key">@option.Value</option>
+                }
+                else
+                {
+                    <option value="@option.Key">@option.Value</option>
+                }
             }
-            else
+        </select>
+    }
+    else
+    {
+        <select class="form-control" onchange="@OnSelectionChanged">
+            @foreach (var option in Options)
             {
-                <option value="@option.Key">@option.Value</option>
+                if (Equals(option.Key, Value))
+                {
+                    <option selected value="@option.Key">@option.Value</option>
+                }
+                else
+                {
+                    <option value="@option.Key">@option.Value</option>
+                }
             }
-        }
-    </select>
+        </select>
+    }
 </ValidatedField>
 
 @functions{
 
-    [Parameter] Dictionary<string, string> Options { get; set; }
+    ElementRef multiSelectElement;
+    bool isInitialized = false;
 
-    private void OnSelectionChanged(UIChangeEventArgs e)
+    [Parameter] Dictionary<TOption, string> Options { get; set; }
+
+    [Parameter] bool Multiple { get; set; }
+
+    protected override void OnAfterRender()
     {
-        Value = (T)Convert.ChangeType(e.Value, typeof(T));
+        base.OnAfterRender();
+        isInitialized = true;
+    }
+
+    private async Task OnSelectionChanged(UIChangeEventArgs e)
+    {
+        if (!Multiple)
+        {
+            Value = ConvertHelper.ConvertTo<T>(e.Value);
+        }
+        else
+        {
+            var ids = await JsUtils.GetAllSelectedOptions(multiSelectElement);
+            var newValues = ids.Select(i => ConvertHelper.ConvertTo<TOption>(i)).ToArray();
+            Console.WriteLine($"Value: {e.Value}; IDs: {string.Join(", ", ids)}");
+            Value = (T)((object)newValues);
+        }
+    }
+
+    IEnumerable<TOption> MultipleValue
+    {
+        get
+        {
+            return (IEnumerable<TOption>)Value;
+        }
     }
 }

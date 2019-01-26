@@ -1,54 +1,31 @@
-﻿@inherits EditableTable<IdentityViewModel>
-
-@if (IsEditing)
-{
-    <Card>
-        <Header>
-            @if (EditingItem.Id == Guid.Empty)
-            {
-                <h4 class="card-title">New Identity</h4>
-            }
-            else
-            {
-                <h4 class="card-title">Editing '@EditingItem.Name'</h4>
-            }
-        </Header>
-        <Body>
-            <ModelValidation Handler="@this">
-                <InputItem Type="text" Title="Name" PropertyName="@nameof(EditingItem.Name)" bind-Value="@EditingItem.Name" />
-                <InputItem Type="password" Title="Token" PropertyName="@nameof(EditingItem.Token)" bind-Value="@EditingItem.Token" />
-                <InputItem Type="date" Title="Expiration Date" PropertyName="@nameof(EditingItem.ExpirationDate)" bind-Value="@EditingItem.ExpirationDate" />
-            </ModelValidation>
-        </Body>
-        <Footer>
-            <button class="btn btn-success btn-fill pull-right" onclick="@(() => Save())">Save</button>
-            <button class="btn btn-danger btn-fill pull-right" onclick="@(() => Cancel())">Cancel</button>
-        </Footer>
-    </Card>
-}
-else
-{
-    <Card>
-        <Header><h4 class="card-title">Identities</h4></Header>
-        <Body>
-            <DataTable Items="@Items">
-                <TableHeader>
-                    <th>Name</th>
-                    <th>Expiration Date</th>
-                    <th>Actions</th>
-                </TableHeader>
-                <RowTemplate Context="identity">
-                    <td>@identity.Name</td>
-                    <td>@identity.ExpirationDate</td>
-                    <td>
-                        <div>
-                            <button class="btn btn-warning btn-fill" onclick="@(() => Edit(identity))">Edit</button>
-                            <button class="btn btn-danger btn-fill" onclick="@(() => Delete(identity))">Delete</button>
-                        </div>
-                    </td>
-                </RowTemplate>
-            </DataTable>
-        </Body>
-        <Footer><button class="btn btn-success btn-fill pull-right" onclick="@(() => New())">New</button></Footer>
-    </Card>
-}
+﻿<EditableTable TItem="IdentityViewModel" 
+    GridTitle="Identities"
+    NewTitle="New identity"
+    ExistingTitle="Editing identity">
+    <ListModeContent Context="ctx">
+        <DataTable Items="@ctx.Items">
+            <TableHeader>
+                <th>Name</th>
+                <th>Expiration Date</th>
+                <th>Actions</th>
+            </TableHeader>
+            <RowTemplate Context="identity">
+                <td>@identity.Name</td>
+                <td>@identity.ExpirationDate</td>
+                <td>
+                    <div>
+                        <button class="btn btn-warning btn-fill" onclick="@(() => ctx.Edit(identity))">Edit</button>
+                        <button class="btn btn-danger btn-fill" onclick="@(() => ctx.Delete(identity))">Delete</button>
+                    </div>
+                </td>
+            </RowTemplate>
+        </DataTable>
+    </ListModeContent>
+    <FormModeContent Context="ctx">
+        <ModelValidation Handler="@ctx">
+            <InputItem Type="text" Title="Name" PropertyName="@nameof(ctx.EditingItem.Name)" bind-Value="@ctx.EditingItem.Name" />
+            <InputItem Type="password" Title="Token" PropertyName="@nameof(ctx.EditingItem.Token)" bind-Value="@ctx.EditingItem.Token" />
+            <InputItem Type="date" Title="Expiration Date" PropertyName="@nameof(ctx.EditingItem.ExpirationDate)" bind-Value="@ctx.EditingItem.ExpirationDate" />
+        </ModelValidation>
+    </FormModeContent>
+</EditableTable>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Ether.Types;
 using Ether.ViewModels;
@@ -9,19 +10,25 @@ using static Ether.Types.JsUtils;
 
 namespace Ether.Components.CodeBehind
 {
-    public class EditableTable<T> : BlazorComponent, IFormHandler, IDisposable
-        where T : ViewModelWithId, new()
+    public class EditableTableBase<T> : BlazorComponent, IFormHandler, IDisposable
     {
+        private static readonly Func<T> TCreator = Expression.Lambda<Func<T>>(Expression.New(typeof(T).GetConstructor(Type.EmptyTypes))).Compile();
+
         private IFormValidator _formValidator;
+
+        public IEnumerable<T> Items { get; set; } = Enumerable.Empty<T>();
+
+        public T EditingItem { get; set; }
 
         [Inject]
         protected EtherClient Client { get; set; }
 
-        protected IEnumerable<T> Items { get; set; } = Enumerable.Empty<T>();
-
-        protected T EditingItem { get; set; }
-
         protected bool IsEditing { get; set; }
+
+        protected bool IsLoading { get; set; }
+
+        [Parameter]
+        protected Action<EditableTableBase<T>> OnRecordsLoaded { get; set; }
 
         public void SetValidator(IFormValidator validator)
         {
@@ -31,6 +38,27 @@ namespace Ether.Components.CodeBehind
         public void Dispose()
         {
             _formValidator = null;
+        }
+
+        public virtual void Edit(T model)
+        {
+            StartEditing(model);
+        }
+
+        public virtual async Task Delete(T model)
+        {
+            var delete = await Confirm($"Are you sure you want to delete selected item?");
+            if (delete)
+            {
+                var viewModelWithId = model as ViewModelWithId;
+                if (viewModelWithId == null)
+                {
+                    throw new NotSupportedException($"View model '{typeof(T).Name}' should be inherited from {nameof(ViewModelWithId)}");
+                }
+
+                await Client.Delete<T>(viewModelWithId.Id);
+                await Refresh();
+            }
         }
 
         protected override async Task OnInitAsync()
@@ -47,19 +75,14 @@ namespace Ether.Components.CodeBehind
 
         protected void FinishEditing()
         {
-            EditingItem = null;
+            EditingItem = default(T);
             IsEditing = false;
             StateHasChanged();
         }
 
         protected virtual void New()
         {
-            Edit(new T());
-        }
-
-        protected virtual void Edit(T model)
-        {
-            StartEditing(model);
+            Edit(TCreator());
         }
 
         protected virtual async Task Save()
@@ -85,24 +108,19 @@ namespace Ether.Components.CodeBehind
             FinishEditing();
         }
 
-        protected virtual async Task Delete(T model)
-        {
-            var delete = await Confirm($"Are you sure you want to delete selected item?");
-            if (delete)
-            {
-                await Client.Delete<T>(model.Id);
-                await Refresh();
-            }
-        }
-
-        protected virtual void OnRecordsLoaded()
-        {
-        }
-
         protected virtual async Task Refresh()
         {
-            Items = await Client.GetAll<T>();
-            OnRecordsLoaded();
+            try
+            {
+                IsLoading = true;
+                Items = await Client.GetAll<T>();
+                OnRecordsLoaded?.Invoke(this);
+            }
+            finally
+            {
+                IsLoading = false;
+            }
+
             StateHasChanged();
         }
     }
