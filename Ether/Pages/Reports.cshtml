@@ -3,10 +3,12 @@
 @inject EtherClient Client
 @inject IUriHelper UriHelper
 
-<Card>
-    <Header>Reports</Header>
-    <Body>
-        <DataTable Items="reports">
+
+<EditableTable TItem="ReportViewModel"
+               GridTitle="Reports"
+               IsReadOnly="true">
+    <ListModeContent Context="ctx">
+        <DataTable Items="ctx.Items" PageSize="8">
             <TableHeader>
                 <th>Name</th>
                 <th>Taken</th>
@@ -24,29 +26,18 @@
                 <td>
                     <div>
                         <button class="btn btn-success btn-fill" onclick="@(() => View(report))">View</button>
-                        <button class="btn btn-danger btn-fill" onclick="@(() => Delete(report))">Delete</button>
+                        <button class="btn btn-danger btn-fill" onclick="@(() => ctx.Delete(report))">Delete</button>
                     </div>
                 </td>
             </RowTemplate>
         </DataTable>
-    </Body>
-</Card>
+    </ListModeContent>
+</EditableTable>
 
 @functions
 {
-    private IEnumerable<ReportViewModel> reports = Enumerable.Empty<ReportViewModel>();
-    protected override async Task OnInitAsync()
-    {
-        reports = await Client.GetAll<ReportViewModel>();
-    }
-
     protected void View(ReportViewModel model)
     {
         UriHelper.NavigateTo($"/reports/view/{model.ReportType}/{model.Id}");
-    }
-
-    protected void Delete(ReportViewModel model)
-    {
-
     }
 }

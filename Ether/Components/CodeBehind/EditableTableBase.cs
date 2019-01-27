@@ -98,7 +98,17 @@ namespace Ether.Components.CodeBehind
                 return;
             }
 
-            await Client.Save(EditingItem);
+            try
+            {
+                await Client.Save(EditingItem);
+                await NotifySuccess("Success", $"{EditingItem.GetType().Name.Replace("ViewModel", string.Empty)} was saved successfully");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("ERROR:", ex);
+                await NotifyError("Error saving record", ex.Message);
+            }
+
             await Refresh();
             FinishEditing();
         }
@@ -115,6 +125,11 @@ namespace Ether.Components.CodeBehind
                 IsLoading = true;
                 Items = await Client.GetAll<T>();
                 OnRecordsLoaded?.Invoke(this);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("ERROR:", ex);
+                await NotifyError("Error loading records", ex.Message);
             }
             finally
             {

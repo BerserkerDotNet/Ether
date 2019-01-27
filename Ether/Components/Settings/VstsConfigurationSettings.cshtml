@@ -40,5 +40,6 @@
     private async Task Save()
     {
         await Client.SaveVstsDataSourceConfig(vstsDataSource);
+        await JsUtils.NotifySuccess("Success", "Vsts configuration was updated successfully");
     }
 }

@@ -48,6 +48,16 @@ namespace Ether.Types
             return JSRuntime.Current.InvokeAsync<object>("window.BlazorComponents.Utils.print");
         }
 
+        public static Task NotifyError(string title, string message)
+        {
+            return JSRuntime.Current.InvokeAsync<object>("window.BlazorComponents.Notify.notify", "danger", title, message, 8000);
+        }
+
+        public static Task NotifySuccess(string title, string message)
+        {
+            return JSRuntime.Current.InvokeAsync<object>("window.BlazorComponents.Notify.notify", "success", title, message, 3000);
+        }
+
         public static Task DateRangePicker(ElementRef element, DotNetObjectRef component)
         {
             return JSRuntime.Current.InvokeAsync<object>("window.BlazorComponents.DateRangePicker.init", element, component);

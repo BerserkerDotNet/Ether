@@ -39,6 +39,23 @@ window.BlazorComponents.Utils = {
     }
 };
 
+window.BlazorComponents.Notify = {
+    notify: function (type, title, message, timer) {
+        $.notify({
+            title: title,
+            message: message
+        },
+            {
+                type: type,
+                timer: timer,
+                placement: {
+                    from: "top",
+                    align: "right"
+                }
+            });
+    }
+}
+
 window.BlazorComponents.DateRangePicker = {
     init: function (element, blazorComponent) {
         var start = moment().subtract(6, 'days').format('MM/DD/YYYY');

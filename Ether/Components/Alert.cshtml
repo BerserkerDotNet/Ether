@@ -1,0 +1,14 @@
+﻿<div class="alert alert-@Type">
+    <button type="button" aria-hidden="true" class="close" data-dismiss="alert">
+        <i class="nc-icon nc-simple-remove"></i>
+    </button>
+    <span>
+        <b> @Header - </b> @Title
+    </span>
+</div>
+
+@functions{
+    [Parameter] string Type { get; set; }
+    [Parameter] string Header { get; set; }
+    [Parameter] string Title { get; set; }
+}
