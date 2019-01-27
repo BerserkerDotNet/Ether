@@ -107,6 +107,7 @@ namespace Ether.Components.CodeBehind
             {
                 Console.WriteLine("ERROR:", ex);
                 await NotifyError("Error saving record", ex.Message);
+                return;
             }
 
             await Refresh();

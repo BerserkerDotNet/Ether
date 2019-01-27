@@ -50,10 +50,7 @@ else
 
     protected override async Task OnInitAsync()
     {
-        Console.WriteLine("Searching for token");
         var token = await TokenService.GetToken();
-        Console.WriteLine("Token value");
-        Console.WriteLine($"Token exp: {token.ExpiresAt}");
         if (token == null || token.ExpiresAt <= DateTime.UtcNow)
         {
             UriHelper.NavigateTo("/login");

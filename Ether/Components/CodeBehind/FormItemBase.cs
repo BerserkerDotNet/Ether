@@ -29,23 +29,28 @@ namespace Ether.Components.CodeBehind
 
         public void Dispose()
         {
+            if (ContainerForm == null)
+            {
+                return;
+            }
+
             ContainerForm.OnValidated -= OnValidated;
         }
 
         protected override void OnInit()
         {
-            Console.WriteLine($"Properties set to {string.Join(",", Properties)}");
+            if (ContainerForm == null)
+            {
+                Console.WriteLine("WARN: Model validation container is not set.");
+                return;
+            }
 
             ContainerForm.OnValidated += OnValidated;
         }
 
         private async void OnValidated(object sender, ValidationResult result)
         {
-            if (Properties != null)
-            {
-                Console.WriteLine($"V Properties set to {string.Join(",", Properties)}, S: {sender}");
-            }
-            else
+            if (Properties == null)
             {
                 Console.WriteLine($"V Properties set to null, S: {sender}");
                 return;

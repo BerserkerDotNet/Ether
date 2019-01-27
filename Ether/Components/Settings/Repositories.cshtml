@@ -1,6 +1,6 @@
 ﻿@inject EtherClient Client
 <EditableTable TItem="VstsRepositoryViewModel"
-               GridTitle="Repositories"
+                GridTitle="Repositories"
                 NewTitle="New Repository"
                 ExistingTitle="Edit Repository">
     <ListModeContent Context="ctx">
@@ -23,8 +23,10 @@
         </DataTable>
     </ListModeContent>
     <FormModeContent Context="ctx">
-        <InputItem Type="text" Title="Name" bind-Value="ctx.EditingItem.Name" PropertyName="@nameof(ctx.EditingItem.Name)" />
-        <SelectItem Title="Project" bind-Value="ctx.EditingItem.Project" PropertyName="@nameof(ctx.EditingItem.Project)" Options="projectsOptions" />
+        <ModelValidation Handler="ctx">
+            <InputItem Type="text" Title="Name" bind-Value="ctx.EditingItem.Name" PropertyName="@nameof(ctx.EditingItem.Name)" />
+            <SelectItem Title="Project" bind-Value="ctx.EditingItem.Project" PropertyName="@nameof(ctx.EditingItem.Project)" Options="projectsOptions" />
+        </ModelValidation>
     </FormModeContent>
 </EditableTable>
 
