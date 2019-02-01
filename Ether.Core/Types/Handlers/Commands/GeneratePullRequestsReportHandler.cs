@@ -43,7 +43,7 @@ namespace Ether.Core.Types.Handlers.Commands
             _logger.LogInformation("Starting to generate {DataSource} PullRequest report for {Profile}, range: {Start} {End}", dataSourceType, profile.Name, command.Start, command.End);
 
             var pullRequests = await dataSource.GetPullRequests(p =>
-                (IsCreatedIn(p, command.Start, command.End) || IsCompletedIn(p, command.Start, command.End)) &&
+                (IsActivePullRequest(p) || IsCreatedIn(p, command.Start, command.End) || IsCompletedIn(p, command.Start, command.End)) &&
                 profile.Repositories.Contains(p.Repository) &&
                 profile.Members.Contains(p.AuthorId));
             var report = new PullRequestsReport(profile.Members.Count());

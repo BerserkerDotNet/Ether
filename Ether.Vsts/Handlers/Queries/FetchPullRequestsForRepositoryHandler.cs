@@ -15,6 +15,8 @@ namespace Ether.Vsts.Handlers.Queries
 {
     public class FetchPullRequestsForRepositoryHandler : IQueryHandler<FetchPullRequestsForRepository, IEnumerable<PullRequestViewModel>>
     {
+        private const string UserCommentType = "text";
+
         private readonly IVstsClientFactory _clientFactory;
         private readonly ILogger<FetchPullRequestsForRepositoryHandler> _logger;
 
@@ -64,7 +66,7 @@ namespace Ether.Vsts.Handlers.Queries
                         Completed = pr.ClosedDate,
                         Repository = info.Id,
                         Iterations = iterations.Count(),
-                        Comments = threads.Sum(t => t.Comments.Count())
+                        Comments = threads.Sum(t => t.Comments.Count(c => !c.IsDeleted && string.Equals(c.CommentType, UserCommentType, StringComparison.OrdinalIgnoreCase)))
                     });
                 }
             }

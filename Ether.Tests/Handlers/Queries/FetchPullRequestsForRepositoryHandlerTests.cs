@@ -81,6 +81,57 @@ namespace Ether.Tests.Handlers.Queries
         }
 
         [Test]
+        public async Task ShouldOnlyCountNotDeletedUserComments()
+        {
+            var members = Builder<TeamMemberViewModel>.CreateListOfSize(1).Build();
+            var pullRequests = Builder<PullRequest>.CreateListOfSize(1)
+                 .All()
+                .With(p => p.Status, "active")
+                .With(p => p.CreatedBy, Builder<IdentityReference>.CreateNew().Build())
+                .With(p => p.Repository, Builder<Repository>.CreateNew().Build())
+                .Build();
+
+            var info = Builder<RepositoryInfo>.CreateNew()
+                .With(i => i.Members = members)
+                .With(i => i.Project, Builder<ProjectInfo>.CreateNew().Build())
+                .Build();
+
+            var threads = Builder<PullRequestThread>.CreateListOfSize(7)
+                .TheFirst(1)
+                .With(t => t.Comments, new[] { new PullRequestComment { CommentType = "system" } })
+                .TheNext(1)
+                .With(t => t.Comments, new[] { new PullRequestComment { CommentType = "text" } })
+                .TheNext(1)
+                .With(t => t.Comments, new[] { new PullRequestComment { CommentType = "text", IsDeleted = true } })
+                .TheNext(1)
+                .With(t => t.Comments, new[] { new PullRequestComment { CommentType = "text" } })
+                .TheNext(1)
+                .With(t => t.Comments, new[] { new PullRequestComment { CommentType = "system", IsDeleted = true } })
+                .TheNext(1)
+                .With(t => t.Comments, new[] { new PullRequestComment { CommentType = "system" } })
+                .TheNext(1)
+                .With(t => t.Comments, new[] { new PullRequestComment { CommentType = "bla" } })
+                .Build();
+
+            SetupClient();
+            _clientMock.Setup(c => c.GetPullRequestsAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<PullRequestQuery>(), default(CancellationToken)))
+                .ReturnsAsync(pullRequests)
+                .Verifiable();
+            _clientMock.Setup(c => c.GetPullRequestIterationsAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), default(CancellationToken)))
+                .ReturnsAsync(Enumerable.Empty<PullRequestIteration>())
+                .Verifiable();
+            _clientMock.Setup(c => c.GetPullRequestThreadsAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), default(CancellationToken)))
+                .ReturnsAsync(threads)
+                .Verifiable();
+
+            var result = await _handler.Handle(new FetchPullRequestsForRepository(info));
+
+            // Only two comments are not deleted and of type 'text'
+            result.Should().HaveCount(1);
+            result.First().Comments.Should().Be(2);
+        }
+
+        [Test]
         public async Task ShouldUseProjectIdentity()
         {
             const int expectedMembersCount = 5;

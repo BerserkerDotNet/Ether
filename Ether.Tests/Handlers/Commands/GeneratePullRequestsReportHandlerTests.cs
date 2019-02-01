@@ -141,18 +141,18 @@ namespace Ether.Tests.Handlers.Commands
                 var secondMemberReport = report.IndividualReports.Last();
 
                 firstMemberReport.Created.Should().Be(7);
-                firstMemberReport.Active.Should().Be(3);
+                firstMemberReport.Active.Should().Be(4);
                 firstMemberReport.Completed.Should().Be(3);
                 firstMemberReport.Abandoned.Should().Be(2);
-                firstMemberReport.TotalIterations.Should().Be(8);
-                firstMemberReport.TotalComments.Should().Be(16);
+                firstMemberReport.TotalIterations.Should().Be(9);
+                firstMemberReport.TotalComments.Should().Be(18);
 
                 secondMemberReport.Created.Should().Be(7);
-                secondMemberReport.Active.Should().Be(2);
+                secondMemberReport.Active.Should().Be(5);
                 secondMemberReport.Completed.Should().Be(6);
                 secondMemberReport.Abandoned.Should().Be(1);
-                secondMemberReport.TotalIterations.Should().Be(9);
-                secondMemberReport.TotalComments.Should().Be(18);
+                secondMemberReport.TotalIterations.Should().Be(12);
+                secondMemberReport.TotalComments.Should().Be(24);
             });
 
             _dataSourceMock.VerifyAll();

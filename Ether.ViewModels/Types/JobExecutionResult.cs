@@ -2,6 +2,7 @@
 {
     public enum JobExecutionResult
     {
+        InProgress,
         Successful,
         Failed
     }
