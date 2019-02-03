@@ -4,6 +4,7 @@
     {
         InProgress,
         Successful,
-        Failed
+        Failed,
+        Aborted
     }
 }

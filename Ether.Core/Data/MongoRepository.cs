@@ -163,6 +163,15 @@ namespace Ether.Core.Data
             await collection.UpdateOneAsync<T>(e => e.Id == obj.Id, update);
         }
 
+        public async Task UpdateFieldValue<T, TField>(Expression<Func<T, bool>> filter, Expression<Func<T, TField>> field, TField value)
+            where T : BaseDto
+        {
+            var collection = GetCollectionFor<T>();
+            var update = Builders<T>.Update
+                .Set(field, value);
+            await collection.UpdateManyAsync<T>(filter, update);
+        }
+
         public async Task<bool> CreateAsync<T>(T item)
             where T : BaseDto
         {

@@ -89,10 +89,12 @@ namespace Ether.Api
             services.AddReporter<GeneratePullRequestsReport, PullRequestsReport, PullRequestReportViewModel>(Constants.PullRequestsReportType, "Pull Requests report");
             services.AddReporter<GenerateAggregatedWorkitemsETAReport, AggregatedWorkitemsETAReport, AggregatedWorkitemsETAReportViewModel>(Constants.ETAReportType, "Aggregated workitems ETA report");
 
+            var jobsConfig = new JobsConfiguration();
+            Configuration.GetSection("Jobs").Bind(jobsConfig);
             services.AddJobs(cfg =>
             {
-                cfg.RecurrentJob<PullRequestsSyncJob>(TimeSpan.FromMinutes(10));
-                cfg.RecurrentJob<WorkItemsSyncJob>(TimeSpan.FromDays(1));
+                cfg.RecurrentJob<PullRequestsSyncJob>(TimeSpan.FromMinutes(jobsConfig.PullRequestJobRecurrence));
+                cfg.RecurrentJob<WorkItemsSyncJob>(TimeSpan.FromMinutes(jobsConfig.WorkItemsJobRecurrence));
             });
         }
 

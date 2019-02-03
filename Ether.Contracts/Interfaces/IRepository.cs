@@ -38,6 +38,9 @@ namespace Ether.Contracts.Interfaces
         Task UpdateFieldValue<T, TField>(T obj, Expression<Func<T, TField>> field, TField value)
             where T : BaseDto;
 
+        Task UpdateFieldValue<T, TField>(Expression<Func<T, bool>> filter, Expression<Func<T, TField>> field, TField value)
+            where T : BaseDto;
+
         Task<object> GetSingleAsync(Guid id, Type itemType);
 
         Task<T> GetSingleAsync<T>(Guid id)

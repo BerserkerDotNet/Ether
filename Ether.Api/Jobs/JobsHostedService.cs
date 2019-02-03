@@ -47,11 +47,15 @@ namespace Ether.Api.Jobs
             return Task.CompletedTask;
         }
 
-        public Task StopAsync(CancellationToken cancellationToken)
+        public async Task StopAsync(CancellationToken cancellationToken)
         {
             _logger.LogInformation("Jobs Background Service is stopping.");
-            _cancellationTokenSource.Cancel();
-            return Task.CompletedTask;
+            using (var scope = _services.CreateScope())
+            {
+                var mediator = scope.ServiceProvider.GetService<IMediator>();
+                await mediator.Execute(new AbortActiveJobs());
+                _cancellationTokenSource.Cancel();
+            }
         }
 
         public void Dispose()

@@ -36,5 +36,8 @@ namespace Ether.Core.Types.Commands
 
         public static ReportJobState GetFailed(Guid jobId, string jobType, string message, TimeSpan executionTime)
             => new ReportJobState(jobId, jobType, JobExecutionState.Failed, message, executionTime);
+
+        public static ReportJobState GetAborted(Guid jobId, string jobType, TimeSpan executionTime)
+            => new ReportJobState(jobId, jobType, JobExecutionState.Failed, "Job aborted", executionTime);
     }
 }
