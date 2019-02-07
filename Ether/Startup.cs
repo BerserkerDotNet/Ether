@@ -1,6 +1,6 @@
 using Blazor.Extensions.Storage;
 using Ether.Types;
-using Microsoft.AspNetCore.Blazor.Builder;
+using Microsoft.AspNetCore.Components.Builder;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Ether
@@ -16,7 +16,7 @@ namespace Ether
             services.AddStorage();
         }
 
-        public void Configure(IBlazorApplicationBuilder app)
+        public void Configure(IComponentsApplicationBuilder app)
         {
             app.AddComponent<App>("app");
         }

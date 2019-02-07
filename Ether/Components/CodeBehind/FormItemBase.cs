@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Linq;
 using Ether.Types;
-using Microsoft.AspNetCore.Blazor;
-using Microsoft.AspNetCore.Blazor.Components;
+using Microsoft.AspNetCore.Components;
 
 namespace Ether.Components.CodeBehind
 {
-    public class FormItemBase : BlazorComponent, IDisposable
+    public class FormItemBase : ComponentBase, IDisposable
     {
         protected string Id { get; set; } = Guid.NewGuid().ToString();
 

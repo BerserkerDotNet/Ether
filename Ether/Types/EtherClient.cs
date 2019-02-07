@@ -5,9 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Ether.ViewModels;
 using IdentityModel.Client;
-using Microsoft.AspNetCore.Blazor;
-using Microsoft.AspNetCore.Blazor.Browser.Http;
-using Microsoft.AspNetCore.Blazor.Services;
+using Microsoft.AspNetCore.Blazor.Http;
+using Microsoft.AspNetCore.Components.Services;
 using Microsoft.JSInterop;
 
 namespace Ether.Types
@@ -34,7 +33,7 @@ namespace Ether.Types
 
         public EtherClient(HttpClient httpClient, IUriHelper navigation)
         {
-            BrowserHttpMessageHandler.DefaultCredentials = FetchCredentialsOption.Include;
+            WebAssemblyHttpMessageHandler.DefaultCredentials = FetchCredentialsOption.Include;
             _httpClient = httpClient;
             this._navigation = navigation;
             httpClient.BaseAddress = new Uri("http://localhost:5000/api/");

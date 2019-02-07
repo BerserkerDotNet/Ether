@@ -6,7 +6,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Ether.Contracts.Interfaces;
 using Ether.Contracts.Interfaces.CQS;
-using Ether.Core.Types;
 using Ether.Core.Types.Commands;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;

@@ -5,12 +5,12 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Ether.Types;
 using Ether.ViewModels;
-using Microsoft.AspNetCore.Blazor.Components;
+using Microsoft.AspNetCore.Components;
 using static Ether.Types.JsUtils;
 
 namespace Ether.Components.CodeBehind
 {
-    public class EditableTableBase<T> : BlazorComponent, IFormHandler, IDisposable
+    public class EditableTableBase<T> : ComponentBase, IFormHandler, IDisposable
     {
         private static readonly Func<T> TCreator = Expression.Lambda<Func<T>>(Expression.New(typeof(T).GetConstructor(Type.EmptyTypes))).Compile();
 

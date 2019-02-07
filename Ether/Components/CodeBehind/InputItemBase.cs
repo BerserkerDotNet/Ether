@@ -1,9 +1,9 @@
 ﻿using System;
-using Microsoft.AspNetCore.Blazor.Components;
+using Microsoft.AspNetCore.Components;
 
 namespace Ether.Components.CodeBehind
 {
-    public class InputItemBase<T> : BlazorComponent
+    public class InputItemBase<T> : ComponentBase
     {
         private T _internalValue = default(T);
 
