@@ -78,7 +78,8 @@ namespace Ether.Api
             {
                 o.Conventions.Add(new NotFoundOnNullResultFilterConvention());
             })
-            .SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
+            .AddNewtonsoftJson()
+            .SetCompatibilityVersion(CompatibilityVersion.Latest)
             .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<IdentityViewModelValidator>());
 
             services.AddSwaggerGen(c =>

@@ -2,7 +2,6 @@
 using Ether.Api.Attributes;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
-using Microsoft.AspNetCore.Mvc.Internal;
 
 namespace Ether.Api.Types
 {
