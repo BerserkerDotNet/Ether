@@ -30,6 +30,7 @@
 
     protected override void OnParametersSet()
     {
+        // TODO: that is not going to fly
         if (string.Equals(Type, "PullRequestsReport", StringComparison.OrdinalIgnoreCase))
         {
             reportDisplayName = "Pull requests report";
@@ -39,6 +40,11 @@
         {
             reportDisplayName = "Aggregated workitems ETA report";
             componentToRender = b => RenderComponent<Ether.Components.Reports.AggregatedWorkitemsETAReport>(b);
+        }
+        else if (string.Equals(Type, "WorkitemsReporter", StringComparison.OrdinalIgnoreCase))
+        {
+            reportDisplayName = "Workitems report";
+            componentToRender = b => RenderComponent<Ether.Components.Reports.WorkitemsReport>(b);
         }
     }
 

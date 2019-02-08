@@ -22,8 +22,7 @@ namespace Ether.Core.Types.Handlers.Commands
         private readonly ILogger<GenerateAggregatedWorkitemsETAReportHandler> _logger;
 
         public GenerateAggregatedWorkitemsETAReportHandler(
-            IIndex<string,
-            IDataSource> dataSources,
+            IIndex<string, IDataSource> dataSources,
             IWorkItemClassificationContext workItemClassificationContext,
             IRepository repository,
             ILogger<GenerateAggregatedWorkitemsETAReportHandler> logger)

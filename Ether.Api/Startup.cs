@@ -87,8 +87,9 @@ namespace Ether.Api
                 c.SwaggerDoc("v1", new Info { Title = "Ether API", Version = "v1" });
             });
 
-            services.AddReporter<GeneratePullRequestsReport, PullRequestsReport, PullRequestReportViewModel>(Constants.PullRequestsReportType, "Pull Requests report");
-            services.AddReporter<GenerateAggregatedWorkitemsETAReport, AggregatedWorkitemsETAReport, AggregatedWorkitemsETAReportViewModel>(Constants.ETAReportType, "Aggregated workitems ETA report");
+            services.AddReporter<GeneratePullRequestsReport, PullRequestsReport, PullRequestReportViewModel>(Constants.PullRequestsReportType, Constants.PullRequestsReportName);
+            services.AddReporter<GenerateAggregatedWorkitemsETAReport, AggregatedWorkitemsETAReport, AggregatedWorkitemsETAReportViewModel>(Constants.ETAReportType, Constants.ETAReportName);
+            services.AddReporter<GenerateWorkItemsReport, WorkItemsReport, WorkItemsReportViewModel>(Constants.WorkitemsReportType, Constants.WorkitemsReporterName);
 
             var jobsConfig = new JobsConfiguration();
             Configuration.GetSection("Jobs").Bind(jobsConfig);

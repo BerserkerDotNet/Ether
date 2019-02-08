@@ -1,0 +1,41 @@
+﻿@inject EtherClient Client
+<DataTable Items="report.Resolutions">
+    <TableHeader>
+        <th>Type</th>
+        <th>Id</th>
+        <th>Title</th>
+        <th>Resolution</th>
+        <th>Resolved by</th>
+    </TableHeader>
+    <RowTemplate Context="resolution">
+        <td>@resolution.WorkItemType</td>
+        <td>@resolution.WorkItemId</td>
+        <td>@resolution.WorkItemTitle</td>
+        <td width="140">@resolution.Reason</td>
+        <td>@resolution.MemberName</td>
+    </RowTemplate>
+    <TableFooter>
+        <tr>
+            <th class="table-active">Total:</th>
+            <td class="table-success" colspan="4">@report.TotalResolved</td>
+        </tr>
+        <tr>
+            <th class="table-active">Tasks:</th>
+            <td class="table-success" colspan="2">@report.TotalTasks</td>
+            <th class="table-active">Bugs:</th>
+            <td class="table-success" colspan="2">@report.TotalBugs</td>
+        </tr>
+    </TableFooter>
+</DataTable>
+
+@functions
+{
+    [Parameter] Guid Id { get; set; }
+
+    private WorkItemsReportViewModel report = new WorkItemsReportViewModel();
+
+    protected override async Task OnInitAsync()
+    {
+        report = await Client.GetById<WorkItemsReportViewModel>(Id);
+    }
+}

@@ -13,6 +13,7 @@ namespace Ether.Types
 {
     public class EtherClient
     {
+        // TODO: Better mapping
         private static readonly Dictionary<Type, string> _typeRoutes = new Dictionary<Type, string>(9)
         {
             { typeof(VstsProjectViewModel), "vsts/project" },
@@ -23,6 +24,7 @@ namespace Ether.Types
             { typeof(ReportViewModel), "report" },
             { typeof(PullRequestReportViewModel), "report" },
             { typeof(AggregatedWorkitemsETAReportViewModel), "report" },
+            { typeof(WorkItemsReportViewModel), "report" },
             { typeof(GenerateReportViewModel), "report" },
             { typeof(ReporterDescriptorViewModel), "report" },
             { typeof(JobLogViewModel), "joblogs" }
