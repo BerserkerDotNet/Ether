@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Ether.Contracts.Attributes;
 using Ether.ViewModels;
@@ -44,7 +45,7 @@ namespace Ether.Contracts.Dto.Reports
             public List<IndividualReportDetail> Details { get; set; }
 
             public static IndividualETAReport GetEmptyFor(TeamMemberViewModel teamMember) =>
-                new IndividualETAReport { MemberEmail = teamMember.Email, MemberName = teamMember.DisplayName };
+                new IndividualETAReport { MemberEmail = teamMember.Email, MemberName = teamMember.DisplayName, Details = new List<IndividualReportDetail>(0) };
         }
 
         public class IndividualReportDetail

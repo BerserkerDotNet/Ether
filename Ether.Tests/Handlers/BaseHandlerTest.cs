@@ -9,6 +9,7 @@ using Ether.Contracts.Interfaces;
 using Ether.Core.Config;
 using Ether.Vsts.Config;
 using ExpectedObjects;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Moq.Language.Flow;
 using NUnit.Framework;
@@ -144,6 +145,11 @@ namespace Ether.Tests.Handlers
 
         protected virtual void InitializeMappings(IMapperConfigurationExpression config)
         {
+        }
+
+        protected ILogger<T> GetLoggerMock<T>()
+        {
+            return Mock.Of<ILogger<T>>();
         }
     }
 }

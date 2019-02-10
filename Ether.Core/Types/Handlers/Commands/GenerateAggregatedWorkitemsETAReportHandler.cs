@@ -47,10 +47,25 @@ namespace Ether.Core.Types.Handlers.Commands
                 throw new ArgumentException("Requested profile is not found.");
             }
 
+            var report = await GenerateReport(command, dataSource, profile);
+            report.Id = Guid.NewGuid();
+            report.DateTaken = DateTime.UtcNow;
+            report.StartDate = command.Start;
+            report.EndDate = command.End;
+            report.ProfileName = profile.Name;
+            report.ProfileId = profile.Id;
+            report.ReportType = Constants.ETAReportType;
+            report.ReportName = Constants.ETAReportName;
+            await _repository.CreateAsync(report);
+            return report.Id;
+        }
+
+        private async Task<AggregatedWorkitemsETAReport> GenerateReport(GenerateAggregatedWorkitemsETAReport command, IDataSource dataSource, ProfileViewModel profile)
+        {
             var workItems = await GetAllWorkItems(dataSource, profile.Members);
             if (!workItems.Any())
             {
-                var empty = AggregatedWorkitemsETAReport.Empty;
+                return AggregatedWorkitemsETAReport.Empty;
             }
 
             var team = await GetAllTeamMembers(dataSource, profile.Members);
@@ -60,24 +75,13 @@ namespace Ether.Core.Types.Handlers.Commands
                 .ToDictionary(k => k.Key, v => v.AsEnumerable());
 
             var report = new AggregatedWorkitemsETAReport(team.Count());
-            report.Id = Guid.NewGuid();
-            report.DateTaken = DateTime.UtcNow;
-            report.StartDate = command.Start;
-            report.EndDate = command.End;
-            report.ProfileName = profile.Name;
-            report.ProfileId = profile.Id;
-            report.ReportType = Constants.ETAReportType;
-            report.ReportName = Constants.ETAReportName;
-
             foreach (var member in team)
             {
                 var individualReport = await GetIndividualReport(resolutions, workItems, dataSource, member);
                 report.IndividualReports.Add(individualReport);
             }
 
-            await _repository.CreateAsync(report);
-
-            return report.Id;
+            return report;
         }
 
         private async Task<AggregatedWorkitemsETAReport.IndividualETAReport> GetIndividualReport(
