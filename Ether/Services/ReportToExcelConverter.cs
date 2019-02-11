@@ -12,6 +12,9 @@ namespace Ether.Services
             if (reportType == typeof(PullRequestsReport))
                 return new PullRequestsReportToExcelConverter();
 
+            if (reportType == typeof(WeeklyStatusReport))
+                return new WeeklyStatusReportToExcelConverter();
+
             throw new NotSupportedException($"Report of type '{reportType}' cannot be converted to Excel.");
         }
     }
