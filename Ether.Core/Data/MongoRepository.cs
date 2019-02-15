@@ -32,6 +32,7 @@ namespace Ether.Core.Data
             SafeRegisterClassMap<WorkItemsReport>();
             SafeRegisterClassMap<ListOfReviewersReport>();
             SafeRegisterClassMap<AggregatedWorkitemsETAReport>();
+            SafeRegisterClassMap<WeeklyStatusReport>();
             var pack = new ConventionPack();
             pack.Add(new IgnoreExtraElementsConvention(true));
 

@@ -155,7 +155,7 @@ namespace Ether.Jobs
                         .Build();
 
                     var updates = await _client.ExecuteGet<ValueResponse<WorkItemUpdate>>(url);
-                    wi.Updates = updates.Value;
+                    wi.Updates = updates.Value.Where(u => !u.CanBeDiscarded);
                     await _repository.CreateOrUpdateAsync(wi, i => i.WorkItemId == wi.WorkItemId);
                 }
                 catch (Exception ex)

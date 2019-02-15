@@ -1,0 +1,158 @@
+﻿@using Ether.Core.Constants
+@model WeeklyStatusReport
+<div class="box box-default">
+    <div class="box-header">
+        <h3 class="box-title">@Model.ReportName for '@Model.ProfileName'</h3>
+        <span class="pull-right">
+            <a class="btn btn-default hidden-print" onclick="window.print();"><img src="~/images/print.png" height="24" />Print</a>
+            <a asp-page-handler="ToExcel" asp-route-id="@Model.Id" class="btn btn-default hidden-print">
+                <img src="~/images/Excel.png" height="24" />Export to Excel</a>
+        </span>
+    </div>
+    <div class="box-footer">
+        <span>Range: @Model.StartDate.ToString("MM/dd/yyyy") - @Model.EndDate.ToString("MM/dd/yyyy")</span>
+    </div>
+</div>
+
+<section id="resolved">
+    <div class="box box-default">
+        <div class="box-header">
+            <h3 class="box-title">Resolved Work Items</h3>
+            <div class="box-tools">
+                <button class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="Collapse"><i class="fa fa-minus"></i></button>
+                <button class="btn btn-box-tool" data-widget="remove" data-toggle="tooltip" title="Remove"><i class="fa fa-times"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <table class="table table-hover table-bordered">
+                <thead>
+                <tr>
+                    <th>Workitem</th>
+                    <th>Title</th>
+                    <th>Type</th>
+                    <th>Estimated (Days)</th>
+                    <th>Time Spent (Days)</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var detail in Model.ResolvedWorkItems.OrderBy(d => d.WorkItemType))
+                {
+                    <tr>
+                        <td><a href="https://dynamicscrm.visualstudio.com/@detail.WorkItemProject/_workitems/edit/@detail.WorkItemId" target="_blank">@detail.WorkItemId</a></td>
+                        <td>@detail.WorkItemTitle</td>
+                        <td>@detail.WorkItemType</td>
+                        <td>@detail.EstimatedToComplete</td>
+                        <td>@detail.TimeSpent</td>
+                    </tr>
+                }
+                </tbody>
+                <tfoot>
+                <tr class="active">
+                    <th>Total:</th>
+                    <td class="success" colspan="2">@Model.ResolvedWorkItems.Count(i => i.WorkItemType == WorkItemTypes.Bug) bugs / @Model.ResolvedWorkItems.Count(i => i.WorkItemType == WorkItemTypes.Task) tasks</td>
+                    <td class="success">@Model.ResolvedWorkItems.Sum(i => i.EstimatedToComplete)</td>
+                    <td class="success">@Model.ResolvedWorkItems.Sum(i => i.TimeSpent)</td>
+                </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</section>
+
+<section id="inreview">
+    <div class="box box-default">
+        <div class="box-header">
+            <h3 class="box-title">Work Items In Pull Request</h3>
+            <div class="box-tools">
+                <button class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="Collapse"><i class="fa fa-minus"></i></button>
+                <button class="btn btn-box-tool" data-widget="remove" data-toggle="tooltip" title="Remove"><i class="fa fa-times"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <table class="table table-hover table-bordered">
+                <thead>
+                <tr>
+                    <th>Workitem</th>
+                    <th>Title</th>
+                    <th>Type</th>
+                    <th>Estimated (Days)</th>
+                    <th>Time Spent (Days)</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var detail in Model.WorkItemsInReview.OrderBy(d => d.WorkItemType))
+                {
+                    <tr>
+                        <td><a href="https://dynamicscrm.visualstudio.com/@detail.WorkItemProject/_workitems/edit/@detail.WorkItemId" target="_blank">@detail.WorkItemId</a></td>
+                        <td>@detail.WorkItemTitle</td>
+                        <td>@detail.WorkItemType</td>
+                        <td>@detail.EstimatedToComplete</td>
+                        <td>@detail.TimeSpent</td>
+                    </tr>
+                }
+                </tbody>
+                <tfoot>
+                <tr class="active">
+                    <th>Total:</th>
+                    <td class="success" colspan="2">@Model.WorkItemsInReview.Count(i => i.WorkItemType == WorkItemTypes.Bug) bugs / @Model.WorkItemsInReview.Count(i => i.WorkItemType == WorkItemTypes.Task) tasks</td>
+                    <td class="success">@Model.WorkItemsInReview.Sum(i => i.EstimatedToComplete)</td>
+                    <td class="success">@Model.WorkItemsInReview.Sum(i => i.TimeSpent)</td>
+                </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</section>
+
+<section id="active">
+    <div class="box box-default">
+        <div class="box-header">
+            <h3 class="box-title">Active Work Items</h3>
+            <div class="box-tools">
+                <button class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="Collapse"><i class="fa fa-minus"></i></button>
+                <button class="btn btn-box-tool" data-widget="remove" data-toggle="tooltip" title="Remove"><i class="fa fa-times"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <table class="table table-hover table-bordered">
+                <thead>
+                    <tr>
+                        <th>Workitem</th>
+                        <th>Title</th>
+                        <th>Type</th>
+                        <th>Tags</th>
+                        <th>Estimated (Days)</th>
+                        <th>Time Spent (Days)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var detail in Model.ActiveWorkItems.OrderBy(d => d.WorkItemType))
+                    {
+                        <tr>
+                            <td><a href="https://dynamicscrm.visualstudio.com/@detail.WorkItemProject/_workitems/edit/@detail.WorkItemId" target="_blank">@detail.WorkItemId</a></td>
+                            <td>@detail.WorkItemTitle</td>
+                            <td>@detail.WorkItemType</td>
+                            <td>@detail.Tags</td>
+                            <td>@detail.EstimatedToComplete</td>
+                            <td>@detail.TimeSpent</td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr class="active">
+                        <th>Total:</th>
+                        <td class="success" colspan="3">@Model.ActiveWorkItems.Count(i => i.WorkItemType == WorkItemTypes.Bug) bugs / @Model.ActiveWorkItems.Count(i => i.WorkItemType == WorkItemTypes.Task) tasks</td>
+                        <td class="success">@Model.ActiveWorkItems.Sum(i => i.EstimatedToComplete)</td>
+                        <td class="success">@Model.ActiveWorkItems.Sum(i => i.TimeSpent)</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</section>
+
+<script capture="@nameof(ReportResult)">
+    $(document).ready(function () {
+        $('.box-info').boxWidget('toggle');
+    });
+</script>
