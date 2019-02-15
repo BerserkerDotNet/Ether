@@ -238,6 +238,7 @@ namespace Ether.Tests.JobTests
         }
 
         [Test]
+        [Ignore("update cleanups")]
         public void ShouldFetchWorkitemsUpdates()
         {
             const int itemsCount = 5;
