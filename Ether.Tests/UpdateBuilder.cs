@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using Ether.Tests.Extensions;
 using Ether.ViewModels;
+using Ether.Vsts;
 
 namespace Ether.Tests
 {
@@ -91,6 +94,16 @@ namespace Ether.Tests
             return this;
         }
 
+        public UpdateBuilder AddTag(string tag)
+        {
+            return Tag(tag, isAdd: true);
+        }
+
+        public UpdateBuilder RemoveTag(string tag)
+        {
+            return Tag(tag, isAdd: false);
+        }
+
         public UpdateBuilder With(string fieldName, string newValue, string oldValue)
         {
             return With(fieldName, new WorkItemFieldUpdate { NewValue = newValue, OldValue = oldValue });
@@ -125,6 +138,31 @@ namespace Ether.Tests
         private void Reset()
         {
             _fields = new Dictionary<string, WorkItemFieldUpdate>();
+        }
+
+        private UpdateBuilder Tag(string tag, bool isAdd)
+        {
+            var lastTagsUpdate = _updates.LastOrDefault(u => u.Fields.ContainsKey(Constants.WorkItemTagsField));
+            if (lastTagsUpdate == null)
+            {
+                With(Constants.WorkItemTagsField, tag, string.Empty);
+                return this;
+            }
+
+            var tagsString = lastTagsUpdate.Fields[Constants.WorkItemTagsField].NewValue;
+            var tags = tagsString.Split(';').ToList();
+
+            if (isAdd)
+            {
+                tags.Add(tag);
+            }
+            else
+            {
+                tags.Remove(tag);
+            }
+
+            With(Constants.WorkItemTagsField, string.Join(';', tags), tagsString);
+            return this;
         }
     }
 }

@@ -4,7 +4,9 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Ether.Contracts.Dto;
+using Ether.Tests.Extensions;
 using Ether.Tests.Handlers;
+using Ether.Tests.TestData;
 using Ether.ViewModels;
 using Ether.Vsts;
 using Ether.Vsts.Dto;
@@ -148,6 +150,105 @@ namespace Ether.Tests.DataSources
             workItems.Should().OnlyContain(w => relatedWorkItems.Contains(w.WorkItemId));
             workItems.Should().NotContain(w => w.WorkItemId == 15 || w.WorkItemId == 25);
         }
+
+        #region GetActiveDuration tests
+
+        [Test]
+        public void GetActiveDurationShouldReturnZeroIfUpdatesIsNull()
+        {
+            var bugData = WorkItemsFactory.CreateBug();
+
+            var result = _dataSource.GetActiveDuration(bugData.WorkItem);
+
+            result.Should().Be(0.0f);
+        }
+
+        [Test]
+        public void GetActiveDurationShouldReturnZeroIfNoUpdates()
+        {
+            var bugData = WorkItemsFactory.CreateBug().WithNoUpdates();
+
+            var result = _dataSource.GetActiveDuration(bugData.WorkItem);
+
+            result.Should().Be(0.0f);
+        }
+
+        [Test]
+        public void GetActiveDurationShouldReturnActiveDurationForResolvedBug()
+        {
+            var john = Builder<TeamMemberViewModel>.CreateNew().Build();
+            var bugData = WorkItemsFactory.CreateBug().WithNormalLifecycle(john, 5);
+
+            var result = _dataSource.GetActiveDuration(bugData.WorkItem);
+
+            result.Should().Be(bugData.ExpectedDuration);
+        }
+
+        [Test]
+        public void GetActiveDurationShouldReturnActiveDurationForClosedTasks()
+        {
+            var john = Builder<TeamMemberViewModel>.CreateNew().Build();
+            var taskData = WorkItemsFactory.CreateTask().WithNormalLifecycle(john, 3);
+
+            var result = _dataSource.GetActiveDuration(taskData.WorkItem);
+
+            result.Should().Be(taskData.ExpectedDuration);
+        }
+
+        [Test]
+        public void GetActiveDurationShouldNotCountTimeWhileBlocked()
+        {
+            const int expectedDuration = 7;
+            var john = Builder<TeamMemberViewModel>.CreateNew().Build();
+            var taskData = WorkItemsFactory
+                .CreateTask()
+                .WithNormalLifecycle(john, 10, onAfterActivation: (builder, activationDate) =>
+                {
+                    builder = builder
+                        .Then().AddTag(Constants.BlockedTag).On(activationDate.AddBusinessDays(1))
+                        .Then().RemoveTag(Constants.BlockedTag).On(activationDate.AddBusinessDays(2))
+                        .Then().AddTag(Constants.BlockedTag).On(activationDate.AddBusinessDays(5))
+                        .Then().RemoveTag(Constants.BlockedTag).On(activationDate.AddBusinessDays(7));
+                });
+
+            var result = _dataSource.GetActiveDuration(taskData.WorkItem);
+
+            result.Should().Be(expectedDuration);
+        }
+
+        [Test]
+        public void GetActiveDurationShouldNotCountTimeWhileOnHold()
+        {
+            const int expectedDuration = 7;
+            var john = Builder<TeamMemberViewModel>.CreateNew().Build();
+            var taskData = WorkItemsFactory
+                .CreateTask()
+                .WithNormalLifecycle(john, 10, onAfterActivation: (builder, activationDate) =>
+                {
+                    builder = builder
+                        .Then().AddTag(Constants.OnHoldTag).On(activationDate.AddBusinessDays(1))
+                        .Then().RemoveTag(Constants.OnHoldTag).On(activationDate.AddBusinessDays(2))
+                        .Then().AddTag(Constants.OnHoldTag).On(activationDate.AddBusinessDays(5))
+                        .Then().RemoveTag(Constants.OnHoldTag).On(activationDate.AddBusinessDays(7));
+                });
+
+            var result = _dataSource.GetActiveDuration(taskData.WorkItem);
+
+            result.Should().Be(expectedDuration);
+        }
+
+        [Test]
+        [Ignore("New feature")]
+        public void GetActiveDurationShouldReturnActiveDurationForStillActiveItem()
+        {
+            var bugData = WorkItemsFactory.CreateBug().WithActiveWorkItem(5);
+
+            var result = _dataSource.GetActiveDuration(bugData.WorkItem);
+
+            result.Should().Be(bugData.ExpectedDuration);
+        }
+
+        #endregion
 
         protected override void Initialize()
         {

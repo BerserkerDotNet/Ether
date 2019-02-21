@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Ether.Contracts.Types;
+using Ether.Tests.Extensions;
 using Ether.ViewModels;
 using Ether.Vsts;
 
@@ -32,16 +33,20 @@ namespace Ether.Tests.TestData
             };
         }
 
-        public static WorkItemTestData WithNormalLifecycle(this WorkItemTestData data, TeamMemberViewModel resolvedBy, int daysActive)
+        public static WorkItemTestData WithNormalLifecycle(
+            this WorkItemTestData data,
+            TeamMemberViewModel resolvedBy,
+            int daysActive,
+            Action<UpdateBuilder, DateTime> onAfterActivation = null)
         {
-            var dayOfWeek = DateTime.Today.DayOfWeek;
-            var activationDate = DateTime.Today.AddDays(-((int)dayOfWeek - 1));
-            var numberOfWeeks = daysActive < 5 ? 0 : Math.Floor(daysActive / 5.0D);
-            var resolutionDate = activationDate.AddDays(daysActive + (numberOfWeeks * 2));
+            var activationDate = DateTime.Today.GetMondayOfCurrentWeek();
+            var resolutionDate = activationDate.AddBusinessDays(daysActive);
 
             var updatesBuilder = UpdateBuilder.Create()
                 .New()
                 .Then().Activated().On(activationDate);
+
+            onAfterActivation?.Invoke(updatesBuilder, activationDate);
 
             if (data.Type == Constants.WorkItemTypeBug)
             {
@@ -69,6 +74,20 @@ namespace Ether.Tests.TestData
             return data;
         }
 
+        public static WorkItemTestData WithActiveWorkItem(this WorkItemTestData data, int daysActive, TeamMemberViewModel activatedBy = null)
+        {
+            var activationDate = GetActivationDate(daysActive);
+
+            data.WorkItem.Updates = UpdateBuilder.Create()
+                .New()
+                .Then().Activated().On(activationDate)
+                .Build();
+
+            data.ExpectedDuration = daysActive;
+
+            return data;
+        }
+
         public static WorkItemTestData WithETA(this WorkItemTestData data, int original, int remaining, int completed)
         {
             if (original > 0)
@@ -90,6 +109,18 @@ namespace Ether.Tests.TestData
             data.ExpectedEstimatedToComplete = remaining + completed;
 
             return data;
+        }
+
+        public static WorkItemTestData WithNoUpdates(this WorkItemTestData data)
+        {
+            data.WorkItem.Updates = UpdateBuilder.Create().Build();
+            return data;
+        }
+
+        private static DateTime GetActivationDate(int daysActive)
+        {
+            var numberOfWeeks = daysActive < 5 ? 0 : Math.Floor(daysActive / 5.0D);
+            return DateTime.Today.AddDays(-(daysActive + (numberOfWeeks * 2)));
         }
     }
 }
