@@ -58,11 +58,11 @@ namespace Ether.Core.Reporters
 
             foreach (var workItem in workitems)
             {
-                if (IsInCodeReview(workItem) && IsAssignedToTeamMember(workItem))
+                if (workItem.IsInCodeReview() && workItem.IsAssignedToTeamMember(Input.Members))
                 {
                     report.WorkItemsInReview.Add(CreateWorkItemDetail(workItem));
                 }
-                else if (workItem.State == WorkItemStates.Active && IsAssignedToTeamMember(workItem))
+                else if (workItem.State == WorkItemStates.Active && workItem.IsAssignedToTeamMember(Input.Members))
                 {
                     report.ActiveWorkItems.Add(CreateWorkItemDetail(workItem));
                 }
@@ -78,10 +78,10 @@ namespace Ether.Core.Reporters
 
             WeeklyStatusReport.WorkItemDetail CreateWorkItemDetail(VSTSWorkItem item)
             {
-                var timeSpent = GetActiveDuration(item);
-                var originalEstimate = GetEtaValue(item, ETAFieldType.OriginalEstimate);
-                var completedWork = GetEtaValue(item, ETAFieldType.CompletedWork);
-                var remainingWork = GetEtaValue(item, ETAFieldType.RemainingWork);
+                var timeSpent = item.GetActiveDuration(Input.Members);
+                var originalEstimate = item.GetEtaValue(ETAFieldType.OriginalEstimate, settings);
+                var completedWork = item.GetEtaValue(ETAFieldType.CompletedWork, settings);
+                var remainingWork = item.GetEtaValue(ETAFieldType.RemainingWork, settings);
                 if (remainingWork < 1)
                 {
                     remainingWork = originalEstimate;
@@ -100,86 +100,7 @@ namespace Ether.Core.Reporters
                 };
             }
 
-            string FieldNameFor(string workItemType, ETAFieldType fieldType) => etaFields.First(f => f.WorkitemType == workItemType && f.FieldType == fieldType).FieldName;
-
-            float GetEtaValue(VSTSWorkItem wi, ETAFieldType etaType)
-            {
-                var fieldName = FieldNameFor(wi.WorkItemType, etaType);
-                if (!wi.Fields.ContainsKey(fieldName))
-                    return 0;
-
-                var value = wi.Fields[fieldName];
-                if (string.IsNullOrEmpty(value))
-                    return 0;
-
-                return float.Parse(value);
-            }
-
             return report;
-        }
-
-        private static bool IsInCodeReview(VSTSWorkItem item)
-        {
-            return item.State == WorkItemStates.Active 
-                   && (WorkItemTags.ContainsTag(item.Updates.LastOrDefault(u => !u.Tags.IsEmpty)?.Tags.NewValue, WorkItemTags.CodeReview)
-                       || item.Updates.Any(u => u.Relations?.Added != null && u.Relations.Added.Any(i => i.IsPullRequest)));
-        }
-
-        private bool IsAssignedToTeamMember(VSTSWorkItem item)
-        {
-            var assignedTo = item.Updates.LastOrDefault(u => !u.AssignedTo.IsEmpty)?.AssignedTo.NewValue;
-            return Input.Members.Any(m => !string.IsNullOrWhiteSpace(assignedTo) && assignedTo.Contains(m.Email));
-        }
-
-        private float GetActiveDuration(VSTSWorkItem workItem)
-        {
-            if (workItem.Updates == null || !workItem.Updates.Any())
-                return 0.0f;
-
-            var activeTime = 0.0F;
-            var isActive = false;
-            var assignedToTeam = false;
-            DateTime? lastActivated = null;
-            foreach (var update in workItem.Updates)
-            {
-                var isActivation = !update.State.IsEmpty && update.State.NewValue == WorkItemStates.Active;
-                var isOnHold = !update.State.IsEmpty && update.State.NewValue == WorkItemStates.New;
-                var isResolved = !update.State.IsEmpty && (update.State.NewValue == WorkItemStates.Resolved || update.State.NewValue == WorkItemStates.Closed);
-                var isCodeReview = !update.Tags.IsEmpty && WorkItemTags.ContainsTag(update.Tags.NewValue, WorkItemTags.CodeReview) || update.Relations?.Added != null 
-                                   && update.Relations.Added.Any(i => !string.IsNullOrWhiteSpace(i.Name) && i.Name.Equals("Pull Request", StringComparison.InvariantCultureIgnoreCase));
-                var isBlocked = !update.Tags.IsEmpty &&
-                    (WorkItemTags.ContainsTag(update.Tags.NewValue, WorkItemTags.Blocked) || WorkItemTags.ContainsTag(update.Tags.NewValue, WorkItemTags.OnHold));
-                var isUnBlocked = !isBlocked && !update.Tags.IsEmpty &&
-                    (WorkItemTags.ContainsTag(update.Tags.OldValue, WorkItemTags.Blocked) && !WorkItemTags.ContainsTag(update.Tags.NewValue, WorkItemTags.Blocked) ||
-                     WorkItemTags.ContainsTag(update.Tags.OldValue, WorkItemTags.OnHold) && !WorkItemTags.ContainsTag(update.Tags.NewValue, WorkItemTags.OnHold));
-
-                if (!assignedToTeam && !string.IsNullOrWhiteSpace(update.AssignedTo.NewValue))
-                {
-                    assignedToTeam = Input.Members.Any(m => update.AssignedTo.NewValue.Contains(m.Email));
-                    if(isActive) lastActivated = update.ChangedDate;
-                }
-
-                if (isActive && (isOnHold || isBlocked))
-                {
-                    isActive = false;
-                    if (lastActivated != null && assignedToTeam)
-                        activeTime += lastActivated.Value.CountBusinessDaysThrough(update.ChangedDate);
-                }
-                else if ((isActivation && !isBlocked) || isUnBlocked)
-                {
-                    lastActivated = update.ChangedDate;
-                    isActive = true;
-                }
-
-                else if (isActive && (isResolved || isCodeReview))
-                {
-                    if (lastActivated != null && assignedToTeam)
-                        activeTime += lastActivated.Value.CountBusinessDaysThrough(update.ChangedDate);
-                    break;
-                }
-            }
-
-            return activeTime;
         }
     }
 }

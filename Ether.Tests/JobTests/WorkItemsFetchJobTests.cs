@@ -10,9 +10,11 @@ using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Ether.Core.Constants;
 using static Ether.Jobs.WorkItemsQueryResponse;
 
 namespace Ether.Tests.JobTests
@@ -25,6 +27,7 @@ namespace Ether.Tests.JobTests
         Mock<IOptions<VSTSConfiguration>> _configurationMock;
         Mock<ILogger<WorkItemsFetchJob>> _loggerMock;
         WorkItemsFetchJob _job;
+        private Random _rand;
 
         [SetUp]
         public void SetUp()
@@ -37,6 +40,8 @@ namespace Ether.Tests.JobTests
             _job = new WorkItemsFetchJob(_repositoryMock.Object, _vstsClientMock.Object, _configurationMock.Object, _loggerMock.Object);
 
             _repositoryMock.Setup(r => r.GetFieldValue<Settings, bool>(_ => true, s => s.WorkItemsSettings.DisableWorkitemsJob)).Returns(false);
+
+            _rand = new Random();
         }
 
         [Test]
@@ -238,7 +243,6 @@ namespace Ether.Tests.JobTests
         }
 
         [Test]
-        [Ignore("update cleanups")]
         public void ShouldFetchWorkitemsUpdates()
         {
             const int itemsCount = 5;
@@ -258,7 +262,7 @@ namespace Ether.Tests.JobTests
             _vstsClientMock.Setup(c => c.ExecuteGet<ValueResponse<VSTSWorkItem>>(It.IsAny<string>()))
                 .Returns(Task.FromResult(new ValueResponse<VSTSWorkItem> { Value = workItems }));
             _vstsClientMock.Setup(c => c.ExecuteGet<ValueResponse<WorkItemUpdate>>(It.IsAny<string>()))
-                .Returns(Task.FromResult(new ValueResponse<WorkItemUpdate> { Value = new[] { new WorkItemUpdate(), new WorkItemUpdate() } }));
+                .Returns(Task.FromResult(new ValueResponse<WorkItemUpdate> { Value = new[] { CreateUpdate(), CreateUpdate(true), CreateUpdate() } }));
 
             _job.Execute();
 
@@ -335,6 +339,20 @@ namespace Ether.Tests.JobTests
                 .SingleOrDefault(q => q.StartsWith("ids"));
 
             return string.Equals(expectedIds, idsSection, StringComparison.OrdinalIgnoreCase);
+        }
+
+        private WorkItemUpdate CreateUpdate(bool empty = false)
+        {
+            var update = new WorkItemUpdate();
+            if (!empty)
+            {
+                var states = new[] {WorkItemStates.Resolved, WorkItemStates.Active, WorkItemStates.Closed, WorkItemStates.New};
+                update.Fields = new Dictionary<string, WorkItemUpdate.UpdateValue>
+                {
+                    { "System.State", new WorkItemUpdate.UpdateValue { NewValue = states[_rand.Next(0, states.Length)] } }
+                };
+            }
+            return update;
         }
     }
 }
