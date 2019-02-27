@@ -2,6 +2,7 @@
 using Ether.Contracts.Interfaces.CQS;
 using Ether.Core.Types.Queries;
 using Ether.ViewModels;
+using Ether.Vsts.Commands;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,21 +12,29 @@ namespace Ether.Api.Controllers
     [ApiController]
     [Route("api/[controller]")]
     [Produces("application/json")]
-    public class JobLogsController : ControllerBase
+    public class JobsController : ControllerBase
     {
         private readonly IMediator _mediator;
 
-        public JobLogsController(IMediator mediator)
+        public JobsController(IMediator mediator)
         {
             _mediator = mediator;
         }
 
         [HttpGet]
-        [Route(nameof(GetAll))]
-        public async Task<ActionResult> GetAll()
+        [Route(nameof(Logs) + "/GetAll")]
+        public async Task<ActionResult> Logs()
         {
             var logs = await _mediator.RequestCollection<GetAllJobLogs, JobLogViewModel>();
             return Ok(logs);
+        }
+
+        [HttpPost]
+        [Route("vsts/" + nameof(RunWorkitemsJob))]
+        public async Task<IActionResult> RunWorkitemsJob(RunWorkitemsJob command)
+        {
+            await _mediator.Execute(command);
+            return Ok();
         }
     }
 }

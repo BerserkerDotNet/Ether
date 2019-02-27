@@ -27,7 +27,7 @@ namespace Ether.Types
             { typeof(WorkItemsReportViewModel), "report" },
             { typeof(GenerateReportViewModel), "report" },
             { typeof(ReporterDescriptorViewModel), "report" },
-            { typeof(JobLogViewModel), "joblogs" }
+            { typeof(JobLogViewModel), "jobs/logs" }
         };
 
         private readonly HttpClient _httpClient;
@@ -97,6 +97,11 @@ namespace Ether.Types
         public Task<Guid> GenerateReport(GenerateReportViewModel model)
         {
             return HttpPost<Guid>($"{GetPathFor<GenerateReportViewModel>()}/Generate", model);
+        }
+
+        public Task RunWorkitemsJob(IEnumerable<Guid> members, bool isReset)
+        {
+            return HttpPost("jobs/vsts/runworkitemsjob", new { Members = members, IsReset = isReset });
         }
 
         public Task<IEnumerable<ReporterDescriptorViewModel>> GetReportTypes()

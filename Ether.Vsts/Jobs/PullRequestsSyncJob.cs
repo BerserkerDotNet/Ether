@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Ether.Contracts.Interfaces;
 using Ether.Contracts.Interfaces.CQS;
@@ -24,7 +25,7 @@ namespace Ether.Vsts.Jobs
             _logger = logger;
         }
 
-        public async Task Execute()
+        public async Task Execute(IReadOnlyDictionary<string, object> parameters)
         {
             var membersAndRepositories = await _mediator.RequestCollection<GetMembersAndRepositoriesOfAllProfiles, RepositoryInfo>();
             _logger.LogInformation("Found {Count} repositories to scan.", membersAndRepositories.Count());

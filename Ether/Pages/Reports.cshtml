@@ -15,7 +15,6 @@
                 <th>Profile</th>
                 <th>Start</th>
                 <th>End</th>
-                <th>Actions</th>
             </TableHeader>
             <RowTemplate Context="report">
                 <td>@report.ReportName</td>
@@ -23,13 +22,13 @@
                 <td>@report.ProfileName</td>
                 <td>@report.StartDate</td>
                 <td>@report.EndDate</td>
-                <td>
-                    <div>
-                        <button class="btn btn-success btn-fill" onclick="@(() => View(report))">View</button>
-                        <button class="btn btn-danger btn-fill" onclick="@(() => ctx.Delete(report))">Delete</button>
-                    </div>
-                </td>
             </RowTemplate>
+            <ActionsTemplate Context="report">
+                <div>
+                    <button class="btn btn-success btn-fill" onclick="@(() => View(report))">View</button>
+                    <button class="btn btn-danger btn-fill" onclick="@(() => ctx.Delete(report))">Delete</button>
+                </div>
+            </ActionsTemplate>
         </DataTable>
     </ListModeContent>
 </EditableTable>

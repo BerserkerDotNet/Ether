@@ -22,12 +22,13 @@ namespace Ether.Api.Types
         public Task ValidateAsync(ResourceOwnerPasswordValidationContext context)
         {
             var type = (ContextType)Enum.Parse(typeof(ContextType), _adConfig.Value.Type);
-            using (var principal = new PrincipalContext(type, _adConfig.Value.Name))
+            using (var principal = new PrincipalContext(type, Environment.UserDomainName))
             {
                 var isValid = principal.ValidateCredentials(context.UserName, context.Password);
                 if (isValid)
                 {
-                    var user = UserPrincipal.FindByIdentity(principal, "War_c");
+                    var userNameToSearch = type == ContextType.Machine ? Environment.UserName : context.UserName;
+                    var user = UserPrincipal.FindByIdentity(principal, userNameToSearch);
                     var claims = GetAdditionalClaims(user);
                     context.Result = new GrantValidationResult(subject: user.Name, authenticationMethod: "ADS", claims: claims);
                 }

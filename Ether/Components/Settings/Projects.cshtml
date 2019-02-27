@@ -9,19 +9,18 @@
                 <th>Name</th>
                 <th>Is workitems enabled</th>
                 <th>Identity</th>
-                <th>Actions</th>
             </TableHeader>
             <RowTemplate Context="project">
                 <td>@project.Name</td>
                 <td>@project.IsWorkItemsEnabled</td>
                 <td>@GetIdentityName(project.Identity)</td>
-                <td>
-                    <div>
-                        <button class="btn btn-warning btn-fill" onclick="@(() => ctx.Edit(project))">Edit</button>
-                        <button class="btn btn-danger btn-fill" onclick="@(() => ctx.Delete(project))">Delete</button>
-                    </div>
-                </td>
             </RowTemplate>
+            <ActionsTemplate Context="project">
+                <div>
+                    <button class="btn btn-warning btn-fill" onclick="@(() => ctx.Edit(project))">Edit</button>
+                    <button class="btn btn-danger btn-fill" onclick="@(() => ctx.Delete(project))">Delete</button>
+                </div>
+            </ActionsTemplate>
         </DataTable>
     </ListModeContent>
     <FormModeContent Context="ctx">

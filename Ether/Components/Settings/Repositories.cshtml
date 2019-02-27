@@ -8,18 +8,17 @@
             <TableHeader>
                 <th>Name</th>
                 <th>Project</th>
-                <th>Actions</th>
             </TableHeader>
             <RowTemplate Context="repository">
                 <td>@repository.Name</td>
                 <td>@GetProjectName(repository.Project)</td>
-                <td>
-                    <div>
-                        <button class="btn btn-warning btn-fill" onclick="@(() => ctx.Edit(repository))">Edit</button>
-                        <button class="btn btn-danger btn-fill" onclick="@(() => ctx.Delete(repository))">Delete</button>
-                    </div>
-                </td>
             </RowTemplate>
+            <ActionsTemplate Context="repository">
+                <div>
+                    <button class="btn btn-warning btn-fill" onclick="@(() => ctx.Edit(repository))">Edit</button>
+                    <button class="btn btn-danger btn-fill" onclick="@(() => ctx.Delete(repository))">Delete</button>
+                </div>
+            </ActionsTemplate>
         </DataTable>
     </ListModeContent>
     <FormModeContent Context="ctx">

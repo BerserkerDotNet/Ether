@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Linq;
+using AutoMapper;
 using Ether.ViewModels;
 using Ether.Vsts.Dto;
 using Ether.Vsts.Types;
@@ -21,6 +22,9 @@ namespace Ether.Vsts.Config
 
             CreateMap<TeamMemberViewModel, TeamMember>()
                 .ForMember(r => r.RelatedWorkItems, p => p.Ignore());
+
+            CreateMap<TeamMember, TeamMemberViewModel>()
+                .ForMember(r => r.WorkItemsCount, p => p.MapFrom(s => s.RelatedWorkItems.Count()));
 
             CreateMap<WorkItemViewModel, WorkItem>()
                 .ForMember(m => m.Id, m => m.Ignore())

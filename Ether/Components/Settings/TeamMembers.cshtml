@@ -1,4 +1,6 @@
-﻿<EditableTable TItem="TeamMemberViewModel"
+﻿@inject EtherClient Client
+
+<EditableTable ref="grid" TItem="TeamMemberViewModel"
     GridTitle="Team members"
     NewTitle="New member"
     ExistingTitle="Editing member">
@@ -7,18 +9,30 @@
             <TableHeader>
                 <th>Display Name</th>
                 <th>Email</th>
-                <th>Actions</th>
+                <th>Workitems count</th>
+                <th>Last workitems fetch</th>
             </TableHeader>
             <RowTemplate Context="member">
                 <td>@member.DisplayName</td>
                 <td>@member.Email</td>
-                <td>
-                    <div>
-                        <button class="btn btn-warning btn-fill" onclick="@(() => ctx.Edit(member))">Edit</button>
-                        <button class="btn btn-danger btn-fill" onclick="@(() => ctx.Delete(member))">Delete</button>
-                    </div>
-                </td>
+                <td>@member.WorkItemsCount</td>
+                <td>@member.LastWorkitemsFetchDate</td>
             </RowTemplate>
+            <ActionsTemplate Context="member">
+                <div>
+                    <div class="btn-group" role="group">
+                        <button id="btnGroupWorkItemsMember" type="button" class="btn btn-info btn-fill dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Work items
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="btnGroupWorkItemsMember">
+                            <button class="dropdown-item btn btn-link" onclick="@(() => FetchWorkItems(member))">Fetch work items</button>
+                            <button class="dropdown-item btn btn-link" onclick="@(() => ResetWorkItems(member))">Reset work items</button>
+                        </div>
+                    </div>
+                    <button class="btn btn-warning btn-fill" onclick="@(() => ctx.Edit(member))">Edit</button>
+                    <button class="btn btn-danger btn-fill" onclick="@(() => ctx.Delete(member))">Delete</button>
+                </div>
+            </ActionsTemplate>
         </DataTable>
     </ListModeContent>
     <FormModeContent Context="ctx">
@@ -28,3 +42,20 @@
         </ModelValidation>
     </FormModeContent>
 </EditableTable>
+
+@functions{
+
+    private EditableTableBase<TeamMemberViewModel> grid;
+
+    protected async Task FetchWorkItems(TeamMemberViewModel member)
+    {
+        await Client.RunWorkitemsJob(new[] { member.Id }, isReset: false);
+        await grid.Refresh();
+    }
+
+    protected async Task ResetWorkItems(TeamMemberViewModel member)
+    {
+        await Client.RunWorkitemsJob(new[] { member.Id }, isReset: true);
+        await grid.Refresh();
+    }
+}

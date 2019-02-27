@@ -11,20 +11,28 @@
                 <th>Type</th>
                 <th>Members</th>
                 <th>Repositories</th>
-                <th>Actions</th>
             </TableHeader>
             <RowTemplate Context="profile">
                 <td>@profile.Name</td>
                 <td>@profile.Type</td>
                 <td>@profile.Members.Count()</td>
                 <td>@profile.Repositories.Count()</td>
-                <td>
-                    <div>
-                        <button class="btn btn-warning btn-fill" onclick="@(() => ctx.Edit(profile))">Edit</button>
-                        <button class="btn btn-danger btn-fill" onclick="@(() => ctx.Delete(profile))">Delete</button>
-                    </div>
-                </td>
             </RowTemplate>
+            <ActionsTemplate Context="profile">
+                <div>
+                    <div class="btn-group" role="group">
+                        <button id="btnGroupWorkItemsProfile" type="button" class="btn btn-info btn-fill dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Work items
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="btnGroupWorkItemsProfile">
+                            <button class="dropdown-item btn btn-link" onclick="@(() => FetchWorkItems(profile.Members))">Fetch work items</button>
+                            <button class="dropdown-item btn btn-link" onclick="@(() => ResetWorkItems(profile.Members))">Reset work items</button>
+                        </div>
+                    </div>
+                    <button class="btn btn-warning btn-fill" onclick="@(() => ctx.Edit(profile))">Edit</button>
+                    <button class="btn btn-danger btn-fill" onclick="@(() => ctx.Delete(profile))">Delete</button>
+                </div>
+            </ActionsTemplate>
         </DataTable>
     </ListModeContent>
     <FormModeContent Context="ctx">
@@ -47,8 +55,21 @@
 
 @functions
 {
+    private EditableTableBase<TeamMemberViewModel> grid;
     private Dictionary<Guid, string> membersOptions = new Dictionary<Guid, string>(0);
     private Dictionary<Guid, string> repositoriesOptions = new Dictionary<Guid, string>(0);
+
+    protected async Task FetchWorkItems(IEnumerable<Guid> members)
+    {
+        await Client.RunWorkitemsJob(members, isReset: false);
+        await grid.Refresh();
+    }
+
+    protected async Task ResetWorkItems(IEnumerable<Guid> members)
+    {
+        await Client.RunWorkitemsJob(members, isReset: true);
+        await grid.Refresh();
+    }
 
     protected override async Task OnInitAsync()
     {

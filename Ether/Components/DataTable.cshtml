@@ -2,12 +2,26 @@
 
 <table class="table">
     <thead>
-        <tr>@TableHeader</tr>
+        <tr>
+            @TableHeader
+            @if (ActionsTemplate != null)
+            {
+                <th class="pull-right">Actions</th>
+            }
+        </tr>
     </thead>
     <tbody>
-        @foreach (var item in Items.Skip(PageSize * (currentPage-1)).Take(PageSize))
+        @foreach (var item in Items.Skip(PageSize * (currentPage - 1)).Take(PageSize))
         {
-            <tr>@RowTemplate(item)</tr>
+            <tr>
+                @RowTemplate(item)
+                @if (ActionsTemplate != null)
+                {
+                    <td class="pull-right">
+                        @ActionsTemplate(item)
+                    </td>
+                }
+            </tr>
         }
     </tbody>
     <tfoot>
@@ -36,6 +50,7 @@
     [Parameter] int PageSize { get; set; } = 10;
     [Parameter] RenderFragment TableHeader { get; set; }
     [Parameter] RenderFragment<TItem> RowTemplate { get; set; }
+    [Parameter] RenderFragment<TItem> ActionsTemplate { get; set; }
     [Parameter] RenderFragment TableFooter { get; set; }
     [Parameter] IEnumerable<TItem> Items { get; set; }
 

@@ -7,18 +7,17 @@
             <TableHeader>
                 <th>Name</th>
                 <th>Expiration Date</th>
-                <th>Actions</th>
             </TableHeader>
             <RowTemplate Context="identity">
                 <td>@identity.Name</td>
                 <td>@identity.ExpirationDate</td>
-                <td>
-                    <div>
-                        <button class="btn btn-warning btn-fill" onclick="@(() => ctx.Edit(identity))">Edit</button>
-                        <button class="btn btn-danger btn-fill" onclick="@(() => ctx.Delete(identity))">Delete</button>
-                    </div>
-                </td>
             </RowTemplate>
+            <ActionsTemplate Context="identity">
+                <div>
+                    <button class="btn btn-warning btn-fill" onclick="@(() => ctx.Edit(identity))">Edit</button>
+                    <button class="btn btn-danger btn-fill" onclick="@(() => ctx.Delete(identity))">Delete</button>
+                </div>
+            </ActionsTemplate>
         </DataTable>
     </ListModeContent>
     <FormModeContent Context="ctx">

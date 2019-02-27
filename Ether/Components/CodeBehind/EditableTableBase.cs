@@ -61,6 +61,27 @@ namespace Ether.Components.CodeBehind
             }
         }
 
+        public virtual async Task Refresh()
+        {
+            try
+            {
+                IsLoading = true;
+                Items = await Client.GetAll<T>();
+                OnRecordsLoaded?.Invoke(this);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("ERROR:", ex);
+                await NotifyError("Error loading records", ex.Message);
+            }
+            finally
+            {
+                IsLoading = false;
+            }
+
+            StateHasChanged();
+        }
+
         protected override async Task OnInitAsync()
         {
             await Refresh();
@@ -117,27 +138,6 @@ namespace Ether.Components.CodeBehind
         protected virtual void Cancel()
         {
             FinishEditing();
-        }
-
-        protected virtual async Task Refresh()
-        {
-            try
-            {
-                IsLoading = true;
-                Items = await Client.GetAll<T>();
-                OnRecordsLoaded?.Invoke(this);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("ERROR:", ex);
-                await NotifyError("Error loading records", ex.Message);
-            }
-            finally
-            {
-                IsLoading = false;
-            }
-
-            StateHasChanged();
         }
     }
 }

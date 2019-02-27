@@ -13,7 +13,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Ether.Api.Jobs
 {
-    public class JobsHostedService : IHostedService, IDisposable
+    public class JobsHostedService : IHostedService, IDisposable, IJobRunner
     {
         private readonly IServiceProvider _services;
         private readonly IEnumerable<JobConfiguration> _jobs;
@@ -40,7 +40,7 @@ namespace Ether.Api.Jobs
 
             foreach (var job in _jobs)
             {
-                Task.Factory.StartNew(j => RunJob((JobConfiguration)j, _cancellationTokenSource.Token), job, TaskCreationOptions.LongRunning);
+                Task.Factory.StartNew(j => RunJobRecurrent((JobConfiguration)j, _cancellationTokenSource.Token), job, TaskCreationOptions.LongRunning);
             }
 
             return Task.CompletedTask;
@@ -57,13 +57,45 @@ namespace Ether.Api.Jobs
             }
         }
 
+        public Task RunJob<T>(Dictionary<string, object> parameters)
+            where T : IJob
+        {
+            return Task.Factory.StartNew(async () =>
+            {
+                using (var scope = _services.CreateScope())
+                {
+                    var jobType = typeof(T);
+                    var job = (IJob)scope.ServiceProvider.GetService(jobType);
+                    var jobName = jobType.Name;
+                    var mediator = scope.ServiceProvider.GetService<IMediator>();
+                    var sw = new Stopwatch();
+                    var jobId = Guid.NewGuid();
+                    sw.Restart();
+                    try
+                    {
+                        await mediator.Execute(ReportJobState.GetRunning(jobId, jobName));
+                        _logger.LogInformation($"Executing '{jobName}'");
+                        await job.Execute(parameters);
+                        await mediator.Execute(ReportJobState.GetSuccessful(jobId, jobName, sw.Elapsed));
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, $"Error while executing '{jobName}'");
+                        await mediator.Execute(ReportJobState.GetFailed(jobId, jobName, ex.Message, sw.Elapsed));
+                    }
+
+                    sw.Stop();
+                }
+            });
+        }
+
         public void Dispose()
         {
             _cancellationTokenSource.Cancel();
             _cancellationTokenSource.Dispose();
         }
 
-        private async Task RunJob(JobConfiguration configuration, CancellationToken cancellationToken)
+        private async Task RunJobRecurrent(JobConfiguration configuration, CancellationToken cancellationToken)
         {
             using (var scope = _services.CreateScope())
             {
@@ -79,12 +111,12 @@ namespace Ether.Api.Jobs
                     {
                         await mediator.Execute(ReportJobState.GetRunning(jobId, jobName));
                         _logger.LogInformation($"Executing '{jobName}'");
-                        await job.Execute();
+                        await job.Execute(new Dictionary<string, object>(0));
                         await mediator.Execute(ReportJobState.GetSuccessful(jobId, jobName, sw.Elapsed));
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError(ex, $"Error while executing '{configuration.JobType.Name}'");
+                        _logger.LogError(ex, $"Error while executing '{jobName}'");
                         await mediator.Execute(ReportJobState.GetFailed(jobId, jobName, ex.Message, sw.Elapsed));
                     }
 

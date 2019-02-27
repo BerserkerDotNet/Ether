@@ -9,3 +9,7 @@
 .card.card-600 {
     min-height: 600px;
 }
+
+.show .dropdown-menu{
+    transform: translate3d(0px, 44px, 0px) !important;
+}
