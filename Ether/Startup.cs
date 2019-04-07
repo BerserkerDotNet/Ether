@@ -1,4 +1,3 @@
-using Blazor.Extensions.Storage;
 using Ether.Types;
 using Microsoft.AspNetCore.Components.Builder;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,7 +12,8 @@ namespace Ether
             services.AddSingleton<EtherMenuService>();
             services.AddSingleton<ModelValidationService>();
             services.AddSingleton<TokenService>();
-            services.AddStorage();
+            services.AddSingleton<JsUtils>();
+            services.AddSingleton<LocalStorage>();
         }
 
         public void Configure(IComponentsApplicationBuilder app)

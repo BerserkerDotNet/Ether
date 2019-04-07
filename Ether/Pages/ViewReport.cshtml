@@ -1,6 +1,8 @@
 ﻿@page "/reports/view/{type}/{id:guid}"
 @inject EtherClient Client
 @inject IUriHelper UriHelper
+@inject JsUtils JsUtils
+
 <Card>
     <Header>
         @reportDisplayName
@@ -13,9 +15,7 @@
     <Body>
         @componentToRender
     </Body>
-    <Footer>
-
-    </Footer>
+    <Footer></Footer>
 </Card>
 @functions
 {

@@ -20,6 +20,10 @@
   <ItemGroup>
     <AdditionalFiles Include="..\stylecop.json" Link="stylecop.json" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <Compile Include="..\GlobalSuppressions.cs" Link="GlobalSuppressions.cs" />
+  </ItemGroup>
 
   <ItemGroup>
     <Folder Include="wwwroot\" />
@@ -30,20 +34,20 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.3.1" />
+    <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.4.0" />
     <PackageReference Include="AutoMapper" Version="8.0.0" />
     <PackageReference Include="FluentValidation.AspNetCore" Version="8.1.2-dev" />
-    <PackageReference Include="IdentityServer4" Version="2.3.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.0.0-preview-19075-0444" />
+    <PackageReference Include="IdentityServer4" Version="2.4.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.0.0-preview3-19153-02" />
     <PackageReference Include="IdentityServer4.AccessTokenValidation" Version="2.7.0" />
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.1" />
-    <PackageReference Include="Microsoft.Windows.Compatibility" Version="2.0.1" />
-    <PackageReference Include="Seq.Extensions.Logging" Version="4.0.0" />
-    <PackageReference Include="StyleCop.Analyzers" Version="1.0.2">
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.3" />
+    <PackageReference Include="Microsoft.Windows.Compatibility" Version="2.1.0-preview3.19128.7" />
+    <PackageReference Include="Seq.Extensions.Logging" Version="4.0.1" />
+    <PackageReference Include="StyleCop.Analyzers" Version="1.1.1-rc.114">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="4.0.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="5.0.0-rc2" />
     <PackageReference Include="VSTS.Net.AspNetCore" Version="0.2.4-gee5c4aa688" />
   </ItemGroup>
 

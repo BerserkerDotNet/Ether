@@ -3,6 +3,7 @@
 
 @inject EtherClient Client
 @inject Microsoft.AspNetCore.Components.Services.IUriHelper UriHelper
+@inject JsUtils JsUtils
 
 <div class="row">
     <div class="col-md-12">
@@ -37,7 +38,7 @@
     private bool isGeneratingReport;
     private IFormValidator formValidator;
     private IEnumerable<ProfileViewModel> profiles = Enumerable.Empty<ProfileViewModel>();
-    private GenerateReportViewModel model = new GenerateReportViewModel {ReportType  = "PullRequestsReport" };
+    private GenerateReportViewModel model = new GenerateReportViewModel { ReportType = "PullRequestsReport" };
 
     private Dictionary<string, string> reportTypes = new Dictionary<string, string>(0);
     private Dictionary<string, string> profileOptions = new Dictionary<string, string>(0);
@@ -72,7 +73,7 @@
             UriHelper.NavigateTo($"/reports/view/{model.ReportType}/{reportId}");
             await JsUtils.NotifySuccess("Report", "Report generated successfully");
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             Console.WriteLine("ERROR", ex);
             await JsUtils.NotifyError("Report", $"Error generating report: {ex.Message}");

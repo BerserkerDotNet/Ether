@@ -1,6 +1,8 @@
 ﻿@typeparam T
 @typeparam TOption
 @inherits InputItemBase<T>
+@inject JsUtils JsUtils
+
 <ValidatedField Properties="@Properties" Title="@Title">
     @if (Multiple)
     {

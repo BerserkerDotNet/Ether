@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using Blazor.Extensions.Storage;
 
 namespace Ether.Types
 {

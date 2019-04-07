@@ -128,7 +128,7 @@ namespace Ether.Tests.Handlers.Commands
             SetupGetProfile(profile);
             SetupGetTeamMember(new[] { emmy });
             var workitemsForEmmy = new WorkItemTestDataContainer(new[]
-{
+            {
                 CreateBug().WithNormalLifecycle(emmy, 3).WithETA(0, 5, 0),
                 CreateTask().WithNormalLifecycle(emmy, 1),
                 CreateBug().WithNormalLifecycle(emmy, 2),
@@ -158,7 +158,7 @@ namespace Ether.Tests.Handlers.Commands
             SetupGetProfile(profile);
             SetupGetTeamMember(new[] { emmy });
             var workitemsForEmmy = new WorkItemTestDataContainer(new[]
-{
+            {
                 CreateBug().WithNormalLifecycle(emmy, 3).WithETA(0, 5, 0),
                 CreateTask().WithNormalLifecycle(emmy, 1),
                 CreateBug().WithNormalLifecycle(emmy, 2),
@@ -190,7 +190,7 @@ namespace Ether.Tests.Handlers.Commands
             SetupGetProfile(profile);
             SetupGetTeamMember(new[] { emmy });
             var workitemsForEmmy = new WorkItemTestDataContainer(new[]
-{
+            {
                 CreateBug().WithNormalLifecycle(emmy, 3).WithETA(2, 5, 1),
                 CreateTask().WithNormalLifecycle(emmy, 1).WithETA(0, 2, 1),
                 CreateBug().WithNormalLifecycle(emmy, 2).WithETA(0, 7, 0),
@@ -332,7 +332,7 @@ namespace Ether.Tests.Handlers.Commands
         private ExpectedValuesContainer SetupBob(TeamMemberViewModel bob)
         {
             var workitemsForBob = new WorkItemTestDataContainer(new[]
-                        {
+            {
                 CreateBug().WithNormalLifecycle(bob, 7).WithETA(0, 4, 0),
                 CreateTask().WithNormalLifecycle(bob, 16).WithETA(0, 1, 0),
                 CreateTask().WithNormalLifecycle(bob, 1).WithETA(0, 1, 1)

@@ -5,6 +5,7 @@
 @inject EtherClient Client
 @inject TokenService TokenService
 @inject Microsoft.AspNetCore.Components.Services.IUriHelper UriHelper
+@inject JsUtils JsUtils
 
 <form class="text-center form-signin" onsubmit="@DoLogin">
     <img class="mb-4" src="/images/logo.png" alt="Ether pie chart logo image" width="128" height="128">
@@ -14,8 +15,10 @@
         <InputItem Title="Password" bind-Value="model.Password" PropertyName="@nameof(model.Password)" Type="password" NoLabel="true" />
     </ModelValidation>
     <button ref="submit" class="btn btn-lg btn-primary btn-fill btn-block" onclick="@DoLogin"
-         data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i> Signing you in"
-         data-normal-text="Sign in">Sign in</button>
+            data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i> Signing you in"
+            data-normal-text="Sign in">
+        Sign in
+    </button>
     <p class="mt-5 mb-3 text-muted">© Andrii Snihyr @DateTime.Now.Year</p>
 </form>
 @functions{

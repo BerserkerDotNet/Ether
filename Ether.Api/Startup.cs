@@ -84,7 +84,7 @@ namespace Ether.Api
 
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new Info { Title = "Ether API", Version = "v1" });
+                c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "Ether API", Version = "v1" });
             });
 
             services.AddReporter<GeneratePullRequestsReport, PullRequestsReport, PullRequestReportViewModel>(Constants.PullRequestsReportType, Constants.PullRequestsReportName);
@@ -107,11 +107,11 @@ namespace Ether.Api
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             RunMigrations(app);
 
-            if (env.IsDevelopment())
+            if ("development".Equals(env.EnvironmentName, StringComparison.OrdinalIgnoreCase))
             {
                 app.UseDeveloperExceptionPage();
             }

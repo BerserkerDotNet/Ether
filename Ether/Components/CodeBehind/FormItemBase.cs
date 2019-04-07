@@ -11,6 +11,9 @@ namespace Ether.Components.CodeBehind
 
         protected string ErrorMessage { get; set; } = string.Empty;
 
+        [Inject]
+        protected JsUtils JsUtils { get; set; }
+
         [CascadingParameter]
         protected IFormValidator ContainerForm { get; set; }
 

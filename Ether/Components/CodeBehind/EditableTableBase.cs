@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Ether.Types;
 using Ether.ViewModels;
 using Microsoft.AspNetCore.Components;
-using static Ether.Types.JsUtils;
 
 namespace Ether.Components.CodeBehind
 {
@@ -22,6 +21,9 @@ namespace Ether.Components.CodeBehind
 
         [Inject]
         protected EtherClient Client { get; set; }
+
+        [Inject]
+        protected JsUtils JsUtils { get; set; }
 
         protected bool IsEditing { get; set; }
 
@@ -47,7 +49,7 @@ namespace Ether.Components.CodeBehind
 
         public virtual async Task Delete(T model)
         {
-            var delete = await Confirm($"Are you sure you want to delete selected item?");
+            var delete = await JsUtils.Confirm($"Are you sure you want to delete selected item?");
             if (delete)
             {
                 var viewModelWithId = model as ViewModelWithId;
@@ -72,7 +74,7 @@ namespace Ether.Components.CodeBehind
             catch (Exception ex)
             {
                 Console.WriteLine("ERROR:", ex);
-                await NotifyError("Error loading records", ex.Message);
+                await JsUtils.NotifyError("Error loading records", ex.Message);
             }
             finally
             {
@@ -122,12 +124,12 @@ namespace Ether.Components.CodeBehind
             try
             {
                 await Client.Save(EditingItem);
-                await NotifySuccess("Success", $"{EditingItem.GetType().Name.Replace("ViewModel", string.Empty)} was saved successfully");
+                await JsUtils.NotifySuccess("Success", $"{EditingItem.GetType().Name.Replace("ViewModel", string.Empty)} was saved successfully");
             }
             catch (Exception ex)
             {
                 Console.WriteLine("ERROR:", ex);
-                await NotifyError("Error saving record", ex.Message);
+                await JsUtils.NotifyError("Error saving record", ex.Message);
                 return;
             }
 
