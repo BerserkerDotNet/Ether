@@ -1,0 +1,34 @@
+﻿<Badge Type="@type" Text="@text" />
+
+@functions{
+
+    private BadgeType type;
+    private string text;
+
+    [Parameter] ViewModels.Types.JobExecutionResult Status { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        switch (Status)
+        {
+            case ViewModels.Types.JobExecutionResult.InProgress:
+                text = "In Progress";
+                type = BadgeType.Primary;
+                break;
+            case ViewModels.Types.JobExecutionResult.Successful:
+                text = "Completed";
+                type = BadgeType.Success;
+                break;
+            case ViewModels.Types.JobExecutionResult.Failed:
+                text = "Failed";
+                type = BadgeType.Danger;
+                break;
+            default:
+                text = Status.ToString();
+                type = BadgeType.Secondary;
+                break;
+        }
+    }
+}

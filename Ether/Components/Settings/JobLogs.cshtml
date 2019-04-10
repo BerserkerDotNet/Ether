@@ -14,28 +14,7 @@
             <RowTemplate Context="log">
                 <td>@log.JobType</td>
                 <td>
-                    @if (log.Result == ViewModels.Types.JobExecutionResult.InProgress)
-                    {
-                        <div class="text-center">
-                            <div class="spinner-border text-primary" role="status">
-                                <span class="sr-only">Loading...</span>
-                            </div>
-                            <div>Running</div>
-                        </div>
-                    }
-                    else if (log.Result == ViewModels.Types.JobExecutionResult.Successful)
-                    {
-                        <span class="badge badge-success">Completed</span>
-                    }
-                    else if (log.Result == ViewModels.Types.JobExecutionResult.Failed)
-                    {
-                        <span class="badge badge-danger">Failed</span>
-                    }
-                    else
-                    {
-                        <span class="badge badge-primary">@log.Result</span>
-                    }
-
+                    <JobStatusBadge Status="log.Result" />
                 </td>
                 <td>@(log.Result == ViewModels.Types.JobExecutionResult.InProgress ? string.Empty : log.CompletedOn.ToString())</td>
                 <td>@(log.Result == ViewModels.Types.JobExecutionResult.InProgress ? string.Empty : log.ExecutionTime.ToString())</td>
