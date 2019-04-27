@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Autofac.Features.Indexed;
@@ -9,12 +11,13 @@ using Ether.Contracts.Interfaces.CQS;
 using Ether.ViewModels;
 using FizzWare.NBuilder;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace Ether.Tests.Handlers.Commands
 {
-    public abstract class BaseReportHandlerTests<T, TCommand> : BaseHandlerTest
-        where T : ICommandHandler<TCommand, Guid>
+    public abstract class BaseReportHandlerTests<THandler, TCommand> : BaseHandlerTest
+        where THandler : ICommandHandler<TCommand, Guid>
         where TCommand : ICommand<Guid>
     {
         protected const string DataSourceType = "FooSource";
@@ -25,9 +28,9 @@ namespace Ether.Tests.Handlers.Commands
 
         protected RandomGenerator Generator { get; } = new RandomGenerator();
 
-        protected T Handler { get; private set; }
+        protected THandler Handler { get; private set; }
 
-        protected abstract T InitializeHandler();
+        protected abstract THandler InitializeHandler();
 
         protected sealed override void Initialize()
         {
@@ -46,6 +49,20 @@ namespace Ether.Tests.Handlers.Commands
         {
             DataSourceMock.Setup(d => d.GetProfile(It.IsAny<Guid>()))
                 .ReturnsAsync(profile)
+                .Verifiable();
+        }
+
+        protected void SetupGetTeamMember(IEnumerable<TeamMemberViewModel> members)
+        {
+            DataSourceMock.Setup(d => d.GetTeamMember(It.IsAny<Guid>()))
+                .Returns<Guid>(id => Task.FromResult(members.Single(m => m.Id == id)))
+                .Verifiable();
+        }
+
+        protected void SetupGetWorkitems(Guid memberId, IEnumerable<WorkItemViewModel> workitems)
+        {
+            DataSourceMock.Setup(d => d.GetWorkItemsFor(memberId))
+                .ReturnsAsync(workitems)
                 .Verifiable();
         }
 
@@ -72,6 +89,11 @@ namespace Ether.Tests.Handlers.Commands
             report.ProfileName.Should().NotBeNullOrEmpty();
             report.ReportType.Should().NotBeNullOrEmpty();
             report.ReportName.Should().NotBeNullOrEmpty();
+        }
+
+        protected ILogger<THandler> GetLoggerMock()
+        {
+            return Mock.Of<ILogger<THandler>>();
         }
     }
 }

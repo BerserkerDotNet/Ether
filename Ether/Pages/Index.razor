@@ -2,18 +2,18 @@
 @implements IFormHandler
 
 @inject EtherClient Client
-@inject Microsoft.AspNetCore.Components.Services.IUriHelper UriHelper
+@inject IUriHelper UriHelper
 @inject JsUtils JsUtils
 
 <div class="row">
     <div class="col-md-12">
-        <Card>
+        <Ether.Components.Card>
             <Header>New report</Header>
             <Body>
                 <ModelValidation Handler="this">
-                    <SelectItem Title="Profile" bind-Value="model.Profile" PropertyName="@nameof(model.Profile)" Options="@profileOptions" />
+                    <Ether.Components.Form.SelectItem Title="Profile" bind-Value="model.Profile" PropertyName="@nameof(model.Profile)" Options="@profileOptions" />
                     @* TODO: Return supported report types from API*@
-                    <SelectItem Title="Report type" bind-Value="model.ReportType" PropertyName="@nameof(model.ReportType)" Options="@reportTypes" />
+                    <Ether.Components.Form.SelectItem Title="Report type" bind-Value="model.ReportType" PropertyName="@nameof(model.ReportType)" Options="@reportTypes" />
                     <DateRangeControl Title="Date range" Properties="@(new[] {nameof(GenerateReportViewModel.Start), nameof(GenerateReportViewModel.End)})" bind-Start="model.Start" bind-End="model.End" />
                 </ModelValidation>
             </Body>
@@ -29,7 +29,7 @@
                 }
                 <button class="btn btn-success btn-fill pull-right" onclick="@(() => Create())">Create a report</button>
             </Footer>
-        </Card>
+        </Ether.Components.Card>
     </div>
 </div>
 

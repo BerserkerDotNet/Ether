@@ -24,7 +24,7 @@
     <FormModeContent Context="ctx">
         <ModelValidation Handler="ctx">
             <InputItem Type="text" Title="Name" bind-Value="ctx.EditingItem.Name" PropertyName="@nameof(ctx.EditingItem.Name)" />
-            <SelectItem Title="Project" bind-Value="ctx.EditingItem.Project" PropertyName="@nameof(ctx.EditingItem.Project)" Options="projectsOptions" />
+            <Ether.Components.Form.SelectItem Title="Project" bind-Value="ctx.EditingItem.Project" PropertyName="@nameof(ctx.EditingItem.Project)" Options="projectsOptions" />
         </ModelValidation>
     </FormModeContent>
 </EditableTable>

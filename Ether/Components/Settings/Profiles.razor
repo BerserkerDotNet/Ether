@@ -37,14 +37,14 @@
     </ListModeContent>
     <FormModeContent Context="ctx">
         <ModelValidation Handler="ctx">
-            <InputItem Type="text" Title="Name" PropertyName="@nameof(ctx.EditingItem.Name)" bind-Value="@ctx.EditingItem.Name" />
-            <InputItem Type="text" Title="Type" PropertyName="@nameof(ctx.EditingItem.Type)" bind-Value="@ctx.EditingItem.Type" />
-            <SelectItem Title="Members"
+            <InputItem Type="text" Title="Name" PropertyName="@nameof(ctx.EditingItem.Name)" bind-Value="ctx.EditingItem.Name" />
+            <InputItem Type="text" Title="Type" PropertyName="@nameof(ctx.EditingItem.Type)" bind-Value="ctx.EditingItem.Type" />
+            <Ether.Components.Form.SelectItem Title="Members"
                         Multiple="true"
                         bind-Value="ctx.EditingItem.Members"
                         PropertyName="@nameof(ctx.EditingItem.Members)"
                         Options="@membersOptions" />
-            <SelectItem Title="Repositories"
+            <Ether.Components.Form.SelectItem Title="Repositories"
                         Multiple="true"
                         bind-Value="ctx.EditingItem.Repositories"
                         PropertyName="@nameof(ctx.EditingItem.Repositories)"

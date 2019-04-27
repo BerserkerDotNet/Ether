@@ -22,6 +22,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Swashbuckle.AspNetCore.Swagger;
 
@@ -111,11 +112,12 @@ namespace Ether.Api
         {
             RunMigrations(app);
 
-            if ("development".Equals(env.EnvironmentName, StringComparison.OrdinalIgnoreCase))
+            if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseRouting();
             app.UseStaticFiles();
             app.UseCors(b => b.WithOrigins("http://localhost:5001")
                              .AllowAnyHeader()
@@ -130,7 +132,11 @@ namespace Ether.Api
             });
 
             app.UseAuthentication();
-            app.UseMvcWithDefaultRoute();
+            app.UseAuthorization();
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+            });
         }
 
         private void RunMigrations(IApplicationBuilder app)

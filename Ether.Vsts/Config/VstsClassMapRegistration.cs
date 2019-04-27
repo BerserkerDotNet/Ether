@@ -12,6 +12,7 @@ namespace Ether.Vsts.Config
     {
         public void Register()
         {
+            /* Disabled until https://github.com/mongodb/mongo-csharp-driver/pull/372 is checked in
             BsonClassMap.RegisterClassMap<WorkItem>(cm =>
             {
                 cm.AutoMap();
@@ -24,7 +25,7 @@ namespace Ether.Vsts.Config
                 cm.MapMember(c => c.Fields).SetSerializer(new DictionaryInterfaceImplementerSerializer<Dictionary<string, WorkItemFieldUpdate>>(DictionaryRepresentation.ArrayOfDocuments));
             });
 
-            BsonClassMap.RegisterClassMap<WorkItemFieldUpdate>();
+            BsonClassMap.RegisterClassMap<WorkItemFieldUpdate>();*/
         }
     }
 }

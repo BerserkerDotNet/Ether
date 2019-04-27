@@ -2,6 +2,7 @@
 
 namespace Ether.Contracts.Dto
 {
+    [Serializable]
     public abstract class BaseDto : IEquatable<BaseDto>
     {
         public virtual Guid Id { get; set; }

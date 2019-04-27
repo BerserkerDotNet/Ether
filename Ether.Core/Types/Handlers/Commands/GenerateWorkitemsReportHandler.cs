@@ -47,17 +47,7 @@ namespace Ether.Core.Types.Handlers.Commands
                 throw new ArgumentException("Requested profile is not found.");
             }
 
-            var workItems = await GetAllWorkItems(dataSource, profile.Members);
-            if (!workItems.Any())
-            {
-                var empty = AggregatedWorkitemsETAReport.Empty;
-            }
-
-            var team = await GetAllTeamMembers(dataSource, profile.Members);
-            var scope = new ClassificationScope(team, command.Start, command.End);
-            var resolutions = workItems.SelectMany(w => _workItemClassificationContext.Classify(w, scope));
-
-            var report = new WorkItemsReport();
+            var report = await GenerateReport(dataSource, profile, command);
             report.Id = Guid.NewGuid();
             report.DateTaken = DateTime.UtcNow;
             report.StartDate = command.Start;
@@ -66,16 +56,41 @@ namespace Ether.Core.Types.Handlers.Commands
             report.ProfileId = profile.Id;
             report.ReportType = Constants.WorkitemsReportType;
             report.ReportName = Constants.WorkitemsReporterName;
-            report.Resolutions = resolutions;
-
             await _repository.CreateAsync(report);
 
             return report.Id;
         }
 
+        private async Task<WorkItemsReport> GenerateReport(IDataSource dataSource, ProfileViewModel profile, GenerateWorkItemsReport command)
+        {
+            if (profile.Members == null || !profile.Members.Any())
+            {
+                _logger.LogWarning("Profile '{ProfileName}({Profile})' does not have any members.", profile.Name, profile.Id);
+                return WorkItemsReport.Empty;
+            }
+
+            var workItems = await GetAllWorkItems(dataSource, profile.Members);
+            if (!workItems.Any())
+            {
+                _logger.LogWarning("No work items found for members in '{ProfileName}({Profile})'", profile.Name, profile.Id);
+                return WorkItemsReport.Empty;
+            }
+
+            var team = await GetAllTeamMembers(dataSource, profile.Members);
+            var scope = new ClassificationScope(team, command.Start, command.End);
+            var resolutions = workItems.SelectMany(w => _workItemClassificationContext.Classify(w, scope));
+
+            var report = new WorkItemsReport();
+            report.Resolutions = resolutions;
+
+            return report;
+        }
+
         private async Task<List<WorkItemViewModel>> GetAllWorkItems(IDataSource dataSource, IEnumerable<Guid> members)
         {
             var allWorkItems = new List<WorkItemViewModel>();
+
+            // TODO: Parallel
             foreach (var member in members)
             {
                 var workItems = await dataSource.GetWorkItemsFor(member);
@@ -88,6 +103,8 @@ namespace Ether.Core.Types.Handlers.Commands
         private async Task<List<TeamMemberViewModel>> GetAllTeamMembers(IDataSource dataSource, IEnumerable<Guid> members)
         {
             var allMembers = new List<TeamMemberViewModel>();
+
+            // TODO: Parallel
             foreach (var member in members)
             {
                 var teamMember = await dataSource.GetTeamMember(member);

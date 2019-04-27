@@ -285,27 +285,6 @@ namespace Ether.Tests.Handlers.Commands
                 GetLoggerMock<GenerateAggregatedWorkitemsETAReportHandler>());
         }
 
-        private void SetupWorkItemsFor(Guid memberId, IEnumerable<WorkItemViewModel> workitems)
-        {
-            DataSourceMock.Setup(d => d.GetWorkItemsFor(memberId))
-                .ReturnsAsync(workitems)
-                .Verifiable();
-        }
-
-        private void SetupGetTeamMember(IEnumerable<TeamMemberViewModel> members)
-        {
-            DataSourceMock.Setup(d => d.GetTeamMember(It.IsAny<Guid>()))
-                .Returns<Guid>(id => Task.FromResult(members.Single(m => m.Id == id)))
-                .Verifiable();
-        }
-
-        private void SetupGetWorkitems(Guid memberId, IEnumerable<WorkItemViewModel> workitems)
-        {
-            DataSourceMock.Setup(d => d.GetWorkItemsFor(memberId))
-                .ReturnsAsync(workitems)
-                .Verifiable();
-        }
-
         private void SetupClassify(WorkItemTestDataContainer dataContainer)
         {
             _classificationContextMock.Setup(c => c.Classify(It.Is<WorkItemViewModel>(w => dataContainer.WorkItems.Any(wi => wi.WorkItemId == w.WorkItemId)), It.IsAny<ClassificationScope>()))

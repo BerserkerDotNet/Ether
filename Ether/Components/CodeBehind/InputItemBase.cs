@@ -26,6 +26,7 @@ namespace Ether.Components.CodeBehind
 
             set
             {
+                Console.WriteLine($"Attempting to set value of {this.GetType().Name} to {value}; {value?.GetType()}");
                 _internalValue = value;
                 ValueChanged?.Invoke(_internalValue);
                 Console.WriteLine($"Value of {this.GetType().Name} is set to {value}");

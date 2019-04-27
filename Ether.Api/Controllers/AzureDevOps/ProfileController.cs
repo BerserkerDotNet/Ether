@@ -25,9 +25,10 @@ namespace Ether.Api.Controllers.AzureDevOps
 
         [HttpGet]
         [Route(nameof(GetAll))]
-        public Task<IEnumerable<ProfileViewModel>> GetAll()
+        public async Task<IEnumerable<ProfileViewModel>> GetAll()
         {
-            return _mediator.RequestCollection<GetAllProfiles, ProfileViewModel>(new GetAllProfiles());
+            var profiles = await _mediator.RequestCollection<GetAllProfiles, ProfileViewModel>(new GetAllProfiles());
+            return profiles;
         }
 
         [HttpPost]

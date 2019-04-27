@@ -1,19 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Ether.Contracts.Dto;
+using Ether.ViewModels;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Bson.Serialization.Options;
 
 namespace Ether.Vsts.Dto
 {
-    [Serializable]
-    public class WorkItem : BaseDto
+    public class WorkItemUpdate : BaseDto
     {
+        public int UpdateId { get; set; }
+
         public int WorkItemId { get; set; }
 
         [BsonDictionaryOptions(DictionaryRepresentation.ArrayOfDocuments)]
-        public Dictionary<string, string> Fields { get; set; }
-
-        public IEnumerable<WorkItemUpdate> Updates { get; set; }
+        public Dictionary<string, WorkItemFieldUpdate> Fields { get; set; }
     }
 }

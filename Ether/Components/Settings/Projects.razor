@@ -27,7 +27,7 @@
         <ModelValidation Handler="ctx">
             <InputItem Type="text" Title="Name" bind-Value="ctx.EditingItem.Name" PropertyName="@nameof(ctx.EditingItem.Name)" />
             <InputItem Type="checkbox" Title="Is Work Items Enabled" bind-Value="ctx.EditingItem.IsWorkItemsEnabled" PropertyName="@nameof(ctx.EditingItem.IsWorkItemsEnabled)" />
-            <SelectItem Title="Identity" bind-Value="ctx.EditingItem.Identity" PropertyName="@nameof(ctx.EditingItem.Identity)" Options="identitiesOptions" />
+            <Ether.Components.Form.SelectItem Title="Identity" bind-Value="ctx.EditingItem.Identity" PropertyName="@nameof(ctx.EditingItem.Identity)" Options="identitiesOptions" />
         </ModelValidation>
     </FormModeContent>
 </EditableTable>

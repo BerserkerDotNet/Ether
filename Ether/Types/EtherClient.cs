@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Ether.ViewModels;
 using IdentityModel.Client;
 using Microsoft.AspNetCore.Blazor.Http;
-using Microsoft.AspNetCore.Components.Services;
+using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
 namespace Ether.Types

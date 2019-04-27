@@ -7,7 +7,7 @@
     <Body>
         <ModelValidation Handler="this">
             <InputItem Type="text" Title="Instance Name" bind-Value="vstsDataSource.InstanceName" PropertyName="@nameof(vstsDataSource.InstanceName)" />
-            <SelectItem Title="Default Token" bind-Value="vstsDataSource.DefaultToken" PropertyName="@nameof(vstsDataSource.DefaultToken)" Options="identitiesOptions" />
+            <Ether.Components.Form.SelectItem Title="Default Token" bind-Value="vstsDataSource.DefaultToken" PropertyName="@nameof(vstsDataSource.DefaultToken)" Options="identitiesOptions" />
         </ModelValidation>
     </Body>
     <Footer><button class="btn btn-success btn-fill pull-right" onclick="@(() => Save())">Save</button></Footer>

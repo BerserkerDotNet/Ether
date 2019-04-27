@@ -30,6 +30,11 @@ namespace Ether.Vsts.Config
                 .ForMember(m => m.Id, m => m.Ignore())
                 .ReverseMap();
 
+            CreateMap<WorkItemUpdateViewModel, WorkItemUpdate>()
+                .ForMember(m => m.UpdateId, m => m.MapFrom(o => o.Id))
+                .ForMember(m => m.Id, m => m.Ignore())
+                .ReverseMap();
+
             CreateMap<Repository, RepositoryInfo>()
                 .ForMember(r => r.Project, o => o.Ignore())
                 .ForMember(r => r.Members, o => o.Ignore());
