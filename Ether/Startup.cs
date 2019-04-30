@@ -14,6 +14,7 @@ namespace Ether
             services.AddSingleton<TokenService>();
             services.AddSingleton<JsUtils>();
             services.AddSingleton<LocalStorage>();
+            services.AddSingleton<AppState>();
         }
 
         public void Configure(IComponentsApplicationBuilder app)

@@ -3,23 +3,21 @@
 
 <Card AdditionalClasses="card-600">
     <Header>
-        <h4 class="card-title">
-            @if (IsEditing)
+        @if (IsEditing)
+        {
+            @if ((EditingItem as ViewModelWithId).Id == Guid.Empty)
             {
-                @if ((EditingItem as ViewModelWithId).Id == Guid.Empty)
-                {
-                    @NewTitle
-                }
-                else
-                {
-                    @ExistingTitle
-                }
+                @NewTitle
             }
             else
             {
-                @GridTitle
+                @ExistingTitle
             }
-        </h4>
+        }
+        else
+        {
+            @GridTitle
+        }
     </Header>
     <Body>
         @if (IsLoading)
@@ -58,7 +56,7 @@
                 <button class="btn btn-success btn-fill" onclick="@(() => Refresh())">Refresh</button>
             </div>
         }
-</Footer>
+    </Footer>
 </Card>
 
 @functions{

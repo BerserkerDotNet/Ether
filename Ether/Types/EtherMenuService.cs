@@ -16,11 +16,16 @@ namespace Ether.Types
 
         public async Task LoadMenuAsync()
         {
-            Menu = new List<MenuItem>(3);
-            await AddItem(new MenuItem("Home", "home", string.Empty, "Reports"));
-            await AddItem(new MenuItem("Reports", "pie-chart", "reports", "Reports"));
-            await AddItem(new MenuItem("Azure DevOps", "cloud-upload", "azure-devops", "AzureDevOps Settings"));
-            await AddItem(new MenuItem("Settings", "cogs", "settings", "Settings"));
+            Menu = new List<MenuItem>(4);
+            await AddItem(MenuItem.Create("Home", "home", string.Empty, "Reports"));
+            await AddItem(MenuItem.Create("Reports", "chart-pie", "reports", "Reports"));
+            await AddItem(MenuItem.CreateContainer("Azure DevOps", "cloud", "AzureDevOps Settings",
+                MenuItem.Create("Profiles", "address-card", "azure-devops/profiles", "AzureDevOps Settings"),
+                MenuItem.Create("Team Members", "users", "azure-devops/teammembers", "AzureDevOps Settings"),
+                MenuItem.Create("Projects & Repositories", "project-diagram", "azure-devops/projects-and-repositories", "AzureDevOps Settings")));
+            await AddItem(MenuItem.CreateContainer("Settings", "cogs", "Settings",
+                MenuItem.Create("Settings", "cog", "settings", "Settings"),
+                MenuItem.Create("Job Logs", "book", "job-logs", "Logs")));
         }
 
         private async Task AddItem(MenuItem item)
