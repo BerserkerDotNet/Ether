@@ -32,8 +32,8 @@
   <ItemGroup>
     <PackageReference Include="Autofac" Version="4.9.2" />
     <PackageReference Include="AutoMapper" Version="8.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.0.0-preview4.19216.2" />
-    <PackageReference Include="Microsoft.Extensions.Options" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.0.0-preview5.19227.9" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="3.0.0-preview5.19227.9" />
     <PackageReference Include="MongoDB.Driver" Version="2.8.0" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.1-rc.114">
       <PrivateAssets>all</PrivateAssets>

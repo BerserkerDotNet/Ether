@@ -38,10 +38,10 @@
     <PackageReference Include="AutoMapper" Version="8.0.0" />
     <PackageReference Include="FluentValidation.AspNetCore" Version="8.1.2-dev" />
     <PackageReference Include="IdentityServer4" Version="2.4.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.0.0-preview4-19216-03" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.0.0-preview5-19227-01" />
     <PackageReference Include="IdentityServer4.AccessTokenValidation" Version="2.7.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.3" />
-    <PackageReference Include="Microsoft.Windows.Compatibility" Version="2.1.0-preview3.19128.7" />
+    <PackageReference Include="Microsoft.Windows.Compatibility" Version="3.0.0-preview5.19224.8" />
     <PackageReference Include="Seq.Extensions.Logging" Version="4.0.1" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.1-rc.114">
       <PrivateAssets>all</PrivateAssets>
