@@ -2,10 +2,8 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Autofac.Features.Indexed;
-using Ether.Contracts.Dto;
 using Ether.Contracts.Dto.Reports;
 using Ether.Contracts.Interfaces;
-using Ether.Contracts.Interfaces.CQS;
 using Ether.Core.Types.Commands;
 using Ether.ViewModels;
 using Ether.ViewModels.Types;
@@ -13,48 +11,20 @@ using Microsoft.Extensions.Logging;
 
 namespace Ether.Core.Types.Handlers.Commands
 {
-    public class GeneratePullRequestsReportHandler : ICommandHandler<GeneratePullRequestsReport, Guid>
+    public class GeneratePullRequestsReportHandler : GenerateReportHandlerBase<GeneratePullRequestsReport>
     {
-        private readonly IIndex<string, IDataSource> _dataSources;
-        private readonly IRepository _repository;
-        private readonly ILogger<GeneratePullRequestsReportHandler> _logger;
-
         public GeneratePullRequestsReportHandler(IIndex<string, IDataSource> dataSources, IRepository repository, ILogger<GeneratePullRequestsReportHandler> logger)
+            : base(dataSources, repository, logger)
         {
-            _dataSources = dataSources;
-            _repository = repository;
-            _logger = logger;
         }
 
-        public async Task<Guid> Handle(GeneratePullRequestsReport command)
+        protected override async Task<ReportResult> GenerateAsync(GeneratePullRequestsReport command, IDataSource dataSource, ProfileViewModel profile)
         {
-            var dataSourceType = await _repository.GetFieldValueAsync<Profile, string>(p => p.Id == command.Profile, p => p.Type);
-            if (!_dataSources.TryGetValue(dataSourceType, out var dataSource))
-            {
-                throw new ArgumentException($"Data source of type {dataSourceType} is not supported.");
-            }
-
-            var profile = await dataSource.GetProfile(command.Profile);
-            if (profile == null)
-            {
-                throw new ArgumentException("Requested profile is not found.");
-            }
-
-            _logger.LogInformation("Starting to generate {DataSource} PullRequest report for {Profile}, range: {Start} {End}", dataSourceType, profile.Name, command.Start, command.End);
-
             var pullRequests = await dataSource.GetPullRequests(p =>
                 (IsActivePullRequest(p) || IsCreatedIn(p, command.Start, command.End) || IsCompletedIn(p, command.Start, command.End)) &&
                 profile.Repositories.Contains(p.Repository) &&
                 profile.Members.Contains(p.AuthorId));
             var report = new PullRequestsReport(profile.Members.Count());
-            report.Id = Guid.NewGuid();
-            report.DateTaken = DateTime.UtcNow;
-            report.StartDate = command.Start;
-            report.EndDate = command.End;
-            report.ProfileName = profile.Name;
-            report.ProfileId = profile.Id;
-            report.ReportType = Constants.PullRequestsReportType;
-            report.ReportName = Constants.PullRequestsReportName;
 
             foreach (var memberId in profile.Members)
             {
@@ -83,9 +53,12 @@ namespace Ether.Core.Types.Handlers.Commands
                 report.AddReport(individualReport);
             }
 
-            await _repository.CreateAsync(report);
+            return report;
+        }
 
-            return report.Id;
+        protected override (string type, string name) GetReportInfo()
+        {
+            return (Constants.PullRequestsReportType, Constants.PullRequestsReportName);
         }
 
         private bool IsActivePullRequest(PullRequestViewModel pullRequest)

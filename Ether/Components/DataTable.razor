@@ -11,6 +11,7 @@
         </tr>
     </thead>
     <tbody>
+        @*TODO: No pagination?*@
         @foreach (var item in Items.Skip(PageSize * (currentPage - 1)).Take(PageSize))
         {
             <tr>

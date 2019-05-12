@@ -26,7 +26,9 @@ namespace Ether.Tests.Handlers.Commands
     {
         private Mock<IWorkItemClassificationContext> _classificationContextMock;
 
-        private GenerateAggregatedWorkitemsETAReport Command => new GenerateAggregatedWorkitemsETAReport { Profile = Guid.NewGuid(), Start = DateTime.UtcNow, End = DateTime.UtcNow };
+        protected override string ReportType => Core.Types.Constants.ETAReportType;
+
+        protected override string ReportName => Core.Types.Constants.ETAReportName;
 
         [Test]
         public void ShouldThrowExceptionIfNotSupportedDataSourceType([Values(null, "", "Bla")]string dataSourceType)

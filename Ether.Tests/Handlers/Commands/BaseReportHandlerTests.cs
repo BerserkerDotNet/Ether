@@ -8,6 +8,7 @@ using Ether.Contracts.Dto;
 using Ether.Contracts.Dto.Reports;
 using Ether.Contracts.Interfaces;
 using Ether.Contracts.Interfaces.CQS;
+using Ether.Core.Types.Commands;
 using Ether.ViewModels;
 using FizzWare.NBuilder;
 using FluentAssertions;
@@ -18,7 +19,7 @@ namespace Ether.Tests.Handlers.Commands
 {
     public abstract class BaseReportHandlerTests<THandler, TCommand> : BaseHandlerTest
         where THandler : ICommandHandler<TCommand, Guid>
-        where TCommand : ICommand<Guid>
+        where TCommand : GenerateReportCommand, new()
     {
         protected const string DataSourceType = "FooSource";
 
@@ -29,6 +30,12 @@ namespace Ether.Tests.Handlers.Commands
         protected RandomGenerator Generator { get; } = new RandomGenerator();
 
         protected THandler Handler { get; private set; }
+
+        protected TCommand Command => new TCommand { Profile = Guid.NewGuid(), Start = DateTime.UtcNow, End = DateTime.UtcNow };
+
+        protected abstract string ReportType { get; }
+
+        protected abstract string ReportName { get; }
 
         protected abstract THandler InitializeHandler();
 
@@ -70,8 +77,8 @@ namespace Ether.Tests.Handlers.Commands
             where TReport : ReportResult
         {
             TReport report = null;
-            RepositoryMock.Setup(r => r.CreateAsync(It.IsAny<TReport>()))
-                .Callback<TReport>(r => report = r)
+            RepositoryMock.Setup(r => r.CreateAsync<ReportResult>(It.IsAny<TReport>()))
+                .Callback<ReportResult>(r => report = (TReport)r)
                 .ReturnsAsync(true);
 
             var reportId = await Handler.Handle(command);
@@ -87,8 +94,8 @@ namespace Ether.Tests.Handlers.Commands
             report.EndDate.Should().NotBe(default(DateTime));
             report.ProfileId.Should().NotBeEmpty();
             report.ProfileName.Should().NotBeNullOrEmpty();
-            report.ReportType.Should().NotBeNullOrEmpty();
-            report.ReportName.Should().NotBeNullOrEmpty();
+            report.ReportType.Should().Be(ReportType);
+            report.ReportName.Should().Be(ReportName);
         }
 
         protected ILogger<THandler> GetLoggerMock()

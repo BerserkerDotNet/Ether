@@ -16,8 +16,8 @@
     <RowTemplate Context="individualReport">
         <td>
             @individualReport.MemberName
-            <button class="btn btn-info btn-simple btn-link" onclick="@(() => ShowDetails(individualReport))">
-                <i class="fa fa-question-circle-o" aria-hidden="true"></i>
+            <button class="d-print-none btn btn-link" onclick="@(() => ShowDetails(individualReport))">
+                <i class="fas fa-question-circle" aria-hidden="true"></i>
             </button>
         </td>
         <td>@individualReport.TotalResolved</td>
@@ -49,61 +49,61 @@
 
 @if (detailsReport != null)
 {<Card>
-    <Header>
-        <h3 class="box-title">Details on '@detailsReport.MemberName'</h3>
-        <div class="pull-right d-print-none">
-            <button class="btn btn-fill btn-danger" onclick="@(() => ShowDetails(null))">Close</button>
-        </div>
-    </Header>
-    <Body>
-        <DataTable Items="detailsReport.Details" PageSize="100">
-            <TableHeader>
-                <th>Workitem</th>
-                <th>Title</th>
-                <th>Type</th>
-                <th>Original Estimate (Days)</th>
-                <th>Total Estimated (Days)</th>
-                <th>Time Spent (Days)</th>
-            </TableHeader>
-            <RowTemplate Context="detail">
-                <td>@detail.WorkItemId</td>
-                <td>@detail.WorkItemTitle</td>
-                <td>@detail.WorkItemType</td>
-                <td>@detail.OriginalEstimate</td>
-                <td>@detail.EstimatedToComplete</td>
-                <td>@detail.TimeSpent</td>
-            </RowTemplate>
-            <TableFooter>
-                <tr>
-                    <th class="table-active">Total:</th>
-                    <td class="table-success" colspan="2">@detailsReport.TotalResolvedBugs bugs / @detailsReport.TotalResolvedTasks tasks</td>
-                    <td class="table-success">@detailsReport.OriginalEstimated</td>
-                    <td class="table-success">@detailsReport.EstimatedToComplete</td>
-                    <td class="table-success">@detailsReport.TotalCompleted</td>
-                </tr>
-            </TableFooter>
-        </DataTable>
-    </Body>
-    <Footer></Footer>
-</Card>
+        <Header>
+            <h3 class="box-title">Details on '@detailsReport.MemberName'</h3>
+            <div class="pull-right d-print-none">
+                <button class="btn btn-fill btn-danger" onclick="@(() => ShowDetails(null))">Close</button>
+            </div>
+        </Header>
+        <Body>
+            <DataTable Items="detailsReport.Details" PageSize="100">
+                <TableHeader>
+                    <th>Workitem</th>
+                    <th>Title</th>
+                    <th>Type</th>
+                    <th>Original Estimate (Days)</th>
+                    <th>Total Estimated (Days)</th>
+                    <th>Time Spent (Days)</th>
+                </TableHeader>
+                <RowTemplate Context="detail">
+                    <td>@detail.WorkItemId</td>
+                    <td>@detail.WorkItemTitle</td>
+                    <td>@detail.WorkItemType</td>
+                    <td>@detail.OriginalEstimate</td>
+                    <td>@detail.EstimatedToComplete</td>
+                    <td>@detail.TimeSpent</td>
+                </RowTemplate>
+                <TableFooter>
+                    <tr>
+                        <th class="table-active">Total:</th>
+                        <td class="table-success" colspan="2">@detailsReport.TotalResolvedBugs bugs / @detailsReport.TotalResolvedTasks tasks</td>
+                        <td class="table-success">@detailsReport.OriginalEstimated</td>
+                        <td class="table-success">@detailsReport.EstimatedToComplete</td>
+                        <td class="table-success">@detailsReport.TotalCompleted</td>
+                    </tr>
+                </TableFooter>
+            </DataTable>
+        </Body>
+        <Footer></Footer>
+    </Card>
 }
 
 @functions
 {
-[Parameter] Guid Id { get; set; }
+    [Parameter] Guid Id { get; set; }
 
-private AggregatedWorkitemsETAReportViewModel report = new AggregatedWorkitemsETAReportViewModel();
+    private AggregatedWorkitemsETAReportViewModel report = new AggregatedWorkitemsETAReportViewModel();
 
-private AggregatedWorkitemsETAReportViewModel.IndividualETAReport detailsReport = null;
+    private AggregatedWorkitemsETAReportViewModel.IndividualETAReport detailsReport = null;
 
-protected override async Task OnInitAsync()
-{
-    report = await Client.GetById<AggregatedWorkitemsETAReportViewModel>(Id);
-}
+    protected override async Task OnInitAsync()
+    {
+        report = await Client.GetById<AggregatedWorkitemsETAReportViewModel>(Id);
+    }
 
-protected void ShowDetails(AggregatedWorkitemsETAReportViewModel.IndividualETAReport report)
-{
-    detailsReport = report;
-    StateHasChanged();
-}
+    protected void ShowDetails(AggregatedWorkitemsETAReportViewModel.IndividualETAReport report)
+    {
+        detailsReport = report;
+        StateHasChanged();
+    }
 }

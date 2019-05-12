@@ -23,13 +23,11 @@ using NUnit.Framework;
 namespace Ether.Tests.Handlers.Commands
 {
     [TestFixture]
-    public class GeneratePullRequestsReportHandlerTests : BaseHandlerTest
+    public class GeneratePullRequestsReportHandlerTests : BaseReportHandlerTests<GeneratePullRequestsReportHandler, GeneratePullRequestsReport>
     {
-        private const string DataSourceType = "FooSource";
-        private Mock<IIndex<string, IDataSource>> _dataSourceProviderMock;
-        private Mock<IDataSource> _dataSourceMock;
-        private RandomGenerator _generator = new RandomGenerator();
-        private GeneratePullRequestsReportHandler _handler;
+        protected override string ReportType => Core.Types.Constants.PullRequestsReportType;
+
+        protected override string ReportName => Core.Types.Constants.PullRequestsReportName;
 
         [Test]
         public void ShouldThrowExceptionIfNotSupportedDataSourceType([Values(null, "", "Bla")]string dataSourceType)
@@ -39,8 +37,8 @@ namespace Ether.Tests.Handlers.Commands
                 .Verifiable();
 
             IDataSource ds;
-            _dataSourceProviderMock.Setup(p => p.TryGetValue(dataSourceType, out ds)).Returns(false);
-            _handler.Awaiting(h => h.Handle(new GeneratePullRequestsReport()))
+            DataSourceProviderMock.Setup(p => p.TryGetValue(dataSourceType, out ds)).Returns(false);
+            Handler.Awaiting(h => h.Handle(new GeneratePullRequestsReport()))
                 .Should().Throw<ArgumentException>();
 
             RepositoryMock.Verify();
@@ -51,10 +49,10 @@ namespace Ether.Tests.Handlers.Commands
         {
             SetupGetProfile(null);
 
-            _handler.Awaiting(h => h.Handle(new GeneratePullRequestsReport { Profile = Guid.NewGuid() }))
+            Handler.Awaiting(h => h.Handle(Command))
                 .Should().Throw<ArgumentException>();
 
-            _dataSourceMock.Verify();
+            DataSourceMock.Verify();
         }
 
         [Test]
@@ -68,11 +66,10 @@ namespace Ether.Tests.Handlers.Commands
                 .With(p => p.Repositories = new Guid[0])
                 .Build();
             SetupGetProfile(profile);
-            SetupGetMember(members);
+            SetupGetTeamMember(members);
             SetupGetPullRequests(Enumerable.Empty<PullRequestViewModel>());
 
-            var command = new GeneratePullRequestsReport { Profile = Guid.NewGuid() };
-            await InvokeAndVerify(command, (report, reportId) =>
+            await InvokeAndVerify<PullRequestsReport>(Command, (report, reportId) =>
             {
                 report.Should().NotBeNull();
                 report.Id.Should().Be(reportId);
@@ -80,7 +77,7 @@ namespace Ether.Tests.Handlers.Commands
                 report.IndividualReports.Should().OnlyContain(r => r.IsEmpty);
             });
 
-            _dataSourceMock.VerifyAll();
+            DataSourceMock.VerifyAll();
             RepositoryMock.Verify();
         }
 
@@ -93,11 +90,10 @@ namespace Ether.Tests.Handlers.Commands
                 .With(p => p.Repositories = new Guid[0])
                 .Build();
             SetupGetProfile(profile);
-            SetupGetMember(members);
+            SetupGetTeamMember(members);
             SetupGetPullRequests(Enumerable.Empty<PullRequestViewModel>());
 
-            var command = new GeneratePullRequestsReport { Profile = Guid.NewGuid() };
-            await InvokeAndVerify(command, (report, reportId) =>
+            await InvokeAndVerify<PullRequestsReport>(Command, (report, reportId) =>
             {
                 report.Should().NotBeNull();
                 report.Id.Should().Be(reportId);
@@ -129,11 +125,11 @@ namespace Ether.Tests.Handlers.Commands
                 .ToArray();
 
             SetupGetProfile(profile);
-            SetupGetMember(members);
+            SetupGetTeamMember(members);
             SetupGetPullRequests(pullRequests);
 
             var command = new GeneratePullRequestsReport { Profile = Guid.NewGuid(), Start = start, End = end };
-            await InvokeAndVerify(command, (report, reportId) =>
+            await InvokeAndVerify<PullRequestsReport>(command, (report, reportId) =>
             {
                 report.Should().NotBeNull();
                 report.IndividualReports.Should().HaveCount(expectedTeamMembersCount);
@@ -155,7 +151,7 @@ namespace Ether.Tests.Handlers.Commands
                 secondMemberReport.TotalComments.Should().Be(24);
             });
 
-            _dataSourceMock.VerifyAll();
+            DataSourceMock.VerifyAll();
             RepositoryMock.Verify();
         }
 
@@ -176,11 +172,11 @@ namespace Ether.Tests.Handlers.Commands
             var pullRequest = GetCompletedPullRequest(member.Id, repositories[0], end.AddHours(5), end.AddHours(5), createdInThePast: true);
 
             SetupGetProfile(profile);
-            SetupGetMember(new[] { member });
+            SetupGetTeamMember(new[] { member });
             SetupGetPullRequests(new[] { pullRequest });
 
             var command = new GeneratePullRequestsReport { Profile = Guid.NewGuid(), Start = start, End = end };
-            await InvokeAndVerify(command, (report, reportId) =>
+            await InvokeAndVerify<PullRequestsReport>(command, (report, reportId) =>
             {
                 report.Should().NotBeNull();
                 var firstMemberReport = report.IndividualReports.First();
@@ -194,82 +190,32 @@ namespace Ether.Tests.Handlers.Commands
                 firstMemberReport.AveragePRLifespan.Should().Be(TimeSpan.Zero);
             });
 
-            _dataSourceMock.VerifyAll();
+            DataSourceMock.VerifyAll();
             RepositoryMock.Verify();
         }
 
-        [Test]
-        public async Task ShouldSetReportMetadata()
+        protected override GeneratePullRequestsReportHandler InitializeHandler()
         {
-            var members = Enumerable.Empty<TeamMemberViewModel>();
-            var profile = Builder<ProfileViewModel>.CreateNew()
-                .With(p => p.Members = new Guid[0])
-                .With(p => p.Repositories = new Guid[0])
-                .Build();
-            SetupGetProfile(profile);
-            SetupGetMember(members);
-            SetupGetPullRequests(Enumerable.Empty<PullRequestViewModel>());
-
-            var command = new GeneratePullRequestsReport { Profile = Guid.NewGuid() };
-            await InvokeAndVerify(command, (report, reportId) =>
-            {
-                report.Should().NotBeNull();
-                report.Id.Should().Be(reportId);
-                report.DateTaken.Should().BeCloseTo(DateTime.UtcNow);
-                report.StartDate.Should().Be(command.Start);
-                report.EndDate.Should().Be(command.End);
-                report.ProfileId.Should().Be(profile.Id);
-                report.ProfileName.Should().Be(profile.Name);
-                report.ReportType.Should().Be(Constants.PullRequestsReportType);
-                report.ReportName.Should().Be(Constants.PullRequestsReportName);
-            });
-
-            RepositoryMock.Verify();
-        }
-
-        protected override void Initialize()
-        {
-            _dataSourceMock = new Mock<IDataSource>(MockBehavior.Strict);
-            var ds = _dataSourceMock.Object;
-            _dataSourceProviderMock = new Mock<IIndex<string, IDataSource>>(MockBehavior.Strict);
-            _dataSourceProviderMock.Setup(p => p.TryGetValue(DataSourceType, out ds)).Returns(true);
-            RepositoryMock.Setup(r => r.GetFieldValueAsync(It.IsAny<Expression<Func<Profile, bool>>>(), It.IsAny<Expression<Func<Profile, string>>>()))
-                .ReturnsAsync(DataSourceType)
-                .Verifiable();
-
-            _handler = new GeneratePullRequestsReportHandler(_dataSourceProviderMock.Object, RepositoryMock.Object, Mock.Of<ILogger<GeneratePullRequestsReportHandler>>());
-        }
-
-        private void SetupGetProfile(ProfileViewModel profile)
-        {
-            _dataSourceMock.Setup(d => d.GetProfile(It.IsAny<Guid>()))
-                .ReturnsAsync(profile)
-                .Verifiable();
-        }
-
-        private void SetupGetMember(IEnumerable<TeamMemberViewModel> allMembers)
-        {
-            _dataSourceMock.Setup(d => d.GetTeamMember(It.IsAny<Guid>()))
-                .Returns<Guid>(id => Task.FromResult(allMembers.SingleOrDefault(m => m.Id == id)));
+            return new GeneratePullRequestsReportHandler(DataSourceProviderMock.Object, RepositoryMock.Object, Mock.Of<ILogger<GeneratePullRequestsReportHandler>>());
         }
 
         private void SetupGetPullRequests(IEnumerable<PullRequestViewModel> allPullRequests)
         {
-            _dataSourceMock.Setup(d => d.GetPullRequests(It.IsAny<Expression<Func<PullRequestViewModel, bool>>>()))
+            DataSourceMock.Setup(d => d.GetPullRequests(It.IsAny<Expression<Func<PullRequestViewModel, bool>>>()))
                 .Returns<Expression<Func<PullRequestViewModel, bool>>>(e => Task.FromResult(allPullRequests.Where(e.Compile())));
         }
 
-        private async Task InvokeAndVerify(GeneratePullRequestsReport command, Action<PullRequestsReport, Guid> verify)
+        /*private async Task InvokeAndVerify<PullRequestsReport>(GeneratePullRequestsReport command, Action<PullRequestsReport, Guid> verify)
         {
             PullRequestsReport report = null;
-            RepositoryMock.Setup(r => r.CreateAsync(It.IsAny<PullRequestsReport>()))
-                .Callback<PullRequestsReport>(r => report = r)
+            RepositoryMock.Setup(r => r.CreateAsync<ReportResult>(It.IsAny<PullRequestsReport>()))
+                .Callback<ReportResult>(r => report = (PullRequestsReport)r)
                 .ReturnsAsync(true);
 
-            var reportId = await _handler.Handle(command);
+            var reportId = await Handler.Handle(command);
 
             verify(report, reportId);
-        }
+        }*/
 
         private IEnumerable<PullRequestViewModel> GetPullRequests(DateTime start, DateTime end, Guid[] members, Guid[] repositories)
         {
@@ -328,7 +274,7 @@ namespace Ether.Tests.Handlers.Commands
         {
             var pr = GetPullRequest(author, repository, start, end, createdInThePast);
             pr.State = state;
-            pr.Completed = _generator.Next(start, end);
+            pr.Completed = Generator.Next(start, end);
             return pr;
         }
 
@@ -342,7 +288,7 @@ namespace Ether.Tests.Handlers.Commands
                 Completed = null,
                 AuthorId = author,
                 Repository = repository,
-                Created = !createdInThePast ? _generator.Next(start, end) : start.AddDays(-_generator.Next(1, 10))
+                Created = !createdInThePast ? Generator.Next(start, end) : start.AddDays(-Generator.Next(1, 10))
             };
         }
     }

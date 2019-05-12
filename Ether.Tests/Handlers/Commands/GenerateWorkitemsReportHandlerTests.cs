@@ -21,6 +21,10 @@ namespace Ether.Tests.Handlers.Commands
     {
         private Mock<IWorkItemClassificationContext> _classificationContextMock;
 
+        protected override string ReportType => Core.Types.Constants.WorkitemsReportType;
+
+        protected override string ReportName => Core.Types.Constants.WorkitemsReporterName;
+
         [Test]
         public void ThrowsExceptionIfIncorrectOrNonExistingDatasourceType([Values(null, "", "Bla")] string dataSourceType)
         {

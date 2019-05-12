@@ -14,50 +14,29 @@ using Microsoft.Extensions.Logging;
 
 namespace Ether.Core.Types.Handlers.Commands
 {
-    public class GenerateAggregatedWorkitemsETAReportHandler : ICommandHandler<GenerateAggregatedWorkitemsETAReport, Guid>
+    public class GenerateAggregatedWorkitemsETAReportHandler : GenerateReportHandlerBase<GenerateAggregatedWorkitemsETAReport>
     {
-        private readonly IIndex<string, IDataSource> _dataSources;
         private readonly IWorkItemClassificationContext _workItemClassificationContext;
-        private readonly IRepository _repository;
-        private readonly ILogger<GenerateAggregatedWorkitemsETAReportHandler> _logger;
 
         public GenerateAggregatedWorkitemsETAReportHandler(
             IIndex<string, IDataSource> dataSources,
             IWorkItemClassificationContext workItemClassificationContext,
             IRepository repository,
             ILogger<GenerateAggregatedWorkitemsETAReportHandler> logger)
+            : base(dataSources, repository, logger)
         {
-            _dataSources = dataSources;
             _workItemClassificationContext = workItemClassificationContext;
-            _repository = repository;
-            _logger = logger;
         }
 
-        public async Task<Guid> Handle(GenerateAggregatedWorkitemsETAReport command)
+        protected override async Task<ReportResult> GenerateAsync(GenerateAggregatedWorkitemsETAReport command, IDataSource dataSource, ProfileViewModel profile)
         {
-            var dataSourceType = await _repository.GetFieldValueAsync<Profile, string>(p => p.Id == command.Profile, p => p.Type);
-            if (!_dataSources.TryGetValue(dataSourceType, out var dataSource))
-            {
-                throw new ArgumentException($"Data source of type {dataSourceType} is not supported.");
-            }
-
-            var profile = await dataSource.GetProfile(command.Profile);
-            if (profile == null)
-            {
-                throw new ArgumentException("Requested profile is not found.");
-            }
-
             var report = await GenerateReport(command, dataSource, profile);
-            report.Id = Guid.NewGuid();
-            report.DateTaken = DateTime.UtcNow;
-            report.StartDate = command.Start;
-            report.EndDate = command.End;
-            report.ProfileName = profile.Name;
-            report.ProfileId = profile.Id;
-            report.ReportType = Constants.ETAReportType;
-            report.ReportName = Constants.ETAReportName;
-            await _repository.CreateAsync(report);
-            return report.Id;
+            return report;
+        }
+
+        protected override (string type, string name) GetReportInfo()
+        {
+            return (Constants.ETAReportType, Constants.ETAReportName);
         }
 
         private async Task<AggregatedWorkitemsETAReport> GenerateReport(GenerateAggregatedWorkitemsETAReport command, IDataSource dataSource, ProfileViewModel profile)

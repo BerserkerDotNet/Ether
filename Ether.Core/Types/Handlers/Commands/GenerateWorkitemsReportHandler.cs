@@ -14,65 +14,43 @@ using Microsoft.Extensions.Logging;
 
 namespace Ether.Core.Types.Handlers.Commands
 {
-    public class GenerateWorkitemsReportHandler : ICommandHandler<GenerateWorkItemsReport, Guid>
+    public class GenerateWorkitemsReportHandler : GenerateReportHandlerBase<GenerateWorkItemsReport>
     {
-        private readonly IIndex<string, IDataSource> _dataSources;
         private readonly IWorkItemClassificationContext _workItemClassificationContext;
-        private readonly IRepository _repository;
-        private readonly ILogger<GenerateWorkitemsReportHandler> _logger;
 
         public GenerateWorkitemsReportHandler(
             IIndex<string, IDataSource> dataSources,
             IWorkItemClassificationContext workItemClassificationContext,
             IRepository repository,
             ILogger<GenerateWorkitemsReportHandler> logger)
+            : base(dataSources, repository, logger)
         {
-            _dataSources = dataSources;
             _workItemClassificationContext = workItemClassificationContext;
-            _repository = repository;
-            _logger = logger;
         }
 
-        public async Task<Guid> Handle(GenerateWorkItemsReport command)
+        protected override async Task<ReportResult> GenerateAsync(GenerateWorkItemsReport command, IDataSource dataSource, ProfileViewModel profile)
         {
-            var dataSourceType = await _repository.GetFieldValueAsync<Profile, string>(p => p.Id == command.Profile, p => p.Type);
-            if (!_dataSources.TryGetValue(dataSourceType, out var dataSource))
-            {
-                throw new ArgumentException($"Data source of type {dataSourceType} is not supported.");
-            }
-
-            var profile = await dataSource.GetProfile(command.Profile);
-            if (profile == null)
-            {
-                throw new ArgumentException("Requested profile is not found.");
-            }
-
             var report = await GenerateReport(dataSource, profile, command);
-            report.Id = Guid.NewGuid();
-            report.DateTaken = DateTime.UtcNow;
-            report.StartDate = command.Start;
-            report.EndDate = command.End;
-            report.ProfileName = profile.Name;
-            report.ProfileId = profile.Id;
-            report.ReportType = Constants.WorkitemsReportType;
-            report.ReportName = Constants.WorkitemsReporterName;
-            await _repository.CreateAsync(report);
+            return report;
+        }
 
-            return report.Id;
+        protected override (string type, string name) GetReportInfo()
+        {
+            return (Constants.WorkitemsReportType, Constants.WorkitemsReporterName);
         }
 
         private async Task<WorkItemsReport> GenerateReport(IDataSource dataSource, ProfileViewModel profile, GenerateWorkItemsReport command)
         {
             if (profile.Members == null || !profile.Members.Any())
             {
-                _logger.LogWarning("Profile '{ProfileName}({Profile})' does not have any members.", profile.Name, profile.Id);
+                Logger.LogWarning("Profile '{ProfileName}({Profile})' does not have any members.", profile.Name, profile.Id);
                 return WorkItemsReport.Empty;
             }
 
             var workItems = await GetAllWorkItems(dataSource, profile.Members);
             if (!workItems.Any())
             {
-                _logger.LogWarning("No work items found for members in '{ProfileName}({Profile})'", profile.Name, profile.Id);
+                Logger.LogWarning("No work items found for members in '{ProfileName}({Profile})'", profile.Name, profile.Id);
                 return WorkItemsReport.Empty;
             }
 
