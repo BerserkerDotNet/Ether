@@ -56,14 +56,14 @@ namespace Ether.Core.Types.Handlers.Commands
             var report = new AggregatedWorkitemsETAReport(team.Count());
             foreach (var member in team)
             {
-                var individualReport = await GetIndividualReport(resolutions, workItems, dataSource, member);
+                var individualReport = GetIndividualReport(resolutions, workItems, dataSource, member);
                 report.IndividualReports.Add(individualReport);
             }
 
             return report;
         }
 
-        private async Task<AggregatedWorkitemsETAReport.IndividualETAReport> GetIndividualReport(
+        private AggregatedWorkitemsETAReport.IndividualETAReport GetIndividualReport(
             Dictionary<string, IEnumerable<WorkItemResolution>> resolutions,
             IEnumerable<WorkItemViewModel> workItems,
             IDataSource dataSource,
@@ -80,12 +80,12 @@ namespace Ether.Core.Types.Handlers.Commands
                 MemberName = member.DisplayName
             };
 
-            await PopulateMetrics(resolutions, workItems, dataSource, member.Email, individualReport);
+            PopulateMetrics(resolutions, workItems, dataSource, member.Email, individualReport);
 
             return individualReport;
         }
 
-        private async Task PopulateMetrics(
+        private void PopulateMetrics(
             Dictionary<string, IEnumerable<WorkItemResolution>> resolutions,
             IEnumerable<WorkItemViewModel> workItems,
             IDataSource dataSource,
@@ -101,7 +101,7 @@ namespace Ether.Core.Types.Handlers.Commands
             {
                 var workitem = workItems.Single(w => w.WorkItemId == item.WorkItemId);
                 var timeSpent = dataSource.GetActiveDuration(workitem);
-                var eta = await dataSource.GetETAValues(workitem);
+                var eta = dataSource.GetETAValues(workitem);
                 if (eta.IsEmpty)
                 {
                     report.WithoutETA++;

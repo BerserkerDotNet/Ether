@@ -4,9 +4,12 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using AutoMapper;
+using Ether.Contracts.Dto.Reports;
 using Ether.Contracts.Interfaces;
+using Ether.Contracts.Types;
 using Ether.Core.Extensions;
 using Ether.ViewModels;
+using Ether.ViewModels.Types;
 using Ether.Vsts.Dto;
 using static Ether.Vsts.Constants;
 
@@ -50,12 +53,12 @@ namespace Ether.Vsts.Types
             return result;
         }
 
-        public Task<ETAValues> GetETAValues(WorkItemViewModel workItem)
+        public ETAValues GetETAValues(WorkItemViewModel workItem)
         {
-            return Task.FromResult(new ETAValues(
-                GetEtaValue(workItem, Constants.OriginalEstimateField),
-                GetEtaValue(workItem, Constants.RemainingWorkField),
-                GetEtaValue(workItem, Constants.CompletedWorkField)));
+            return new ETAValues(
+                GetEtaValue(workItem, OriginalEstimateField),
+                GetEtaValue(workItem, RemainingWorkField),
+                GetEtaValue(workItem, CompletedWorkField));
         }
 
         public async Task<IEnumerable<WorkItemViewModel>> GetWorkItemsFor(Guid memberId)
@@ -117,6 +120,47 @@ namespace Ether.Vsts.Types
             }
 
             return activeTime;
+        }
+
+        public bool IsInCodeReview(WorkItemViewModel workItem)
+        {
+            // TODO: Fetch info from related Pull Request
+            return IsActive(workItem) && ContainsTag(workItem.Updates.LastOrDefault(u => !u[WorkItemTagsField].IsEmpty())?[WorkItemTagsField].NewValue, CodeReviewTag);
+        }
+
+        public bool IsActive(WorkItemViewModel workItem)
+        {
+            return string.Equals(workItem[WorkItemStateField], WorkItemStateActive, StringComparison.OrdinalIgnoreCase);
+        }
+
+        public bool IsResolved(IEnumerable<WorkItemResolution> resolutions)
+        {
+            return resolutions.Any(r => r.Resolution == WorkItemStateResolved || (r.WorkItemType == WorkItemTypeTask && r.Resolution == WorkItemStateClosed));
+        }
+
+        public bool IsAssignedToTeamMember(WorkItemViewModel workItem, IEnumerable<TeamMemberViewModel> team)
+        {
+            var assignedTo = workItem.Updates.LastOrDefault(u => !u[WorkItemAssignedToField].IsEmpty())?[WorkItemAssignedToField].NewValue;
+            return team.Any(m => !string.IsNullOrWhiteSpace(assignedTo) && assignedTo.Contains(m.Email));
+        }
+
+        // TODO: DataSource should not have knowledge on the type specific to reporters!
+        public WorkItemDetail CreateWorkItemDetail(WorkItemViewModel item)
+        {
+            var timeSpent = GetActiveDuration(item);
+            var etaValues = GetETAValues(item);
+
+            return new WorkItemDetail
+            {
+                WorkItemId = item.WorkItemId,
+                WorkItemTitle = item[WorkItemTitleField],
+                WorkItemType = item[WorkItemTypeField],
+                WorkItemProject = string.IsNullOrWhiteSpace(item[WorkItemAreaPathField]) ? null : item[WorkItemAreaPathField].Split('\\')[0],
+                Tags = item.Updates.LastOrDefault(u => !string.IsNullOrWhiteSpace(u[WorkItemTagsField].NewValue))?[WorkItemTagsField]?.NewValue,
+                OriginalEstimate = etaValues.OriginalEstimate,
+                EstimatedToComplete = etaValues.RemainingWork + etaValues.CompletedWork,
+                TimeSpent = timeSpent
+            };
         }
 
         private bool ContainsTag(string tags, string tag)

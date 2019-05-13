@@ -56,10 +56,27 @@ namespace Ether.Core.Types.Handlers.Commands
 
             var team = await GetAllTeamMembers(dataSource, profile.Members);
             var scope = new ClassificationScope(team, command.Start, command.End);
-            var resolutions = workItems.SelectMany(w => _workItemClassificationContext.Classify(w, scope));
 
-            var report = new WorkItemsReport();
-            report.Resolutions = resolutions;
+            var report = WorkItemsReport.Empty;
+            foreach (var workItem in workItems)
+            {
+                if (dataSource.IsInCodeReview(workItem) && dataSource.IsAssignedToTeamMember(workItem, team))
+                {
+                    report.WorkItemsInReview.Add(dataSource.CreateWorkItemDetail(workItem));
+                }
+                else if (dataSource.IsActive(workItem) && dataSource.IsAssignedToTeamMember(workItem, team))
+                {
+                    report.ActiveWorkItems.Add(dataSource.CreateWorkItemDetail(workItem));
+                }
+                else
+                {
+                    var resolutions = _workItemClassificationContext.Classify(workItem, scope);
+                    if (dataSource.IsResolved(resolutions))
+                    {
+                        report.ResolvedWorkItems.Add(dataSource.CreateWorkItemDetail(workItem));
+                    }
+                }
+            }
 
             return report;
         }

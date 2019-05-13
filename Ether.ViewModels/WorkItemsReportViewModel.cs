@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Ether.ViewModels.Types;
 
 namespace Ether.ViewModels
 {
@@ -7,17 +8,23 @@ namespace Ether.ViewModels
     {
         public WorkItemsReportViewModel()
         {
-            Resolutions = Enumerable.Empty<WorkItemResolutionViewModel>();
+            ActiveWorkItems = Enumerable.Empty<WorkItemDetail>();
+            ResolvedWorkItems = Enumerable.Empty<WorkItemDetail>();
+            WorkItemsInReview = Enumerable.Empty<WorkItemDetail>();
         }
 
-        public int TotalResolved => Resolutions.Count(r => r.Resolution == "Resolved" || r.Resolution == "Closed");
+        public IEnumerable<WorkItemDetail> ActiveWorkItems { get; set; }
 
-        public int TotalInvestigated => Resolutions.Count(r => r.Resolution == "Investigated");
+        public IEnumerable<WorkItemDetail> ResolvedWorkItems { get; set; }
 
-        public int TotalTasks => Resolutions.Count(w => w.WorkItemType == "Task");
+        public IEnumerable<WorkItemDetail> WorkItemsInReview { get; set; }
 
-        public int TotalBugs => Resolutions.Count(w => w.WorkItemType == "Bug");
+        public int GetTotalBugs(IEnumerable<WorkItemDetail> details) => details.Count(w => string.Equals(w.WorkItemType, "bug", System.StringComparison.OrdinalIgnoreCase));
 
-        public IEnumerable<WorkItemResolutionViewModel> Resolutions { get; set; }
+        public int GetTotalTasks(IEnumerable<WorkItemDetail> details) => details.Count(w => string.Equals(w.WorkItemType, "task", System.StringComparison.OrdinalIgnoreCase));
+
+        public float GetTotalEstimated(IEnumerable<WorkItemDetail> details) => details.Sum(i => i.EstimatedToComplete);
+
+        public float GetTotalTimeSpent(IEnumerable<WorkItemDetail> details) => details.Sum(i => i.TimeSpent);
     }
 }

@@ -16,16 +16,15 @@ namespace Ether.Core.Types.Handlers.Commands
     {
         private readonly IIndex<string, IDataSource> _dataSources;
         private readonly IRepository _repository;
-        private readonly ILogger _logger;
 
         public GenerateReportHandlerBase(IIndex<string, IDataSource> dataSources, IRepository repository, ILogger logger)
         {
             _dataSources = dataSources;
             _repository = repository;
-            _logger = logger;
+            Logger = logger;
         }
 
-        protected ILogger Logger => _logger;
+        protected ILogger Logger { get; }
 
         public async Task<Guid> Handle(TCommand command)
         {
@@ -41,9 +40,9 @@ namespace Ether.Core.Types.Handlers.Commands
                 throw new ArgumentException("Requested profile is not found.");
             }
 
-            _logger.LogInformation("Starting to generate {DataSource} PullRequest report for {Profile}, range: {Start} {End}", dataSourceType, profile.Name, command.Start, command.End);
+            Logger.LogInformation("Starting to generate {DataSource} PullRequest report for {Profile}, range: {Start} {End}", dataSourceType, profile.Name, command.Start, command.End);
             var report = await GenerateAsync(command, dataSource, profile);
-            _logger.LogInformation("Finished generating {DataSource} PullRequest report for {Profile}, range: {Start} {End}", dataSourceType, profile.Name, command.Start, command.End);
+            Logger.LogInformation("Finished generating {DataSource} PullRequest report for {Profile}, range: {Start} {End}", dataSourceType, profile.Name, command.Start, command.End);
             var info = GetReportInfo();
             report.Id = Guid.NewGuid();
             report.DateTaken = DateTime.UtcNow;

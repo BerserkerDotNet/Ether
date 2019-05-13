@@ -1,32 +1,103 @@
 ﻿@inject EtherClient Client
-<DataTable Items="report.Resolutions">
-    <TableHeader>
-        <th>Type</th>
-        <th>Id</th>
-        <th>Title</th>
-        <th>Resolution</th>
-        <th>Resolved by</th>
-    </TableHeader>
-    <RowTemplate Context="resolution">
-        <td>@resolution.WorkItemType</td>
-        <td>@resolution.WorkItemId</td>
-        <td>@resolution.WorkItemTitle</td>
-        <td width="140">@resolution.Reason</td>
-        <td>@resolution.MemberName</td>
-    </RowTemplate>
-    <TableFooter>
-        <tr>
-            <th class="table-active">Total:</th>
-            <td class="table-success" colspan="4">@report.TotalResolved</td>
-        </tr>
-        <tr>
-            <th class="table-active">Tasks:</th>
-            <td class="table-success" colspan="2">@report.TotalTasks</td>
-            <th class="table-active">Bugs:</th>
-            <td class="table-success" colspan="2">@report.TotalBugs</td>
-        </tr>
-    </TableFooter>
-</DataTable>
+
+<section id="resolved">
+    <Ether.Components.Card>
+        <Header>Resolved work items</Header>
+        <Body>
+            <DataTable Items="report.ResolvedWorkItems" PageSize="int.MaxValue">
+                <TableHeader>
+                    <th>Workitem</th>
+                    <th>Title</th>
+                    <th>Type</th>
+                    <th>Estimated (Days)</th>
+                    <th>Time Spent (Days)</th>
+                </TableHeader>
+                <RowTemplate Context="detail">
+                    <td><a href="https://dynamicscrm.visualstudio.com/@detail.WorkItemProject/_workitems/edit/@detail.WorkItemId" target="_blank">@detail.WorkItemId</a></td>
+                    <td>@detail.WorkItemTitle</td>
+                    <td>@detail.WorkItemType</td>
+                    <td>@detail.EstimatedToComplete</td>
+                    <td>@detail.TimeSpent</td>
+                </RowTemplate>
+                <TableFooter>
+                    <tr class="table-active">
+                        <th>Total:</th>
+                        <td class="table-success" colspan="2">@report.GetTotalBugs(report.ResolvedWorkItems) bugs / @report.GetTotalTasks(report.ResolvedWorkItems) tasks</td>
+                        <td class="table-success">@report.GetTotalEstimated(report.ResolvedWorkItems)</td>
+                        <td class="table-success">@report.GetTotalTimeSpent(report.ResolvedWorkItems)</td>
+                    </tr>
+                </TableFooter>
+            </DataTable>
+        </Body>
+        <Footer></Footer>
+    </Ether.Components.Card>
+</section>
+
+<section id="pullrequest">
+    <Ether.Components.Card>
+        <Header>Work items in pull request</Header>
+        <Body>
+            <DataTable Items="report.WorkItemsInReview" PageSize="int.MaxValue">
+                <TableHeader>
+                    <th>Workitem</th>
+                    <th>Title</th>
+                    <th>Type</th>
+                    <th>Estimated (Days)</th>
+                    <th>Time Spent (Days)</th>
+                </TableHeader>
+                <RowTemplate Context="detail">
+                    <td><a href="https://dynamicscrm.visualstudio.com/@detail.WorkItemProject/_workitems/edit/@detail.WorkItemId" target="_blank">@detail.WorkItemId</a></td>
+                    <td>@detail.WorkItemTitle</td>
+                    <td>@detail.WorkItemType</td>
+                    <td>@detail.EstimatedToComplete</td>
+                    <td>@detail.TimeSpent</td>
+                </RowTemplate>
+                <TableFooter>
+                    <tr class="table-active">
+                        <th>Total:</th>
+                        <td class="table-success" colspan="2">@report.GetTotalBugs(report.WorkItemsInReview) bugs / @report.GetTotalTasks(report.WorkItemsInReview) tasks</td>
+                        <td class="table-success">@report.GetTotalEstimated(report.WorkItemsInReview)</td>
+                        <td class="table-success">@report.GetTotalTimeSpent(report.WorkItemsInReview)</td>
+                    </tr>
+                </TableFooter>
+            </DataTable>
+        </Body>
+        <Footer></Footer>
+    </Ether.Components.Card>
+</section>
+
+<section id="active">
+    <Ether.Components.Card>
+        <Header>Active work items</Header>
+        <Body>
+            <DataTable Items="report.ActiveWorkItems" PageSize="int.MaxValue">
+                <TableHeader>
+                    <th>Workitem</th>
+                    <th>Title</th>
+                    <th>Type</th>
+                    <th>Estimated (Days)</th>
+                    <th>Time Spent (Days)</th>
+                </TableHeader>
+                <RowTemplate Context="detail">
+                    <td><a href="https://dynamicscrm.visualstudio.com/@detail.WorkItemProject/_workitems/edit/@detail.WorkItemId" target="_blank">@detail.WorkItemId</a></td>
+                    <td>@detail.WorkItemTitle</td>
+                    <td>@detail.WorkItemType</td>
+                    <td>@detail.EstimatedToComplete</td>
+                    <td>@detail.TimeSpent</td>
+                </RowTemplate>
+                <TableFooter>
+                    <tr class="table-active">
+                        <th>Total:</th>
+                        <td class="table-success" colspan="2">@report.GetTotalBugs(report.ActiveWorkItems) bugs / @report.GetTotalTasks(report.ActiveWorkItems) tasks</td>
+                        <td class="table-success">@report.GetTotalEstimated(report.ActiveWorkItems)</td>
+                        <td class="table-success">@report.GetTotalTimeSpent(report.ActiveWorkItems)</td>
+                    </tr>
+                </TableFooter>
+            </DataTable>
+        </Body>
+        <Footer></Footer>
+    </Ether.Components.Card>
+</section>
 
 @functions
 {

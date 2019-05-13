@@ -12,6 +12,7 @@
         public const string WorkItemReasonField = "System.Reason";
         public const string WorkItemAssignedToField = "System.AssignedTo";
         public const string WokItemCreatedDateField = "System.CreatedDate";
+        public const string WorkItemAreaPathField = "System.AreaPath";
         public const string WorkItemResolvedByField = "Microsoft.VSTS.Common.ResolvedBy";
         public const string WorkItemClosedByField = "Microsoft.VSTS.Common.ClosedBy";
         public const string WorkItemChangedDateField = "System.ChangedDate";

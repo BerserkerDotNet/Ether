@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Ether.Contracts.Types;
 using Ether.ViewModels;
+using Ether.ViewModels.Types;
 
 namespace Ether.Contracts.Interfaces
 {
@@ -14,10 +16,20 @@ namespace Ether.Contracts.Interfaces
 
         Task<TeamMemberViewModel> GetTeamMember(Guid id);
 
-        Task<ETAValues> GetETAValues(WorkItemViewModel workItem);
+        ETAValues GetETAValues(WorkItemViewModel workItem);
 
         Task<IEnumerable<WorkItemViewModel>> GetWorkItemsFor(Guid memberId);
 
         float GetActiveDuration(WorkItemViewModel workItem);
+
+        bool IsInCodeReview(WorkItemViewModel workItem);
+
+        bool IsActive(WorkItemViewModel workItem);
+
+        bool IsAssignedToTeamMember(WorkItemViewModel workItem, IEnumerable<TeamMemberViewModel> team);
+
+        bool IsResolved(IEnumerable<WorkItemResolution> resolutions);
+
+        WorkItemDetail CreateWorkItemDetail(WorkItemViewModel item);
     }
 }

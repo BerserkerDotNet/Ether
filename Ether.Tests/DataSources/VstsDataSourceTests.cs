@@ -64,14 +64,14 @@ namespace Ether.Tests.DataSources
         }
 
         [Test]
-        public async Task ShouldReturnCorrectETAData()
+        public void ShouldReturnCorrectETAData()
         {
             var workitem = Builder<WorkItemViewModel>.CreateNew().Build();
             workitem.Fields = new Dictionary<string, string>();
             workitem.Fields.Add(Constants.OriginalEstimateField, "4");
             workitem.Fields.Add(Constants.RemainingWorkField, "8");
             workitem.Fields.Add(Constants.CompletedWorkField, "9");
-            var eta = await _dataSource.GetETAValues(workitem);
+            var eta = _dataSource.GetETAValues(workitem);
 
             eta.Should().NotBeNull();
             eta.OriginalEstimate.Should().Be(4);
@@ -80,11 +80,11 @@ namespace Ether.Tests.DataSources
         }
 
         [Test]
-        public async Task ShouldReturnCorrectETAIfNoETAData()
+        public void ShouldReturnCorrectETAIfNoETAData()
         {
             var workitem = Builder<WorkItemViewModel>.CreateNew().Build();
             workitem.Fields = new Dictionary<string, string>();
-            var eta = await _dataSource.GetETAValues(workitem);
+            var eta = _dataSource.GetETAValues(workitem);
 
             eta.Should().NotBeNull();
             eta.OriginalEstimate.Should().Be(0);
