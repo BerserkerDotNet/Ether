@@ -1,5 +1,5 @@
 ﻿@inject EtherClient Client
-<DataTable Items="report.IndividualReports.OrderBy(r => r.TeamMember)">
+<DataTable Items="Report.IndividualReports.OrderBy(r => r.TeamMember)">
     <TableHeader>
         <th>Name</th>
         <th>Created</th>
@@ -29,27 +29,27 @@
     <TableFooter>
         <tr>
             <th class="table-active">Total created:</th>
-            <td class="table-success" colspan="2">@report.TotalCreated</td>
+            <td class="table-success" colspan="2">@Report.TotalCreated</td>
             <th class="table-active" colspan="2">Avg iterations:</th>
-            <td class="table-success" colspan="2">@report.AverageIterations.ToString("F2")</td>
+            <td class="table-success" colspan="2">@Report.AverageIterations.ToString("F2")</td>
         </tr>
         <tr>
             <th class="table-active">Total completed:</th>
-            <td class="table-success" colspan="2">@report.TotalCompleted</td>
+            <td class="table-success" colspan="2">@Report.TotalCompleted</td>
             <th class="table-active" colspan="2">Avg comments:</th>
-            <td class="table-success" colspan="2">@report.AverageComments.ToString("F2")</td>
+            <td class="table-success" colspan="2">@Report.AverageComments.ToString("F2")</td>
         </tr>
         <tr>
             <th class="table-active">Total active:</th>
-            <td class="table-success" colspan="2">@report.TotalActive</td>
+            <td class="table-success" colspan="2">@Report.TotalActive</td>
             <th class="table-active" colspan="2">Code quality:</th>
-            <td class="table-success" colspan="2">@report.CodeQuality.ToString("F2")</td>
+            <td class="table-success" colspan="2">@Report.CodeQuality.ToString("F2")</td>
         </tr>
         <tr>
             <th class="table-active">Total abandoned:</th>
-            <td class="table-success" colspan="2">@report.TotalAbandoned</td>
+            <td class="table-success" colspan="2">@Report.TotalAbandoned</td>
             <th class="table-active" colspan="2">Avg lifespan:</th>
-            <td class="table-success" colspan="2">@report.AveragePRLifespan.TotalDays.ToString("F2")</td>
+            <td class="table-success" colspan="2">@Report.AveragePRLifespan.TotalDays.ToString("F2")</td>
         </tr>
     </TableFooter>
 </DataTable>
@@ -58,10 +58,5 @@
 {
     [Parameter] Guid Id { get; set; }
 
-    private PullRequestReportViewModel report = new PullRequestReportViewModel();
-
-    protected override async Task OnInitAsync()
-    {
-        report = await Client.GetById<PullRequestReportViewModel>(Id);
-    }
+    [Parameter] PullRequestReportViewModel Report { get; set; }
 }

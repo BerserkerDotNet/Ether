@@ -4,7 +4,7 @@
     <Ether.Components.Card>
         <Header>Resolved work items</Header>
         <Body>
-            <DataTable Items="report.ResolvedWorkItems" PageSize="int.MaxValue">
+            <DataTable Items="Report.ResolvedWorkItems" PageSize="int.MaxValue">
                 <TableHeader>
                     <th>Workitem</th>
                     <th>Title</th>
@@ -22,9 +22,9 @@
                 <TableFooter>
                     <tr class="table-active">
                         <th>Total:</th>
-                        <td class="table-success" colspan="2">@report.GetTotalBugs(report.ResolvedWorkItems) bugs / @report.GetTotalTasks(report.ResolvedWorkItems) tasks</td>
-                        <td class="table-success">@report.GetTotalEstimated(report.ResolvedWorkItems)</td>
-                        <td class="table-success">@report.GetTotalTimeSpent(report.ResolvedWorkItems)</td>
+                        <td class="table-success" colspan="2">@Report.GetTotalBugs(Report.ResolvedWorkItems) bugs / @Report.GetTotalTasks(Report.ResolvedWorkItems) tasks</td>
+                        <td class="table-success">@Report.GetTotalEstimated(Report.ResolvedWorkItems)</td>
+                        <td class="table-success">@Report.GetTotalTimeSpent(Report.ResolvedWorkItems)</td>
                     </tr>
                 </TableFooter>
             </DataTable>
@@ -37,7 +37,7 @@
     <Ether.Components.Card>
         <Header>Work items in pull request</Header>
         <Body>
-            <DataTable Items="report.WorkItemsInReview" PageSize="int.MaxValue">
+            <DataTable Items="Report.WorkItemsInReview" PageSize="int.MaxValue">
                 <TableHeader>
                     <th>Workitem</th>
                     <th>Title</th>
@@ -55,9 +55,9 @@
                 <TableFooter>
                     <tr class="table-active">
                         <th>Total:</th>
-                        <td class="table-success" colspan="2">@report.GetTotalBugs(report.WorkItemsInReview) bugs / @report.GetTotalTasks(report.WorkItemsInReview) tasks</td>
-                        <td class="table-success">@report.GetTotalEstimated(report.WorkItemsInReview)</td>
-                        <td class="table-success">@report.GetTotalTimeSpent(report.WorkItemsInReview)</td>
+                        <td class="table-success" colspan="2">@Report.GetTotalBugs(Report.WorkItemsInReview) bugs / @Report.GetTotalTasks(Report.WorkItemsInReview) tasks</td>
+                        <td class="table-success">@Report.GetTotalEstimated(Report.WorkItemsInReview)</td>
+                        <td class="table-success">@Report.GetTotalTimeSpent(Report.WorkItemsInReview)</td>
                     </tr>
                 </TableFooter>
             </DataTable>
@@ -70,7 +70,7 @@
     <Ether.Components.Card>
         <Header>Active work items</Header>
         <Body>
-            <DataTable Items="report.ActiveWorkItems" PageSize="int.MaxValue">
+            <DataTable Items="Report.ActiveWorkItems" PageSize="int.MaxValue">
                 <TableHeader>
                     <th>Workitem</th>
                     <th>Title</th>
@@ -88,9 +88,9 @@
                 <TableFooter>
                     <tr class="table-active">
                         <th>Total:</th>
-                        <td class="table-success" colspan="2">@report.GetTotalBugs(report.ActiveWorkItems) bugs / @report.GetTotalTasks(report.ActiveWorkItems) tasks</td>
-                        <td class="table-success">@report.GetTotalEstimated(report.ActiveWorkItems)</td>
-                        <td class="table-success">@report.GetTotalTimeSpent(report.ActiveWorkItems)</td>
+                        <td class="table-success" colspan="2">@Report.GetTotalBugs(Report.ActiveWorkItems) bugs / @Report.GetTotalTasks(Report.ActiveWorkItems) tasks</td>
+                        <td class="table-success">@Report.GetTotalEstimated(Report.ActiveWorkItems)</td>
+                        <td class="table-success">@Report.GetTotalTimeSpent(Report.ActiveWorkItems)</td>
                     </tr>
                 </TableFooter>
             </DataTable>
@@ -103,10 +103,5 @@
 {
     [Parameter] Guid Id { get; set; }
 
-    private WorkItemsReportViewModel report = new WorkItemsReportViewModel();
-
-    protected override async Task OnInitAsync()
-    {
-        report = await Client.GetById<WorkItemsReportViewModel>(Id);
-    }
+    [Parameter] WorkItemsReportViewModel Report { get; set; }
 }

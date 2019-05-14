@@ -72,8 +72,8 @@ namespace Ether.Api.Controllers
         [ProducesResponseType(404)]
         public async Task<IActionResult> GetById(Guid id)
         {
-            var reports = await _mediator.Request<GetReportById, ReportViewModel>(new GetReportById(id));
-            return Ok(reports);
+            var report = await _mediator.Request<GetReportById, ReportViewModel>(new GetReportById(id));
+            return Ok(report);
         }
 
         private Task<Guid> GenerateReport(Type generateCommandType, GenerateReportViewModel requestModel)

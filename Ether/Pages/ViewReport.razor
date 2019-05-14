@@ -7,6 +7,10 @@
     <Header>
         @reportDisplayName
         <div class="d-print-none pull-right d-print-none">
+            @if (excelConverter != null)
+            {
+                <button class="btn btn-fill btn-primary" onclick="@ExportToExcel">Export to Excel</button>
+            }
             <button class="btn btn-fill btn-secondary" onclick="@Print">Print</button>
             <button class="btn btn-fill btn-info" onclick="@NewReport">New report</button>
             <button class="btn btn-fill btn-success" onclick="@BackToList">Back to list</button>
@@ -20,7 +24,9 @@
 @functions
 {
     private string reportDisplayName = string.Empty;
-    RenderFragment componentToRender;
+    private Types.Excel.ReportToExcelConverter excelConverter = null;
+    private RenderFragment componentToRender;
+    private ReportViewModel report;
 
     [Parameter]
     private Guid? Id { get; set; }
@@ -28,22 +34,28 @@
     [Parameter]
     private string Type { get; set; }
 
-    protected override void OnParametersSet()
+    protected override async Task OnParametersSetAsync()
     {
         // TODO: that is not going to fly
         if (string.Equals(Type, "PullRequestsReport", StringComparison.OrdinalIgnoreCase))
         {
             reportDisplayName = "Pull requests report";
+            report = await Client.GetById<PullRequestReportViewModel>(Id.Value);
+            excelConverter = new Types.Excel.PullRequestsReportToExcelConverter();
             componentToRender = b => RenderComponent<Ether.Components.Reports.PullRequestsReport>(b);
         }
         else if (string.Equals(Type, "AggregatedWorkitemsETAReport", StringComparison.OrdinalIgnoreCase))
         {
             reportDisplayName = "Aggregated workitems ETA report";
+            report = await Client.GetById<AggregatedWorkitemsETAReportViewModel>(Id.Value);
+            excelConverter = null;
             componentToRender = b => RenderComponent<Ether.Components.Reports.AggregatedWorkitemsETAReport>(b);
         }
         else if (string.Equals(Type, "WorkitemsReporter", StringComparison.OrdinalIgnoreCase))
         {
             reportDisplayName = "Workitems report";
+            report = await Client.GetById<WorkItemsReportViewModel>(Id.Value);
+            excelConverter = new Types.Excel.WorkItemsReportToExcelConverter();
             componentToRender = b => RenderComponent<Ether.Components.Reports.WorkitemsReport>(b);
         }
     }
@@ -53,6 +65,7 @@
     {
         builder.OpenComponent<T>(1);
         builder.AddAttribute(2, "Id", Id.Value);
+        builder.AddAttribute(3, "Report", report);
         builder.CloseComponent();
     }
 
@@ -69,5 +82,12 @@
     protected void Print()
     {
         JsUtils.Print();
+    }
+
+    protected async Task ExportToExcel()
+    {
+        var excelReport = excelConverter.Convert(report);
+        var base64EncodedReport = Convert.ToBase64String(excelReport);
+        await JsUtils.SaveAsFile("report.xlsx", base64EncodedReport);
     }
 }

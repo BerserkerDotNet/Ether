@@ -1,5 +1,5 @@
 ﻿@inject EtherClient Client
-<DataTable Items="report.IndividualReports.OrderBy(r => r.MemberName)">
+<DataTable Items="Report.IndividualReports.OrderBy(r => r.MemberName)">
     <TableHeader>
         <th>Name</th>
         <th>Resolved</th>
@@ -34,15 +34,15 @@
     <TableFooter>
         <tr>
             <th class="table-active">Total resolved:</th>
-            <td class="table-success" colspan="2">@report.TotalResolved</td>
+            <td class="table-success" colspan="2">@Report.TotalResolved</td>
             <th class="table-active" colspan="2">Estimated To Complete:</th>
-            <td class="table-success" colspan="2">@report.EstimatedToComplete.ToString("F2")</td>
+            <td class="table-success" colspan="2">@Report.EstimatedToComplete.ToString("F2")</td>
         </tr>
         <tr>
             <th class="table-active">Completed With Estimates:</th>
-            <td class="table-success" colspan="2">@report.CompletedWithEstimates.ToString("F2")</td>
+            <td class="table-success" colspan="2">@Report.CompletedWithEstimates.ToString("F2")</td>
             <th class="table-active" colspan="2">Estimated/Completed:</th>
-            <td class="table-success" colspan="2">@report.EstimatedToCompletedRatio.ToString("F2")</td>
+            <td class="table-success" colspan="2">@Report.EstimatedToCompletedRatio.ToString("F2")</td>
         </tr>
     </TableFooter>
 </DataTable>
@@ -92,14 +92,9 @@
 {
     [Parameter] Guid Id { get; set; }
 
-    private AggregatedWorkitemsETAReportViewModel report = new AggregatedWorkitemsETAReportViewModel();
+    [Parameter] AggregatedWorkitemsETAReportViewModel Report { get; set; }
 
     private AggregatedWorkitemsETAReportViewModel.IndividualETAReport detailsReport = null;
-
-    protected override async Task OnInitAsync()
-    {
-        report = await Client.GetById<AggregatedWorkitemsETAReportViewModel>(Id);
-    }
 
     protected void ShowDetails(AggregatedWorkitemsETAReportViewModel.IndividualETAReport report)
     {

@@ -54,6 +54,11 @@ namespace Ether.Types
             return _jsRuntime.InvokeAsync<object>("window.BlazorComponents.Utils.print");
         }
 
+        public Task SaveAsFile(string fileName, string base64EncodedFile)
+        {
+            return _jsRuntime.InvokeAsync<object>("window.BlazorComponents.Utils.saveAsFile", fileName, base64EncodedFile);
+        }
+
         public Task NotifyError(string title, string message)
         {
             return _jsRuntime.InvokeAsync<object>("window.BlazorComponents.Notify.notify", "danger", title, message, 8000);
