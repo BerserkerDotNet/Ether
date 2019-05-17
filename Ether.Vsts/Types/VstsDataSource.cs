@@ -177,6 +177,11 @@ namespace Ether.Vsts.Types
 
         private float GetEtaValue(WorkItemViewModel wi, string field)
         {
+            if (!wi.Fields.ContainsKey(field))
+            {
+                return GetEtaFromUpdates(wi, field);
+            }
+
             var value = wi[field];
             if (string.IsNullOrEmpty(value))
             {
@@ -184,6 +189,21 @@ namespace Ether.Vsts.Types
             }
 
             return float.Parse(value);
+        }
+
+        private float GetEtaFromUpdates(WorkItemViewModel wi, string field)
+        {
+            if (wi.Updates == null || !wi.Updates.Any())
+            {
+                return 0;
+            }
+
+            var recoveredValue = wi.Updates
+                .LastOrDefault(u => (u[WorkItemStateField]?.NewValue == WorkItemStateClosed || u[WorkItemStateField]?.NewValue == WorkItemStateResolved) && u.Fields.ContainsKey(field))?
+                .Fields[field].OldValue;
+
+            float.TryParse(recoveredValue, out var result);
+            return result;
         }
 
         private float CountBusinessDaysBetween(DateTime firstDay, DateTime lastDay, params DateTime[] holidays)

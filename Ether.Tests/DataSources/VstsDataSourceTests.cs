@@ -93,6 +93,25 @@ namespace Ether.Tests.DataSources
         }
 
         [Test]
+        public void ShouldFallbackToGettingETAFromUpdates()
+        {
+            var workitem = Builder<WorkItemViewModel>.CreateNew().Build();
+            workitem.Fields = new Dictionary<string, string>();
+            workitem.Updates = UpdateBuilder.Create()
+                .Activated()
+                .Then()
+                .Closed()
+                .With(Constants.RemainingWorkField, "0", "6")
+                .Build();
+            var eta = _dataSource.GetETAValues(workitem);
+
+            eta.Should().NotBeNull();
+            eta.OriginalEstimate.Should().Be(0);
+            eta.RemainingWork.Should().Be(6);
+            eta.CompletedWork.Should().Be(0);
+        }
+
+        [Test]
         public async Task ShouldReturnEmptyListOfWorkItemsIfMemberDoesNotExists()
         {
             var teamMemberId = Guid.NewGuid();

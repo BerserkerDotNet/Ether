@@ -27,6 +27,7 @@ namespace Ether.Vsts.Handlers.Queries
             "System.Tags",
             Constants.WorkItemStateField,
             "System.Reason",
+            "System.AssignedTo",
             "System.CreatedDate",
             "Microsoft.VSTS.Common.ResolvedDate",
             "Microsoft.VSTS.Common.ClosedDate",

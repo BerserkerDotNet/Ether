@@ -47,10 +47,11 @@ namespace Ether.Tests.Classifiers
         }
 
         [Test]
-        public void ShouldReturnNoneIfResolvedNotByTheTeam()
+        public void ShouldReturnResolvedIfResolvedNotByTheTeamAndWasNotAssignedToTheTeam()
         {
             var workItem = new WorkItemViewModel { Fields = new Dictionary<string, string>() };
             workItem.Fields.Add(Constants.WorkItemTypeField, Constants.WorkItemTypeBug);
+            workItem.Fields.Add(Constants.WorkItemAssignedToField, "Fake <fake@bla.com>");
             workItem.Updates = UpdateBuilder.Create()
                 .Resolved(new TeamMemberViewModel { DisplayName = "Not a member", Email = "not@team.com" })
                 .Because("Reasons")

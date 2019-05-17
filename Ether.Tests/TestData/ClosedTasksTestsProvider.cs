@@ -22,13 +22,15 @@ namespace Ether.Tests.TestData
                 MultipleClosedUpdates(),
                 MultipleClosedUpdates(),
                 WithCorrectDate(),
-                CorrectClosedByIfNeeded()
+                CorrectClosedByIfNeeded(),
+                ClosedNotByTeamMember(),
+                ClosedByTeamMemberNotAssigned()
             };
         }
 
         public static IEnumerable GetTestCasesForNotClosedTasks()
         {
-            return new[] { SimpleClosedFromResolved(), ClosedNotByTeamMember(), SimpleClosedThruResolved() };
+            return new[] { SimpleClosedFromResolved(), SimpleClosedThruResolved(), ClosedNotByTeamMemberAndNotAssignedToTeamMember() };
         }
 
         public static IEnumerable<TeamMemberViewModel> GetFakeTeam()
@@ -139,6 +141,34 @@ namespace Ether.Tests.TestData
                 .SetName($"{nameof(ClosedTasksWorkItemsClassifierTests.ShouldReturnClosedResolution)}On{nameof(CorrectClosedByIfNeeded)}");
         }
 
+        private static TestCaseData ClosedNotByTeamMember()
+        {
+            var teamMember = GetFakeTeam().ElementAt(0);
+            var revisedDate = DateTime.UtcNow.AddDays(-4);
+            var updates = UpdateBuilder.Create()
+                        .Then().ClosedFromActive()
+                        .On(revisedDate)
+                        .Build();
+            var request = GetRequest(updates);
+            var assignedTo = $"{teamMember.DisplayName} <{teamMember.Email}>";
+            request.WorkItem.Fields.Add(Constants.WorkItemAssignedToField, assignedTo);
+            return new TestCaseData(request, revisedDate, teamMember)
+                .SetName($"{nameof(ClosedTasksWorkItemsClassifierTests.ShouldReturnClosedResolution)}On{nameof(ClosedNotByTeamMember)}");
+        }
+
+        private static TestCaseData ClosedByTeamMemberNotAssigned()
+        {
+            var teamMember = GetFakeTeam().ElementAt(0);
+            var revisedDate = DateTime.UtcNow.AddDays(-4);
+            var updates = UpdateBuilder.Create()
+                        .Then().ClosedFromActive(teamMember)
+                        .On(revisedDate)
+                        .Build();
+            var request = GetRequest(updates);
+            return new TestCaseData(request, revisedDate, teamMember)
+                .SetName($"{nameof(ClosedTasksWorkItemsClassifierTests.ShouldReturnClosedResolution)}On{nameof(ClosedByTeamMemberNotAssigned)}");
+        }
+
         #endregion
 
         #region NotResolvable
@@ -174,17 +204,18 @@ namespace Ether.Tests.TestData
                 .SetName($"{nameof(ClosedTasksWorkItemsClassifierTests.ShouldReturnNoneResolution)}On{nameof(SimpleClosedThruResolved)}");
         }
 
-        private static TestCaseData ClosedNotByTeamMember()
+        private static TestCaseData ClosedNotByTeamMemberAndNotAssignedToTeamMember()
         {
-            var teamMember = GetFakeTeam().ElementAt(0);
             var revisedDate = DateTime.UtcNow.AddDays(-4);
             var updates = UpdateBuilder.Create()
                         .Then().ClosedFromActive()
                         .On(revisedDate)
                         .Build();
             var request = GetRequest(updates);
+            var assignedTo = $"Fake <FakeTeam@bla.com>";
+            request.WorkItem.Fields.Add(Constants.WorkItemAssignedToField, assignedTo);
             return new TestCaseData(request)
-                .SetName($"{nameof(ClosedTasksWorkItemsClassifierTests.ShouldReturnNoneResolution)}On{nameof(ClosedNotByTeamMember)}");
+                .SetName($"{nameof(ClosedTasksWorkItemsClassifierTests.ShouldReturnNoneResolution)}On{nameof(ClosedNotByTeamMemberAndNotAssignedToTeamMember)}");
         }
 
         #endregion

@@ -21,7 +21,9 @@ namespace Ether.Tests.TestData
                 GetResolvedMultipleTimes(),
                 GetVerifiedTask(),
                 TestCorrectChangedDate(),
-                CorrectResolvedByIfNeeded()
+                CorrectResolvedByIfNeeded(),
+                ResolvedNotByTheTeamButWasAssignedToTheTeam(),
+                ResolvedByTheTeamButWasNotAssigned()
             };
         }
 
@@ -130,6 +132,37 @@ namespace Ether.Tests.TestData
             var request = GetRequest(updates);
             return new TestCaseData(request, Reasons, expectedRevisedDate, teamMember)
                 .SetName(nameof(ResolvedWorkItemsClassifierTest.ShouldReturnResolvedResolution) + "AndCorrectResolvedByIfNeeded");
+        }
+
+        private static TestCaseData ResolvedNotByTheTeamButWasAssignedToTheTeam()
+        {
+            const string CannotReproduce = "Cannot Reproduce";
+            var teamMember = GetFakeTeam().ElementAt(0);
+            var revisedDate = DateTime.UtcNow.AddDays(-4);
+            var updates = UpdateBuilder.Create()
+                        .Resolved()
+                        .Because(CannotReproduce)
+                        .On(revisedDate)
+                        .Build();
+            var request = GetRequest(updates);
+            request.WorkItem.Fields.Add(Constants.WorkItemAssignedToField, $"{teamMember.DisplayName} <{teamMember.Email}>");
+            return new TestCaseData(request, CannotReproduce, revisedDate, teamMember)
+                .SetName(nameof(ResolvedWorkItemsClassifierTest.ShouldReturnResolvedResolution) + "OnResolvedNotByTheTeamButWasAssignedToTheTeam");
+        }
+
+        private static TestCaseData ResolvedByTheTeamButWasNotAssigned()
+        {
+            const string CannotReproduce = "Cannot Reproduce";
+            var teamMember = GetFakeTeam().ElementAt(0);
+            var revisedDate = DateTime.UtcNow.AddDays(-4);
+            var updates = UpdateBuilder.Create()
+                        .Resolved(by: teamMember)
+                        .Because(CannotReproduce)
+                        .On(revisedDate)
+                        .Build();
+            var request = GetRequest(updates);
+            return new TestCaseData(request, CannotReproduce, revisedDate, teamMember)
+                .SetName(nameof(ResolvedWorkItemsClassifierTest.ShouldReturnResolvedResolution) + "OnResolvedByTheTeamButWasNotAssigned");
         }
 
         private static WorkItemResolutionRequest GetRequest(IEnumerable<WorkItemUpdateViewModel> updates, string type = Constants.WorkItemTypeBug)

@@ -10,9 +10,7 @@ namespace Ether.Vsts.Types.Classifiers
     {
         protected override WorkItemResolution ClassifyInternal(WorkItemResolutionRequest request)
         {
-            var resolutionUpdate = request.WorkItem.Updates.LastOrDefault(u => u[WorkItemStateField].NewValue == WorkItemStateResolved
-                && u[WorkItemStateField].OldValue != WorkItemStateClosed
-                && request.Team.Any(member => !string.IsNullOrEmpty(u[WorkItemResolvedByField].NewValue) && u[WorkItemResolvedByField].NewValue.Contains(member.Email)));
+            var resolutionUpdate = request.WorkItem.Updates.LastOrDefault(u => WasResolvedByTeamMember(u, request));
             if (resolutionUpdate == null)
             {
                 return WorkItemResolution.None;
@@ -21,7 +19,12 @@ namespace Ether.Vsts.Types.Classifiers
             var assignedToMember = request.Team.SingleOrDefault(member => !resolutionUpdate[WorkItemAssignedToField].IsEmpty() &&
                 !string.IsNullOrEmpty(resolutionUpdate[WorkItemAssignedToField].OldValue) &&
                 resolutionUpdate[WorkItemAssignedToField].OldValue.Contains(member.Email));
-            var resolvedByMemeber = request.Team.Single(member => resolutionUpdate[WorkItemResolvedByField].NewValue.Contains(member.Email));
+            if (assignedToMember == null)
+            {
+                assignedToMember = request.Team.SingleOrDefault(t => (!string.IsNullOrEmpty(request.WorkItem[WorkItemAssignedToField]) && request.WorkItem[WorkItemAssignedToField].Contains(t.Email)));
+            }
+
+            var resolvedByMemeber = request.Team.SingleOrDefault(member => resolutionUpdate[WorkItemResolvedByField].NewValue.Contains(member.Email));
             if (assignedToMember != null)
             {
                 resolvedByMemeber = assignedToMember;
@@ -43,6 +46,15 @@ namespace Ether.Vsts.Types.Classifiers
             var type = item[WorkItemTypeField];
             return string.Equals(type, WorkItemTypeBug, StringComparison.OrdinalIgnoreCase) ||
                 string.Equals(type, WorkItemTypeTask, StringComparison.OrdinalIgnoreCase);
+        }
+
+        private bool WasResolvedByTeamMember(WorkItemUpdateViewModel update, WorkItemResolutionRequest request)
+        {
+            var assignedTo = update[WorkItemAssignedToField].IsEmpty() ? request.WorkItem[WorkItemAssignedToField] : update[WorkItemAssignedToField].OldValue;
+            var resolvedBy = update[WorkItemResolvedByField].NewValue;
+            return update[WorkItemStateField].NewValue == WorkItemStateResolved
+                && update[WorkItemStateField].OldValue != WorkItemStateClosed
+                && request.Team.Any(t => (!string.IsNullOrEmpty(assignedTo) && assignedTo.Contains(t.Email)) || (!string.IsNullOrEmpty(resolvedBy) && resolvedBy.Contains(t.Email)));
         }
     }
 }
