@@ -10,7 +10,7 @@ namespace Ether.Api.Controllers
 {
     [Authorize]
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [Produces("application/json")]
     public class SettingsController : ControllerBase
     {

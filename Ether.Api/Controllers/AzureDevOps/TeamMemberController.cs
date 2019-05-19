@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Ether.Api.Controllers.AzureDevOps
 {
-    [Route("api/vsts/[controller]")]
+    [Route("vsts/[controller]")]
     [ApiController]
     [Authorize]
     [Produces("application/json")]

@@ -130,7 +130,7 @@ namespace Ether.Api
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Ether API V1");
+                c.SwaggerEndpoint("/api/swagger/v1/swagger.json", "Ether API V1");
             });
 
             app.UseAuthentication();
