@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Ether.Types;
 using Ether.ViewModels;
 using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Logging;
 
 namespace Ether.Components.CodeBehind
 {
@@ -21,6 +22,9 @@ namespace Ether.Components.CodeBehind
 
         [Inject]
         protected EtherClient Client { get; set; }
+
+        [Inject]
+        protected ILogger<EditableTableBase<T>> Logger { get; set; }
 
         [Inject]
         protected JsUtils JsUtils { get; set; }
@@ -73,7 +77,7 @@ namespace Ether.Components.CodeBehind
             }
             catch (Exception ex)
             {
-                Console.WriteLine("ERROR:", ex);
+                Logger.LogError(ex, "Refresh failed");
                 await JsUtils.NotifyError("Error loading records", ex.Message);
             }
             finally
@@ -111,11 +115,6 @@ namespace Ether.Components.CodeBehind
         protected virtual async Task Save()
         {
             var model = EditingItem as IdentityViewModel;
-            if (model != null)
-            {
-                Console.WriteLine($"Model: {model.Name}; {model.Token}");
-            }
-
             if (_formValidator != null && !_formValidator.Validate(EditingItem))
             {
                 return;
@@ -128,7 +127,7 @@ namespace Ether.Components.CodeBehind
             }
             catch (Exception ex)
             {
-                Console.WriteLine("ERROR:", ex);
+                Logger.LogError(ex, "Error saving record");
                 await JsUtils.NotifyError("Error saving record", ex.Message);
                 return;
             }

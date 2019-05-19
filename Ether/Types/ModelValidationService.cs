@@ -14,8 +14,6 @@ namespace Ether.Types
         {
             var scanner = AssemblyScanner.FindValidatorsInAssemblyContaining<IdentityViewModelValidator>();
             _validators = scanner.Select(r => (IValidator)Activator.CreateInstance(r.ValidatorType)).ToArray();
-
-            Console.WriteLine($"ModelValidationService - found {_validators.Count()} validators. {string.Join(",", _validators)}");
         }
 
         public Dictionary<string, IEnumerable<string>> Validate<T>(T model)

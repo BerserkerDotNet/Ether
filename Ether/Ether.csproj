@@ -39,6 +39,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Blazor.Extensions.Logging" Version="0.1.11" />
     <PackageReference Include="Blazor.Extensions.Storage" Version="0.1.8-preview1" />
     <PackageReference Include="IdentityModel" Version="3.10.4" />
     <PackageReference Include="DotNetCore.NPOI" Version="1.2.0" />

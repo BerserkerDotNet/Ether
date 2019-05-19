@@ -4,6 +4,7 @@
 @inject EtherClient Client
 @inject IUriHelper UriHelper
 @inject JsUtils JsUtils
+@inject ILogger<Index> Logger
 
 <div class="row">
     <div class="col-md-12">
@@ -75,7 +76,7 @@
         }
         catch (Exception ex)
         {
-            Console.WriteLine("ERROR", ex);
+            Logger.LogError(ex, "Error generating report");
             await JsUtils.NotifyError("Report", $"Error generating report: {ex.Message}");
             isGeneratingReport = false;
         }

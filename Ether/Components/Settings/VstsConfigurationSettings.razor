@@ -1,6 +1,7 @@
 ﻿@implements IFormHandler
 @inject EtherClient Client
 @inject JsUtils JsUtils
+@inject ILogger<VstsConfigurationSettings> Logger
 
 <Card AdditionalClasses="card-600">
     <Header>Vsts configuration</Header>
@@ -52,7 +53,7 @@
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"ERROR: {ex}");
+            Logger.LogError(ex, "Error updating VSTS configuration");
             await JsUtils.NotifyError("Error updating VSTS configuration", ex.Message);
         }
     }

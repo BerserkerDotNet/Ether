@@ -12,6 +12,10 @@
     </thead>
     <tbody>
         @*TODO: No pagination?*@
+        @if (!Items.Any())
+        {
+            <p>@GetNoItemsText()</p>
+        }
         @foreach (var item in Items.Skip(PageSize * (currentPage - 1)).Take(PageSize))
         {
             <tr>
@@ -54,6 +58,7 @@
     [Parameter] RenderFragment<TItem> ActionsTemplate { get; set; }
     [Parameter] RenderFragment TableFooter { get; set; }
     [Parameter] IEnumerable<TItem> Items { get; set; }
+    [Parameter] string NoItemsText { get; set; }
 
     protected override void OnParametersSet()
     {
@@ -72,5 +77,10 @@
     {
         currentPage--;
         StateHasChanged();
+    }
+
+    protected string GetNoItemsText()
+    {
+        return string.IsNullOrEmpty(NoItemsText) ? "No items" : NoItemsText;
     }
 }

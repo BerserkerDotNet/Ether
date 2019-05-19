@@ -24,7 +24,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Swashbuckle.AspNetCore.Swagger;
 
 namespace Ether.Api
 {
@@ -66,7 +65,7 @@ namespace Ether.Api
             services.AddAuthentication("Bearer")
                 .AddIdentityServerAuthentication(options =>
             {
-                options.Authority = "http://localhost:5000";
+                options.Authority = Configuration.GetValue<string>("Authority");
                 options.RequireHttpsMetadata = false;
                 options.ApiName = "api";
             });
@@ -119,10 +118,13 @@ namespace Ether.Api
 
             app.UseRouting();
             app.UseStaticFiles();
-            app.UseCors(b => b.WithOrigins("http://localhost:5001")
+            if (env.IsDevelopment())
+            {
+                app.UseCors(b => b.WithOrigins("http://localhost:5001")
                              .AllowAnyHeader()
                              .AllowAnyMethod()
                              .AllowCredentials());
+            }
 
             app.UseIdentityServer();
             app.UseSwagger();

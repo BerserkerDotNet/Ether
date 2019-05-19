@@ -13,7 +13,7 @@
                     <th>Time Spent (Days)</th>
                 </TableHeader>
                 <RowTemplate Context="detail">
-                    <td><a href="https://dynamicscrm.visualstudio.com/@detail.WorkItemProject/_workitems/edit/@detail.WorkItemId" target="_blank">@detail.WorkItemId</a></td>
+                    <td><a href="@GetWorkItemUrl(detail.WorkItemProject, detail.WorkItemId)" target="_blank">@detail.WorkItemId</a></td>
                     <td>@detail.WorkItemTitle</td>
                     <td>@detail.WorkItemType</td>
                     <td>@detail.EstimatedToComplete</td>
@@ -46,7 +46,7 @@
                     <th>Time Spent (Days)</th>
                 </TableHeader>
                 <RowTemplate Context="detail">
-                    <td><a href="https://dynamicscrm.visualstudio.com/@detail.WorkItemProject/_workitems/edit/@detail.WorkItemId" target="_blank">@detail.WorkItemId</a></td>
+                    <td><a href="@GetWorkItemUrl(detail.WorkItemProject, detail.WorkItemId)" target="_blank">@detail.WorkItemId</a></td>
                     <td>@detail.WorkItemTitle</td>
                     <td>@detail.WorkItemType</td>
                     <td>@detail.EstimatedToComplete</td>
@@ -79,7 +79,7 @@
                     <th>Time Spent (Days)</th>
                 </TableHeader>
                 <RowTemplate Context="detail">
-                    <td><a href="https://dynamicscrm.visualstudio.com/@detail.WorkItemProject/_workitems/edit/@detail.WorkItemId" target="_blank">@detail.WorkItemId</a></td>
+                    <td><a href="@GetWorkItemUrl(detail.WorkItemProject, detail.WorkItemId)" target="_blank">@detail.WorkItemId</a></td>
                     <td>@detail.WorkItemTitle</td>
                     <td>@detail.WorkItemType</td>
                     <td>@detail.EstimatedToComplete</td>
@@ -101,7 +101,19 @@
 
 @functions
 {
+    private VstsDataSourceViewModel vstsConfiguration = new VstsDataSourceViewModel();
+
     [Parameter] Guid Id { get; set; }
 
     [Parameter] WorkItemsReportViewModel Report { get; set; }
+
+    protected override async Task OnInitAsync()
+    {
+        vstsConfiguration = await Client.GetVstsDataSourceConfig();
+    }
+
+    protected string GetWorkItemUrl(string project, int workItemId)
+    {
+        return $"https://{vstsConfiguration.InstanceName}.visualstudio.com/{project}/_workitems/edit/{workItemId}";
+    }
 }

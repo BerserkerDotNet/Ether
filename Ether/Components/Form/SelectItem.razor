@@ -63,7 +63,6 @@
         {
             var ids = await JsUtils.GetAllSelectedOptions(multiSelectElement);
             var newValues = ids.Select(i => ConvertHelper.ConvertTo<TOption>(i)).ToArray();
-            Console.WriteLine($"Value: {e.Value}; IDs: {string.Join(", ", ids)}");
             Value = (T)((object)newValues);
         }
     }

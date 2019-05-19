@@ -1,6 +1,8 @@
+using Blazor.Extensions.Logging;
 using Ether.Types;
 using Microsoft.AspNetCore.Components.Builder;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace Ether
 {
@@ -15,6 +17,11 @@ namespace Ether
             services.AddSingleton<JsUtils>();
             services.AddSingleton<LocalStorage>();
             services.AddSingleton<AppState>();
+
+            services.AddLogging(builder => builder
+                .AddBrowserConsole()
+                .SetMinimumLevel(LogLevel.Trace)
+            );
         }
 
         public void Configure(IComponentsApplicationBuilder app)

@@ -4,8 +4,10 @@
   stripped by the IL Linker even if they aren't referenced by user code.
 -->
 <linker>
-  <assembly fullname="mscorlib" />
-  <assembly fullname="Newtonsoft.Json" />
   <assembly fullname="IdentityModel" />
   <assembly fullname="Ether" />
+  <assembly fullname="NPOI" />
+  <assembly fullname="NPOI.OOXML" />
+  <assembly fullname="NPOI.OpenXml4Net" />
+  <assembly fullname="NPOI.OpenXmlFormats" />
 </linker>

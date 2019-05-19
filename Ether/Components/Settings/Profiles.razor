@@ -20,13 +20,13 @@
             </RowTemplate>
             <ActionsTemplate Context="profile">
                 <div>
-                    <div class="btn-group" role="group">
+                    <div class="dropdown btn-group" role="group">
                         <button id="btnGroupWorkItemsProfile" type="button" class="btn btn-info btn-fill dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             Work items
                         </button>
                         <div class="dropdown-menu" aria-labelledby="btnGroupWorkItemsProfile">
-                            <button class="dropdown-item btn btn-link" onclick="@(() => FetchWorkItems(profile.Members))">Fetch work items</button>
-                            <button class="dropdown-item btn btn-link" onclick="@(() => ResetWorkItems(profile.Members))">Reset work items</button>
+                            <button class="dropdown-item" onclick="@(() => FetchWorkItems(profile.Members))">Fetch work items</button>
+                            <button class="dropdown-item" onclick="@(() => ResetWorkItems(profile.Members))">Reset work items</button>
                         </div>
                     </div>
                     <button class="btn btn-warning btn-fill" onclick="@(() => ctx.Edit(profile))">Edit</button>

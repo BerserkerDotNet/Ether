@@ -2,6 +2,7 @@
 using System.Linq;
 using Ether.Types;
 using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Logging;
 
 namespace Ether.Components.CodeBehind
 {
@@ -13,6 +14,9 @@ namespace Ether.Components.CodeBehind
 
         [Inject]
         protected JsUtils JsUtils { get; set; }
+
+        [Inject]
+        protected ILogger<FormItemBase> Logger { get; set; }
 
         [CascadingParameter]
         protected IFormValidator ContainerForm { get; set; }
@@ -43,7 +47,7 @@ namespace Ether.Components.CodeBehind
         {
             if (ContainerForm == null)
             {
-                Console.WriteLine("WARN: Model validation container is not set.");
+                Logger.LogWarning("Model validation container is not set.");
                 return;
             }
 
@@ -54,7 +58,7 @@ namespace Ether.Components.CodeBehind
         {
             if (Properties == null)
             {
-                Console.WriteLine($"V Properties set to null, S: {sender}");
+                Logger.LogInformation($"Validation properties set to null, Sender: {sender}");
                 return;
             }
 

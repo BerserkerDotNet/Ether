@@ -24,8 +24,6 @@ namespace Ether.Api
                     AllowedGrantTypes = GrantTypes.ResourceOwnerPassword,
                     AllowedScopes = { "api", "openid" },
                     RequireClientSecret = false,
-                    AllowedCorsOrigins = new[] { "http://localhost:57796" },
-                    RedirectUris = { "http://localhost:57796" },
                     AccessTokenLifetime = (int)TimeSpan.FromDays(30).TotalSeconds
                 }
             };

@@ -7,6 +7,7 @@ using Ether.ViewModels;
 using IdentityModel.Client;
 using Microsoft.AspNetCore.Blazor.Http;
 using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
 
 namespace Ether.Types
@@ -32,13 +33,15 @@ namespace Ether.Types
 
         private readonly HttpClient _httpClient;
         private readonly IUriHelper _navigation;
+        private readonly ILogger<EtherClient> _logger;
 
-        public EtherClient(HttpClient httpClient, IUriHelper navigation)
+        public EtherClient(HttpClient httpClient, IUriHelper navigation, ILogger<EtherClient> logger)
         {
             WebAssemblyHttpMessageHandler.DefaultCredentials = FetchCredentialsOption.Include;
             _httpClient = httpClient;
-            this._navigation = navigation;
-            httpClient.BaseAddress = new Uri("http://localhost:5000/api/");
+            _navigation = navigation;
+            _logger = logger;
+            httpClient.BaseAddress = GetApiUrl();
         }
 
         public void SetAccessToken(string token)
@@ -59,7 +62,7 @@ namespace Ether.Types
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                _logger.LogError(ex, "Cannot fetch user menu metadata");
                 return false;
             }
         }
@@ -122,7 +125,6 @@ namespace Ether.Types
 
             if (tokenResponse.IsError)
             {
-                Console.WriteLine(tokenResponse.Error);
                 throw new Exception(tokenResponse.Error);
             }
 
@@ -182,6 +184,14 @@ namespace Ether.Types
         {
             var key = typeof(T);
             return _typeRoutes.ContainsKey(typeof(T)) ? _typeRoutes[key] : string.Empty;
+        }
+
+        private Uri GetApiUrl()
+        {
+            var baseUrl = _navigation.GetBaseUri();
+            var isDevelopment = baseUrl.StartsWith("http://localhost");
+
+            return isDevelopment ? new Uri("http://localhost:5000/api/") : new Uri($"{baseUrl}api/");
         }
     }
 }

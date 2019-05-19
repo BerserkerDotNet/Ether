@@ -5,7 +5,7 @@
     NewTitle="New member"
     ExistingTitle="Editing member">
     <ListModeContent Context="ctx">
-        <DataTable Items="@ctx.Items" PageSize="5">
+        <DataTable Items="@ctx.Items" PageSize="10">
             <TableHeader>
                 <th>Display Name</th>
                 <th>Email</th>
@@ -20,13 +20,13 @@
             </RowTemplate>
             <ActionsTemplate Context="member">
                 <div>
-                    <div class="btn-group" role="group">
+                    <div class=" dropdown btn-group" role="group">
                         <button id="btnGroupWorkItemsMember" type="button" class="btn btn-info btn-fill dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             Work items
                         </button>
                         <div class="dropdown-menu" aria-labelledby="btnGroupWorkItemsMember">
-                            <button class="dropdown-item btn btn-link" onclick="@(() => FetchWorkItems(member))">Fetch work items</button>
-                            <button class="dropdown-item btn btn-link" onclick="@(() => ResetWorkItems(member))">Reset work items</button>
+                            <button class="dropdown-item" onclick="@(() => FetchWorkItems(member))">Fetch work items</button>
+                            <button class="dropdown-item" onclick="@(() => ResetWorkItems(member))">Reset work items</button>
                         </div>
                     </div>
                     <button class="btn btn-warning btn-fill" onclick="@(() => ctx.Edit(member))">Edit</button>
