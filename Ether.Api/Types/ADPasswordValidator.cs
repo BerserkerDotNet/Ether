@@ -22,7 +22,7 @@ namespace Ether.Api.Types
         public Task ValidateAsync(ResourceOwnerPasswordValidationContext context)
         {
             var type = (ContextType)Enum.Parse(typeof(ContextType), _adConfig.Value.Type);
-            using (var principal = new PrincipalContext(type, Environment.UserDomainName))
+            using (var principal = new PrincipalContext(type, _adConfig.Value.Name))
             {
                 var isValid = principal.ValidateCredentials(context.UserName, context.Password);
                 if (isValid)
