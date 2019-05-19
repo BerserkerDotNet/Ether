@@ -116,7 +116,7 @@ namespace Ether.Types
         {
             var tokenResponse = await _httpClient.RequestPasswordTokenAsync(new PasswordTokenRequest
             {
-                Address = "http://localhost:5000/connect/token",
+                Address = $"{GetApiUrl()}connect/token",
                 ClientId = "EtherBlazorClient",
                 UserName = model.UserName,
                 Password = model.Password,
