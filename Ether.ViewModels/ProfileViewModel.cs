@@ -10,8 +10,8 @@ namespace Ether.ViewModels
 
         public string Type { get; set; }
 
-        public IEnumerable<Guid> Members { get; set; } = Enumerable.Empty<Guid>();
+        public IEnumerable<Guid> Members { get; set; }
 
-        public IEnumerable<Guid> Repositories { get; set; } = Enumerable.Empty<Guid>();
+        public IEnumerable<Guid> Repositories { get; set; }
     }
 }
