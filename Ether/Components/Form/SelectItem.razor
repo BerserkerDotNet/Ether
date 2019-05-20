@@ -40,8 +40,8 @@
 
 @functions{
 
-    ElementRef multiSelectElement;
-    bool isInitialized = false;
+        ElementRef multiSelectElement;
+        bool isInitialized = false;
 
     [Parameter] Dictionary<TOption, string> Options { get; set; }
 
@@ -63,7 +63,15 @@
         {
             var ids = await JsUtils.GetAllSelectedOptions(multiSelectElement);
             var newValues = ids.Select(i => ConvertHelper.ConvertTo<TOption>(i)).ToArray();
-            Value = (T)((object)newValues);
+
+            if (Value == null)
+            {
+                Value = (T)Enumerable.Empty<TOption>();
+            }
+            else
+            {
+                Value = (T)((object)newValues);
+            }
         }
     }
 
@@ -71,6 +79,11 @@
     {
         get
         {
+            if (Value == null)
+            {
+                return Enumerable.Empty<TOption>();
+            }
+
             return (IEnumerable<TOption>)Value;
         }
     }
