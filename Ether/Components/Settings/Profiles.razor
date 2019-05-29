@@ -39,16 +39,14 @@
         <ModelValidation Handler="ctx">
             <InputItem Type="text" Title="Name" PropertyName="@nameof(ctx.EditingItem.Name)" bind-Value="ctx.EditingItem.Name" />
             <InputItem Type="text" Title="Type" PropertyName="@nameof(ctx.EditingItem.Type)" bind-Value="ctx.EditingItem.Type" />
-            <Ether.Components.Form.SelectItem Title="Members"
-                        Multiple="true"
-                        bind-Value="ctx.EditingItem.Members"
+            <Ether.Components.Form.OptionsSelector Title="Members"
                         PropertyName="@nameof(ctx.EditingItem.Members)"
-                        Options="@membersOptions" />
-            <Ether.Components.Form.SelectItem Title="Repositories"
-                        Multiple="true"
-                        bind-Value="ctx.EditingItem.Repositories"
+                        Options="@membersOptions"
+                        bind-Value="ctx.EditingItem.Members" />
+            <Ether.Components.Form.OptionsSelector Title="Repositories"
                         PropertyName="@nameof(ctx.EditingItem.Repositories)"
-                        Options="@repositoriesOptions" />
+                        Options="@repositoriesOptions"
+                        bind-Value="ctx.EditingItem.Repositories" />
         </ModelValidation>
     </FormModeContent>
 </EditableTable>

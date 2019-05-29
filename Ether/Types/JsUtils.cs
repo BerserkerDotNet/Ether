@@ -83,5 +83,15 @@ namespace Ether.Types
         {
             return _jsRuntime.InvokeAsync<DateTime>("window.BlazorComponents.DateRangePicker.getEndDate", element);
         }
+
+        public Task<string> GetValue(ElementRef element)
+        {
+            return _jsRuntime.InvokeAsync<string>("window.BlazorComponents.Utils.getValue", element);
+        }
+
+        public Task<string> SetValue(ElementRef element, string value)
+        {
+            return _jsRuntime.InvokeAsync<string>("window.BlazorComponents.Utils.setValue", element, value);
+        }
     }
 }

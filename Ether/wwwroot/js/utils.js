@@ -16,11 +16,10 @@ window.BlazorComponents.Utils = {
         return $(select).val();
     },
     failValidation: function (id) {
-        console.log('Set invalid for ' + id);
-        $('#' + id).children(':input').addClass('is-invalid', 'was-validated');
+        $('#' + id).find(':input').addClass('is-invalid', 'was-validated');
     },
     succeedValidation: function (id) {
-        $('#' + id).children(':input').removeClass('is-invalid', 'was-validated');
+        $('#' + id).find(':input').removeClass('is-invalid', 'was-validated');
     },
     buttonState: function (btn, state) {
         var button = $(btn);
@@ -44,6 +43,12 @@ window.BlazorComponents.Utils = {
         document.body.appendChild(link); // Needed for Firefox
         link.click();
         document.body.removeChild(link);
+    },
+    getValue: function (element) {
+        return $(element).val();
+    },
+    setValue: function (element, value) {
+        return $(element).val(value);
     }
 };
 

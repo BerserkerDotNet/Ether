@@ -1,0 +1,127 @@
+﻿@typeparam T
+@typeparam TOption
+@inherits InputItemBase<T>
+@inject JsUtils Js
+
+<ValidatedField Properties="@Properties" Title="@Title">
+    <div class="btn-group d-block">
+        <input type="text"
+               class="form-control"
+               id="searchKeyword"
+               autocomplete="off"
+               aria-describedby="search keyword"
+               placeholder="Type to add..."
+               bind-value-oninput="@SearchText"
+               ref="searchField" />
+        <ui class="dropdown-menu @GetShowClass()">
+            @foreach (var option in filteredOptions)
+            {
+                <li class="dropdown-item" onclick="@(() => Add(option))">@option.Value</li>
+            }
+        </ui>
+    </div>
+    <ui class="buttons-list">
+        @foreach (var option in selectedOptions)
+        {
+            <li class="dropdown-item">
+                @option.Value
+                <i onclick="@(() => Delete(option))" class="pull-right far fa-trash-alt"></i>
+            </li>
+        }
+    </ui>
+</ValidatedField>
+
+@functions{
+
+    private bool isShown = false;
+    private int highlightedIdx = -1;
+    private string searchText = string.Empty;
+    private ElementRef searchField;
+    private Dictionary<TOption, string> selectedOptions = new Dictionary<TOption, string>();
+    private IEnumerable<KeyValuePair<TOption, string>> filteredOptions = new Dictionary<TOption, string>();
+
+    [Parameter] Dictionary<TOption, string> Options { get; set; }
+
+    IEnumerable<TOption> Selected
+    {
+        get
+        {
+            if (Value == null)
+            {
+                return Enumerable.Empty<TOption>();
+            }
+
+            return (IEnumerable<TOption>)Value;
+        }
+    }
+
+    protected string SearchText
+    {
+        get { return searchText; }
+        set
+        {
+            searchText = value;
+            Filter();
+        }
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        if (Selected != null)
+        {
+            selectedOptions = Options.Where(o => Selected.Contains(o.Key)).ToDictionary(k => k.Key, v => v.Value);
+        }
+    }
+
+    protected void Filter()
+    {
+        if (!string.IsNullOrEmpty(SearchText))
+        {
+            filteredOptions = Options.Where(o => o.Value.ToLower().Contains(SearchText.ToLower()))
+                .Except(selectedOptions);
+            ShowSearch();
+        }
+        else
+        {
+            HideSearch();
+        }
+    }
+
+    protected void Add(KeyValuePair<TOption, string> option)
+    {
+        if (!selectedOptions.Contains(option))
+        {
+            selectedOptions.Add(option.Key, option.Value);
+        }
+        SearchText = string.Empty;
+        Value = (T)((object)selectedOptions.Keys);
+    }
+
+    protected void Delete(KeyValuePair<TOption, string> option)
+    {
+        selectedOptions.Remove(option.Key);
+        Value = (T)((object)selectedOptions.Keys);
+    }
+
+    protected string GetShowClass()
+    {
+        return isShown ? "show" : "";
+    }
+
+    protected void HideSearch()
+    {
+        isShown = false;
+    }
+
+    protected void ShowSearch()
+    {
+        isShown = true;
+    }
+
+    protected void ShowDeleteOption()
+    {
+
+    }
+}

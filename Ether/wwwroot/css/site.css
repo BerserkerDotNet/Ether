@@ -1,6 +1,7 @@
 ﻿select.form-control {
     height: auto;
 }
+
 .btn-link {
     padding: 0px;
     vertical-align: super;
@@ -16,4 +17,22 @@ a.nav-link {
 
 .pull-right {
     float: right;
+}
+
+.buttons-list {
+    display: block;
+    border-color: lightgray;
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 5.6px;
+    padding: 10px;
+    margin-top: 10px;
+}
+
+    .buttons-list .dropdown-item {
+        padding: 0px;
+    }
+
+li.dropdown-item {
+    cursor: pointer;
 }

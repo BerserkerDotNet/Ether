@@ -8,6 +8,7 @@
   
   <PropertyGroup>
     <BlazorLinkOnBuild>false</BlazorLinkOnBuild>
+    <RunXdt>true</RunXdt>
   </PropertyGroup>
  
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
