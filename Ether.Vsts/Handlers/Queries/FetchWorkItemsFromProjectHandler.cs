@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Ether.Contracts.Interfaces.CQS;
 using Ether.ViewModels;
+using Ether.ViewModels.Types;
 using Ether.Vsts.Interfaces;
 using Ether.Vsts.Queries;
 using Microsoft.Extensions.Logging;
@@ -61,7 +62,7 @@ namespace Ether.Vsts.Handlers.Queries
                 return Enumerable.Empty<WorkItemViewModel>();
             }
 
-            var workItems = await client.GetWorkItemsAsync(ids, fields: _workItemFields);
+            var workItems = await client.GetWorkItemsAsync(ids);
             var result = new List<WorkItemViewModel>(workItems.Count());
             foreach (var workItem in workItems)
             {
@@ -69,7 +70,13 @@ namespace Ether.Vsts.Handlers.Queries
                 var viewModel = new WorkItemViewModel
                 {
                     WorkItemId = workItem.Id,
-                    Fields = workItem.Fields,
+                    Fields = workItem.Fields?.Where(f => _workItemFields.Contains(f.Key)).ToDictionary(k => k.Key, v => v.Value),
+                    Relations = workItem.Relations?.Select(r => new WorkItemRelation
+                    {
+                        Attributes = r.Attributes,
+                        RelationType = r.RelationType,
+                        Url = r.Url
+                    }),
                     Updates = updates.Select(u => new WorkItemUpdateViewModel
                     {
                         WorkItemId = workItem.Id,

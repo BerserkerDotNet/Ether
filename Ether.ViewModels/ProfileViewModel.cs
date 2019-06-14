@@ -8,7 +8,7 @@ namespace Ether.ViewModels
     {
         public string Name { get; set; }
 
-        public string Type { get; set; }
+        public string Type { get; set; } = "Vsts";
 
         public IEnumerable<Guid> Members { get; set; }
 

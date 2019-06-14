@@ -4,19 +4,23 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using AutoMapper;
-using Ether.Contracts.Dto.Reports;
 using Ether.Contracts.Interfaces;
 using Ether.Contracts.Types;
 using Ether.Core.Extensions;
 using Ether.ViewModels;
 using Ether.ViewModels.Types;
 using Ether.Vsts.Dto;
+using Ether.Vsts.Interfaces;
 using static Ether.Vsts.Constants;
 
 namespace Ether.Vsts.Types
 {
     public class VstsDataSource : IDataSource
     {
+        private const string ArtifactLink = "ArtifactLink";
+        private const string PullRequestId = "PullRequestId";
+        private const string ForwardSlash = "/";
+
         private readonly IRepository _repository;
         private readonly IMapper _mapper;
 
@@ -122,10 +126,32 @@ namespace Ether.Vsts.Types
             return activeTime;
         }
 
-        public bool IsInCodeReview(WorkItemViewModel workItem)
+        public async Task<bool> IsInCodeReview(WorkItemViewModel workItem)
         {
-            // TODO: Fetch info from related Pull Request
-            return IsActive(workItem) && ContainsTag(workItem.Updates.LastOrDefault(u => !u[WorkItemTagsField].IsEmpty())?[WorkItemTagsField].NewValue, CodeReviewTag);
+            var isActiveWithCodeReviewTag = IsActive(workItem) && workItem.Fields.ContainsKey(WorkItemTagsField) && ContainsTag(workItem.Fields[WorkItemTagsField], CodeReviewTag);
+            if (isActiveWithCodeReviewTag)
+            {
+                return true;
+            }
+
+            if (!IsActive(workItem))
+            {
+                return false;
+            }
+
+            var pullRequestIds = workItem.Relations?
+                .Where(r => string.Equals(r.RelationType, ArtifactLink, StringComparison.OrdinalIgnoreCase) && r.Url.LocalPath.Contains(PullRequestId))
+                .Select(r => r.Url.LocalPath.Substring(r.Url.LocalPath.LastIndexOf(ForwardSlash) + 1))
+                .Select(id => int.Parse(id))
+                .ToArray();
+
+            if (pullRequestIds == null || !pullRequestIds.Any())
+            {
+                return false;
+            }
+
+            var pullRequests = await _repository.GetAsync<PullRequest>(p => pullRequestIds.Contains(p.PullRequestId));
+            return pullRequests.Count() == pullRequestIds.Count() && pullRequests.Any(p => p.State == PullRequestState.Active);
         }
 
         public bool IsActive(WorkItemViewModel workItem)

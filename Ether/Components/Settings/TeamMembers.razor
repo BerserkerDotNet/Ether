@@ -5,7 +5,7 @@
     NewTitle="New member"
     ExistingTitle="Editing member">
     <ListModeContent Context="ctx">
-        <DataTable Items="@ctx.Items" PageSize="10">
+        <DataTable Items="@ctx.Items" PageSize="10" EnableSearch="true" SearchPredicate="@((i, q) => i.DisplayName.Contains(q) || i.Email.Contains(q))">
             <TableHeader>
                 <th>Display Name</th>
                 <th>Email</th>

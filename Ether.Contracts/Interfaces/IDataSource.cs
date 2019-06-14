@@ -22,7 +22,7 @@ namespace Ether.Contracts.Interfaces
 
         float GetActiveDuration(WorkItemViewModel workItem);
 
-        bool IsInCodeReview(WorkItemViewModel workItem);
+        Task<bool> IsInCodeReview(WorkItemViewModel workItem);
 
         bool IsActive(WorkItemViewModel workItem);
 

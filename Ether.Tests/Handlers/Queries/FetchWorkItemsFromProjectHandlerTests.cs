@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -102,6 +103,105 @@ namespace Ether.Tests.Handlers.Queries
             _clientMock.Verify();
             _clientMock.Verify(c => c.GetWorkItemsAsync(It.IsAny<int[]>(), null, It.IsAny<string[]>(), It.IsAny<CancellationToken>()), Times.Never);
             _clientMock.Verify(c => c.GetWorkItemUpdatesAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()), Times.Never);
+        }
+
+        [Test]
+        public async Task ShouldReturnOnlyRequestedFields()
+        {
+            var fields = new Dictionary<string, string>
+            {
+                { "System.Id", "1" },
+                { "FakeField1", "Fake" },
+                { "System.Title", "Workitem" },
+                { "FakeField2", "Fake" },
+                { "System.AreaPath", "Bugs" }
+            };
+            var teamMember = Builder<TeamMemberViewModel>.CreateNew()
+               .With(m => m.Email, DummyEmail)
+               .With(m => m.LastWorkitemsFetchDate, null)
+               .Build();
+
+            var workitems = Builder<WorkItem>.CreateListOfSize(5)
+                .All()
+                .With(w => w.Fields, fields)
+                .Build();
+            var references = workitems.Select(w => new WorkItemReference(w.Id));
+            var ids = workitems.Select(w => w.Id).ToArray();
+            _clientMock.Setup(c => c.ExecuteFlatQueryAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new FlatWorkItemsQueryResult
+                {
+                    WorkItems = references
+                })
+                .Verifiable();
+
+            var updates = Builder<WorkItemUpdate>.CreateListOfSize(2)
+                .All()
+                .With(u => u.Fields, new System.Collections.Generic.Dictionary<string, VSTS.Net.Models.WorkItems.WorkItemFieldUpdate>())
+                .Build();
+
+            _clientMock.Setup(c => c.ExecuteFlatQueryAsync(It.Is<string>(q => ValidateQueryString(q, DateTime.Now)), default(CancellationToken)))
+                .ReturnsAsync(new FlatWorkItemsQueryResult
+                {
+                    WorkItems = references
+                })
+                .Verifiable();
+            _clientMock.Setup(c => c.GetWorkItemsAsync(ids, null, It.IsAny<string[]>(), default(CancellationToken)))
+                .ReturnsAsync(workitems)
+                .Verifiable();
+            _clientMock.Setup(c => c.GetWorkItemUpdatesAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(updates)
+                .Verifiable();
+
+            var result = await _handler.Handle(new FetchWorkItemsFromProject(teamMember));
+
+            result.Should().OnlyContain(w => !w.Fields.ContainsKey("FakeField1") && !w.Fields.ContainsKey("FakeField2"));
+        }
+
+        [Test]
+        public async Task ShouldReturnRelations()
+        {
+            var teamMember = Builder<TeamMemberViewModel>.CreateNew()
+               .With(m => m.Email, DummyEmail)
+               .With(m => m.LastWorkitemsFetchDate, null)
+               .Build();
+
+            var relations = Builder<WorkItemRelation>.CreateListOfSize(6)
+                .Build();
+
+            var workitems = Builder<WorkItem>.CreateListOfSize(5)
+                .All()
+                .With(w => w.Relations, relations)
+                .Build();
+            var references = workitems.Select(w => new WorkItemReference(w.Id));
+            var ids = workitems.Select(w => w.Id).ToArray();
+            _clientMock.Setup(c => c.ExecuteFlatQueryAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new FlatWorkItemsQueryResult
+                {
+                    WorkItems = references
+                })
+                .Verifiable();
+
+            var updates = Builder<WorkItemUpdate>.CreateListOfSize(2)
+                .All()
+                .With(u => u.Fields, new System.Collections.Generic.Dictionary<string, VSTS.Net.Models.WorkItems.WorkItemFieldUpdate>())
+                .Build();
+
+            _clientMock.Setup(c => c.ExecuteFlatQueryAsync(It.Is<string>(q => ValidateQueryString(q, DateTime.Now)), default(CancellationToken)))
+                .ReturnsAsync(new FlatWorkItemsQueryResult
+                {
+                    WorkItems = references
+                })
+                .Verifiable();
+            _clientMock.Setup(c => c.GetWorkItemsAsync(ids, null, It.IsAny<string[]>(), default(CancellationToken)))
+                .ReturnsAsync(workitems)
+                .Verifiable();
+            _clientMock.Setup(c => c.GetWorkItemUpdatesAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(updates)
+                .Verifiable();
+
+            var result = await _handler.Handle(new FetchWorkItemsFromProject(teamMember));
+
+            result.Should().OnlyContain(w => w.Relations != null && w.Relations.Any());
         }
 
         protected override void Initialize()

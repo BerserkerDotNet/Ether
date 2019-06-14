@@ -60,6 +60,7 @@ namespace Ether.Tests.Handlers.Commands
         public async Task ShouldReturnEmptyReportForEachMemberIfNoWorkItems()
         {
             var profile = Builder<ProfileViewModel>.CreateNew()
+                .With(p => p.Members, new Guid[0])
                 .Build();
 
             SetupGetProfile(profile);

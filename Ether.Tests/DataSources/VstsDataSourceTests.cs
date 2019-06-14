@@ -15,6 +15,7 @@ using FizzWare.NBuilder;
 using FluentAssertions;
 using Moq;
 using NUnit.Framework;
+using static Ether.Vsts.Constants;
 
 namespace Ether.Tests.DataSources
 {
@@ -265,6 +266,218 @@ namespace Ether.Tests.DataSources
             var result = _dataSource.GetActiveDuration(bugData.WorkItem);
 
             result.Should().Be(bugData.ExpectedDuration);
+        }
+
+        #endregion
+
+        #region IsInCodeReview tests
+
+        [TestCase(WorkItemStateResolved, "", false)]
+        [TestCase(WorkItemStateResolved, "code review", false)]
+        [TestCase(WorkItemStateActive, "", false)]
+        [TestCase(WorkItemStateActive, "code review", true)]
+        [TestCase(WorkItemStateActive, "codereview", true)]
+        [TestCase(WorkItemStateActive, "Code Review", true)]
+        [TestCase(WorkItemStateActive, "foo;code review;bla;bar", true)]
+        public async Task IsInCodeReviewWorkItemStateAndTagTests(string state, string tags, bool expected)
+        {
+            var item = Builder<WorkItemViewModel>.CreateNew()
+                .With(w => w.Fields, new Dictionary<string, string>
+                {
+                    [WorkItemStateField] = state,
+                    [WorkItemTagsField] = tags
+                })
+                .Build();
+            var isInCodeReview = await _dataSource.IsInCodeReview(item);
+
+            isInCodeReview.Should().Be(expected);
+        }
+
+        [Test]
+        public async Task IsInCodeReviewReturnFalseIfNoRelations()
+        {
+            var item = Builder<WorkItemViewModel>.CreateNew()
+                .With(w => w.Fields, new Dictionary<string, string>
+                {
+                    [WorkItemStateField] = WorkItemStateActive,
+                    [WorkItemTagsField] = string.Empty
+                })
+                .With(w => w.Relations, null)
+                .Build();
+
+            var isInCodeReview = await _dataSource.IsInCodeReview(item);
+
+            isInCodeReview.Should().BeFalse();
+        }
+
+        [Test]
+        public async Task IsInCodeReviewReturnFalseIfEmptyRelations()
+        {
+            var item = Builder<WorkItemViewModel>.CreateNew()
+                .With(w => w.Fields, new Dictionary<string, string>
+                {
+                    [WorkItemStateField] = WorkItemStateActive,
+                    [WorkItemTagsField] = string.Empty
+                })
+                .With(w => w.Relations, Enumerable.Empty<ViewModels.Types.WorkItemRelation>())
+                .Build();
+
+            var isInCodeReview = await _dataSource.IsInCodeReview(item);
+
+            isInCodeReview.Should().BeFalse();
+        }
+
+        [Test]
+        public async Task IsInCodeReviewReturnFalseIfNoPullRequestRelations()
+        {
+            var relations = Builder<ViewModels.Types.WorkItemRelation>.CreateListOfSize(5)
+                .All()
+                .With(r => r.RelationType, "ArtifactLink")
+                .With(r => r.Url, new Uri("vstfs:///Git/Commit/bla%2ffoo%2fsha"))
+                .Build();
+            var item = Builder<WorkItemViewModel>.CreateNew()
+                .With(w => w.Fields, new Dictionary<string, string>
+                {
+                    [WorkItemStateField] = WorkItemStateActive,
+                    [WorkItemTagsField] = string.Empty
+                })
+                .With(w => w.Relations, relations)
+                .Build();
+
+            var isInCodeReview = await _dataSource.IsInCodeReview(item);
+
+            isInCodeReview.Should().BeFalse();
+        }
+
+        [Test]
+        public async Task IsInCodeReviewReturnFalseIfPullRequestsNotFetched()
+        {
+            var relations = Builder<ViewModels.Types.WorkItemRelation>.CreateListOfSize(2)
+                .All()
+                .With(r => r.RelationType, "ArtifactLink")
+                .TheFirst(1)
+                .With(r => r.Url, new Uri("vstfs:///Git/PullRequestId/bla%2ffoo%2f123456789"))
+                .TheNext(1)
+                .With(r => r.Url, new Uri("vstfs:///Git/PullRequestId/bla%2ffoo%2f987654321"))
+                .Build();
+
+            var item = Builder<WorkItemViewModel>.CreateNew()
+                .With(w => w.Fields, new Dictionary<string, string>
+                {
+                    [WorkItemStateField] = WorkItemStateActive,
+                    [WorkItemTagsField] = string.Empty
+                })
+                .With(w => w.Relations, relations)
+                .Build();
+
+            var prs = Builder<PullRequest>.CreateListOfSize(1).Build();
+            RepositoryMock.Setup(r => r.GetAsync(It.IsAny<Expression<Func<PullRequest, bool>>>()))
+                .ReturnsAsync(prs);
+
+            var isInCodeReview = await _dataSource.IsInCodeReview(item);
+
+            isInCodeReview.Should().BeFalse();
+        }
+
+        [Test]
+        public async Task IsInCodeReviewReturnFalseIfPullRequestsCompleted()
+        {
+            var relations = Builder<ViewModels.Types.WorkItemRelation>.CreateListOfSize(2)
+                .All()
+                .With(r => r.RelationType, "ArtifactLink")
+                .TheFirst(1)
+                .With(r => r.Url, new Uri("vstfs:///Git/PullRequestId/bla%2ffoo%2f123456789"))
+                .TheNext(1)
+                .With(r => r.Url, new Uri("vstfs:///Git/PullRequestId/bla%2ffoo%2f987654321"))
+                .Build();
+
+            var item = Builder<WorkItemViewModel>.CreateNew()
+                .With(w => w.Fields, new Dictionary<string, string>
+                {
+                    [WorkItemStateField] = WorkItemStateActive,
+                    [WorkItemTagsField] = string.Empty
+                })
+                .With(w => w.Relations, relations)
+                .Build();
+
+            var prs = Builder<PullRequest>.CreateListOfSize(2)
+                .All()
+                .With(p => p.State, PullRequestState.Completed)
+                .Build();
+            RepositoryMock.Setup(r => r.GetAsync(It.IsAny<Expression<Func<PullRequest, bool>>>()))
+                .ReturnsAsync(prs);
+
+            var isInCodeReview = await _dataSource.IsInCodeReview(item);
+
+            isInCodeReview.Should().BeFalse();
+        }
+
+        [Test]
+        public async Task IsInCodeReviewReturnTrueIfActiveAndCompletedPullRequests()
+        {
+            var relations = Builder<ViewModels.Types.WorkItemRelation>.CreateListOfSize(2)
+                .All()
+                .With(r => r.RelationType, "ArtifactLink")
+                .TheFirst(1)
+                .With(r => r.Url, new Uri("vstfs:///Git/PullRequestId/bla%2ffoo%2f123456789"))
+                .TheNext(1)
+                .With(r => r.Url, new Uri("vstfs:///Git/PullRequestId/bla%2ffoo%2f987654321"))
+                .Build();
+
+            var item = Builder<WorkItemViewModel>.CreateNew()
+                .With(w => w.Fields, new Dictionary<string, string>
+                {
+                    [WorkItemStateField] = WorkItemStateActive,
+                    [WorkItemTagsField] = string.Empty
+                })
+                .With(w => w.Relations, relations)
+                .Build();
+
+            var prs = Builder<PullRequest>.CreateListOfSize(2)
+                .TheFirst(1)
+                .With(p => p.State, PullRequestState.Completed)
+                .TheNext(1)
+                .With(p => p.State, PullRequestState.Active)
+                .Build();
+            RepositoryMock.Setup(r => r.GetAsync(It.IsAny<Expression<Func<PullRequest, bool>>>()))
+                .ReturnsAsync(prs);
+
+            var isInCodeReview = await _dataSource.IsInCodeReview(item);
+
+            isInCodeReview.Should().BeTrue();
+        }
+
+        [Test]
+        public async Task IsInCodeReviewReturnTrueIfActivePullRequests()
+        {
+            var relations = Builder<ViewModels.Types.WorkItemRelation>.CreateListOfSize(2)
+                .All()
+                .With(r => r.RelationType, "ArtifactLink")
+                .TheFirst(1)
+                .With(r => r.Url, new Uri("vstfs:///Git/PullRequestId/bla%2ffoo%2f123456789"))
+                .TheNext(1)
+                .With(r => r.Url, new Uri("vstfs:///Git/PullRequestId/bla%2ffoo%2f987654321"))
+                .Build();
+
+            var item = Builder<WorkItemViewModel>.CreateNew()
+                .With(w => w.Fields, new Dictionary<string, string>
+                {
+                    [WorkItemStateField] = WorkItemStateActive,
+                    [WorkItemTagsField] = string.Empty
+                })
+                .With(w => w.Relations, relations)
+                .Build();
+
+            var prs = Builder<PullRequest>.CreateListOfSize(2)
+                .All()
+                .With(p => p.State, PullRequestState.Active)
+                .Build();
+            RepositoryMock.Setup(r => r.GetAsync(It.IsAny<Expression<Func<PullRequest, bool>>>()))
+                .ReturnsAsync(prs);
+
+            var isInCodeReview = await _dataSource.IsInCodeReview(item);
+
+            isInCodeReview.Should().BeTrue();
         }
 
         #endregion

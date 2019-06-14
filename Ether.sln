@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26730.12
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28917.182
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ether", "Ether\Ether.csproj", "{4BA11030-02C1-48D9-A6E7-D9014CBEE19C}"
 EndProject
@@ -19,7 +19,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{F921274A
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ether.Core", "Ether.Core\Ether.Core.csproj", "{A098D6D2-6CC9-4B64-9CA6-2CBB541CA619}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ether.ViewModels", "Ether.ViewModels\Ether.ViewModels.csproj", "{16B24C64-9C2C-4676-8F52-48DD7DBBF392}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ether.ViewModels", "Ether.ViewModels\Ether.ViewModels.csproj", "{16B24C64-9C2C-4676-8F52-48DD7DBBF392}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

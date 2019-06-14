@@ -1,5 +1,10 @@
 ﻿@typeparam TItem
 
+@if (EnableSearch)
+{
+    <DataTableSearch OnSearch="OnSearch"/>
+}
+
 <table class="table">
     <thead>
         <tr>
@@ -12,11 +17,11 @@
     </thead>
     <tbody>
         @*TODO: No pagination?*@
-        @if (!Items.Any())
+        @if (!_itemsToShow.Any())
         {
             <p>@GetNoItemsText()</p>
         }
-        @foreach (var item in Items.Skip(PageSize * (currentPage - 1)).Take(PageSize))
+        @foreach (var item in _itemsToShow.Skip(PageSize * (currentPage - 1)).Take(PageSize))
         {
             <tr>
                 @RowTemplate(item)
@@ -52,7 +57,11 @@
     private int totalPages = 0;
     private int itemsCount = 0;
 
+    private IEnumerable<TItem> _itemsToShow = Enumerable.Empty<TItem>();
+
     [Parameter] int PageSize { get; set; } = 10;
+    [Parameter] bool EnableSearch { get; set; } = false;
+    [Parameter] Func<TItem, string, bool> SearchPredicate { get; set; }
     [Parameter] RenderFragment TableHeader { get; set; }
     [Parameter] RenderFragment<TItem> RowTemplate { get; set; }
     [Parameter] RenderFragment<TItem> ActionsTemplate { get; set; }
@@ -63,7 +72,12 @@
     protected override void OnParametersSet()
     {
         base.OnParametersSet();
-        itemsCount = Items.Count();
+        if (EnableSearch && SearchPredicate == null)
+        {
+            throw new SearchPredicateIsNotSetException();
+        }
+        _itemsToShow = Items;
+        itemsCount = _itemsToShow.Count();
         totalPages = (int)Math.Ceiling(itemsCount / (decimal)PageSize);
     }
 
@@ -82,5 +96,10 @@
     protected string GetNoItemsText()
     {
         return string.IsNullOrEmpty(NoItemsText) ? "No items" : NoItemsText;
+    }
+
+    protected void OnSearch(string query)
+    {
+        _itemsToShow = string.IsNullOrEmpty(query) ? Items : Items.Where(i => SearchPredicate(i, query));
     }
 }

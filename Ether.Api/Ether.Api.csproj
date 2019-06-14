@@ -48,7 +48,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.0.0-rc2" />
-    <PackageReference Include="VSTS.Net.AspNetCore" Version="0.2.4-gee5c4aa688" />
+    <PackageReference Include="VSTS.Net.AspNetCore" Version="0.2.4" />
   </ItemGroup>
 
   <ItemGroup>

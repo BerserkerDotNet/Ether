@@ -60,7 +60,8 @@ namespace Ether.Core.Types.Handlers.Commands
             var report = WorkItemsReport.Empty;
             foreach (var workItem in workItems)
             {
-                if (dataSource.IsInCodeReview(workItem) && dataSource.IsAssignedToTeamMember(workItem, team))
+                var isInCodeReview = await dataSource.IsInCodeReview(workItem);
+                if (isInCodeReview && dataSource.IsAssignedToTeamMember(workItem, team))
                 {
                     report.WorkItemsInReview.Add(dataSource.CreateWorkItemDetail(workItem));
                 }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Ether.ViewModels.Types;
 
 namespace Ether.ViewModels
 {
@@ -9,6 +10,8 @@ namespace Ether.ViewModels
         public Dictionary<string, string> Fields { get; set; }
 
         public IEnumerable<WorkItemUpdateViewModel> Updates { get; set; }
+
+        public IEnumerable<WorkItemRelation> Relations { get; set; }
 
         public string this[string key]
         {
