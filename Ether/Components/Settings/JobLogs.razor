@@ -1,7 +1,7 @@
 ﻿<EditableTable TItem="JobLogViewModel"
                IsReadOnly="true"
                GridTitle="Job Logs"
-               OnRecordsLoaded="@OnRecordsLoaded">
+               OrderByDescending="@(item => item.CompletedOn)">
     <ListModeContent Context="ctx">
         <DataTable Items="@ctx.Items" PageSize="8">
             <TableHeader>
@@ -26,8 +26,4 @@
 
 @functions
 {
-protected void OnRecordsLoaded(EditableTableBase<JobLogViewModel> ctx)
-{
-    ctx.Items = ctx.Items.OrderByDescending(r => r.CompletedOn).ToArray();
-}
 }

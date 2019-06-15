@@ -15,10 +15,22 @@ namespace Ether.Components.CodeBehind
         private static readonly Func<T> TCreator = Expression.Lambda<Func<T>>(Expression.New(typeof(T).GetConstructor(Type.EmptyTypes))).Compile();
 
         private IFormValidator _formValidator;
+        private T[] _items = new T[0];
 
-        public IEnumerable<T> Items { get; set; } = Enumerable.Empty<T>();
+        private T _shadowCopy;
+
+        public IEnumerable<T> Items
+        {
+            get { return _items; }
+        }
 
         public T EditingItem { get; set; }
+
+        [Parameter]
+        protected Func<T, object> OrderBy { get; set; }
+
+        [Parameter]
+        protected Func<T, object> OrderByDescending { get; set; }
 
         [Inject]
         protected EtherClient Client { get; set; }
@@ -72,7 +84,18 @@ namespace Ether.Components.CodeBehind
             try
             {
                 IsLoading = true;
-                Items = await Client.GetAll<T>();
+                var items = await Client.GetAll<T>();
+                if (OrderByDescending != null)
+                {
+                    items = items.OrderByDescending(OrderByDescending);
+                }
+
+                if (OrderBy != null)
+                {
+                    items = items.OrderBy(OrderBy);
+                }
+
+                _items = items.ToArray();
                 OnRecordsLoaded?.Invoke(this);
             }
             catch (Exception ex)
@@ -95,6 +118,7 @@ namespace Ether.Components.CodeBehind
 
         protected void StartEditing(T item)
         {
+            _shadowCopy = item.PoorMansClone();
             EditingItem = item;
             IsEditing = true;
             StateHasChanged();
@@ -102,7 +126,8 @@ namespace Ether.Components.CodeBehind
 
         protected void FinishEditing()
         {
-            EditingItem = default(T);
+            _shadowCopy = default;
+            EditingItem = default;
             IsEditing = false;
             StateHasChanged();
         }
@@ -138,6 +163,12 @@ namespace Ether.Components.CodeBehind
 
         protected virtual void Cancel()
         {
+            var idx = Array.IndexOf(_items, EditingItem);
+            if (idx != -1)
+            {
+                _items[idx] = _shadowCopy;
+            }
+
             FinishEditing();
         }
     }
