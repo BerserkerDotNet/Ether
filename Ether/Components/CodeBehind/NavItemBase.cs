@@ -12,17 +12,17 @@ namespace Ether.Components.CodeBehind
         [Inject]
         public IUriHelper UriHelper { get; set; }
 
+        public void Dispose()
+        {
+            UriHelper.OnLocationChanged -= OnLocationChanged;
+        }
+
         protected bool IsActive => _isActive;
 
         protected override void OnInit()
         {
             base.OnInit();
             UriHelper.OnLocationChanged += OnLocationChanged;
-        }
-
-        public void Dispose()
-        {
-            UriHelper.OnLocationChanged -= OnLocationChanged;
         }
 
         protected override void OnParametersSet()

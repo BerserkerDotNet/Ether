@@ -1,14 +1,18 @@
 ﻿@inherits NavItemBase
 @implements IDisposable
 
-<li class="nav-item @(IsActive ? "active": "")">
+<li class="nav-item @(IsActive ? "active": "")"
+    onmouseenter="@(_ => ShowMenu())"
+    onmouseleave="@(_ => HideMenu())">
     @if (Item.Children.Any())
     {
-        <a class="nav-link collapsed" data-toggle="collapse" data-target="#subMenu@(Item.GetHashCode())" aria-expanded="true" aria-controls="@(Item.Name)">
+        <a class="nav-link @(isExpanded ? "": "collapsed")"
+           aria-expanded="@isExpanded"
+           aria-controls="@(Item.Name)">
             <i class="fas fa-@Item.Icon"></i>
             <span>@Item.Name</span>
         </a>
-        <div id="subMenu@(Item.GetHashCode())" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+        <div id="subMenu@(Item.GetHashCode())" class="collapse @(isExpanded ? "show": "")" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
             <div class="bg-white py-2 collapse-inner rounded">
                 @foreach (var subMenu in Item.Children)
                 {
@@ -31,6 +35,8 @@
 
 @functions
 {
+    private bool isExpanded = false;
+    private bool cancelHide = false;
     [Parameter] RenderFragment ChildContent { get; set; }
     [Parameter] MenuItem Item { get; set; }
 
@@ -39,5 +45,27 @@
         return string.IsNullOrEmpty(Item.Path) && Item.Children.Any() ?
             Item.Children.Select(m => m.Path).ToArray()
             : new[] { Item.Path };
+    }
+
+    protected void ShowMenu()
+    {
+        isExpanded = true;
+        cancelHide = true;
+        StateHasChanged();
+        Console.WriteLine("Menu showed");
+    }
+
+    protected async Task HideMenu()
+    {
+        cancelHide = false;
+        await Task.Delay(100);
+        if (cancelHide)
+        {
+            return;
+        }
+        
+        isExpanded = false;
+        StateHasChanged();
+        Console.WriteLine("Menu hidden");
     }
 }
