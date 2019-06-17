@@ -6,8 +6,4 @@
 <linker>
   <assembly fullname="IdentityModel" />
   <assembly fullname="Ether" />
-  <assembly fullname="NPOI" />
-  <assembly fullname="NPOI.OOXML" />
-  <assembly fullname="NPOI.OpenXml4Net" />
-  <assembly fullname="NPOI.OpenXmlFormats" />
 </linker>

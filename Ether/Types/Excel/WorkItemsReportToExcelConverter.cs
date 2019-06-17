@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using Ether.ViewModels;
 using Ether.ViewModels.Types;
-using NPOI.HSSF.Util;
-using NPOI.SS.UserModel;
-using NPOI.XSSF.UserModel;
+//using NPOI.HSSF.Util;
+//using NPOI.SS.UserModel;
+//using NPOI.XSSF.UserModel;
 
 namespace Ether.Types.Excel
 {
@@ -32,29 +32,32 @@ namespace Ether.Types.Excel
 
         public override byte[] Convert(ReportViewModel report)
         {
-            if (report == null)
-            {
-                throw new ArgumentNullException(nameof(report));
-            }
+            return new byte[0];
 
-            var prReport = report as WorkItemsReportViewModel;
-            if (prReport == null)
-            {
-                throw new NotSupportedException($"Report of type {report.GetType()} is not supported by {nameof(WorkItemsReportToExcelConverter)}");
-            }
+            //if (report == null)
+            //{
+            //    throw new ArgumentNullException(nameof(report));
+            //}
 
-            var memory = new MemoryStream();
-            {
-                var workbook = new XSSFWorkbook();
-                CreateReportSheet(workbook, "Resolved Work Items", prReport.ResolvedWorkItems, prReport);
-                CreateReportSheet(workbook, "Work Items In Pull Request", prReport.WorkItemsInReview, prReport);
-                CreateReportSheet(workbook, "Active Work Items", prReport.ActiveWorkItems, prReport, true);
+            //var prReport = report as WorkItemsReportViewModel;
+            //if (prReport == null)
+            //{
+            //    throw new NotSupportedException($"Report of type {report.GetType()} is not supported by {nameof(WorkItemsReportToExcelConverter)}");
+            //}
 
-                workbook.Write(memory);
-                return memory.ToArray();
-            }
+            //var memory = new MemoryStream();
+            //{
+            //    var workbook = new XSSFWorkbook();
+            //    CreateReportSheet(workbook, "Resolved Work Items", prReport.ResolvedWorkItems, prReport);
+            //    CreateReportSheet(workbook, "Work Items In Pull Request", prReport.WorkItemsInReview, prReport);
+            //    CreateReportSheet(workbook, "Active Work Items", prReport.ActiveWorkItems, prReport, true);
+
+            //    workbook.Write(memory);
+            //    return memory.ToArray();
+            //}
         }
 
+        /*
         private void CreateReportSheet(XSSFWorkbook workbook, string sectionName, IEnumerable<WorkItemDetail> workItems, WorkItemsReportViewModel prReport, bool includeTags = false)
         {
             var excelSheet = workbook.CreateSheet(sectionName);
@@ -133,6 +136,6 @@ namespace Ether.Types.Excel
             {
                 sheet.AutoSizeColumn(i);
             }
-        }
+        }*/
     }
 }

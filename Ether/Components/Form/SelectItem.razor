@@ -6,7 +6,7 @@
 <ValidatedField Properties="@Properties" Title="@Title">
     @if (Multiple)
     {
-        <select ref="multiSelectElement" multiple class="form-control" onchange="@OnSelectionChanged">
+        <select @ref="multiSelectElement" multiple class="form-control" @onchange="@OnSelectionChanged">
             @foreach (var option in Options)
             {
                 if (!isInitialized && MultipleValue.Contains(option.Key))
@@ -22,7 +22,7 @@
     }
     else
     {
-        <select class="form-control" onchange="@OnSelectionChanged">
+        <select class="form-control" @onchange="@OnSelectionChanged">
             @foreach (var option in Options)
             {
                 if (Equals(option.Key, Value))
@@ -38,7 +38,7 @@
     }
 </ValidatedField>
 
-@functions{
+@code{
 
         ElementRef multiSelectElement;
         bool isInitialized = false;

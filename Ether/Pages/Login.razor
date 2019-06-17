@@ -7,21 +7,26 @@
 @inject IUriHelper UriHelper
 @inject JsUtils JsUtils
 
-<form class="text-center form-signin" onsubmit="@DoLogin">
+<EditForm class="text-center form-signin" Model="@model" OnValidSubmit="@DoLogin">
     <img class="mb-4" src="/images/logo.png" alt="Ether pie chart logo image" width="128" height="128">
     <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
-    <ModelValidation Handler="this">
-        <InputItem Title="User name" bind-Value="model.UserName" PropertyName="@nameof(model.UserName)" NoLabel="true" />
-        <InputItem Title="Password" bind-Value="model.Password" PropertyName="@nameof(model.Password)" Type="password" NoLabel="true" />
-    </ModelValidation>
-    <button ref="submit" class="btn btn-lg btn-primary btn-fill btn-block" onclick="@DoLogin"
+    <FluentValidationValidator />
+    <div class="form-group">
+        <InputText Class="form-control" id="UserName" @bind-Value="@model.UserName" placeholder="User name" />
+        <ValidationMessage For="@(() => model.UserName)" />
+    </div>
+    <div class="form-group">
+        <InputText Class="form-control" id="Password" @bind-Value="@model.Password" type="password" placeholder="Password" />
+        <ValidationMessage For="@(() => model.Password)" />
+    </div>
+    <button @ref="submit" type="submit" ref="submit" class="btn btn-lg btn-primary btn-fill btn-block"
             data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i> Signing you in"
             data-normal-text="Sign in">
         Sign in
     </button>
     <p class="mt-5 mb-3 text-muted">Copyright © 2017 - @DateTime.UtcNow.Year <a href="https://twitter.com/BerserkerDotNET">Andrii Snihyr</a>.</p>
-</form>
-@functions{
+</EditForm>
+@code{
 
     private IFormValidator formValidator;
     private LoginViewModel model;

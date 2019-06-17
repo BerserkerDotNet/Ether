@@ -41,9 +41,9 @@
             <tr>
                 <td colspan="100">
                     <div class="pull-right">
-                        <button class="btn btn-simple" disabled="@(currentPage == 1)" onclick="@(() => PrevPage())">Prev</button>
+                        <button class="btn btn-simple" disabled="@(currentPage == 1)" @onclick="@(() => PrevPage())">Prev</button>
                         <span>@currentPage of @totalPages</span>
-                        <button class="btn btn-simple" disabled="@(currentPage >= totalPages)" onclick="@(() => NextPage())">Next</button>
+                        <button class="btn btn-simple" disabled="@(currentPage >= totalPages)" @onclick="@(() => NextPage())">Next</button>
                     </div>
                 </td>
             </tr>
@@ -51,7 +51,7 @@
     </tfoot>
 </table>
 
-@functions
+@code
 {
     private int currentPage = 1;
     private int totalPages = 0;

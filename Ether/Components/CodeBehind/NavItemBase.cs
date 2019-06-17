@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Routing;
 
 namespace Ether.Components.CodeBehind
 {
@@ -31,14 +32,14 @@ namespace Ether.Components.CodeBehind
             _absoluteUrls = GetRelativeUrlPrefixes()
                 .Select(u => UriHelper.ToAbsoluteUri(u).AbsoluteUri)
                 .ToArray();
-            OnLocationChanged(this, UriHelper.GetAbsoluteUri());
+            OnLocationChanged(this, new LocationChangedEventArgs(UriHelper.GetAbsoluteUri(), false));
         }
 
         protected abstract string[] GetRelativeUrlPrefixes();
 
-        private void OnLocationChanged(object sender, string newUriAbsolute)
+        private void OnLocationChanged(object sender, LocationChangedEventArgs args)
         {
-            var shouldBeActiveNow = _absoluteUrls.Any(u => EqualsHrefExactlyOrIfTrailingSlashAdded(newUriAbsolute, u));
+            var shouldBeActiveNow = _absoluteUrls.Any(u => EqualsHrefExactlyOrIfTrailingSlashAdded(args.Location, u));
             if (shouldBeActiveNow != _isActive)
             {
                 _isActive = shouldBeActiveNow;

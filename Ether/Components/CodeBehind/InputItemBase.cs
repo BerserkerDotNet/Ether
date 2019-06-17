@@ -22,18 +22,23 @@ namespace Ether.Components.CodeBehind
         {
             get
             {
+                Console.WriteLine("Get Value");
                 return _internalValue;
             }
 
             set
             {
+                Console.WriteLine("Set Value: ", value);
                 _internalValue = value;
-                ValueChanged?.Invoke(_internalValue);
+                if (ValueChanged.HasDelegate)
+                {
+                    // ValueChanged.InvokeAsync(_internalValue);
+                }
             }
         }
 
         [Parameter]
-        protected Action<T> ValueChanged { get; set; }
+        protected EventCallback<T> ValueChanged { get; set; }
 
         protected string[] Properties => new[] { PropertyName };
     }

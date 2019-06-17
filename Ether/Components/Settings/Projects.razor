@@ -17,17 +17,17 @@
             </RowTemplate>
             <ActionsTemplate Context="project">
                 <div>
-                    <button class="btn btn-warning btn-fill" onclick="@(() => ctx.Edit(project))">Edit</button>
-                    <button class="btn btn-danger btn-fill" onclick="@(() => ctx.Delete(project))">Delete</button>
+                    <button class="btn btn-warning btn-fill" @onclick="@(() => ctx.Edit(project))">Edit</button>
+                    <button class="btn btn-danger btn-fill" @onclick="@(() => ctx.Delete(project))">Delete</button>
                 </div>
             </ActionsTemplate>
         </DataTable>
     </ListModeContent>
     <FormModeContent Context="ctx">
         <ModelValidation Handler="ctx">
-            <InputItem Type="text" Title="Name" bind-Value="ctx.EditingItem.Name" PropertyName="@nameof(ctx.EditingItem.Name)" />
-            <InputItem Type="checkbox" Title="Is Work Items Enabled" bind-Value="ctx.EditingItem.IsWorkItemsEnabled" PropertyName="@nameof(ctx.EditingItem.IsWorkItemsEnabled)" />
-            <Ether.Components.Form.SelectItem Title="Identity" bind-Value="ctx.EditingItem.Identity" PropertyName="@nameof(ctx.EditingItem.Identity)" Options="identitiesOptions" />
+            <InputItem Type="text" Title="Name" @bind-Value="ctx.EditingItem.Name" PropertyName="@nameof(ctx.EditingItem.Name)" />
+            <InputItem Type="checkbox" Title="Is Work Items Enabled" @bind-Value="ctx.EditingItem.IsWorkItemsEnabled" PropertyName="@nameof(ctx.EditingItem.IsWorkItemsEnabled)" />
+            <Ether.Components.Form.SelectItem Title="Identity" @bind-Value="ctx.EditingItem.Identity" PropertyName="@nameof(ctx.EditingItem.Identity)" Options="identitiesOptions" />
         </ModelValidation>
     </FormModeContent>
 </EditableTable>
@@ -39,7 +39,7 @@
     </label>
 </div>*@
 
-@functions
+@code
 {
     private Dictionary<Guid, string> identitiesOptions = new Dictionary<Guid, string>(10);
 

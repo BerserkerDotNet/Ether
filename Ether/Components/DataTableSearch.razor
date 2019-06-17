@@ -3,6 +3,6 @@
            oninput="@(async (e) => await OnSearch.InvokeAsync(e.Value.ToString()))" />
 </div>
 
-@functions{
+@code{
     [Parameter] EventCallback<string> OnSearch { get; set; }
 }

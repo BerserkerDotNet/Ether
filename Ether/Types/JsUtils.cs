@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Ether.Components.Form;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
@@ -69,7 +70,7 @@ namespace Ether.Types
             return _jsRuntime.InvokeAsync<object>("window.BlazorComponents.Notify.notify", "success", title, message, 3000);
         }
 
-        public Task DateRangePicker(ElementRef element, DotNetObjectRef component)
+        public Task DateRangePicker(ElementRef element, DotNetObjectRef<object> component)
         {
             return _jsRuntime.InvokeAsync<object>("window.BlazorComponents.DateRangePicker.init", element, component);
         }

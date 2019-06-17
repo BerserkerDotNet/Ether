@@ -2,9 +2,9 @@
 using System.IO;
 using System.Linq;
 using Ether.ViewModels;
-using NPOI.SS.UserModel;
-using NPOI.SS.Util;
-using NPOI.XSSF.UserModel;
+//using NPOI.SS.UserModel;
+//using NPOI.SS.Util;
+//using NPOI.XSSF.UserModel;
 
 namespace Ether.Types.Excel
 {
@@ -27,61 +27,63 @@ namespace Ether.Types.Excel
 
         public override byte[] Convert(ReportViewModel report)
         {
-            if (report == null)
-            {
-                throw new ArgumentNullException(nameof(report));
-            }
+            return new byte[0];
 
-            var prReport = report as PullRequestReportViewModel;
-            if (prReport == null)
-            {
-                throw new NotSupportedException($"Report of type {report.GetType()} is not supported by {nameof(PullRequestsReportToExcelConverter)}");
-            }
+            //if (report == null)
+            //{
+            //    throw new ArgumentNullException(nameof(report));
+            //}
 
-            var memory = new MemoryStream();
-            {
-                var workbook = new XSSFWorkbook();
-                var excelSheet = workbook.CreateSheet($"{prReport.ProfileName}_{prReport.StartDate.ToString("yyyy_MM_dd")}_{prReport.EndDate.ToString("yyyy_MM_dd")}");
-                SetHeader(excelSheet);
+            //var prReport = report as PullRequestReportViewModel;
+            //if (prReport == null)
+            //{
+            //    throw new NotSupportedException($"Report of type {report.GetType()} is not supported by {nameof(PullRequestsReportToExcelConverter)}");
+            //}
 
-                var rowIdx = 1;
-                foreach (var reportEntry in prReport.IndividualReports)
-                {
-                    var cellIdx = 0;
-                    var row = excelSheet.CreateRow(rowIdx);
-                    row.CreateCell(cellIdx++, CellType.String).SetCellValue(reportEntry.TeamMember);
-                    row.CreateCell(cellIdx++, CellType.Numeric).SetCellValue(reportEntry.Created);
-                    row.CreateCell(cellIdx++, CellType.Numeric).SetCellValue(reportEntry.Completed);
-                    row.CreateCell(cellIdx++, CellType.Numeric).SetCellValue(reportEntry.Active);
-                    row.CreateCell(cellIdx++, CellType.Numeric).SetCellValue(reportEntry.Abandoned);
-                    row.CreateCell(cellIdx++, CellType.Numeric).SetCellValue(reportEntry.TotalIterations);
-                    row.CreateCell(cellIdx++, CellType.Numeric).SetCellValue(reportEntry.AverageIterations.ToString("F2"));
-                    row.CreateCell(cellIdx++, CellType.Numeric).SetCellValue(reportEntry.CodeQuality.ToString("F2"));
-                    row.CreateCell(cellIdx++, CellType.Numeric).SetCellValue(reportEntry.TotalComments);
-                    row.CreateCell(cellIdx++, CellType.Numeric).SetCellValue(reportEntry.AverageComments.ToString("F2"));
-                    row.CreateCell(cellIdx++, CellType.Numeric).SetCellValue(reportEntry.AveragePRLifespan.TotalDays.ToString("F2"));
-                    rowIdx++;
-                }
+            //var memory = new MemoryStream();
+            //{
+            //    var workbook = new XSSFWorkbook();
+            //    var excelSheet = workbook.CreateSheet($"{prReport.ProfileName}_{prReport.StartDate.ToString("yyyy_MM_dd")}_{prReport.EndDate.ToString("yyyy_MM_dd")}");
+            //    SetHeader(excelSheet);
 
-                var summaryRow1 = excelSheet.CreateRow(rowIdx++);
-                var summaryRow2 = excelSheet.CreateRow(rowIdx++);
-                var summaryRow3 = excelSheet.CreateRow(rowIdx++);
-                var summaryRow4 = excelSheet.CreateRow(rowIdx++);
-                InitCells(summaryRow1, cellsCount: 7);
-                InitCells(summaryRow2, cellsCount: 7);
-                InitCells(summaryRow3, cellsCount: 7);
-                InitCells(summaryRow4, cellsCount: 7);
+            //    var rowIdx = 1;
+            //    foreach (var reportEntry in prReport.IndividualReports)
+            //    {
+            //        var cellIdx = 0;
+            //        var row = excelSheet.CreateRow(rowIdx);
+            //        row.CreateCell(cellIdx++, CellType.String).SetCellValue(reportEntry.TeamMember);
+            //        row.CreateCell(cellIdx++, CellType.Numeric).SetCellValue(reportEntry.Created);
+            //        row.CreateCell(cellIdx++, CellType.Numeric).SetCellValue(reportEntry.Completed);
+            //        row.CreateCell(cellIdx++, CellType.Numeric).SetCellValue(reportEntry.Active);
+            //        row.CreateCell(cellIdx++, CellType.Numeric).SetCellValue(reportEntry.Abandoned);
+            //        row.CreateCell(cellIdx++, CellType.Numeric).SetCellValue(reportEntry.TotalIterations);
+            //        row.CreateCell(cellIdx++, CellType.Numeric).SetCellValue(reportEntry.AverageIterations.ToString("F2"));
+            //        row.CreateCell(cellIdx++, CellType.Numeric).SetCellValue(reportEntry.CodeQuality.ToString("F2"));
+            //        row.CreateCell(cellIdx++, CellType.Numeric).SetCellValue(reportEntry.TotalComments);
+            //        row.CreateCell(cellIdx++, CellType.Numeric).SetCellValue(reportEntry.AverageComments.ToString("F2"));
+            //        row.CreateCell(cellIdx++, CellType.Numeric).SetCellValue(reportEntry.AveragePRLifespan.TotalDays.ToString("F2"));
+            //        rowIdx++;
+            //    }
 
-                CreateSummaryRow(excelSheet, summaryRow1, "Total created:", "Avg iterations:", prReport.TotalCreated, prReport.AverageIterations);
-                CreateSummaryRow(excelSheet, summaryRow2, "Total completed:", "Avg comments:", prReport.TotalCompleted, prReport.AverageComments);
-                CreateSummaryRow(excelSheet, summaryRow3, "Total active:", "Code quality:", prReport.TotalActive, prReport.CodeQuality);
-                CreateSummaryRow(excelSheet, summaryRow4, "Total abandoned:", "Avg lifespan:", prReport.TotalAbandoned, prReport.AveragePRLifespan.TotalDays);
+            //    var summaryRow1 = excelSheet.CreateRow(rowIdx++);
+            //    var summaryRow2 = excelSheet.CreateRow(rowIdx++);
+            //    var summaryRow3 = excelSheet.CreateRow(rowIdx++);
+            //    var summaryRow4 = excelSheet.CreateRow(rowIdx++);
+            //    InitCells(summaryRow1, cellsCount: 7);
+            //    InitCells(summaryRow2, cellsCount: 7);
+            //    InitCells(summaryRow3, cellsCount: 7);
+            //    InitCells(summaryRow4, cellsCount: 7);
 
-                workbook.Write(memory);
-                return memory.ToArray();
-            }
+            //    CreateSummaryRow(excelSheet, summaryRow1, "Total created:", "Avg iterations:", prReport.TotalCreated, prReport.AverageIterations);
+            //    CreateSummaryRow(excelSheet, summaryRow2, "Total completed:", "Avg comments:", prReport.TotalCompleted, prReport.AverageComments);
+            //    CreateSummaryRow(excelSheet, summaryRow3, "Total active:", "Code quality:", prReport.TotalActive, prReport.CodeQuality);
+            //    CreateSummaryRow(excelSheet, summaryRow4, "Total abandoned:", "Avg lifespan:", prReport.TotalAbandoned, prReport.AveragePRLifespan.TotalDays);
+
+            //    workbook.Write(memory);
+            //    return memory.ToArray();
+            //}
         }
-
+        /*
         private static void CreateSummaryRow(ISheet sheet, IRow row, string header1, string header2, double value1, double value2)
         {
             var greyBackground = sheet.Workbook.CreateFont();
@@ -145,6 +147,6 @@ namespace Ether.Types.Excel
             {
                 sheet.AutoSizeColumn(i);
             }
-        }
+        }*/
     }
 }

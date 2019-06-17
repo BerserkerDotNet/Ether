@@ -2,10 +2,10 @@
 @inject JsUtils JsUtils
 
 <ValidatedField Properties="@Properties" Title="@Title">
-    <input ref="dateRange" class="form-control" />
+    <input @ref="dateRange" class="form-control" />
 </ValidatedField>
 
-@functions{
+@code{
 
     private ElementRef dateRange;
 
@@ -19,7 +19,7 @@
 
     protected override async Task OnAfterRenderAsync()
     {
-        await JsUtils.DateRangePicker(dateRange, new DotNetObjectRef(this));
+        await JsUtils.DateRangePicker(dateRange, DotNetObjectRef.Create<object>(this));
     }
 
     [JSInvokable]

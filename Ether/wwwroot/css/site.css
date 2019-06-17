@@ -36,3 +36,11 @@ a.nav-link {
 li.dropdown-item {
     cursor: pointer;
 }
+
+.form-control.invalid {
+    border-color: #e74a3b;
+}
+
+.validation-message {
+    color: #e74a3b;
+}

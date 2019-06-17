@@ -11,12 +11,12 @@
                autocomplete="off"
                aria-describedby="search keyword"
                placeholder="Type to add..."
-               bind-value-oninput="@SearchText"
-               ref="searchField" />
+               bind-value:oninput="@SearchText"
+               @ref="searchField" />
         <ui class="dropdown-menu @GetShowClass()">
             @foreach (var option in filteredOptions)
             {
-                <li class="dropdown-item" onclick="@(() => Add(option))">@option.Value</li>
+                <li class="dropdown-item" @onclick="@(() => Add(option))">@option.Value</li>
             }
         </ui>
     </div>
@@ -25,13 +25,13 @@
         {
             <li class="dropdown-item">
                 @option.Value
-                <i onclick="@(() => Delete(option))" class="pull-right far fa-trash-alt"></i>
+                <i @onclick="@(() => Delete(option))" class="pull-right far fa-trash-alt"></i>
             </li>
         }
     </ui>
 </ValidatedField>
 
-@functions{
+@code{
 
     private bool isShown = false;
     private int highlightedIdx = -1;

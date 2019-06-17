@@ -25,33 +25,33 @@
                             Work items
                         </button>
                         <div class="dropdown-menu" aria-labelledby="btnGroupWorkItemsProfile">
-                            <button class="dropdown-item" onclick="@(() => FetchWorkItems(profile.Members))">Fetch work items</button>
-                            <button class="dropdown-item" onclick="@(() => ResetWorkItems(profile.Members))">Reset work items</button>
+                            <button class="dropdown-item" @onclick="@(() => FetchWorkItems(profile.Members))">Fetch work items</button>
+                            <button class="dropdown-item" @onclick="@(() => ResetWorkItems(profile.Members))">Reset work items</button>
                         </div>
                     </div>
-                    <button class="btn btn-warning btn-fill" onclick="@(() => ctx.Edit(profile))">Edit</button>
-                    <button class="btn btn-danger btn-fill" onclick="@(() => ctx.Delete(profile))">Delete</button>
+                    <button class="btn btn-warning btn-fill" @onclick="@(() => ctx.Edit(profile))">Edit</button>
+                    <button class="btn btn-danger btn-fill" @onclick="@(() => ctx.Delete(profile))">Delete</button>
                 </div>
             </ActionsTemplate>
         </DataTable>
     </ListModeContent>
     <FormModeContent Context="ctx">
         <ModelValidation Handler="ctx">
-            <InputItem Type="text" Title="Name" PropertyName="@nameof(ctx.EditingItem.Name)" bind-Value="ctx.EditingItem.Name" />
-            <InputItem Type="text" Title="Type" PropertyName="@nameof(ctx.EditingItem.Type)" bind-Value="ctx.EditingItem.Type" />
+            <InputItem Type="text" Title="Name" PropertyName="@nameof(ctx.EditingItem.Name)" @bind-Value="ctx.EditingItem.Name" />
+            <InputItem Type="text" Title="Type" PropertyName="@nameof(ctx.EditingItem.Type)" @bind-Value="ctx.EditingItem.Type" />
             <Ether.Components.Form.OptionsSelector Title="Members"
                         PropertyName="@nameof(ctx.EditingItem.Members)"
                         Options="@membersOptions"
-                        bind-Value="ctx.EditingItem.Members" />
+                        @bind-Value="ctx.EditingItem.Members" />
             <Ether.Components.Form.OptionsSelector Title="Repositories"
                         PropertyName="@nameof(ctx.EditingItem.Repositories)"
                         Options="@repositoriesOptions"
-                        bind-Value="ctx.EditingItem.Repositories" />
+                        @bind-Value="ctx.EditingItem.Repositories" />
         </ModelValidation>
     </FormModeContent>
 </EditableTable>
 
-@functions
+@code
 {
     private EditableTableBase<TeamMemberViewModel> grid;
     private Dictionary<Guid, string> membersOptions = new Dictionary<Guid, string>(0);

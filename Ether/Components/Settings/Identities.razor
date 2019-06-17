@@ -14,17 +14,17 @@
             </RowTemplate>
             <ActionsTemplate Context="identity">
                 <div>
-                    <button class="btn btn-warning btn-fill" onclick="@(() => ctx.Edit(identity))">Edit</button>
-                    <button class="btn btn-danger btn-fill" onclick="@(() => ctx.Delete(identity))">Delete</button>
+                    <button class="btn btn-warning btn-fill" @onclick="@(() => ctx.Edit(identity))">Edit</button>
+                    <button class="btn btn-danger btn-fill" @onclick="@(() => ctx.Delete(identity))">Delete</button>
                 </div>
             </ActionsTemplate>
         </DataTable>
     </ListModeContent>
     <FormModeContent Context="ctx">
         <ModelValidation Handler="@ctx">
-            <InputItem Type="text" Title="Name" PropertyName="@nameof(ctx.EditingItem.Name)" bind-Value="@ctx.EditingItem.Name" />
-            <InputItem Type="password" Title="Token" PropertyName="@nameof(ctx.EditingItem.Token)" bind-Value="@ctx.EditingItem.Token" />
-            <InputItem Type="date" Title="Expiration Date" PropertyName="@nameof(ctx.EditingItem.ExpirationDate)" bind-Value="@ctx.EditingItem.ExpirationDate" />
+            <InputItem Type="text" Title="Name" PropertyName="@nameof(ctx.EditingItem.Name)" @bind-Value="@ctx.EditingItem.Name" />
+            <InputItem Type="password" Title="Token" PropertyName="@nameof(ctx.EditingItem.Token)" @bind-Value="@ctx.EditingItem.Token" />
+            <InputItem Type="date" Title="Expiration Date" PropertyName="@nameof(ctx.EditingItem.ExpirationDate)" @bind-Value="@ctx.EditingItem.ExpirationDate" />
         </ModelValidation>
     </FormModeContent>
 </EditableTable>

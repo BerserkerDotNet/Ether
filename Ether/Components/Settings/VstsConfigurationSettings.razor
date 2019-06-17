@@ -7,14 +7,14 @@
     <Header>Vsts configuration</Header>
     <Body>
         <ModelValidation Handler="this">
-            <InputItem Type="text" Title="Instance Name" bind-Value="vstsDataSource.InstanceName" PropertyName="@nameof(vstsDataSource.InstanceName)" />
-            <Ether.Components.Form.SelectItem Title="Default Token" bind-Value="vstsDataSource.DefaultToken" PropertyName="@nameof(vstsDataSource.DefaultToken)" Options="identitiesOptions" />
+            <InputItem Type="text" Title="Instance Name" @bind-Value="vstsDataSource.InstanceName" PropertyName="@nameof(vstsDataSource.InstanceName)" />
+            <Ether.Components.Form.SelectItem Title="Default Token" @bind-Value="vstsDataSource.DefaultToken" PropertyName="@nameof(vstsDataSource.DefaultToken)" Options="identitiesOptions" />
         </ModelValidation>
     </Body>
-    <Footer><button class="btn btn-success btn-fill pull-right" onclick="@(() => Save())">Save</button></Footer>
+    <Footer><button class="btn btn-success btn-fill pull-right" @onclick="@(() => Save())">Save</button></Footer>
 </Card>
 
-@functions
+@code
 {
     private IFormValidator formValidator;
     private Dictionary<Guid, string> identitiesOptions = new Dictionary<Guid, string>(10);

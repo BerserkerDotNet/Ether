@@ -8,7 +8,7 @@ using IdentityModel.Client;
 using Microsoft.AspNetCore.Blazor.Http;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Logging;
-using Microsoft.JSInterop;
+using Newtonsoft.Json;
 
 namespace Ether.Types
 {
@@ -138,7 +138,7 @@ namespace Ether.Types
             VerifyResponseStatusCode(response);
 
             var content = await response.Content.ReadAsStringAsync();
-            return Json.Deserialize<T>(content);
+            return JsonConvert.DeserializeObject<T>(content);
         }
 
         private Task HttpPost(string url, object payload)
@@ -150,12 +150,12 @@ namespace Ether.Types
         {
             var response = await HttpPostInternal(url, payload);
             var content = await response.Content.ReadAsStringAsync();
-            return Json.Deserialize<T>(content);
+            return JsonConvert.DeserializeObject<T>(content);
         }
 
         private async Task<HttpResponseMessage> HttpPostInternal(string url, object payload)
         {
-            var json = Json.Serialize(payload);
+            var json = JsonConvert.SerializeObject(payload);
             var response = await _httpClient.PostAsync(url, new StringContent(json, Encoding.UTF8, "application/json"));
             VerifyResponseStatusCode(response);
 

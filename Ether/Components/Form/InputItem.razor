@@ -2,27 +2,29 @@
 @inherits InputItemBase<T>
 
 <ValidatedField Properties="@Properties" Title="@Title" NoLabel="@NoLabel">
-    <input type="@Type" class="form-control" bind="InternalValue" placeholder="@Title" />
+    <input type="@Type" class="form-control" @bind="InternalValue" placeholder="@Title" />
 </ValidatedField>
 
-@functions{
+@code{
 
-    [Parameter] string Type { get; set; }
+[Parameter] string Type { get; set; }
 
-    private string InternalValue
+private string InternalValue
+{
+    get
     {
-        get
+        Console.WriteLine("Get interbnal value");
+        if (Value == null)
         {
-            if (Value == null)
-            {
-                return string.Empty;
-            }
+            return string.Empty;
+        }
 
-            return Value.ToString();
-        }
-        set
-        {
-            Value = (T)Convert.ChangeType(value, typeof(T));
-        }
+        return Value.ToString();
     }
+    set
+    {
+        Console.WriteLine("Set interbnal value: " + value+"   T: "+ typeof(T) + "New: "+ (T)Convert.ChangeType(value, typeof(T)));
+        Value = (T)Convert.ChangeType(value, typeof(T));
+    }
+}
 }
