@@ -5,13 +5,13 @@ using System.Linq;
 using System.Reflection;
 using Ether.ViewModels.Validators;
 using FluentValidation;
+using FluentValidation.Internal;
 using Microsoft.AspNetCore.Components.Forms;
 
 namespace Ether.Types.Extensions
 {
     public static class EditContextFluentValidationExtensions
     {
-        private static ConcurrentDictionary<(Type ModelType, string FieldName), PropertyInfo> _propertyInfoCache = new ConcurrentDictionary<(Type, string), PropertyInfo>();
         private static IEnumerable<IValidator> _validators;
 
         static EditContextFluentValidationExtensions()
@@ -59,38 +59,26 @@ namespace Ether.Types.Extensions
 
         private static void ValidateField(EditContext editContext, ValidationMessageStore messages, in FieldIdentifier fieldIdentifier)
         {
-            if (TryGetValidatableProperty(fieldIdentifier, out var propertyInfo))
+            var properties = new[] { fieldIdentifier.FieldName };
+            var context = new ValidationContext(fieldIdentifier.Model, new PropertyChain(), new MemberNameValidatorSelector(properties));
+
+            var validator = GetValidatorFor(context);
+            if (validator == null)
             {
-                var validator = GetValidatorFor(editContext.Model);
-                if (validator == null)
-                {
-                    messages.Clear();
-                    return;
-                }
-
-                var result = validator.Validate(editContext.Model);
-                messages.Clear(fieldIdentifier);
-                messages.AddRange(fieldIdentifier, result.Errors.Where(e => e.PropertyName == propertyInfo.Name).Select(e => e.ErrorMessage));
-
-                editContext.NotifyValidationStateChanged();
+                messages.Clear();
+                return;
             }
+
+            var result = validator.Validate(editContext.Model);
+            messages.Clear(fieldIdentifier);
+            messages.AddRange(fieldIdentifier, result.Errors.Select(e => e.ErrorMessage));
+
+            editContext.NotifyValidationStateChanged();
         }
 
         private static IValidator GetValidatorFor(object model)
         {
             return _validators.SingleOrDefault(v => v.CanValidateInstancesOfType(model.GetType()));
-        }
-
-        private static bool TryGetValidatableProperty(in FieldIdentifier fieldIdentifier, out PropertyInfo propertyInfo)
-        {
-            var cacheKey = (ModelType: fieldIdentifier.Model.GetType(), fieldIdentifier.FieldName);
-            if (!_propertyInfoCache.TryGetValue(cacheKey, out propertyInfo))
-            {
-                propertyInfo = cacheKey.ModelType.GetProperty(cacheKey.FieldName);
-                _propertyInfoCache[cacheKey] = propertyInfo;
-            }
-
-            return propertyInfo != null;
         }
     }
 }
