@@ -1,6 +1,5 @@
 ﻿@page "/login"
 @layout LoginLayout
-@implements IFormHandler
 
 @inject EtherClient Client
 @inject TokenService TokenService
@@ -28,7 +27,6 @@
 </EditForm>
 @code{
 
-    private IFormValidator formValidator;
     private LoginViewModel model;
     private ElementRef submit;
 
@@ -38,18 +36,8 @@
         base.OnInit();
     }
 
-    public void SetValidator(IFormValidator validator)
-    {
-        formValidator = validator;
-    }
-
     private async Task DoLogin()
     {
-        if (formValidator != null && !formValidator.Validate(model))
-        {
-            return;
-        }
-
         await JsUtils.ButtonState(submit, "loading");
         var token = await Client.RequestAccessToken(model);
         await TokenService.SetToken(token);

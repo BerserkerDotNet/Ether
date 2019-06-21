@@ -1,7 +1,7 @@
-﻿<EditableTable TItem="IdentityViewModel" 
-    GridTitle="Identities"
-    NewTitle="New identity"
-    ExistingTitle="Editing identity">
+﻿<EditableTable TItem="IdentityViewModel"
+               GridTitle="Identities"
+               NewTitle="New identity"
+               ExistingTitle="Editing identity">
     <ListModeContent Context="ctx">
         <DataTable Items="@ctx.Items">
             <TableHeader>
@@ -21,10 +21,20 @@
         </DataTable>
     </ListModeContent>
     <FormModeContent Context="ctx">
-        <ModelValidation Handler="@ctx">
-            <InputItem Type="text" Title="Name" PropertyName="@nameof(ctx.EditingItem.Name)" @bind-Value="@ctx.EditingItem.Name" />
-            <InputItem Type="password" Title="Token" PropertyName="@nameof(ctx.EditingItem.Token)" @bind-Value="@ctx.EditingItem.Token" />
-            <InputItem Type="date" Title="Expiration Date" PropertyName="@nameof(ctx.EditingItem.ExpirationDate)" @bind-Value="@ctx.EditingItem.ExpirationDate" />
-        </ModelValidation>
+        <div class="form-group">
+            <label>Name</label>
+            <InputText Class="form-control" @bind-Value="ctx.EditingItem.Name" />
+            <ValidationMessage For="@(() => ctx.EditingItem.Name)" />
+        </div>
+        <div class="form-group">
+            <label>Token</label>
+            <InputText type="password" Class="form-control" @bind-Value="ctx.EditingItem.Token" />
+            <ValidationMessage For="@(() => ctx.EditingItem.Token)" />
+        </div>
+        <div class="form-group">
+            <label>Expiration Date</label>
+            <InputDate Class="form-control" @bind-Value="ctx.EditingItem.ExpirationDate" />
+            <ValidationMessage For="@(() => ctx.EditingItem.ExpirationDate)" />
+        </div>
     </FormModeContent>
 </EditableTable>

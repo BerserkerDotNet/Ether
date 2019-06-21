@@ -1,5 +1,4 @@
 ﻿@page "/"
-@implements IFormHandler
 
 @inject EtherClient Client
 @inject IUriHelper UriHelper
@@ -11,25 +10,37 @@
         <Ether.Components.Card>
             <Header>New report</Header>
             <Body>
-                <ModelValidation Handler="this">
-                    <Ether.Components.Form.SelectItem Title="Profile" @bind-Value="model.Profile" PropertyName="@nameof(model.Profile)" Options="@profileOptions" />
-                    @* TODO: Return supported report types from API*@
-                    <Ether.Components.Form.SelectItem Title="Report type" @bind-Value="model.ReportType" PropertyName="@nameof(model.ReportType)" Options="@reportTypes" />
-                    <DateRangeControl Title="Date range" Properties="@(new[] {nameof(GenerateReportViewModel.Start), nameof(GenerateReportViewModel.End)})" @bind-Start="model.Start" @bind-End="model.End" />
-                </ModelValidation>
-            </Body>
-            <Footer>
-                @if (isGeneratingReport)
-                {
-                    <div class="text-center">
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="sr-only">Generating...</span>
-                        </div>
-                        <div>Generating...</div>
+                <EditForm OnValidSubmit="Create" Model="model">
+                    <FluentValidationValidator />
+                    <div class="form-group">
+                        <label>Profile</label>
+                        <SelectInput Class="form-control" @bind-Value="model.Profile" Options="@profileOptions" />
+                        <ValidationMessage For="@(() => model.Profile)" />
                     </div>
-                }
-                <button class="btn btn-success btn-fill pull-right" @onclick="@(() => Create())">Create a report</button>
-            </Footer>
+                    @* TODO: Return supported report types from API*@
+                    <div class="form-group">
+                        <label>Report type</label>
+                        <SelectInput Class="form-control" @bind-Value="model.ReportType" Options="@reportTypes" />
+                        <ValidationMessage For="@(() => model.ReportType)" />
+                    </div>
+                    <div class="form-group">
+                        <label>Date range</label>
+                        <DateRangeControl Class="form-control" @bind-Start="model.Start" @bind-End="model.End" />
+                        <ValidationMessage For="@(() => model.Start)" />
+                        <ValidationMessage For="@(() => model.End)" />
+                    </div>
+                    @if (isGeneratingReport)
+                    {
+                        <div class="text-center">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="sr-only">Generating...</span>
+                            </div>
+                            <div>Generating...</div>
+                        </div>
+                    }
+                    <button class="btn btn-success btn-fill pull-right" type="submit">Create a report</button>
+                </EditForm>
+            </Body>
         </Ether.Components.Card>
     </div>
 </div>
@@ -37,12 +48,11 @@
 @code
 {
     private bool isGeneratingReport;
-    private IFormValidator formValidator;
     private IEnumerable<ProfileViewModel> profiles = Enumerable.Empty<ProfileViewModel>();
     private GenerateReportViewModel model = new GenerateReportViewModel { ReportType = "PullRequestsReport" };
 
     private Dictionary<string, string> reportTypes = new Dictionary<string, string>(0);
-    private Dictionary<string, string> profileOptions = new Dictionary<string, string>(0);
+    private Dictionary<Guid, string> profileOptions = new Dictionary<Guid, string>(0);
 
     protected override async Task OnInitAsync()
     {
@@ -50,25 +60,17 @@
         var reportDescriptors = await Client.GetReportTypes();
         reportTypes = reportDescriptors.ToDictionary(k => k.UniqueName, v => v.DisplayName);
 
-        profileOptions = profiles.ToDictionary(k => k.Id.ToString(), v => $"{v.Name} ({v.Type})");
+        profileOptions = profiles.ToDictionary(k => k.Id, v => $"{v.Name} ({v.Type})");
         // Select first profile
         model.Profile = profiles.First().Id;
     }
 
-    public void SetValidator(IFormValidator validator)
-    {
-        formValidator = validator;
-    }
-
     private async Task Create()
     {
-        if (formValidator != null && !formValidator.Validate(model))
-        {
-            return;
-        }
-
         try
         {
+            Console.WriteLine("CREATE: " + model.Profile + "; " + model.Start + "; " + model.End);
+
             isGeneratingReport = true;
             var reportId = await Client.GenerateReport(model);
             UriHelper.NavigateTo($"/reports/view/{model.ReportType}/{reportId}");

@@ -3,7 +3,7 @@ using Ether.Types.Extensions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 
-namespace Ether.Components.CodeBehind
+namespace Ether.Components.Code
 {
     public class FluentValidationValidator : ComponentBase
     {

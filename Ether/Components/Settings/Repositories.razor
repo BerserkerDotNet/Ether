@@ -23,8 +23,16 @@
     </ListModeContent>
     <FormModeContent Context="ctx">
         <ModelValidation Handler="ctx">
-            <InputItem Type="text" Title="Name" @bind-Value="ctx.EditingItem.Name" PropertyName="@nameof(ctx.EditingItem.Name)" />
-            <Ether.Components.Form.SelectItem Title="Project" @bind-Value="ctx.EditingItem.Project" PropertyName="@nameof(ctx.EditingItem.Project)" Options="projectsOptions" />
+            <div class="form-group">
+                <label>Name</label>
+                <InputText Class="form-control" @bind-Value="ctx.EditingItem.Name" />
+                <ValidationMessage For="@(() => ctx.EditingItem.Name)" />
+            </div>
+            <div class="form-group">
+                <label>Project</label>
+                <SelectInput Class="form-control" @bind-Value="ctx.EditingItem.Project" Options="projectsOptions"  />
+                <ValidationMessage For="@(() => ctx.EditingItem.Project)" />
+            </div>
         </ModelValidation>
     </FormModeContent>
 </EditableTable>

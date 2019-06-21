@@ -1,127 +1,113 @@
 ﻿@typeparam T
-@typeparam TOption
-@inherits InputItemBase<T>
 @inject JsUtils Js
 
-<ValidatedField Properties="@Properties" Title="@Title">
-    <div class="btn-group d-block">
-        <input type="text"
-               class="form-control"
-               id="searchKeyword"
-               autocomplete="off"
-               aria-describedby="search keyword"
-               placeholder="Type to add..."
-               bind-value:oninput="@SearchText"
-               @ref="searchField" />
-        <ui class="dropdown-menu @GetShowClass()">
-            @foreach (var option in filteredOptions)
-            {
-                <li class="dropdown-item" @onclick="@(() => Add(option))">@option.Value</li>
-            }
-        </ui>
-    </div>
-    <ui class="buttons-list">
-        @foreach (var option in selectedOptions)
+<div class="btn-group d-block">
+    <input type="text"
+           class="form-control"
+           id="searchKeyword"
+           autocomplete="off"
+           aria-describedby="search keyword"
+           placeholder="Type to add..."
+           @oninput="@(a => SearchText = a.Value.ToString())" />
+    <ui class="dropdown-menu @GetShowClass()">
+        @foreach (var option in filteredOptions)
         {
-            <li class="dropdown-item">
-                @option.Value
-                <i @onclick="@(() => Delete(option))" class="pull-right far fa-trash-alt"></i>
-            </li>
+            <li class="dropdown-item" @onclick="@(() => Add(option))">@option.Value</li>
         }
     </ui>
-</ValidatedField>
+</div>
+<ui class="buttons-list">
+    @foreach (var option in selectedOptions)
+    {
+        <li class="dropdown-item">
+            @option.Value
+            <i @onclick="@(() => Delete(option))" class="pull-right far fa-trash-alt"></i>
+        </li>
+    }
+</ui>
 
 @code{
 
-    private bool isShown = false;
-    private int highlightedIdx = -1;
-    private string searchText = string.Empty;
-    private ElementRef searchField;
-    private Dictionary<TOption, string> selectedOptions = new Dictionary<TOption, string>();
-    private IEnumerable<KeyValuePair<TOption, string>> filteredOptions = new Dictionary<TOption, string>();
+private bool isShown = false;
+private int highlightedIdx = -1;
+private string searchText = string.Empty;
+private Dictionary<T, string> selectedOptions = new Dictionary<T, string>();
+private IEnumerable<KeyValuePair<T, string>> filteredOptions = new Dictionary<T, string>();
 
-    [Parameter] Dictionary<TOption, string> Options { get; set; }
 
-    IEnumerable<TOption> Selected
+[Parameter] public IEnumerable<T> Value { get; private set; }
+
+[Parameter] public EventCallback<IEnumerable<T>> ValueChanged { get; private set; }
+
+[Parameter] public Expression<Func<IEnumerable<T>>> ValueExpression { get; private set; }
+
+[Parameter] Dictionary<T, string> Options { get; set; }
+
+protected string SearchText
+{
+    get { return searchText; }
+    set
     {
-        get
-        {
-            if (Value == null)
-            {
-                return Enumerable.Empty<TOption>();
-            }
-
-            return (IEnumerable<TOption>)Value;
-        }
+        searchText = value;
+        Filter();
     }
+}
 
-    protected string SearchText
+protected override void OnParametersSet()
+{
+    base.OnParametersSet();
+
+    if (Value != null)
     {
-        get { return searchText; }
-        set
-        {
-            searchText = value;
-            Filter();
-        }
+        selectedOptions = Options.Where(o => Value.Contains(o.Key)).ToDictionary(k => k.Key, v => v.Value);
     }
+}
 
-    protected override void OnParametersSet()
+protected void Filter()
+{
+    if (!string.IsNullOrEmpty(SearchText))
     {
-        base.OnParametersSet();
-
-        if (Selected != null)
-        {
-            selectedOptions = Options.Where(o => Selected.Contains(o.Key)).ToDictionary(k => k.Key, v => v.Value);
-        }
+        filteredOptions = Options.Where(o => o.Value.ToLower().Contains(SearchText.ToLower()))
+            .Except(selectedOptions);
+        ShowSearch();
     }
-
-    protected void Filter()
+    else
     {
-        if (!string.IsNullOrEmpty(SearchText))
-        {
-            filteredOptions = Options.Where(o => o.Value.ToLower().Contains(SearchText.ToLower()))
-                .Except(selectedOptions);
-            ShowSearch();
-        }
-        else
-        {
-            HideSearch();
-        }
+        HideSearch();
     }
+}
 
-    protected void Add(KeyValuePair<TOption, string> option)
+protected async Task Add(KeyValuePair<T, string> option)
+{
+    Console.WriteLine("New option: " + option.Key + " V:" + option.Value);
+    if (!selectedOptions.Contains(option))
     {
-        if (!selectedOptions.Contains(option))
-        {
-            selectedOptions.Add(option.Key, option.Value);
-        }
-        SearchText = string.Empty;
-        Value = (T)((object)selectedOptions.Keys);
+        selectedOptions.Add(option.Key, option.Value);
     }
+    SearchText = string.Empty;
+    Value = (IEnumerable<T>)((object)selectedOptions.Keys);
+    await ValueChanged.InvokeAsync(Value);
+}
 
-    protected void Delete(KeyValuePair<TOption, string> option)
-    {
-        selectedOptions.Remove(option.Key);
-        Value = (T)((object)selectedOptions.Keys);
-    }
+protected async Task Delete(KeyValuePair<T, string> option)
+{
+    selectedOptions.Remove(option.Key);
+    Value = (IEnumerable<T>)((object)selectedOptions.Keys);
+    await ValueChanged.InvokeAsync(Value);
+}
 
-    protected string GetShowClass()
-    {
-        return isShown ? "show" : "";
-    }
+protected string GetShowClass()
+{
+    return isShown ? "show" : "";
+}
 
-    protected void HideSearch()
-    {
-        isShown = false;
-    }
+protected void HideSearch()
+{
+    isShown = false;
+}
 
-    protected void ShowSearch()
-    {
-        isShown = true;
-    }
-
-    protected void ShowDeleteOption()
-    {
-
-    }
+protected void ShowSearch()
+{
+    isShown = true;
+}
 }

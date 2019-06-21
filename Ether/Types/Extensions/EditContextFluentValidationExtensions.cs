@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using Ether.ViewModels.Validators;
 using FluentValidation;
 using FluentValidation.Internal;
@@ -62,14 +60,15 @@ namespace Ether.Types.Extensions
             var properties = new[] { fieldIdentifier.FieldName };
             var context = new ValidationContext(fieldIdentifier.Model, new PropertyChain(), new MemberNameValidatorSelector(properties));
 
-            var validator = GetValidatorFor(context);
+            var validator = GetValidatorFor(editContext.Model);
             if (validator == null)
             {
+                Console.WriteLine("ERROR: No validator found for", editContext.Model.GetType());
                 messages.Clear();
                 return;
             }
 
-            var result = validator.Validate(editContext.Model);
+            var result = validator.Validate(context);
             messages.Clear(fieldIdentifier);
             messages.AddRange(fieldIdentifier, result.Errors.Select(e => e.ErrorMessage));
 

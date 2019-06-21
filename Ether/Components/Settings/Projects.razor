@@ -24,11 +24,21 @@
         </DataTable>
     </ListModeContent>
     <FormModeContent Context="ctx">
-        <ModelValidation Handler="ctx">
-            <InputItem Type="text" Title="Name" @bind-Value="ctx.EditingItem.Name" PropertyName="@nameof(ctx.EditingItem.Name)" />
-            <InputItem Type="checkbox" Title="Is Work Items Enabled" @bind-Value="ctx.EditingItem.IsWorkItemsEnabled" PropertyName="@nameof(ctx.EditingItem.IsWorkItemsEnabled)" />
-            <Ether.Components.Form.SelectItem Title="Identity" @bind-Value="ctx.EditingItem.Identity" PropertyName="@nameof(ctx.EditingItem.Identity)" Options="identitiesOptions" />
-        </ModelValidation>
+        <div class="form-group">
+            <label>Name</label>
+            <InputText Class="form-control" @bind-Value="ctx.EditingItem.Name" />
+            <ValidationMessage For="@(() => ctx.EditingItem.Name)" />
+        </div>
+        <div class="form-group">
+            <label>Is Work Items Enabled</label>
+            <InputCheckbox Class="form-control" @bind-Value="ctx.EditingItem.IsWorkItemsEnabled" />
+            <ValidationMessage For="@(() => ctx.EditingItem.IsWorkItemsEnabled)" />
+        </div>
+        <div class="form-group">
+            <label>Identity</label>
+            <SelectInput Class="form-control" @bind-Value="ctx.EditingItem.Identity" Options="identitiesOptions"/>
+            <ValidationMessage For="@(() => ctx.EditingItem.Identity)" />
+        </div>
     </FormModeContent>
 </EditableTable>
 
@@ -41,7 +51,7 @@
 
 @code
 {
-    private Dictionary<Guid, string> identitiesOptions = new Dictionary<Guid, string>(10);
+    private Dictionary<Guid?, string> identitiesOptions = new Dictionary<Guid?, string>(10);
 
     protected override async Task OnInitAsync()
     {

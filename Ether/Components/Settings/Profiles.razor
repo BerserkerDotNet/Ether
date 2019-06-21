@@ -36,18 +36,28 @@
         </DataTable>
     </ListModeContent>
     <FormModeContent Context="ctx">
-        <ModelValidation Handler="ctx">
-            <InputItem Type="text" Title="Name" PropertyName="@nameof(ctx.EditingItem.Name)" @bind-Value="ctx.EditingItem.Name" />
-            <InputItem Type="text" Title="Type" PropertyName="@nameof(ctx.EditingItem.Type)" @bind-Value="ctx.EditingItem.Type" />
-            <Ether.Components.Form.OptionsSelector Title="Members"
-                        PropertyName="@nameof(ctx.EditingItem.Members)"
-                        Options="@membersOptions"
-                        @bind-Value="ctx.EditingItem.Members" />
-            <Ether.Components.Form.OptionsSelector Title="Repositories"
-                        PropertyName="@nameof(ctx.EditingItem.Repositories)"
-                        Options="@repositoriesOptions"
-                        @bind-Value="ctx.EditingItem.Repositories" />
-        </ModelValidation>
+        <div class="form-group">
+            <label>Name</label>
+            <InputText Class="form-control" @bind-Value="ctx.EditingItem.Name" />
+            <ValidationMessage For="@(() => ctx.EditingItem.Name)" />
+        </div>
+        <div class="form-group">
+            <label>Type</label>
+            <InputText Class="form-control" @bind-Value="ctx.EditingItem.Type" />
+            <ValidationMessage For="@(() => ctx.EditingItem.Type)" />
+        </div>
+        <div class="form-group">
+            <label>Members</label>
+            <Ether.Components.Form.OptionsSelector Options="@membersOptions"
+                                                   @bind-Value="ctx.EditingItem.Members" />
+            <ValidationMessage For="@(() => ctx.EditingItem.Members)" />
+        </div>
+        <div class="form-group">
+            <label>Repositories</label>
+            <Ether.Components.Form.OptionsSelector Options="@repositoriesOptions"
+                                                   @bind-Value="ctx.EditingItem.Repositories" />
+            <ValidationMessage For="@(() => ctx.EditingItem.Repositories)" />
+        </div>
     </FormModeContent>
 </EditableTable>
 

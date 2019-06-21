@@ -3,7 +3,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Routing;
 
-namespace Ether.Components.CodeBehind
+namespace Ether.Components.Code
 {
     public abstract class NavItemBase : ComponentBase, IDisposable
     {

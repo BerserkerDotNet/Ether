@@ -8,13 +8,12 @@ using Ether.ViewModels;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Logging;
 
-namespace Ether.Components.CodeBehind
+namespace Ether.Components.Code
 {
-    public class EditableTableBase<T> : ComponentBase, IFormHandler, IDisposable
+    public class EditableTableBase<T> : ComponentBase
     {
         private static readonly Func<T> TCreator = Expression.Lambda<Func<T>>(Expression.New(typeof(T).GetConstructor(Type.EmptyTypes))).Compile();
 
-        private IFormValidator _formValidator;
         private T[] _items = new T[0];
 
         private T _shadowCopy;
@@ -47,16 +46,6 @@ namespace Ether.Components.CodeBehind
 
         [Parameter]
         protected Action<EditableTableBase<T>> OnRecordsLoaded { get; set; }
-
-        public void SetValidator(IFormValidator validator)
-        {
-            _formValidator = validator;
-        }
-
-        public void Dispose()
-        {
-            _formValidator = null;
-        }
 
         public virtual void Edit(T model)
         {
@@ -139,12 +128,6 @@ namespace Ether.Components.CodeBehind
 
         protected virtual async Task Save()
         {
-            var model = EditingItem as IdentityViewModel;
-            if (_formValidator != null && !_formValidator.Validate(EditingItem))
-            {
-                return;
-            }
-
             try
             {
                 await Client.Save(EditingItem);
