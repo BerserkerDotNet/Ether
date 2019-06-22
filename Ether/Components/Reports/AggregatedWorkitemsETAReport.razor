@@ -1,5 +1,5 @@
 ﻿@inject EtherClient Client
-<DataTable Items="Report.IndividualReports.OrderBy(r => r.MemberName)">
+<DataTable Items="Report.IndividualReports.OrderBy(r => r.MemberName)" PageSize="int.MaxValue">
     <TableHeader>
         <th>Name</th>
         <th>Resolved</th>

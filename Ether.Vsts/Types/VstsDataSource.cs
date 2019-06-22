@@ -20,6 +20,7 @@ namespace Ether.Vsts.Types
         private const string ArtifactLink = "ArtifactLink";
         private const string PullRequestId = "PullRequestId";
         private const string ForwardSlash = "/";
+        private const float MinimumPossibleEstimate = 1.0f;
 
         private readonly IRepository _repository;
         private readonly IMapper _mapper;
@@ -176,6 +177,22 @@ namespace Ether.Vsts.Types
             var timeSpent = GetActiveDuration(item);
             var etaValues = GetETAValues(item);
 
+            var estimatedToComplete = etaValues.RemainingWork + etaValues.CompletedWork;
+            if (estimatedToComplete == 0)
+            {
+                estimatedToComplete = etaValues.OriginalEstimate;
+            }
+
+            if (estimatedToComplete == 0)
+            {
+                estimatedToComplete = MinimumPossibleEstimate;
+            }
+
+            if (timeSpent == 0)
+            {
+                timeSpent = MinimumPossibleEstimate;
+            }
+
             return new WorkItemDetail
             {
                 WorkItemId = item.WorkItemId,
@@ -184,7 +201,7 @@ namespace Ether.Vsts.Types
                 WorkItemProject = string.IsNullOrWhiteSpace(item[WorkItemAreaPathField]) ? null : item[WorkItemAreaPathField].Split('\\')[0],
                 Tags = item.Updates.LastOrDefault(u => !string.IsNullOrWhiteSpace(u[WorkItemTagsField].NewValue))?[WorkItemTagsField]?.NewValue,
                 OriginalEstimate = etaValues.OriginalEstimate,
-                EstimatedToComplete = etaValues.RemainingWork + etaValues.CompletedWork,
+                EstimatedToComplete = estimatedToComplete,
                 TimeSpent = timeSpent
             };
         }

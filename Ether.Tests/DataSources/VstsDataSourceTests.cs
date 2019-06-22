@@ -482,6 +482,114 @@ namespace Ether.Tests.DataSources
 
         #endregion
 
+        #region CreateWorkItemDetail tests
+
+        [Test]
+        public void ShouldSetRemainingToOrginal()
+        {
+            const float expected = 3.45F;
+
+            var vm = Builder<WorkItemViewModel>.CreateNew()
+                .With(v => v.Fields, new Dictionary<string, string>())
+                .With(v => v.Updates, Enumerable.Empty<WorkItemUpdateViewModel>())
+                .With(v => v.Fields[Constants.OriginalEstimateField] = expected.ToString())
+                .With(v => v.Fields[Constants.RemainingWorkField] = "0")
+                .With(v => v.Fields[Constants.WorkItemTitleField] = "test")
+                .With(v => v.Fields[Constants.WorkItemTypeField] = Constants.WorkItemTypeBug)
+                .Build();
+
+            var result = _dataSource.CreateWorkItemDetail(vm);
+
+            result.OriginalEstimate.Should().Be(expected);
+            result.EstimatedToComplete.Should().Be(expected);
+        }
+
+        [Test]
+        public void ShouldNotOverrideRemainingWithOrginalIfRemainingNotNull()
+        {
+            const float expectedOriginal = 3.45F;
+            const float expectedRemaining = 2.0F;
+
+            var vm = Builder<WorkItemViewModel>.CreateNew()
+                .With(v => v.Fields, new Dictionary<string, string>())
+                .With(v => v.Updates, Enumerable.Empty<WorkItemUpdateViewModel>())
+                .With(v => v.Fields[Constants.OriginalEstimateField] = expectedOriginal.ToString())
+                .With(v => v.Fields[Constants.RemainingWorkField] = expectedRemaining.ToString())
+                .With(v => v.Fields[Constants.WorkItemTitleField] = "test")
+                .With(v => v.Fields[Constants.WorkItemTypeField] = Constants.WorkItemTypeBug)
+                .Build();
+
+            var result = _dataSource.CreateWorkItemDetail(vm);
+
+            result.OriginalEstimate.Should().Be(expectedOriginal);
+            result.EstimatedToComplete.Should().Be(expectedRemaining);
+        }
+
+        [Test]
+        public void ShouldNotOverrideRemainingWithOrginalIfCompletedNotNull()
+        {
+            const float expectedOriginal = 3.45F;
+            const float expectedCompleted = 2.0F;
+
+            var vm = Builder<WorkItemViewModel>.CreateNew()
+                .With(v => v.Fields, new Dictionary<string, string>())
+                .With(v => v.Updates, Enumerable.Empty<WorkItemUpdateViewModel>())
+                .With(v => v.Fields[Constants.OriginalEstimateField] = expectedOriginal.ToString())
+                .With(v => v.Fields[Constants.CompletedWorkField] = expectedCompleted.ToString())
+                .With(v => v.Fields[Constants.WorkItemTitleField] = "test")
+                .With(v => v.Fields[Constants.WorkItemTypeField] = Constants.WorkItemTypeBug)
+                .Build();
+
+            var result = _dataSource.CreateWorkItemDetail(vm);
+
+            result.OriginalEstimate.Should().Be(expectedOriginal);
+            result.EstimatedToComplete.Should().Be(expectedCompleted);
+        }
+
+        [Test]
+        public void ShouldCalculateEstimateAsSumOfRemainingAndCompleted()
+        {
+            const float expectedOriginal = 3.45F;
+            const float expectedRemaining = 2.0F;
+            const float expectedCompleted = 4.0F;
+
+            var vm = Builder<WorkItemViewModel>.CreateNew()
+                .With(v => v.Fields, new Dictionary<string, string>())
+                .With(v => v.Updates, Enumerable.Empty<WorkItemUpdateViewModel>())
+                .With(v => v.Fields[Constants.OriginalEstimateField] = expectedOriginal.ToString())
+                .With(v => v.Fields[Constants.RemainingWorkField] = expectedRemaining.ToString())
+                .With(v => v.Fields[Constants.CompletedWorkField] = expectedCompleted.ToString())
+                .With(v => v.Fields[Constants.WorkItemTitleField] = "test")
+                .With(v => v.Fields[Constants.WorkItemTypeField] = Constants.WorkItemTypeBug)
+                .Build();
+
+            var result = _dataSource.CreateWorkItemDetail(vm);
+
+            result.OriginalEstimate.Should().Be(expectedOriginal);
+            result.EstimatedToComplete.Should().Be(expectedRemaining + expectedCompleted);
+        }
+
+        [Test]
+        public void ShouldSetEstimateAndTimeSpentToDefaultIfAllFieldsAreNull()
+        {
+            const float defaultValue = 1.0F;
+
+            var vm = Builder<WorkItemViewModel>.CreateNew()
+                .With(v => v.Fields, new Dictionary<string, string>())
+                .With(v => v.Updates, Enumerable.Empty<WorkItemUpdateViewModel>())
+                .With(v => v.Fields[Constants.WorkItemTitleField] = "test")
+                .With(v => v.Fields[Constants.WorkItemTypeField] = Constants.WorkItemTypeBug)
+                .Build();
+
+            var result = _dataSource.CreateWorkItemDetail(vm);
+
+            result.OriginalEstimate.Should().Be(0);
+            result.EstimatedToComplete.Should().Be(defaultValue);
+            result.TimeSpent.Should().Be(defaultValue);
+        }
+
+        #endregion
+
         protected override void Initialize()
         {
             _dataSource = new VstsDataSource(RepositoryMock.Object, Mapper);

@@ -28,86 +28,86 @@
 
 @code{
 
-private bool isShown = false;
-private int highlightedIdx = -1;
-private string searchText = string.Empty;
-private Dictionary<T, string> selectedOptions = new Dictionary<T, string>();
-private IEnumerable<KeyValuePair<T, string>> filteredOptions = new Dictionary<T, string>();
+    private bool isShown = false;
+    private int highlightedIdx = -1;
+    private string searchText = string.Empty;
+    private Dictionary<T, string> selectedOptions = new Dictionary<T, string>();
+    private IEnumerable<KeyValuePair<T, string>> filteredOptions = new Dictionary<T, string>();
 
 
-[Parameter] public IEnumerable<T> Value { get; private set; }
+    [Parameter] public IEnumerable<T> Value { get; private set; }
 
-[Parameter] public EventCallback<IEnumerable<T>> ValueChanged { get; private set; }
+    [Parameter] public EventCallback<IEnumerable<T>> ValueChanged { get; private set; }
 
-[Parameter] public Expression<Func<IEnumerable<T>>> ValueExpression { get; private set; }
+    [Parameter] public Expression<Func<IEnumerable<T>>> ValueExpression { get; private set; }
 
-[Parameter] Dictionary<T, string> Options { get; set; }
+    [Parameter] Dictionary<T, string> Options { get; set; }
 
-protected string SearchText
-{
-    get { return searchText; }
-    set
+    protected string SearchText
     {
-        searchText = value;
-        Filter();
+        get { return searchText; }
+        set
+        {
+            searchText = value;
+            Filter();
+        }
     }
-}
 
-protected override void OnParametersSet()
-{
-    base.OnParametersSet();
-
-    if (Value != null)
+    protected override void OnParametersSet()
     {
-        selectedOptions = Options.Where(o => Value.Contains(o.Key)).ToDictionary(k => k.Key, v => v.Value);
-    }
-}
+        base.OnParametersSet();
 
-protected void Filter()
-{
-    if (!string.IsNullOrEmpty(SearchText))
+        if (Value != null)
+        {
+            selectedOptions = Options.Where(o => Value.Contains(o.Key)).ToDictionary(k => k.Key, v => v.Value);
+        }
+    }
+
+    protected void Filter()
     {
-        filteredOptions = Options.Where(o => o.Value.ToLower().Contains(SearchText.ToLower()))
-            .Except(selectedOptions);
-        ShowSearch();
+        if (!string.IsNullOrEmpty(SearchText))
+        {
+            filteredOptions = Options.Where(o => o.Value.ToLower().Contains(SearchText.ToLower()))
+                .Except(selectedOptions);
+            ShowSearch();
+        }
+        else
+        {
+            HideSearch();
+        }
     }
-    else
+
+    protected async Task Add(KeyValuePair<T, string> option)
     {
-        HideSearch();
+        Console.WriteLine("New option: " + option.Key + " V:" + option.Value);
+        if (!selectedOptions.Contains(option))
+        {
+            selectedOptions.Add(option.Key, option.Value);
+        }
+        SearchText = string.Empty;
+        Value = (IEnumerable<T>)((object)selectedOptions.Keys);
+        await ValueChanged.InvokeAsync(Value);
     }
-}
 
-protected async Task Add(KeyValuePair<T, string> option)
-{
-    Console.WriteLine("New option: " + option.Key + " V:" + option.Value);
-    if (!selectedOptions.Contains(option))
+    protected async Task Delete(KeyValuePair<T, string> option)
     {
-        selectedOptions.Add(option.Key, option.Value);
+        selectedOptions.Remove(option.Key);
+        Value = (IEnumerable<T>)((object)selectedOptions.Keys);
+        await ValueChanged.InvokeAsync(Value);
     }
-    SearchText = string.Empty;
-    Value = (IEnumerable<T>)((object)selectedOptions.Keys);
-    await ValueChanged.InvokeAsync(Value);
-}
 
-protected async Task Delete(KeyValuePair<T, string> option)
-{
-    selectedOptions.Remove(option.Key);
-    Value = (IEnumerable<T>)((object)selectedOptions.Keys);
-    await ValueChanged.InvokeAsync(Value);
-}
+    protected string GetShowClass()
+    {
+        return isShown ? "show" : "";
+    }
 
-protected string GetShowClass()
-{
-    return isShown ? "show" : "";
-}
+    protected void HideSearch()
+    {
+        isShown = false;
+    }
 
-protected void HideSearch()
-{
-    isShown = false;
-}
-
-protected void ShowSearch()
-{
-    isShown = true;
-}
+    protected void ShowSearch()
+    {
+        isShown = true;
+    }
 }
