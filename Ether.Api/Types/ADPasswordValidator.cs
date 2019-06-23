@@ -22,9 +22,23 @@ namespace Ether.Api.Types
         public Task ValidateAsync(ResourceOwnerPasswordValidationContext context)
         {
             var type = (ContextType)Enum.Parse(typeof(ContextType), _adConfig.Value.Type);
-            using (var principal = new PrincipalContext(type, _adConfig.Value.Name))
+            var domainAndName = context.UserName.Split('\\');
+            if (domainAndName.Length != 2)
             {
-                var isValid = principal.ValidateCredentials(context.UserName, context.Password);
+                context.Result = new GrantValidationResult(TokenRequestErrors.InvalidGrant, "User name should have be in the format of 'domain\\username'");
+                return Task.CompletedTask;
+            }
+
+            var domain = domainAndName[0];
+            var userName = context.UserName.Substring(context.UserName.IndexOf('\\'));
+            if (type == ContextType.Machine)
+            {
+                domain = Environment.MachineName;
+            }
+
+            using (var principal = new PrincipalContext(type, domain))
+            {
+                var isValid = principal.ValidateCredentials(userName, context.Password);
                 if (isValid)
                 {
                     var userNameToSearch = type == ContextType.Machine ? Environment.UserName : context.UserName;
