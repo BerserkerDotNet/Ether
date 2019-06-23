@@ -7,7 +7,7 @@
     <Header>
         @reportDisplayName
         <div class="d-print-none pull-right d-print-none">
-            @if (excelConverter != null)
+            @if (supportsExcel != null)
             {
                 <button class="btn btn-fill btn-primary" onclick="@ExportToExcel">Export to Excel</button>
             }
@@ -24,7 +24,7 @@
 @code
 {
     private string reportDisplayName = string.Empty;
-    private Types.Excel.ReportToExcelConverter excelConverter = null;
+    private bool supportsExcel = false;
     private RenderFragment componentToRender;
     private ReportViewModel report;
 
@@ -41,21 +41,21 @@
         {
             reportDisplayName = "Pull requests report";
             report = await Client.GetById<PullRequestReportViewModel>(Id.Value);
-            excelConverter = new Types.Excel.PullRequestsReportToExcelConverter();
+            supportsExcel = true;
             componentToRender = b => RenderComponent<Ether.Components.Reports.PullRequestsReport>(b);
         }
         else if (string.Equals(Type, "AggregatedWorkitemsETAReport", StringComparison.OrdinalIgnoreCase))
         {
             reportDisplayName = "Aggregated workitems ETA report";
             report = await Client.GetById<AggregatedWorkitemsETAReportViewModel>(Id.Value);
-            excelConverter = null;
+            supportsExcel = false;
             componentToRender = b => RenderComponent<Ether.Components.Reports.AggregatedWorkitemsETAReport>(b);
         }
         else if (string.Equals(Type, "WorkitemsReporter", StringComparison.OrdinalIgnoreCase))
         {
             reportDisplayName = "Workitems report";
             report = await Client.GetById<WorkItemsReportViewModel>(Id.Value);
-            excelConverter = new Types.Excel.WorkItemsReportToExcelConverter();
+            supportsExcel = true;
             componentToRender = b => RenderComponent<Ether.Components.Reports.WorkitemsReport>(b);
         }
     }
@@ -86,7 +86,7 @@
 
     protected async Task ExportToExcel()
     {
-        var excelReport = excelConverter.Convert(report);
+        var excelReport = await Client.GenerateExcel(report.Id);
         var base64EncodedReport = Convert.ToBase64String(excelReport);
         await JsUtils.SaveAsFile("report.xlsx", base64EncodedReport);
     }

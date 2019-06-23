@@ -8,6 +8,7 @@ using Ether.Core.Extensions;
 using Ether.Core.Types;
 using Ether.Core.Types.Commands;
 using Ether.Core.Types.Queries;
+using Ether.Types.Excel;
 using Ether.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -74,6 +75,30 @@ namespace Ether.Api.Controllers
         {
             var report = await _mediator.Request<GetReportById, ReportViewModel>(new GetReportById(id));
             return Ok(report);
+        }
+
+        [HttpGet]
+        [Route(nameof(GenerateExcel))]
+        [ProducesResponseType(200)]
+        public async Task<IActionResult> GenerateExcel(Guid id)
+        {
+            var report = await _mediator.Request<GetReportById, ReportViewModel>(new GetReportById(id));
+            ReportToExcelConverter excelConverter = null;
+
+            // TODO: DI
+            switch (report.ReportType)
+            {
+                case "PullRequestsReport":
+                    excelConverter = new PullRequestsReportToExcelConverter();
+                    break;
+                case "WorkitemsReporter":
+                    excelConverter = new WorkItemsReportToExcelConverter();
+                    break;
+                default:
+                    throw new NotSupportedException($"Report of type '{report.ReportType}' is not supported.");
+            }
+
+            return Ok(excelConverter.Convert(report));
         }
 
         private Task<Guid> GenerateReport(Type generateCommandType, GenerateReportViewModel requestModel)

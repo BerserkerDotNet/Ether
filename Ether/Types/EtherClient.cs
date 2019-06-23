@@ -112,6 +112,12 @@ namespace Ether.Types
             return HttpGet<IEnumerable<ReporterDescriptorViewModel>>($"{GetPathFor<ReporterDescriptorViewModel>()}/types");
         }
 
+        public async Task<byte[]> GenerateExcel(Guid id)
+        {
+            var url = $"{GetApiUrl()}report/generateexcel?id={id}";
+            return await HttpGet<byte[]>(url);
+        }
+
         public async Task<AccessToken> RequestAccessToken(LoginViewModel model)
         {
             var tokenResponse = await _httpClient.RequestPasswordTokenAsync(new PasswordTokenRequest
