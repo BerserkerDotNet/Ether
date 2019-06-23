@@ -44,3 +44,7 @@ li.dropdown-item {
 .validation-message {
     color: #e74a3b;
 }
+
+.font-size-1 {
+    font-size: 1.18em;
+}

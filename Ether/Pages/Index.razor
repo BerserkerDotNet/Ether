@@ -69,8 +69,6 @@
     {
         try
         {
-            Console.WriteLine("CREATE: " + model.Profile + "; " + model.Start + "; " + model.End);
-
             isGeneratingReport = true;
             var reportId = await Client.GenerateReport(model);
             UriHelper.NavigateTo($"/reports/view/{model.ReportType}/{reportId}");

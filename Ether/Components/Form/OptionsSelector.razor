@@ -8,11 +8,11 @@
            autocomplete="off"
            aria-describedby="search keyword"
            placeholder="Type to add..."
-           @oninput="@(a => SearchText = a.Value.ToString())" />
+           @oninput="@(a => SearchText = a.Value.ToString())" @bind="searchText" />
     <ui class="dropdown-menu @GetShowClass()">
         @foreach (var option in filteredOptions)
         {
-            <li class="dropdown-item" @onclick="@(() => Add(option))">@option.Value</li>
+            <li class="dropdown-item border-bottom-primary font-size-1" @onclick="@(() => Add(option))"><i class="far fa-user"></i> @option.Value</li>
         }
     </ui>
 </div>
@@ -33,7 +33,6 @@
     private string searchText = string.Empty;
     private Dictionary<T, string> selectedOptions = new Dictionary<T, string>();
     private IEnumerable<KeyValuePair<T, string>> filteredOptions = new Dictionary<T, string>();
-
 
     [Parameter] public IEnumerable<T> Value { get; private set; }
 
@@ -79,21 +78,25 @@
 
     protected async Task Add(KeyValuePair<T, string> option)
     {
-        Console.WriteLine("New option: " + option.Key + " V:" + option.Value);
         if (!selectedOptions.Contains(option))
         {
             selectedOptions.Add(option.Key, option.Value);
         }
-        SearchText = string.Empty;
+        
         Value = (IEnumerable<T>)((object)selectedOptions.Keys);
         await ValueChanged.InvokeAsync(Value);
+        SearchText = string.Empty;
     }
 
     protected async Task Delete(KeyValuePair<T, string> option)
     {
-        selectedOptions.Remove(option.Key);
-        Value = (IEnumerable<T>)((object)selectedOptions.Keys);
-        await ValueChanged.InvokeAsync(Value);
+        var isSure = await Js.Confirm($"Are you sure you want to remove '{option.Value}'?");
+        if (isSure)
+        {
+            selectedOptions.Remove(option.Key);
+            Value = (IEnumerable<T>)((object)selectedOptions.Keys);
+            await ValueChanged.InvokeAsync(Value);
+        }
     }
 
     protected string GetShowClass()

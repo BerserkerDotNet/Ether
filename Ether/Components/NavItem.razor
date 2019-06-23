@@ -2,8 +2,8 @@
 @implements IDisposable
 
 <li class="nav-item @(IsActive ? "active": "")"
-    onmouseenter="@(_ => ShowMenu())"
-    onmouseleave="@(_ => HideMenu())">
+    onmouseenter="@(() => ShowMenu())"
+    onmouseleave="@(() => HideMenu())">
     @if (Item.Children.Any())
     {
         <a class="nav-link @(isExpanded ? "": "collapsed")"
@@ -16,7 +16,7 @@
             <div class="bg-white py-2 collapse-inner rounded">
                 @foreach (var subMenu in Item.Children)
                 {
-                    <NavLink class="collapse-item" href="@(subMenu.Path)" Match="NavLinkMatch.Prefix">
+                    <NavLink class="collapse-item" href="@(subMenu.Path)" Match="NavLinkMatch.Prefix" @onclick="@(() => HideMenu(delay: false))">
                         <i class="fas fa-@subMenu.Icon"></i>
                         <span>@subMenu.Name</span>
                     </NavLink>
@@ -52,20 +52,22 @@
         isExpanded = true;
         cancelHide = true;
         StateHasChanged();
-        Console.WriteLine("Menu showed");
     }
 
-    protected async Task HideMenu()
+    protected async Task HideMenu(bool delay = true)
     {
         cancelHide = false;
-        await Task.Delay(100);
+        if (delay)
+        {
+            await Task.Delay(100);
+        }
+
         if (cancelHide)
         {
             return;
         }
-        
+
         isExpanded = false;
         StateHasChanged();
-        Console.WriteLine("Menu hidden");
     }
 }
