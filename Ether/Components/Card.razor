@@ -1,17 +1,28 @@
 ﻿<div class="card shadow mb-4 @AdditionalClasses">
     <div class="card-header">
-        <h6 class="m-0 font-weight-bold text-primary">@Header</h6>
+        @if (!string.IsNullOrEmpty(Title))
+        {
+            <h6 class="m-0 font-weight-bold text-primary card-title">@Title</h6>
+        }
+        @Header
     </div>
-    <div class="card-body">
-        @Body
-    </div>
-    <div class="card-footer">
-        @Footer
-    </div>
+    @if (Body != null)
+    {
+        <div class="card-body">
+            @Body
+        </div>
+    }
+    @if (Footer != null)
+    {
+        <div class="card-footer">
+            @Footer
+        </div>
+    }
 </div>
 
 @code
 {
+    [Parameter] string Title { get; set; }
     [Parameter] RenderFragment Header { get; set; }
     [Parameter] RenderFragment Body { get; set; }
     [Parameter] RenderFragment Footer { get; set; }

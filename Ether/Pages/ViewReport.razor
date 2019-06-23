@@ -3,24 +3,43 @@
 @inject IUriHelper UriHelper
 @inject JsUtils JsUtils
 
-<Ether.Components.Card>
-    <Header>
-        @reportDisplayName
-        <div class="d-print-none pull-right d-print-none">
-            @if (supportsExcel != null)
-            {
-                <button class="btn btn-fill btn-primary" onclick="@ExportToExcel">Export to Excel</button>
-            }
-            <button class="btn btn-fill btn-secondary" onclick="@Print">Print</button>
-            <button class="btn btn-fill btn-info" onclick="@NewReport">New report</button>
-            <button class="btn btn-fill btn-success" onclick="@BackToList">Back to list</button>
-        </div>
-    </Header>
-    <Body>
-        @componentToRender
-    </Body>
-    <Footer></Footer>
-</Ether.Components.Card>
+@if (string.Equals(Type, "WorkitemsReporter"))
+{
+    <Ether.Components.Card Title="@reportDisplayName">
+        <Header>
+            <div class="d-print-none pull-right d-print-none">
+                @if (supportsExcel != null)
+                {
+                    <button class="btn btn-fill btn-primary" onclick="@ExportToExcel">Export to Excel</button>
+                }
+                <button class="btn btn-fill btn-secondary" onclick="@Print">Print</button>
+                <button class="btn btn-fill btn-info" onclick="@NewReport">New report</button>
+                <button class="btn btn-fill btn-success" onclick="@BackToList">Back to list</button>
+            </div>
+        </Header>
+    </Ether.Components.Card>
+    @componentToRender
+}
+else
+{
+    <Ether.Components.Card Title="@reportDisplayName">
+        <Header>
+            <div class="d-print-none pull-right d-print-none">
+                @if (supportsExcel != null)
+                {
+                    <button class="btn btn-fill btn-primary" onclick="@ExportToExcel">Export to Excel</button>
+                }
+                <button class="btn btn-fill btn-secondary" onclick="@Print">Print</button>
+                <button class="btn btn-fill btn-info" onclick="@NewReport">New report</button>
+                <button class="btn btn-fill btn-success" onclick="@BackToList">Back to list</button>
+            </div>
+        </Header>
+        <Body>
+            @componentToRender
+        </Body>
+    </Ether.Components.Card>
+}
+
 @code
 {
     private string reportDisplayName = string.Empty;

@@ -1,8 +1,7 @@
 ﻿@inject EtherClient Client
 
 <section id="resolved">
-    <Ether.Components.Card>
-        <Header>Resolved work items</Header>
+    <Ether.Components.Card Title="Resolved work items">
         <Body>
             <DataTable Items="Report.ResolvedWorkItems" PageSize="int.MaxValue">
                 <TableHeader>
@@ -29,13 +28,11 @@
                 </TableFooter>
             </DataTable>
         </Body>
-        <Footer></Footer>
     </Ether.Components.Card>
 </section>
 
 <section id="pullrequest">
-    <Ether.Components.Card>
-        <Header>Work items in pull request</Header>
+    <Ether.Components.Card Title="Work items in pull request">
         <Body>
             <DataTable Items="Report.WorkItemsInReview" PageSize="int.MaxValue">
                 <TableHeader>
@@ -62,13 +59,11 @@
                 </TableFooter>
             </DataTable>
         </Body>
-        <Footer></Footer>
     </Ether.Components.Card>
 </section>
 
 <section id="active">
-    <Ether.Components.Card>
-        <Header>Active work items</Header>
+    <Ether.Components.Card Title="Active work items">
         <Body>
             <DataTable Items="Report.ActiveWorkItems" PageSize="int.MaxValue">
                 <TableHeader>
@@ -95,7 +90,6 @@
                 </TableFooter>
             </DataTable>
         </Body>
-        <Footer></Footer>
     </Ether.Components.Card>
 </section>
 
