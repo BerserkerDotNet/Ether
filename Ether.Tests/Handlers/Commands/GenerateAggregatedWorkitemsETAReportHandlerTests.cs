@@ -276,8 +276,8 @@ namespace Ether.Tests.Handlers.Commands
         {
             var realDataSource = new VstsDataSource(RepositoryMock.Object, Mapper);
 
-            DataSourceMock.Setup(d => d.GetActiveDuration(It.IsAny<WorkItemViewModel>()))
-                .Returns<WorkItemViewModel>(w => realDataSource.GetActiveDuration(w));
+            DataSourceMock.Setup(d => d.GetActiveDuration(It.IsAny<WorkItemViewModel>(), It.IsAny<IEnumerable<TeamMemberViewModel>>()))
+                .Returns<WorkItemViewModel, IEnumerable<TeamMemberViewModel>>((w, t) => realDataSource.GetActiveDuration(w, t));
             DataSourceMock.Setup(d => d.GetETAValues(It.IsAny<WorkItemViewModel>()))
                 .Returns<WorkItemViewModel>(w => realDataSource.GetETAValues(w));
             _classificationContextMock = new Mock<IWorkItemClassificationContext>(MockBehavior.Strict);

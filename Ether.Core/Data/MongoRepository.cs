@@ -109,6 +109,14 @@ namespace Ether.Core.Data
                 .SingleOrDefaultAsync(predicate);
         }
 
+        public T GetSingle<T>(Expression<Func<T, bool>> predicate)
+            where T : BaseDto
+        {
+            return GetCollectionFor<T>()
+                .AsQueryable()
+                .SingleOrDefault(predicate);
+        }
+
         public async Task<object> GetSingleAsync(Guid id, Type itemType)
         {
             var filter = Builders<BsonDocument>.Filter.Eq("_id", id);

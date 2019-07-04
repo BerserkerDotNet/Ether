@@ -26,6 +26,9 @@ namespace Ether.Contracts.Interfaces
         Task<T> GetSingleAsync<T>(Expression<Func<T, bool>> predicate)
             where T : BaseDto;
 
+        T GetSingle<T>(Expression<Func<T, bool>> predicate)
+            where T : BaseDto;
+
         Task<TProjection> GetFieldValueAsync<TType, TProjection>(Expression<Func<TType, bool>> predicate, Expression<Func<TType, TProjection>> projection)
             where TType : BaseDto;
 

@@ -20,7 +20,7 @@ namespace Ether.Contracts.Interfaces
 
         Task<IEnumerable<WorkItemViewModel>> GetWorkItemsFor(Guid memberId);
 
-        float GetActiveDuration(WorkItemViewModel workItem);
+        float GetActiveDuration(WorkItemViewModel workItem, IEnumerable<TeamMemberViewModel> team);
 
         Task<bool> IsInCodeReview(WorkItemViewModel workItem);
 
@@ -30,6 +30,8 @@ namespace Ether.Contracts.Interfaces
 
         bool IsResolved(IEnumerable<WorkItemResolution> resolutions);
 
-        WorkItemDetail CreateWorkItemDetail(WorkItemViewModel item);
+        WorkItemDetail CreateWorkItemDetail(WorkItemViewModel item, IEnumerable<TeamMemberViewModel> team);
+
+        Task<WorkitemInformationViewModel> GetWorkItemInfo(WorkItemViewModel item, IEnumerable<TeamMemberViewModel> team);
     }
 }

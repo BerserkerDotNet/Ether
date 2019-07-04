@@ -5,7 +5,13 @@
                NewTitle="New member"
                ExistingTitle="Editing member">
     <ListModeContent Context="ctx">
-        <DataTable Items="@ctx.Items" PageSize="10" EnableSearch="true" SearchPredicate="@((i, q) => i.DisplayName.Contains(q) || i.Email.Contains(q))">
+        <DataTable Items="@ctx.Items" PageSize="10">
+            <FilterTemplate Context="dt">
+                <div class="form-group">
+                    <input class="form-control" type="text" placeholder="Type to search..."
+                           @oninput="@(e => dt.Filter(i => i.DisplayName.Contains(e.Value.ToString()) || i.Email.Contains(e.Value.ToString())))" />
+                </div>
+            </FilterTemplate>
             <TableHeader>
                 <th>Display Name</th>
                 <th>Email</th>

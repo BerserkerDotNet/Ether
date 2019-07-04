@@ -1,8 +1,0 @@
-﻿<div class="form-group">
-    <input class="form-control" type="text" placeholder="Type to search..."
-           oninput="@(async (e) => await OnSearch.InvokeAsync(e.Value.ToString()))" />
-</div>
-
-@code{
-    [Parameter] EventCallback<string> OnSearch { get; set; }
-}

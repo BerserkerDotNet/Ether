@@ -1,0 +1,105 @@
+﻿@page "/dashboard"
+@inject EtherClient Client
+
+<Card Title="Active work items">
+    <Body>
+        @if (isLoading)
+        {
+            <div class="text-center">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
+                <div>Loading...</div>
+            </div>
+        }
+        else
+        {
+            <DataTable Items="model.Workitems" RowClass="@GetRowClass" PageSize="5">
+                <FilterTemplate Context="dt">
+                    <div class="form-group">
+                        <select class="form-control" @onchange="@(e => ApplyFilter(e, dt))">
+                            <option value="">None</option>
+                            @foreach (var member in teamMebmersOptions)
+                            {
+                                <option value="@member.Key">@member.Value</option>
+                            }
+                        </select>
+                    </div>
+                </FilterTemplate>
+                <TableHeader>
+                    <th>Id</th>
+                    <th>Type</th>
+                    <th>State</th>
+                    <th>Assigned To</th>
+                    <th>Title</th>
+                    <th>Estimated</th>
+                    <th>Spent</th>
+                    <th>IsBlocked</th>
+                    <th>IsOnHold</th>
+                    <th># of PRs</th>
+                </TableHeader>
+                <RowTemplate Context="workItem">
+                    <td><a href="@workItem.Url">@workItem.Id</a></td>
+                    <td>@workItem.Type</td>
+                    <td>@workItem.State</td>
+                    <td>@workItem.AssignedTo.Title</td>
+                    <td>@workItem.Title</td>
+                    <td>@workItem.Estimated</td>
+                    <td>@workItem.Spent</td>
+                    <td>@workItem.IsBlocked</td>
+                    <td>@workItem.IsOnHold</td>
+                    <td>@workItem.PullRequests.Count()</td>
+                </RowTemplate>
+                <ActionsTemplate>
+                    <div>
+                        <button class="btn btn-success btn-fill">Details</button>
+                        <button class="btn btn-primary btn-fill">Delete</button>
+                    </div>
+                </ActionsTemplate>
+            </DataTable>
+        }
+    </Body>
+</Card>
+
+@code{
+
+    private bool isLoading = false;
+    private ActiveWorkitemsViewModel model = new ActiveWorkitemsViewModel();
+    private string selectedTeamMember = string.Empty;
+    private Dictionary<string, string> teamMebmersOptions = new Dictionary<string, string>();
+
+    protected override async Task OnInitAsync()
+    {
+        isLoading = true;
+        model = await Client.GetActiveWorkitems(Guid.Parse("b79159f4-a834-49fb-9702-36076c664ea0"));
+        teamMebmersOptions = model.Workitems.GroupBy(w => w.AssignedTo.Email).ToDictionary(k => k.Key, v => v.First().AssignedTo.Title);
+        isLoading = false;
+    }
+
+    protected string GetRowClass(WorkitemInformationViewModel item)
+    {
+        if (item.IsBlocked)
+            return "table-danger";
+
+        if (item.IsOnHold)
+            return "table-warning";
+
+        if (string.Equals(item.State, "resolved", StringComparison.OrdinalIgnoreCase))
+            return "table-success";
+
+        return string.Empty;
+    }
+
+    protected void ApplyFilter(UIChangeEventArgs args, DataTableBase<WorkitemInformationViewModel> dt)
+    {
+        if (args.Value == null || string.IsNullOrEmpty(args.Value.ToString()))
+        {
+            // TODO: Reset filter?
+            dt.Filter(null);
+        }
+        else
+        {
+            dt.Filter(i => string.Equals(i.AssignedTo.Email, args.Value));
+        }
+    }
+}

@@ -11,6 +11,7 @@ namespace Ether.Tests
     {
         public const string DefaultUser = "Foo <foo@bar.com>";
         public const string StateField = "System.State";
+        public const string ActivatedByField = "Microsoft.VSTS.Common.ActivatedBy";
         public const string ResolvedByField = "Microsoft.VSTS.Common.ResolvedBy";
         public const string ClosedByField = "Microsoft.VSTS.Common.ClosedBy";
         public const string ReasonField = "System.Reason";
@@ -48,9 +49,11 @@ namespace Ether.Tests
             return Closed(by, from, reason);
         }
 
-        public UpdateBuilder Activated(string from = "New")
+        public UpdateBuilder Activated(string from = "New", TeamMemberViewModel by = null)
         {
+            var activatedBy = by == null ? DefaultUser : $"{by.DisplayName} <{by.Email}>";
             _fields.Add(StateField, new WorkItemFieldUpdate { NewValue = "Active", OldValue = from });
+            _fields.Add(ActivatedByField, new WorkItemFieldUpdate { NewValue = activatedBy });
             On(DateTime.UtcNow);
             return this;
         }

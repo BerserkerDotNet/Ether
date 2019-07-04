@@ -118,6 +118,12 @@ namespace Ether.Types
             return await HttpGet<byte[]>(url);
         }
 
+        public async Task<ActiveWorkitemsViewModel> GetActiveWorkitems(Guid profileId)
+        {
+            var url = $"{GetApiUrl()}dashboard/activeworkitems?profileId={profileId}";
+            return await HttpGet<ActiveWorkitemsViewModel>(url);
+        }
+
         public async Task<AccessToken> RequestAccessToken(LoginViewModel model)
         {
             var tokenResponse = await _httpClient.RequestPasswordTokenAsync(new PasswordTokenRequest

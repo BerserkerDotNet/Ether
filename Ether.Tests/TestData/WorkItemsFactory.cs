@@ -37,14 +37,19 @@ namespace Ether.Tests.TestData
             this WorkItemTestData data,
             TeamMemberViewModel resolvedBy,
             int daysActive,
+            TeamMemberViewModel activatedBy = null,
+            TeamMemberViewModel assignedTo = null,
             Action<UpdateBuilder, DateTime> onAfterActivation = null)
         {
             var activationDate = DateTime.Today.GetMondayOfCurrentWeek();
             var resolutionDate = activationDate.AddBusinessDays(daysActive);
 
             var updatesBuilder = UpdateBuilder.Create()
-                .New()
-                .Then().Activated().On(activationDate);
+                .New();
+
+            assignedTo = assignedTo ?? resolvedBy;
+            updatesBuilder.Then().With(Constants.WorkItemAssignedToField, assignedTo.Email, string.Empty);
+            updatesBuilder.Then().Activated(by: activatedBy ?? resolvedBy).On(activationDate);
 
             onAfterActivation?.Invoke(updatesBuilder, activationDate);
 
@@ -70,6 +75,43 @@ namespace Ether.Tests.TestData
 
             data.Resolutions.Add(resolution);
             data.ExpectedDuration = daysActive;
+
+            return data;
+        }
+
+        public static WorkItemTestData WithResolvedWithoutActivation(
+            this WorkItemTestData data,
+            int resolovedAfterDays,
+            TeamMemberViewModel resolvedBy)
+        {
+            var createdOn = DateTime.Today.GetMondayOfCurrentWeek();
+            var resolutionDate = createdOn.AddDays(resolovedAfterDays);
+
+            var updatesBuilder = UpdateBuilder.Create()
+                .New().On(createdOn);
+
+            if (data.Type == Constants.WorkItemTypeBug)
+            {
+                updatesBuilder.Then().Resolved(resolvedBy).On(resolutionDate);
+            }
+            else if (data.Type == Constants.WorkItemTypeTask)
+            {
+                updatesBuilder.Then().ClosedFromActive(resolvedBy).On(resolutionDate);
+            }
+
+            data.WorkItem.Updates = updatesBuilder.Build();
+
+            var resolution = new WorkItemResolution(
+                data.WorkItem.WorkItemId,
+                $"Work item #{data.WorkItem.WorkItemId}",
+                data.Type,
+                Constants.WorkItemStateResolved, "No Repro",
+                DateTime.UtcNow,
+                resolvedBy.Email,
+                resolvedBy.DisplayName);
+
+            data.Resolutions.Add(resolution);
+            data.ExpectedDuration = 1;
 
             return data;
         }

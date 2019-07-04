@@ -56,7 +56,7 @@ namespace Ether.Core.Types.Handlers.Commands
             var report = new AggregatedWorkitemsETAReport(team.Count());
             foreach (var member in team)
             {
-                var individualReport = GetIndividualReport(resolutions, workItems, dataSource, member);
+                var individualReport = GetIndividualReport(resolutions, workItems, dataSource, member, team);
                 report.IndividualReports.Add(individualReport);
             }
 
@@ -67,7 +67,8 @@ namespace Ether.Core.Types.Handlers.Commands
             Dictionary<string, IEnumerable<WorkItemResolution>> resolutions,
             IEnumerable<WorkItemViewModel> workItems,
             IDataSource dataSource,
-            TeamMemberViewModel member)
+            TeamMemberViewModel member,
+            IEnumerable<TeamMemberViewModel> team)
         {
             if (!resolutions.ContainsKey(member.Email))
             {
@@ -80,7 +81,7 @@ namespace Ether.Core.Types.Handlers.Commands
                 MemberName = member.DisplayName
             };
 
-            PopulateMetrics(resolutions, workItems, dataSource, member.Email, individualReport);
+            PopulateMetrics(resolutions, workItems, dataSource, member.Email, individualReport, team);
 
             return individualReport;
         }
@@ -90,7 +91,8 @@ namespace Ether.Core.Types.Handlers.Commands
             IEnumerable<WorkItemViewModel> workItems,
             IDataSource dataSource,
             string email,
-            AggregatedWorkitemsETAReport.IndividualETAReport report)
+            AggregatedWorkitemsETAReport.IndividualETAReport report,
+            IEnumerable<TeamMemberViewModel> team)
         {
             var resolvedByMember = resolutions[email];
             report.TotalResolved = resolvedByMember.Count();
@@ -100,7 +102,7 @@ namespace Ether.Core.Types.Handlers.Commands
             foreach (var item in resolvedByMember)
             {
                 var workitem = workItems.Single(w => w.WorkItemId == item.WorkItemId);
-                var timeSpent = dataSource.GetActiveDuration(workitem);
+                var timeSpent = dataSource.GetActiveDuration(workitem, team);
                 var eta = dataSource.GetETAValues(workitem);
                 if (eta.IsEmpty)
                 {

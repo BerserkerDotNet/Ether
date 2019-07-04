@@ -174,32 +174,32 @@ namespace Ether.Tests.DataSources
         #region GetActiveDuration tests
 
         [Test]
-        public void GetActiveDurationShouldReturnZeroIfUpdatesIsNull()
+        public void GetActiveDurationShouldReturnDefaultIfUpdatesIsNull()
         {
             var bugData = WorkItemsFactory.CreateBug();
 
-            var result = _dataSource.GetActiveDuration(bugData.WorkItem);
+            var result = _dataSource.GetActiveDuration(bugData.WorkItem, Enumerable.Empty<TeamMemberViewModel>());
 
-            result.Should().Be(0.0f);
+            result.Should().Be(1.0f);
         }
 
         [Test]
-        public void GetActiveDurationShouldReturnZeroIfNoUpdates()
+        public void GetActiveDurationShouldReturnDefaultIfNoUpdates()
         {
             var bugData = WorkItemsFactory.CreateBug().WithNoUpdates();
 
-            var result = _dataSource.GetActiveDuration(bugData.WorkItem);
+            var result = _dataSource.GetActiveDuration(bugData.WorkItem, Enumerable.Empty<TeamMemberViewModel>());
 
-            result.Should().Be(0.0f);
+            result.Should().Be(1.0f);
         }
 
         [Test]
         public void GetActiveDurationShouldReturnActiveDurationForResolvedBug()
         {
             var john = Builder<TeamMemberViewModel>.CreateNew().Build();
-            var bugData = WorkItemsFactory.CreateBug().WithNormalLifecycle(john, 5);
+            var bugData = WorkItemsFactory.CreateBug().WithNormalLifecycle(resolvedBy: john, 5, activatedBy: john, assignedTo: john);
 
-            var result = _dataSource.GetActiveDuration(bugData.WorkItem);
+            var result = _dataSource.GetActiveDuration(bugData.WorkItem, new[] { john });
 
             result.Should().Be(bugData.ExpectedDuration);
         }
@@ -208,9 +208,9 @@ namespace Ether.Tests.DataSources
         public void GetActiveDurationShouldReturnActiveDurationForClosedTasks()
         {
             var john = Builder<TeamMemberViewModel>.CreateNew().Build();
-            var taskData = WorkItemsFactory.CreateTask().WithNormalLifecycle(john, 3);
+            var taskData = WorkItemsFactory.CreateTask().WithNormalLifecycle(resolvedBy: john, 3, activatedBy: john, assignedTo: john);
 
-            var result = _dataSource.GetActiveDuration(taskData.WorkItem);
+            var result = _dataSource.GetActiveDuration(taskData.WorkItem, new[] { john });
 
             result.Should().Be(taskData.ExpectedDuration);
         }
@@ -222,7 +222,7 @@ namespace Ether.Tests.DataSources
             var john = Builder<TeamMemberViewModel>.CreateNew().Build();
             var taskData = WorkItemsFactory
                 .CreateTask()
-                .WithNormalLifecycle(john, 10, onAfterActivation: (builder, activationDate) =>
+                .WithNormalLifecycle(resolvedBy: john, 10, activatedBy: john, assignedTo: john, onAfterActivation: (builder, activationDate) =>
                 {
                     builder = builder
                         .Then().AddTag(Constants.BlockedTag).On(activationDate.AddBusinessDays(1))
@@ -231,7 +231,7 @@ namespace Ether.Tests.DataSources
                         .Then().RemoveTag(Constants.BlockedTag).On(activationDate.AddBusinessDays(7));
                 });
 
-            var result = _dataSource.GetActiveDuration(taskData.WorkItem);
+            var result = _dataSource.GetActiveDuration(taskData.WorkItem, new[] { john });
 
             result.Should().Be(expectedDuration);
         }
@@ -243,7 +243,7 @@ namespace Ether.Tests.DataSources
             var john = Builder<TeamMemberViewModel>.CreateNew().Build();
             var taskData = WorkItemsFactory
                 .CreateTask()
-                .WithNormalLifecycle(john, 10, onAfterActivation: (builder, activationDate) =>
+                .WithNormalLifecycle(resolvedBy: john, 10, activatedBy: john, assignedTo: john, onAfterActivation: (builder, activationDate) =>
                 {
                     builder = builder
                         .Then().AddTag(Constants.OnHoldTag).On(activationDate.AddBusinessDays(1))
@@ -252,7 +252,62 @@ namespace Ether.Tests.DataSources
                         .Then().RemoveTag(Constants.OnHoldTag).On(activationDate.AddBusinessDays(7));
                 });
 
-            var result = _dataSource.GetActiveDuration(taskData.WorkItem);
+            var result = _dataSource.GetActiveDuration(taskData.WorkItem, new[] { john });
+
+            result.Should().Be(expectedDuration);
+        }
+
+        [Test]
+        public void GetActiveDurationShouldReturnDefaultIfItemWasResolvedWithoutActivation()
+        {
+            const int expectedDuration = 1;
+            var john = Builder<TeamMemberViewModel>.CreateNew().Build();
+            var taskData = WorkItemsFactory
+                .CreateTask()
+                .WithResolvedWithoutActivation(5, john);
+
+            var result = _dataSource.GetActiveDuration(taskData.WorkItem, new[] { john });
+
+            result.Should().Be(expectedDuration);
+        }
+
+        [Test]
+        public void GetActiveDurationShouldReturnDefaultIfItemWasNotActivateByTeam()
+        {
+            const int expectedDuration = 1;
+            var john = Builder<TeamMemberViewModel>.CreateNew()
+                .With(m => m.Email, "john@foo.com")
+                .Build();
+            var merry = Builder<TeamMemberViewModel>.CreateNew()
+                .With(m => m.Email, "merry@foo.com")
+                .Build();
+            var taskData = WorkItemsFactory
+                .CreateTask()
+                .WithNormalLifecycle(resolvedBy: john, 5, activatedBy: merry, assignedTo: merry);
+
+            var result = _dataSource.GetActiveDuration(taskData.WorkItem, new[] { john });
+
+            result.Should().Be(expectedDuration);
+        }
+
+        [Test]
+        public void GetActiveDurationShouldReturnOnlyTimeItrWasActuallyAssignedToTeamMember()
+        {
+            const int expectedDuration = 3;
+            var john = Builder<TeamMemberViewModel>.CreateNew()
+                .With(m => m.Email, "john@foo.com")
+                .Build();
+            var merry = Builder<TeamMemberViewModel>.CreateNew()
+                .With(m => m.Email, "merry@foo.com")
+                .Build();
+            var taskData = WorkItemsFactory
+                .CreateTask()
+                .WithNormalLifecycle(resolvedBy: john, 5, activatedBy: merry, assignedTo: merry, onAfterActivation: (builder, activationDate) =>
+                {
+                    builder = builder.Then().With(Constants.WorkItemAssignedToField, john.Email, merry.Email).On(activationDate.AddDays(2));
+                });
+
+            var result = _dataSource.GetActiveDuration(taskData.WorkItem, new[] { john });
 
             result.Should().Be(expectedDuration);
         }
@@ -263,7 +318,7 @@ namespace Ether.Tests.DataSources
         {
             var bugData = WorkItemsFactory.CreateBug().WithActiveWorkItem(5);
 
-            var result = _dataSource.GetActiveDuration(bugData.WorkItem);
+            var result = _dataSource.GetActiveDuration(bugData.WorkItem, Enumerable.Empty<TeamMemberViewModel>());
 
             result.Should().Be(bugData.ExpectedDuration);
         }
@@ -498,7 +553,7 @@ namespace Ether.Tests.DataSources
                 .With(v => v.Fields[Constants.WorkItemTypeField] = Constants.WorkItemTypeBug)
                 .Build();
 
-            var result = _dataSource.CreateWorkItemDetail(vm);
+            var result = _dataSource.CreateWorkItemDetail(vm, Enumerable.Empty<TeamMemberViewModel>());
 
             result.OriginalEstimate.Should().Be(expected);
             result.EstimatedToComplete.Should().Be(expected);
@@ -519,7 +574,7 @@ namespace Ether.Tests.DataSources
                 .With(v => v.Fields[Constants.WorkItemTypeField] = Constants.WorkItemTypeBug)
                 .Build();
 
-            var result = _dataSource.CreateWorkItemDetail(vm);
+            var result = _dataSource.CreateWorkItemDetail(vm, Enumerable.Empty<TeamMemberViewModel>());
 
             result.OriginalEstimate.Should().Be(expectedOriginal);
             result.EstimatedToComplete.Should().Be(expectedRemaining);
@@ -540,7 +595,7 @@ namespace Ether.Tests.DataSources
                 .With(v => v.Fields[Constants.WorkItemTypeField] = Constants.WorkItemTypeBug)
                 .Build();
 
-            var result = _dataSource.CreateWorkItemDetail(vm);
+            var result = _dataSource.CreateWorkItemDetail(vm, Enumerable.Empty<TeamMemberViewModel>());
 
             result.OriginalEstimate.Should().Be(expectedOriginal);
             result.EstimatedToComplete.Should().Be(expectedCompleted);
@@ -563,7 +618,7 @@ namespace Ether.Tests.DataSources
                 .With(v => v.Fields[Constants.WorkItemTypeField] = Constants.WorkItemTypeBug)
                 .Build();
 
-            var result = _dataSource.CreateWorkItemDetail(vm);
+            var result = _dataSource.CreateWorkItemDetail(vm, Enumerable.Empty<TeamMemberViewModel>());
 
             result.OriginalEstimate.Should().Be(expectedOriginal);
             result.EstimatedToComplete.Should().Be(expectedRemaining + expectedCompleted);
@@ -581,7 +636,7 @@ namespace Ether.Tests.DataSources
                 .With(v => v.Fields[Constants.WorkItemTypeField] = Constants.WorkItemTypeBug)
                 .Build();
 
-            var result = _dataSource.CreateWorkItemDetail(vm);
+            var result = _dataSource.CreateWorkItemDetail(vm, Enumerable.Empty<TeamMemberViewModel>());
 
             result.OriginalEstimate.Should().Be(0);
             result.EstimatedToComplete.Should().Be(defaultValue);

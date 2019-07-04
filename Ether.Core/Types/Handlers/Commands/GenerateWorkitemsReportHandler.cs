@@ -63,18 +63,18 @@ namespace Ether.Core.Types.Handlers.Commands
                 var isInCodeReview = await dataSource.IsInCodeReview(workItem);
                 if (isInCodeReview && dataSource.IsAssignedToTeamMember(workItem, team))
                 {
-                    report.WorkItemsInReview.Add(dataSource.CreateWorkItemDetail(workItem));
+                    report.WorkItemsInReview.Add(dataSource.CreateWorkItemDetail(workItem, team));
                 }
                 else if (dataSource.IsActive(workItem) && dataSource.IsAssignedToTeamMember(workItem, team))
                 {
-                    report.ActiveWorkItems.Add(dataSource.CreateWorkItemDetail(workItem));
+                    report.ActiveWorkItems.Add(dataSource.CreateWorkItemDetail(workItem, team));
                 }
                 else
                 {
                     var resolutions = _workItemClassificationContext.Classify(workItem, scope);
                     if (dataSource.IsResolved(resolutions))
                     {
-                        report.ResolvedWorkItems.Add(dataSource.CreateWorkItemDetail(workItem));
+                        report.ResolvedWorkItems.Add(dataSource.CreateWorkItemDetail(workItem, team));
                     }
                 }
             }

@@ -1,8 +1,9 @@
 ﻿@typeparam TItem
+@inherits DataTableBase<TItem>
 
-@if (EnableSearch)
+@if (FilterTemplate != null)
 {
-    <DataTableSearch OnSearch="OnSearch"/>
+    @FilterTemplate(this);
 }
 
 <table class="table">
@@ -17,13 +18,14 @@
     </thead>
     <tbody>
         @*TODO: No pagination?*@
-        @if (!_itemsToShow.Any())
+        @if (!ItemsToShow.Any())
         {
             <p>@GetNoItemsText()</p>
         }
-        @foreach (var item in _itemsToShow.Skip(PageSize * (currentPage - 1)).Take(PageSize))
+        @foreach (var item in ItemsToShow.Skip(PageSize * (CurrentPage - 1)).Take(PageSize))
         {
-            <tr>
+            var className = RowClass == null ? string.Empty : RowClass(item);
+            <tr class="@className">
                 @RowTemplate(item)
                 @if (ActionsTemplate != null)
                 {
@@ -36,70 +38,17 @@
     </tbody>
     <tfoot>
         @TableFooter
-        @if (itemsCount > PageSize)
+        @if (ItemsCount > PageSize)
         {
             <tr>
                 <td colspan="100">
                     <div class="pull-right">
-                        <button class="btn btn-simple" disabled="@(currentPage == 1)" @onclick="@(() => PrevPage())">Prev</button>
-                        <span>@currentPage of @totalPages</span>
-                        <button class="btn btn-simple" disabled="@(currentPage >= totalPages)" @onclick="@(() => NextPage())">Next</button>
+                        <button class="btn btn-simple" disabled="@(CurrentPage == 1)" @onclick="@(() => PrevPage())">Prev</button>
+                        <span>@CurrentPage of @TotalPages</span>
+                        <button class="btn btn-simple" disabled="@(CurrentPage >= TotalPages)" @onclick="@(() => NextPage())">Next</button>
                     </div>
                 </td>
             </tr>
         }
     </tfoot>
 </table>
-
-@code
-{
-    private int currentPage = 1;
-    private int totalPages = 0;
-    private int itemsCount = 0;
-
-    private IEnumerable<TItem> _itemsToShow = Enumerable.Empty<TItem>();
-
-    [Parameter] int PageSize { get; set; } = 10;
-    [Parameter] bool EnableSearch { get; set; } = false;
-    [Parameter] Func<TItem, string, bool> SearchPredicate { get; set; }
-    [Parameter] RenderFragment TableHeader { get; set; }
-    [Parameter] RenderFragment<TItem> RowTemplate { get; set; }
-    [Parameter] RenderFragment<TItem> ActionsTemplate { get; set; }
-    [Parameter] RenderFragment TableFooter { get; set; }
-    [Parameter] IEnumerable<TItem> Items { get; set; }
-    [Parameter] string NoItemsText { get; set; }
-
-    protected override void OnParametersSet()
-    {
-        base.OnParametersSet();
-        if (EnableSearch && SearchPredicate == null)
-        {
-            throw new SearchPredicateIsNotSetException();
-        }
-        _itemsToShow = Items;
-        itemsCount = _itemsToShow.Count();
-        totalPages = (int)Math.Ceiling(itemsCount / (decimal)PageSize);
-    }
-
-    protected void NextPage()
-    {
-        currentPage++;
-        StateHasChanged();
-    }
-
-    protected void PrevPage()
-    {
-        currentPage--;
-        StateHasChanged();
-    }
-
-    protected string GetNoItemsText()
-    {
-        return string.IsNullOrEmpty(NoItemsText) ? "No items" : NoItemsText;
-    }
-
-    protected void OnSearch(string query)
-    {
-        _itemsToShow = string.IsNullOrEmpty(query) ? Items : Items.Where(i => SearchPredicate(i, query));
-    }
-}
