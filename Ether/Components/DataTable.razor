@@ -19,9 +19,9 @@
     <tbody>
         @*TODO: No pagination?*@
         @if (!ItemsToShow.Any())
-        {
+            {
             <p>@GetNoItemsText()</p>
-        }
+            }
         @foreach (var item in ItemsToShow.Skip(PageSize * (CurrentPage - 1)).Take(PageSize))
         {
             var className = RowClass == null ? string.Empty : RowClass(item);
@@ -30,10 +30,35 @@
                 @if (ActionsTemplate != null)
                 {
                     <td class="pull-right">
+                        @if (RowDetailTemplate != null)
+                        {
+                        <button class="btn btn-success btn-fill" @onclick="@(() => ToggleDetails(item))">
+                            @if (IsItemDetailsVisible(item))
+                            {
+                                <i class="far fa-minus-square"></i>
+                            }
+                            else
+                            {
+                                <i class="far fa-plus-square"></i>
+                            }
+                            Details
+                        </button>
+                        }
                         @ActionsTemplate(item)
                     </td>
                 }
             </tr>
+            @if (IsItemDetailsVisible(item))
+            {
+                <tr>
+                    <td colspan="@int.MaxValue">
+                        @if (RowDetailTemplate != null)
+                        {
+                            @RowDetailTemplate(item)
+                        }
+                    </td>
+                </tr>
+            }
         }
     </tbody>
     <tfoot>

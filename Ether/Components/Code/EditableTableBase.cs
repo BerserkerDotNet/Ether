@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Ether.Types;
+using Ether.Types.EditableTable;
 using Ether.ViewModels;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Logging;
@@ -18,6 +19,8 @@ namespace Ether.Components.Code
 
         private T _shadowCopy;
 
+        private IEditableTableDataProvider _dataProvider;
+
         public IEnumerable<T> Items
         {
             get { return _items; }
@@ -31,11 +34,17 @@ namespace Ether.Components.Code
         [Parameter]
         protected Func<T, object> OrderByDescending { get; set; }
 
-        [Inject]
-        protected EtherClient Client { get; set; }
+        [Parameter]
+        protected Action<EditableTableBase<T>> OnRecordsLoaded { get; set; }
+
+        [Parameter]
+        protected IEditableTableDataProvider DataProvider { get; set; }
 
         [Inject]
         protected ILogger<EditableTableBase<T>> Logger { get; set; }
+
+        [Inject]
+        protected EtherClientEditableTableDataProvider DefaultDataProvider { get; set; }
 
         [Inject]
         protected JsUtils JsUtils { get; set; }
@@ -43,9 +52,6 @@ namespace Ether.Components.Code
         protected bool IsEditing { get; set; }
 
         protected bool IsLoading { get; set; }
-
-        [Parameter]
-        protected Action<EditableTableBase<T>> OnRecordsLoaded { get; set; }
 
         public virtual void Edit(T model)
         {
@@ -63,7 +69,7 @@ namespace Ether.Components.Code
                     throw new NotSupportedException($"View model '{typeof(T).Name}' should be inherited from {nameof(ViewModelWithId)}");
                 }
 
-                await Client.Delete<T>(viewModelWithId.Id);
+                await _dataProvider.Delete<T>(viewModelWithId.Id);
                 await Refresh();
             }
         }
@@ -73,7 +79,14 @@ namespace Ether.Components.Code
             try
             {
                 IsLoading = true;
-                var items = await Client.GetAll<T>();
+                if (_dataProvider == null)
+                {
+                    Console.WriteLine("Data provider is null. Exit.");
+                    return;
+                }
+                Console.WriteLine("Loading data with " + _dataProvider.GetType());
+
+                var items = await _dataProvider.Load<T>();
                 if (OrderByDescending != null)
                 {
                     items = items.OrderByDescending(OrderByDescending);
@@ -100,8 +113,11 @@ namespace Ether.Components.Code
             StateHasChanged();
         }
 
-        protected override async Task OnInitAsync()
+        protected override async Task OnParametersSetAsync()
         {
+            Console.WriteLine("Settings up data provider. " + DataProvider == null);
+            _dataProvider = DataProvider ?? DefaultDataProvider;
+
             await Refresh();
         }
 
@@ -123,14 +139,20 @@ namespace Ether.Components.Code
 
         protected virtual void New()
         {
-            Edit(TCreator());
+            var item = TCreator();
+            if (item is ViewModelWithId vm)
+            {
+                vm.Id = Guid.NewGuid();
+            }
+
+            Edit(item);
         }
 
         protected virtual async Task Save()
         {
             try
             {
-                await Client.Save(EditingItem);
+                await _dataProvider.Save(EditingItem);
                 await JsUtils.NotifySuccess("Success", $"{EditingItem.GetType().Name.Replace("ViewModel", string.Empty)} was saved successfully");
             }
             catch (Exception ex)

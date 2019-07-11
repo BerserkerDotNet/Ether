@@ -28,7 +28,8 @@ namespace Ether.Types
             { typeof(WorkItemsReportViewModel), "report" },
             { typeof(GenerateReportViewModel), "report" },
             { typeof(ReporterDescriptorViewModel), "report" },
-            { typeof(JobLogViewModel), "jobs/logs" }
+            { typeof(JobLogViewModel), "jobs/logs" },
+            { typeof(DashboardSettingsViewModel), "dashboard" }
         };
 
         private readonly HttpClient _httpClient;

@@ -1,0 +1,56 @@
+﻿@inject EtherClient Client
+<EditableTable TItem="FilterSubTeam"
+               DataProvider="dataProvider"
+               GridTitle="SubTeams"
+               NewTitle="New SubTeam"
+               ExistingTitle="Edit SubTeam">
+    <ListModeContent Context="ctx">
+        <DataTable Items="ctx.Items">
+            <TableHeader>
+                <th>Name</th>
+                <th>Members count</th>
+            </TableHeader>
+            <RowTemplate Context="subTeam">
+                <td>@subTeam.Name</td>
+                <td>@subTeam.Members?.Count()</td>
+            </RowTemplate>
+            <ActionsTemplate Context="team">
+                <div>
+                    <button class="btn btn-warning btn-fill" @onclick="@(() => ctx.Edit(team))">Edit</button>
+                    <button class="btn btn-danger btn-fill" @onclick="@(() => ctx.Delete(team))">Delete</button>
+                </div>
+            </ActionsTemplate>
+        </DataTable>
+    </ListModeContent>
+    <FormModeContent Context="ctx">
+        <div>
+            <div class="form-group">
+                <label>Group name</label>
+                <InputText class="form-control" @bind-Value="@ctx.EditingItem.Name" />
+            </div>
+            <div class="form-group">
+                <label>Members</label>
+                <Ether.Components.Form.OptionsSelector Options="@options" @bind-Value="@ctx.EditingItem.Members" />
+            </div>
+        </div>
+    </FormModeContent>
+</EditableTable>
+
+@code{
+private Dictionary<string, string> options = new Dictionary<string, string>();
+private IEditableTableDataProvider dataProvider = new NoOpEditableTableDataProvider();
+
+[Parameter] Guid DashboardId { get; set; }
+
+protected override async Task OnInitAsync()
+{
+    var settings = await Client.GetById<DashboardSettingsViewModel>(DashboardId);
+    var members = await Client.GetAll<TeamMemberViewModel>();
+    options = members.ToDictionary(k => k.Email, k => k.DisplayName);
+}
+
+protected override void OnParametersSet()
+{
+    dataProvider = new DashboardSubTeamEditableTableDataProvider(Client, DashboardId);
+}
+}

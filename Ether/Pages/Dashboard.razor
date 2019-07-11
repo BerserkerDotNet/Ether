@@ -1,5 +1,6 @@
 ﻿@page "/dashboard"
 @inject EtherClient Client
+@inject ModalService Modal
 
 <Card Title="Active work items">
     <Body>
@@ -14,16 +15,29 @@
         }
         else
         {
-            <DataTable Items="model.Workitems" RowClass="@GetRowClass" PageSize="5">
+            <DataTable Items="model.Workitems" PageSize="10" OrderBy="orderByConfig">
                 <FilterTemplate Context="dt">
                     <div class="form-group">
-                        <select class="form-control" @onchange="@(e => ApplyFilter(e, dt))">
-                            <option value="">None</option>
-                            @foreach (var member in teamMebmersOptions)
-                            {
-                                <option value="@member.Key">@member.Value</option>
-                            }
-                        </select>
+                        <div class="input-group">
+                            <select class="form-control" @onchange="@(e => ApplyFilter(e, dt))">
+                                <option value="">None</option>
+                                <optgroup label="Teams">
+                                    @foreach (var subTeam in settings.SubTeams)
+                                    {
+                                        <option value="@subTeam.Id">@subTeam.Name</option>
+                                    }
+                                </optgroup>
+                                <optgroup label="Members">
+                                    @foreach (var member in teamMebmersOptions)
+                                    {
+                                        <option value="@member.Key">@member.Value</option>
+                                    }
+                                </optgroup>
+                            </select>
+                            <div class="input-group-append">
+                                <button class="btn btn-light" @onclick="@(() => ShowDashboardSettings())">Settings</button>
+                            </div>
+                        </div>
                     </div>
                 </FilterTemplate>
                 <TableHeader>
@@ -34,27 +48,50 @@
                     <th>Title</th>
                     <th>Estimated</th>
                     <th>Spent</th>
-                    <th>IsBlocked</th>
-                    <th>IsOnHold</th>
-                    <th># of PRs</th>
+                    <th>Additional</th>
                 </TableHeader>
                 <RowTemplate Context="workItem">
                     <td><a href="@workItem.Url">@workItem.Id</a></td>
                     <td>@workItem.Type</td>
-                    <td>@workItem.State</td>
+                    <td class="@(GetRowClass(workItem))">@workItem.State</td>
                     <td>@workItem.AssignedTo.Title</td>
                     <td>@workItem.Title</td>
                     <td>@workItem.Estimated</td>
                     <td>@workItem.Spent</td>
-                    <td>@workItem.IsBlocked</td>
-                    <td>@workItem.IsOnHold</td>
-                    <td>@workItem.PullRequests.Count()</td>
+                    <td>
+                        @if (workItem.PullRequests.Any())
+                            {
+                            <span>
+                                @workItem.PullRequests.Count()
+                                <img src="/images/dashboard/pullrequest.png" alt="@workItem.PullRequests.Count() Pull Requests" title="@workItem.PullRequests.Count() Pull Requests" height="18" />
+                            </span>
+
+                            }
+                        @if (workItem.IsBlocked)
+                            {
+                            <img src="/images/dashboard/blocked.png" alt="Blocked" title="Blocked" height="16" />
+                            }
+
+                        @if (workItem.IsOnHold)
+                            {
+                            <img src="/images/dashboard/onhold.png" alt="On Hold" title="On Hold" height="16" />
+                            }
+                    </td>
                 </RowTemplate>
+                <RowDetailTemplate Context="workItem">
+                    <DataTable PageSize="20" Items="workItem.PullRequests">
+                        <TableHeader>
+                        </TableHeader>
+                        <RowTemplate Context="pr">
+                            <td>@pr.Id</td>
+                            <td>@pr.State</td>
+                            <td>@pr.Title</td>
+                            <td>@pr.TimeActive</td>
+                            <td>@pr.NumberOfApprovals</td>
+                        </RowTemplate>
+                    </DataTable>
+                </RowDetailTemplate>
                 <ActionsTemplate>
-                    <div>
-                        <button class="btn btn-success btn-fill">Details</button>
-                        <button class="btn btn-primary btn-fill">Delete</button>
-                    </div>
                 </ActionsTemplate>
             </DataTable>
         }
@@ -63,43 +100,79 @@
 
 @code{
 
-    private bool isLoading = false;
-    private ActiveWorkitemsViewModel model = new ActiveWorkitemsViewModel();
-    private string selectedTeamMember = string.Empty;
-    private Dictionary<string, string> teamMebmersOptions = new Dictionary<string, string>();
+private bool isLoading = false;
+private Guid dashboardId = Guid.Parse("5441900f-d2e2-4b66-a4ac-8713641495b7");
+private DashboardSettingsViewModel settings;
+private ActiveWorkitemsViewModel model = new ActiveWorkitemsViewModel();
+private string selectedTeamMember = string.Empty;
+private Dictionary<string, string> teamMebmersOptions = new Dictionary<string, string>();
 
-    protected override async Task OnInitAsync()
+private OrderByConfiguration<WorkitemInformationViewModel>[] orderByConfig = OrderByConfigurationBuilder<WorkitemInformationViewModel>.New()
+                        .OrderBy(w => w.AssignedTo.Title)
+                        .OrderByDescending(w => w.IsBlocked)
+                        .OrderByDescending(w => w.IsOnHold)
+                        .Build();
+
+protected override async Task OnInitAsync()
+{
+    isLoading = true;
+    settings = await Client.GetById<DashboardSettingsViewModel>(dashboardId);
+    model = await Client.GetActiveWorkitems(Guid.Parse("b79159f4-a834-49fb-9702-36076c664ea0"));
+    teamMebmersOptions = model.Workitems.GroupBy(w => w.AssignedTo.Email).ToDictionary(k => k.Key, v => v.First().AssignedTo.Title);
+    isLoading = false;
+}
+
+protected string GetRowClass(WorkitemInformationViewModel item)
+{
+    if (item.IsBlocked)
+        return "table-danger";
+
+    if (item.IsOnHold)
+        return "table-warning";
+
+    if (string.Equals(item.State, "active", StringComparison.OrdinalIgnoreCase))
+        return "table-primary";
+
+    if (string.Equals(item.State, "new", StringComparison.OrdinalIgnoreCase))
+        return "table-secondary";
+
+    if (string.Equals(item.State, "resolved", StringComparison.OrdinalIgnoreCase))
+        return "table-success";
+
+    return string.Empty;
+}
+
+protected void ApplyFilter(UIChangeEventArgs args, DataTableBase<WorkitemInformationViewModel> dt)
+{
+    Console.WriteLine("Filter: " + args.Value + " Type: " + args.Value.GetType());
+    if (args.Value == null || string.IsNullOrEmpty(args.Value.ToString()))
     {
-        isLoading = true;
-        model = await Client.GetActiveWorkitems(Guid.Parse("b79159f4-a834-49fb-9702-36076c664ea0"));
-        teamMebmersOptions = model.Workitems.GroupBy(w => w.AssignedTo.Email).ToDictionary(k => k.Key, v => v.First().AssignedTo.Title);
-        isLoading = false;
+        // TODO: Reset filter?
+        dt.Filter(null);
     }
-
-    protected string GetRowClass(WorkitemInformationViewModel item)
+    else
     {
-        if (item.IsBlocked)
-            return "table-danger";
-
-        if (item.IsOnHold)
-            return "table-warning";
-
-        if (string.Equals(item.State, "resolved", StringComparison.OrdinalIgnoreCase))
-            return "table-success";
-
-        return string.Empty;
-    }
-
-    protected void ApplyFilter(UIChangeEventArgs args, DataTableBase<WorkitemInformationViewModel> dt)
-    {
-        if (args.Value == null || string.IsNullOrEmpty(args.Value.ToString()))
+        var isGuid = Guid.TryParse(args.Value.ToString(), out var id);
+        if (isGuid)
         {
-            // TODO: Reset filter?
-            dt.Filter(null);
+            var members = settings.SubTeams.SingleOrDefault(s => s.Id == id)?.Members;
+            dt.Filter(i => members != null && members.Any(m => string.Equals(i.AssignedTo.Email, m)));
         }
         else
         {
             dt.Filter(i => string.Equals(i.AssignedTo.Email, args.Value));
         }
     }
+}
+
+private void ShowDashboardSettings()
+{
+    var actions = new[]
+    {
+        ModalAction.Get("Update", () => Console.WriteLine("Updated")),
+        ModalAction.GetClose()
+    };
+
+    Modal.Show<DashboardSettings>("Settings", actions, ModalParameter.Get("DashboardId", dashboardId));
+}
 }
