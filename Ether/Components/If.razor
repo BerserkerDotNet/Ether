@@ -1,0 +1,14 @@
+@if (Condition)
+{
+    @Then
+}
+else if (Else != null)
+{
+    @Else
+}
+
+@code {
+    [Parameter] bool Condition { get; set; }
+    [Parameter] RenderFragment Then { get; set; }
+    [Parameter] RenderFragment Else { get; set; }
+}

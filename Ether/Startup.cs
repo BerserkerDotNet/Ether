@@ -1,10 +1,9 @@
 //using Blazor.Extensions.Logging;
-using Ether.Components.Modal;
+using BlazorBootstrap.Modal;
 using Ether.Types;
 using Ether.Types.EditableTable;
 using Microsoft.AspNetCore.Components.Builder;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
 namespace Ether
 {
@@ -21,7 +20,7 @@ namespace Ether
             services.AddSingleton<AppState>();
             services.AddSingleton<EtherClientEditableTableDataProvider>();
             services.AddSingleton<NoOpEditableTableDataProvider>();
-            services.AddScoped<ModalService>();
+            services.AddBootstrapModal();
 
             //services.AddLogging(builder => builder
             //    .AddBrowserConsole()

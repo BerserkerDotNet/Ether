@@ -40,6 +40,7 @@
 
   <ItemGroup>
     <PackageReference Include="Blazor.Extensions.Storage" Version="0.1.8-preview1" />
+    <PackageReference Include="BlazorBootstrap.Modal" Version="1.0.0" />
     <PackageReference Include="IdentityModel" Version="3.10.10" />
     <PackageReference Include="Microsoft.AspNetCore.Blazor" Version="3.0.0-preview6.19307.2" />
     <PackageReference Include="Microsoft.AspNetCore.Blazor.Build" Version="3.0.0-preview6.19307.2" PrivateAssets="all" />

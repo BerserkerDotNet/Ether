@@ -27,5 +27,7 @@ namespace Ether.ViewModels
         public bool IsOnHold { get; set; }
 
         public IEnumerable<WorkitemPullRequest> PullRequests { get; set; }
+
+        public IEnumerable<string> Warnings { get; set; }
     }
 }

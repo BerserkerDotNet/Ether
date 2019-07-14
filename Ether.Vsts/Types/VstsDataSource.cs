@@ -214,7 +214,7 @@ namespace Ether.Vsts.Types
         // TODO: DataSource should not have knowledge on the type specific to reporters!
         public async Task<WorkitemInformationViewModel> GetWorkItemInfo(WorkItemViewModel workItem, IEnumerable<TeamMemberViewModel> team)
         {
-            (var estimatedToComplete, var timeSpent) = GetEtaMetric(workItem, team);
+            (var estimatedToComplete, var timeSpent) = GetEtaMetric(workItem, team, allowZeroEstimate: true);
             var isInCodeReview = await IsInCodeReview(workItem);
 
             if (IsResolved(workItem) || (!IsActive(workItem) && !IsNew(workItem)) || !IsAssignedToTeamMember(workItem, team))
@@ -236,7 +236,7 @@ namespace Ether.Vsts.Types
                 IsOnHold = ContainsTag(workItem, "onhold"),
                 Estimated = estimatedToComplete,
                 Spent = timeSpent,
-                PullRequests = Enumerable.Empty<WorkitemPullRequest>()
+                PullRequests = Enumerable.Empty<WorkitemPullRequest>(),
             };
 
             var pullRequestIds = GetPullRequestIds(workItem);
@@ -252,8 +252,9 @@ namespace Ether.Vsts.Types
                         return prInfo;
                     }
 
+                    prInfo.Url = GetPullRequestUrl(GetProject(workItem), pr.Repository, pId);
                     prInfo.Title = pr.Title;
-                    prInfo.TimeActive = DateTime.UtcNow - pr.Created;
+                    prInfo.TimeActive = GetPullRequestActiveTime(pr);
                     prInfo.Author = pr.Author;
                     prInfo.State = pr.State.ToString();
 
@@ -261,7 +262,34 @@ namespace Ether.Vsts.Types
                 });
             }
 
+            workItemInfo.Warnings = GetWorkitemWarnings(workItemInfo, workItem);
+
             return workItemInfo;
+        }
+
+        private IEnumerable<string> GetWorkitemWarnings(WorkitemInformationViewModel workItem, WorkItemViewModel workItemVM)
+        {
+            if (string.Equals(workItem.State, WorkItemStateActive, StringComparison.OrdinalIgnoreCase) && workItem.Estimated == 0)
+            {
+                yield return "Workitem does not have an estimate";
+            }
+
+            if (workItem.Spent / workItem.Estimated > 1.8f)
+            {
+                yield return "Workitem is delayed";
+            }
+
+            var activePrWithNoCodeReview = workItem.PullRequests.Any(p => string.Equals(workItem.State, "Active", StringComparison.OrdinalIgnoreCase)) && ContainsTag(workItemVM, "code review");
+            if (activePrWithNoCodeReview)
+            {
+                yield return "Active Pull Request, but no 'Code Review' tag.";
+            }
+        }
+
+        private TimeSpan GetPullRequestActiveTime(PullRequest pr)
+        {
+            var completedDate = pr.State != PullRequestState.Active ? pr.Completed : DateTime.UtcNow;
+            return completedDate - pr.Created;
         }
 
         private IEnumerable<int> GetPullRequestIds(WorkItemViewModel workItem)
@@ -273,7 +301,7 @@ namespace Ether.Vsts.Types
                 .ToArray();
         }
 
-        private (float eta, float spent) GetEtaMetric(WorkItemViewModel workItem, IEnumerable<TeamMemberViewModel> team)
+        private (float eta, float spent) GetEtaMetric(WorkItemViewModel workItem, IEnumerable<TeamMemberViewModel> team, bool allowZeroEstimate = false)
         {
             var timeSpent = GetActiveDuration(workItem, team);
             var etaValues = GetETAValues(workItem);
@@ -284,12 +312,12 @@ namespace Ether.Vsts.Types
                 estimatedToComplete = etaValues.OriginalEstimate;
             }
 
-            if (estimatedToComplete == 0)
+            if (estimatedToComplete == 0 && !allowZeroEstimate)
             {
                 estimatedToComplete = MinimumPossibleEstimate;
             }
 
-            if (timeSpent == 0)
+            if (timeSpent == 0 && !allowZeroEstimate)
             {
                 timeSpent = MinimumPossibleEstimate;
             }
@@ -437,6 +465,12 @@ namespace Ether.Vsts.Types
         {
             var instance = _vstsConfigCache.Value.InstanceName;
             return $"https://{instance}.visualstudio.com/{project}/_workitems/edit/{workItemId}";
+        }
+
+        private string GetPullRequestUrl(string project, Guid repository, int pullRequestId)
+        {
+            var instance = _vstsConfigCache.Value.InstanceName;
+            return $"https://{instance}.visualstudio.com/{project}/_git/{repository}/pullrequest/{pullRequestId}";
         }
 
         private string GetProject(WorkItemViewModel item)

@@ -1,0 +1,26 @@
+@if (Workitem.PullRequests.Any())
+{
+    <span>
+        @Workitem.PullRequests.Count()
+        <img src="/images/dashboard/pullrequest.png" alt="@Workitem.PullRequests.Count() Pull Requests" title="@Workitem.PullRequests.Count() Pull Requests" height="18" />
+    </span>
+}
+@if (Workitem.Warnings.Any())
+{
+    var title = string.Join(Environment.NewLine, Workitem.Warnings);
+    <img src="/images/dashboard/warning.png" alt="@title" title="@title" height="16" />
+}
+@if (Workitem.IsBlocked)
+{
+    <img src="/images/dashboard/blocked.png" alt="Blocked" title="Blocked" height="16" />
+}
+
+@if (Workitem.IsOnHold)
+{
+    <img src="/images/dashboard/onhold.png" alt="On Hold" title="On Hold" height="16" />
+}
+
+@code {
+
+    [Parameter] WorkitemInformationViewModel Workitem { get; set; }
+}

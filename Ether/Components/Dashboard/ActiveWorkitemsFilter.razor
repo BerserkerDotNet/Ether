@@ -1,0 +1,24 @@
+@inherits ActiveWorkitemsFilterBase
+
+<div class="form-group">
+    <div class="input-group">
+        <select class="form-control" @onchange="@OnChange">
+            <option value="">None</option>
+            <optgroup label="Teams">
+                @foreach (var subTeam in Settings.SubTeams)
+                {
+                    <option value="@subTeam.Id">@subTeam.Name</option>
+                }
+            </optgroup>
+            <optgroup label="Members">
+                @foreach (var member in TeamMebmersOptions)
+                {
+                    <option value="@member.Key">@member.Value</option>
+                }
+            </optgroup>
+        </select>
+        <div class="input-group-append">
+            <button class="btn btn-light" @onclick="@(() => ShowDashboardSettings())">Settings</button>
+        </div>
+    </div>
+</div>
