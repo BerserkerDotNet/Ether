@@ -76,6 +76,7 @@ namespace Ether.Components.Code
 
         public virtual async Task Refresh()
         {
+            Console.WriteLine("EDT: Refresh");
             try
             {
                 IsLoading = true;
@@ -84,6 +85,7 @@ namespace Ether.Components.Code
                     Console.WriteLine("Data provider is null. Exit.");
                     return;
                 }
+
                 Console.WriteLine("Loading data with " + _dataProvider.GetType());
 
                 var items = await _dataProvider.Load<T>();
@@ -110,12 +112,12 @@ namespace Ether.Components.Code
                 IsLoading = false;
             }
 
-            StateHasChanged();
+            // StateHasChanged();
         }
 
         protected override async Task OnParametersSetAsync()
         {
-            Console.WriteLine("Settings up data provider. " + DataProvider == null);
+            Console.WriteLine("Settings up data provider. ");
             _dataProvider = DataProvider ?? DefaultDataProvider;
 
             await Refresh();

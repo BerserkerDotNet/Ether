@@ -33,5 +33,7 @@ namespace Ether.Contracts.Interfaces
         WorkItemDetail CreateWorkItemDetail(WorkItemViewModel item, IEnumerable<TeamMemberViewModel> team);
 
         Task<WorkitemInformationViewModel> GetWorkItemInfo(WorkItemViewModel item, IEnumerable<TeamMemberViewModel> team);
+
+        Task<UnAssignedWorkitemsViewModel> GetUnAssignedFromQuery(Guid queryId);
     }
 }

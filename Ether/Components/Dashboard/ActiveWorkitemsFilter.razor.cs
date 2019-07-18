@@ -11,9 +11,6 @@ namespace Ether.Components.Dashboard
 {
     public class ActiveWorkitemsFilterBase : ComponentBase
     {
-        [Inject]
-        protected IModal Modal { get; set; }
-
         [Parameter]
         protected DashboardSettingsViewModel Settings { get; private set; }
 
@@ -25,11 +22,6 @@ namespace Ether.Components.Dashboard
 
         [Parameter]
         protected EventCallback<object> OnFilter { get; set; }
-
-        protected void ShowDashboardSettings()
-        {
-            Modal.Show<DashboardSettings>("Settings", ModalParameter.Get("DashboardId", DashboardId));
-        }
 
         protected async Task OnChange(UIChangeEventArgs args)
         {

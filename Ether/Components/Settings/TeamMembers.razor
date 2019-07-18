@@ -56,18 +56,21 @@
 </EditableTable>
 
 @code{
+    [Parameter] IEnumerable<TeamMemberViewModel> Members { get; set; }
+    [Parameter] EventCallback<TeamMemberViewModel> OnChange { get; set; }
+    [Parameter] EventCallback<TeamMemberViewModel> OnDelete { get; set; }
 
-    private EditableTableBase<TeamMemberViewModel> grid;
+private EditableTableBase<TeamMemberViewModel> grid;
 
-    protected async Task FetchWorkItems(TeamMemberViewModel member)
-    {
-        await Client.RunWorkitemsJob(new[] { member.Id }, isReset: false);
-        await grid.Refresh();
-    }
+protected async Task FetchWorkItems(TeamMemberViewModel member)
+{
+    await Client.RunWorkitemsJob(new[] { member.Id }, isReset: false);
+    await grid.Refresh();
+}
 
-    protected async Task ResetWorkItems(TeamMemberViewModel member)
-    {
-        await Client.RunWorkitemsJob(new[] { member.Id }, isReset: true);
-        await grid.Refresh();
-    }
+protected async Task ResetWorkItems(TeamMemberViewModel member)
+{
+    await Client.RunWorkitemsJob(new[] { member.Id }, isReset: true);
+    await grid.Refresh();
+}
 }

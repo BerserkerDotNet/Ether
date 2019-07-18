@@ -24,12 +24,14 @@ namespace Ether.Pages
                                 .OrderByDescending(w => w.IsBlocked)
                                 .OrderByDescending(w => w.IsOnHold)
                                 .Build();
+            Dashboards = new List<DashboardSettingsViewModel>(0);
         }
-
 
         protected bool IsLoading { get; private set; }
 
         protected DashboardSettingsViewModel Settings { get; private set; }
+
+        protected List<DashboardSettingsViewModel> Dashboards { get; private set; }
 
         protected ActiveWorkitemsViewModel Model { get; private set; }
 
@@ -42,9 +44,13 @@ namespace Ether.Pages
         [Inject]
         protected EtherClient Client { get; set; }
 
+        [Inject]
+        protected IModal Modal { get; set; }
+
         protected override async Task OnInitAsync()
         {
             IsLoading = true;
+            Dashboards = new List<DashboardSettingsViewModel>(await Client.GetAll<DashboardSettingsViewModel>());
             Settings = await Client.GetById<DashboardSettingsViewModel>(dashboardId);
             Model = await Client.GetActiveWorkitems(Guid.Parse("b79159f4-a834-49fb-9702-36076c664ea0"));
             TeamMebmersOptions = Model.Workitems.GroupBy(w => w.AssignedTo.Email).ToDictionary(k => k.Key, v => v.First().AssignedTo.Title);
@@ -101,6 +107,16 @@ namespace Ether.Pages
                     dt.Filter(i => string.Equals(i.AssignedTo.Email, value));
                 }
             }
+        }
+
+        protected void ShowDashboardSettings(Guid id)
+        {
+            Modal.Show<DashboardSettings>("Settings", ModalParameter.Get("DashboardId", id));
+        }
+
+        protected void ShowDashboardSettings()
+        {
+            Modal.Show<DashboardSettings>("Settings");
         }
     }
 }

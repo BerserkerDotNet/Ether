@@ -267,6 +267,12 @@ namespace Ether.Vsts.Types
             return workItemInfo;
         }
 
+        // TODO: Shouldn't be here
+        public Task<UnAssignedWorkitemsViewModel> GetUnAssignedFromQuery(Guid queryId)
+        {
+            throw new NotImplementedException();
+        }
+
         private IEnumerable<string> GetWorkitemWarnings(WorkitemInformationViewModel workItem, WorkItemViewModel workItemVM)
         {
             if (string.Equals(workItem.State, WorkItemStateActive, StringComparison.OrdinalIgnoreCase) && workItem.Estimated == 0)

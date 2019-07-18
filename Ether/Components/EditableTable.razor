@@ -3,7 +3,7 @@
 
 @if (!IsEditing)
 {
-    <Card Title="@GridTitle" AdditionalClasses="card-600">
+    <Card Title="@GridTitle" AdditionalClasses="@(!FitToRecords ? "card-600": "")">
         <Header>
             <div class="pull-right">
                 @if (!IsReadOnly)
@@ -67,6 +67,7 @@ else
     [Parameter] string ExistingTitle { get; set; }
 
     [Parameter] bool IsReadOnly { get; set; }
+    [Parameter] bool FitToRecords { get; set; }
 
     [Parameter] RenderFragment<EditableTableBase<TItem>> ListModeContent { get; set; }
     [Parameter] RenderFragment<EditableTableBase<TItem>> FormModeContent { get; set; }

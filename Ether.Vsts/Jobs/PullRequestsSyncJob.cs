@@ -14,13 +14,11 @@ namespace Ether.Vsts.Jobs
 {
     public class PullRequestsSyncJob : IJob
     {
-        private readonly IVstsClientFactory _clientFactory;
         private readonly IMediator _mediator;
         private readonly ILogger<PullRequestsSyncJob> _logger;
 
-        public PullRequestsSyncJob(IVstsClientFactory clientFactory, IMediator mediator, ILogger<PullRequestsSyncJob> logger)
+        public PullRequestsSyncJob(IMediator mediator, ILogger<PullRequestsSyncJob> logger)
         {
-            _clientFactory = clientFactory;
             _mediator = mediator;
             _logger = logger;
         }
@@ -38,6 +36,23 @@ namespace Ether.Vsts.Jobs
                 await _mediator.Execute(new SavePullRequests(pullRequests));
                 _logger.LogInformation("Found {Count} pull requests for {Repository}", pullRequests.Count(), repository.Name);
             }
+        }
+    }
+
+    public class DashboardQueriesSyncJob : IJob
+    {
+        private readonly IMediator _mediator;
+        private readonly ILogger<DashboardQueriesSyncJob> _logger;
+
+        public DashboardQueriesSyncJob(IMediator mediator, ILogger<DashboardQueriesSyncJob> logger)
+        {
+            _mediator = mediator;
+            _logger = logger;
+        }
+
+        public Task Execute(IReadOnlyDictionary<string, object> parameters)
+        {
+            throw new KeyNotFoundException();
         }
     }
 }

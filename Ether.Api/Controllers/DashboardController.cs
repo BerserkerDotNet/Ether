@@ -31,11 +31,27 @@ namespace Ether.Api.Controllers
         }
 
         [HttpGet]
+        [Route(nameof(UnAssignedWorkitems))]
+        public async Task<IActionResult> UnAssignedWorkitems(Guid profileId)
+        {
+            var data = await _mediator.Request<GetUnAssignedWorkitemsForQuery, UnAssignedWorkitemsViewModel>(new GetUnAssignedWorkitemsForQuery { QueryId = profileId });
+            return Ok(data);
+        }
+
+        [HttpGet]
         [Route(nameof(GetById))]
         public async Task<IActionResult> GetById(Guid id)
         {
             var settings = await _mediator.Request<GetDashboardSettings, DashboardSettingsViewModel>(new GetDashboardSettings(id));
             return Ok(settings);
+        }
+
+        [HttpGet]
+        [Route(nameof(GetAll))]
+        public async Task<IActionResult> GetAll()
+        {
+            var result = await _mediator.RequestCollection<GetAllDashboards, DashboardSettingsViewModel>();
+            return Ok(result);
         }
 
         [HttpPost]

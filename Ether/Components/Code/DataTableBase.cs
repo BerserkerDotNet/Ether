@@ -41,6 +41,7 @@ namespace Ether.Components.Code
 
         protected override void OnParametersSet()
         {
+            Console.WriteLine("DT: Parameters set");
             base.OnParametersSet();
             ItemsToShow = Items;
             if (_filterPredicate != null)

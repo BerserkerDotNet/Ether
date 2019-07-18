@@ -1,6 +1,14 @@
 ﻿@page "/dashboard"
 @inherits DashboardBase
 
+<Card Title="Dashboard">
+    <Body>
+        <DashboardSelector Dashboards="Dashboards"
+                           OnNew="@(() => ShowDashboardSettings())"
+                           OnEdit="@(id => ShowDashboardSettings(id))" />
+    </Body>
+</Card>
+
 <Card Title="Active work items">
     <Body>
         <If Condition="IsLoading">
