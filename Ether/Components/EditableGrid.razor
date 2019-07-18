@@ -1,0 +1,69 @@
+@typeparam TItem
+@inherits EditableGridBase<TItem>
+
+<If Condition="!IsEditing">
+    <Then>
+        <Card Title="@GridTitle">
+            <Header>
+                <div class="pull-right">
+                    <button class="btn btn-primary btn-fill" @onclick="@OnNew">New</button>
+                    <button class="btn btn-success btn-fill" @onclick="@(async () => await OnRefresh.InvokeAsync(null))">Refresh</button>
+                </div>
+            </Header>
+            <Body>
+                <If Condition="IsLoading">
+                    <Then>
+                        <div class="text-center" style="padding-top:15%">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="sr-only">Loading...</span>
+                            </div>
+                            <div>Loading...</div>
+                        </div>
+                    </Then>
+                    <Else>
+                        @ListModeContent(this)
+                    </Else>
+                </If>
+            </Body>
+            <Footer></Footer>
+        </Card>
+    </Then>
+    <Else>
+        <EditForm Model="EditingItem" OnValidSubmit="Save">
+            <FluentValidationValidator />
+            <Card AdditionalClasses="card-600">
+                <Header>
+                    @if ((EditingItem as ViewModelWithId).Id == Guid.Empty)
+                    {
+                        @NewTitle
+                    }
+                    else
+                    {
+                        @ExistingTitle
+                    }
+                </Header>
+                <Body>
+                    <If Condition="IsSaving">
+                        <Then>
+                            <div class="text-center" style="padding-top:15%">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="sr-only">Loading...</span>
+                                </div>
+                                <div>Saving...</div>
+                            </div>
+                        </Then>
+                        <Else>
+                            @FormModeContent(this)
+                        </Else>
+                    </If>
+                </Body>
+                <Footer>
+                    <div class="pull-right">
+                        <button type="submit" class="btn btn-success btn-fill">Save</button>
+                        <button class="btn btn-danger btn-fill" @onclick="@Cancel">Cancel</button>
+                    </div>
+                </Footer>
+            </Card>
+        </EditForm>
+    </Else>
+</If>

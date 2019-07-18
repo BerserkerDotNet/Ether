@@ -1,11 +1,15 @@
 ﻿@inject EtherClient Client
 
-<EditableTable @ref="grid" TItem="TeamMemberViewModel"
+<EditableGrid Items="Members"
                GridTitle="Team members"
                NewTitle="New member"
-               ExistingTitle="Editing member">
+               ExistingTitle="Editing member"
+               OnSave="@(async (TeamMemberViewModel m) => await OnChange.InvokeAsync(m))"
+               OnDelete="@(async (TeamMemberViewModel m) => await OnDelete.InvokeAsync(m))"
+               OnRefresh="@(async () => await OnRefresh.InvokeAsync(null))"
+              >
     <ListModeContent Context="ctx">
-        <DataTable Items="@ctx.Items" PageSize="10">
+        <DataTable Items="ctx.Items" PageSize="10">
             <FilterTemplate Context="dt">
                 <div class="form-group">
                     <input class="form-control" type="text" placeholder="Type to search..."
@@ -53,24 +57,25 @@
             <ValidationMessage For="@(() => ctx.EditingItem.Email)" />
         </div>
     </FormModeContent>
-</EditableTable>
+</EditableGrid>
 
 @code{
-    [Parameter] IEnumerable<TeamMemberViewModel> Members { get; set; }
-    [Parameter] EventCallback<TeamMemberViewModel> OnChange { get; set; }
-    [Parameter] EventCallback<TeamMemberViewModel> OnDelete { get; set; }
+[Parameter] IEnumerable<TeamMemberViewModel> Members { get; set; }
+[Parameter] EventCallback<TeamMemberViewModel> OnChange { get; set; }
+[Parameter] EventCallback<TeamMemberViewModel> OnDelete { get; set; }
+[Parameter] EventCallback OnRefresh { get; set; }
 
-private EditableTableBase<TeamMemberViewModel> grid;
+//private EditableTableBase<TeamMemberViewModel> grid;
 
 protected async Task FetchWorkItems(TeamMemberViewModel member)
 {
     await Client.RunWorkitemsJob(new[] { member.Id }, isReset: false);
-    await grid.Refresh();
+    // await grid.Refresh();
 }
 
 protected async Task ResetWorkItems(TeamMemberViewModel member)
 {
     await Client.RunWorkitemsJob(new[] { member.Id }, isReset: true);
-    await grid.Refresh();
+    // await grid.Refresh();
 }
 }

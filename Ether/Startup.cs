@@ -17,7 +17,11 @@ namespace Ether
             services.AddSingleton<TokenService>();
             services.AddSingleton<JsUtils>();
             services.AddSingleton<LocalStorage>();
+
+            // State
+            services.AddSingleton<TeamMembersStateService>();
             services.AddSingleton<AppState>();
+
             services.AddSingleton<EtherClientEditableTableDataProvider>();
             services.AddSingleton<NoOpEditableTableDataProvider>();
             services.AddBootstrapModal();

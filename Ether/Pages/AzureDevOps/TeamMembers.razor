@@ -3,6 +3,33 @@
 
 <div class="row">
     <div class="col-md-12">
-        <Ether.Components.Settings.TeamMembers />
+        <Ether.Components.Settings.TeamMembers Members="State.Members"
+                                               OnChange="OnChange"
+                                               OnDelete="OnDelete"
+                                               OnRefresh="OnRefresh" />
     </div>
 </div>
+
+@code {
+
+    protected override async Task OnInitAsync()
+    {
+        await State.LoadAsync();
+    }
+
+    protected async Task OnChange(TeamMemberViewModel model)
+    {
+        await State.UpdateMemberAsync(model);
+    }
+
+    protected async Task OnDelete(TeamMemberViewModel model)
+    {
+        await State.DeleteMemberAsync(model);
+    }
+
+    protected async Task OnRefresh()
+    {
+        await State.LoadAsync(hard: true);
+    }
+
+}
