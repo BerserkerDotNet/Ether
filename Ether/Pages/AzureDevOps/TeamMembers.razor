@@ -1,35 +1,51 @@
 ﻿@page "/azure-devops/teammembers"
 @inject TeamMembersStateService State
+@inject JsUtils JsUtils
 
 <div class="row">
     <div class="col-md-12">
         <Ether.Components.Settings.TeamMembers Members="State.Members"
                                                OnChange="OnChange"
                                                OnDelete="OnDelete"
-                                               OnRefresh="OnRefresh" />
+                                               OnRefresh="OnRefresh"
+                                               OnFetchWorkItems="OnFetchWorkItems"
+                                               OnResetWorkItems="OnResetWorkItems" />
     </div>
 </div>
 
 @code {
 
-    protected override async Task OnInitAsync()
-    {
-        await State.LoadAsync();
-    }
+protected override async Task OnInitAsync()
+{
+    await State.LoadAsync();
+}
 
-    protected async Task OnChange(TeamMemberViewModel model)
-    {
-        await State.UpdateMemberAsync(model);
-    }
+protected async Task OnChange(TeamMemberViewModel model)
+{
+    await State.UpdateAsync(model);
+}
 
-    protected async Task OnDelete(TeamMemberViewModel model)
-    {
-        await State.DeleteMemberAsync(model);
-    }
+protected async Task OnDelete(TeamMemberViewModel model)
+{
+    await State.DeleteAsync(model);
+}
 
-    protected async Task OnRefresh()
-    {
-        await State.LoadAsync(hard: true);
-    }
+protected async Task OnRefresh()
+{
+    await State.LoadAsync(hard: true);
+}
+
+protected async Task OnFetchWorkItems(TeamMemberViewModel model)
+{
+    await State.FetchWorkItems(model);
+    await JsUtils.NotifySuccess("Fetch Workitems", $"Started to fetch workitems for {model.DisplayName}");
+}
+
+protected async Task OnResetWorkItems(TeamMemberViewModel model)
+{
+    await State.ResetWorkItems(model);
+    await State.LoadAsync(hard: true);
+    await JsUtils.NotifySuccess("Reset Workitems", $"Reset workitems for {model.DisplayName}");
+}
 
 }

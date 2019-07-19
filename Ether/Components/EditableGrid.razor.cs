@@ -28,6 +28,15 @@ namespace Ether.Components
         protected string ExistingTitle { get; set; }
 
         [Parameter]
+        protected bool IsReadOnly { get; set; }
+
+        [Parameter]
+        protected Func<TItem, object> OrderBy { get; set; }
+
+        [Parameter]
+        protected Func<TItem, object> OrderByDescending { get; set; }
+
+        [Parameter]
         protected EventCallback<TItem> OnSave { get; set; }
 
         [Parameter]

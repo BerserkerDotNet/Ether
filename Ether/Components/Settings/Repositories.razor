@@ -1,8 +1,11 @@
 ﻿@inject EtherClient Client
-<EditableTable TItem="VstsRepositoryViewModel"
-                GridTitle="Repositories"
-                NewTitle="New Repository"
-                ExistingTitle="Edit Repository">
+<EditableGrid Items="Items"
+              GridTitle="Repositories"
+              NewTitle="New Repository"
+              ExistingTitle="Edit Repository"
+              OnSave="@(async (VstsRepositoryViewModel r) => await OnChange.InvokeAsync(r))"
+              OnDelete="@(async (VstsRepositoryViewModel r) => await OnDelete.InvokeAsync(r))"
+              OnRefresh="@(async () => await OnRefresh.InvokeAsync(null))">
     <ListModeContent Context="ctx">
         <DataTable Items="@ctx.Items">
             <TableHeader>
@@ -30,35 +33,28 @@
             </div>
             <div class="form-group">
                 <label>Project</label>
-                <SelectInput Class="form-control" @bind-Value="ctx.EditingItem.Project" Options="projectsOptions"  />
+                <SelectInput Class="form-control" @bind-Value="ctx.EditingItem.Project" Options="ProjectsOptions" />
                 <ValidationMessage For="@(() => ctx.EditingItem.Project)" />
             </div>
         </ModelValidation>
     </FormModeContent>
-</EditableTable>
+</EditableGrid>
 
 @code
 {
-    private Dictionary<Guid, string> projectsOptions = new Dictionary<Guid, string>();
-
-    protected override async Task OnInitAsync()
-    {
-        await base.OnInitAsync();
-        var projects = await Client.GetAll<VstsProjectViewModel>();
-        projectsOptions.Add(Guid.Empty, Constants.NoneLabel);
-        foreach (var project in projects)
-        {
-            projectsOptions.Add(project.Id, project.Name);
-        }
-    }
+    [Parameter] IEnumerable<VstsRepositoryViewModel> Items { get; set; }
+    [Parameter] Dictionary<Guid, string> ProjectsOptions { get; set; }
+    [Parameter] EventCallback<VstsRepositoryViewModel> OnChange { get; set; }
+    [Parameter] EventCallback<VstsRepositoryViewModel> OnDelete { get; set; }
+    [Parameter] EventCallback OnRefresh { get; set; }
 
     private string GetProjectName(Guid projectId)
     {
-        if (!projectsOptions.ContainsKey(projectId))
+        if (!ProjectsOptions.ContainsKey(projectId))
         {
             return "N/A";
         }
 
-        return projectsOptions[projectId];
+        return ProjectsOptions[projectId];
     }
 }

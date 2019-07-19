@@ -1,9 +1,9 @@
-﻿<EditableTable TItem="JobLogViewModel"
-               IsReadOnly="true"
-               GridTitle="Job Logs"
-               OrderByDescending="@(item => item.CompletedOn)">
+﻿<EditableGrid Items="Items"
+              IsReadOnly="true"
+              GridTitle="Job Logs"
+              OnRefresh="@(async () => await OnRefresh.InvokeAsync(null))">
     <ListModeContent Context="ctx">
-        <DataTable Items="@ctx.Items" PageSize="8">
+        <DataTable Items="@ctx.Items" PageSize="8" OrderBy="orderByConfig">
             <TableHeader>
                 <th>Type</th>
                 <th>Result</th>
@@ -22,8 +22,15 @@
             </RowTemplate>
         </DataTable>
     </ListModeContent>
-</EditableTable>
+</EditableGrid>
 
 @code
 {
+    private OrderByConfiguration<JobLogViewModel>[] orderByConfig = OrderByConfigurationBuilder<JobLogViewModel>
+        .New()
+        .OrderByDescending(l => l.CompletedOn)
+        .Build();
+
+    [Parameter] IEnumerable<JobLogViewModel> Items { get; set; }
+    [Parameter] EventCallback OnRefresh { get; set; }
 }

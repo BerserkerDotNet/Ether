@@ -1,8 +1,10 @@
-﻿@inject EtherClient Client
-<EditableTable TItem="VstsProjectViewModel"
-               GridTitle="Projects"
-               NewTitle="New Project"
-               ExistingTitle="Editing Project">
+﻿<EditableGrid Items="Items"
+              GridTitle="Projects"
+              NewTitle="New Project"
+              ExistingTitle="Editing Project"
+              OnSave="@(async (VstsProjectViewModel p) => await OnChange.InvokeAsync(p))"
+              OnDelete="@(async (VstsProjectViewModel p) => await OnDelete.InvokeAsync(p))"
+              OnRefresh="@(async () => await OnRefresh.InvokeAsync(null))">
     <ListModeContent Context="ctx">
         <DataTable Items="@ctx.Items">
             <TableHeader>
@@ -36,33 +38,19 @@
         </div>
         <div class="form-group">
             <label>Identity</label>
-            <SelectInput Class="form-control" @bind-Value="ctx.EditingItem.Identity" Options="identitiesOptions"/>
+            <SelectInput Class="form-control" @bind-Value="ctx.EditingItem.Identity" Options="IdentitiesOptions" />
             <ValidationMessage For="@(() => ctx.EditingItem.Identity)" />
         </div>
     </FormModeContent>
-</EditableTable>
-
-@*<div class="form-check">
-    <label class="form-check-label">
-        <input class="form-check-input" type="checkbox" bind="EditingItem.IsWorkItemsEnabled" />
-        Is Work Items Enabled
-    </label>
-</div>*@
+</EditableGrid>
 
 @code
 {
-    private Dictionary<Guid?, string> identitiesOptions = new Dictionary<Guid?, string>(10);
-
-    protected override async Task OnInitAsync()
-    {
-        await base.OnInitAsync();
-        var identities = await Client.GetAll<IdentityViewModel>();
-        identitiesOptions.Add(Guid.Empty, Constants.NoneLabel);
-        foreach (var identity in identities)
-        {
-            identitiesOptions.Add(identity.Id, identity.Name);
-        }
-    }
+    [Parameter] IEnumerable<VstsProjectViewModel> Items { get; set; }
+    [Parameter] Dictionary<Guid?, string> IdentitiesOptions { get; set; }
+    [Parameter] EventCallback<VstsProjectViewModel> OnChange { get; set; }
+    [Parameter] EventCallback<VstsProjectViewModel> OnDelete { get; set; }
+    [Parameter] EventCallback OnRefresh { get; set; }
 
     private string GetIdentityName(Guid? identityId)
     {
@@ -71,12 +59,12 @@
             return Constants.NoneLabel;
         }
 
-        if (!identitiesOptions.ContainsKey(identityId.Value))
+        if (!IdentitiesOptions.ContainsKey(identityId.Value))
         {
             return "N/A";
         }
 
-        return identitiesOptions[identityId.Value];
+        return IdentitiesOptions[identityId.Value];
     }
 
 }

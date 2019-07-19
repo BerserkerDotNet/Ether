@@ -1,6 +1,4 @@
-﻿@inject EtherClient Client
-
-<EditableGrid Items="Members"
+﻿<EditableGrid Items="Members"
                GridTitle="Team members"
                NewTitle="New member"
                ExistingTitle="Editing member"
@@ -35,8 +33,8 @@
                             Work items
                         </button>
                         <div class="dropdown-menu" aria-labelledby="btnGroupWorkItemsMember">
-                            <button class="dropdown-item" @onclick="@(() => FetchWorkItems(member))">Fetch work items</button>
-                            <button class="dropdown-item" @onclick="@(() => ResetWorkItems(member))">Reset work items</button>
+                            <button class="dropdown-item" @onclick="@(async () => await OnFetchWorkItems.InvokeAsync(member))">Fetch work items</button>
+                            <button class="dropdown-item" @onclick="@(async () => await OnResetWorkItems.InvokeAsync(member))">Reset work items</button>
                         </div>
                     </div>
                     <button class="btn btn-warning btn-fill" @onclick="@(() => ctx.Edit(member))">Edit</button>
@@ -63,19 +61,7 @@
 [Parameter] IEnumerable<TeamMemberViewModel> Members { get; set; }
 [Parameter] EventCallback<TeamMemberViewModel> OnChange { get; set; }
 [Parameter] EventCallback<TeamMemberViewModel> OnDelete { get; set; }
+[Parameter] EventCallback<TeamMemberViewModel> OnFetchWorkItems { get; set; }
+[Parameter] EventCallback<TeamMemberViewModel> OnResetWorkItems { get; set; }
 [Parameter] EventCallback OnRefresh { get; set; }
-
-//private EditableTableBase<TeamMemberViewModel> grid;
-
-protected async Task FetchWorkItems(TeamMemberViewModel member)
-{
-    await Client.RunWorkitemsJob(new[] { member.Id }, isReset: false);
-    // await grid.Refresh();
-}
-
-protected async Task ResetWorkItems(TeamMemberViewModel member)
-{
-    await Client.RunWorkitemsJob(new[] { member.Id }, isReset: true);
-    // await grid.Refresh();
-}
 }

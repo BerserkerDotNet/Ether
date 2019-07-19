@@ -1,6 +1,63 @@
 ﻿@page "/azure-devops/profiles"
+@inject ProfilesStateService ProfilesState
+@inject TeamMembersStateService MembersState
+@inject RepositoriesStateService RepositoriesState
+@inject JsUtils JsUtils
 <div class="row">
     <div class="col-md-12">
-        <Ether.Components.Settings.Profiles />
+        <Ether.Components.Settings.Profiles Items="ProfilesState.Profiles"
+                                            MembersOptions="membersOptions"
+                                            RepositoriesOptions="repositoriesOptions"
+                                            OnChange="OnChange"
+                                            OnDelete="OnDelete"
+                                            OnRefresh="OnRefresh"
+                                            OnFetchWorkItems="OnFetchWorkItems"
+                                            OnResetWorkItems="OnResetWorkItems" />
     </div>
 </div>
+
+@code{
+    private Dictionary<Guid, string> membersOptions = new Dictionary<Guid, string>(0);
+    private Dictionary<Guid, string> repositoriesOptions = new Dictionary<Guid, string>(0);
+
+    protected override async Task OnInitAsync()
+    {
+        await ProfilesState.LoadAsync();
+        await MembersState.LoadAsync();
+        await RepositoriesState.LoadAsync();
+    }
+
+    protected override void OnParametersSet()
+    {
+        membersOptions = MembersState.Members.ToDictionary(m => m.Id, m => m.DisplayName);
+        repositoriesOptions = RepositoriesState.Repositories.ToDictionary(r => r.Id, r => r.Name);
+    }
+
+    protected async Task OnChange(ProfileViewModel model)
+    {
+        await ProfilesState.UpdateAsync(model);
+    }
+
+    protected async Task OnDelete(ProfileViewModel model)
+    {
+        await ProfilesState.DeleteAsync(model);
+    }
+
+    protected async Task OnRefresh()
+    {
+        await ProfilesState.LoadAsync(hard: true);
+    }
+
+    protected async Task OnFetchWorkItems(IEnumerable<Guid> members)
+    {
+        await ProfilesState.FetchWorkItems(members);
+        await JsUtils.NotifySuccess("Fetch Workitems", $"Started to fetch workitems for {members.Count()} members.");
+    }
+
+    protected async Task OnResetWorkItems(IEnumerable<Guid> members)
+    {
+        await ProfilesState.ResetWorkItems(members);
+        await ProfilesState.LoadAsync(hard: true);
+        await JsUtils.NotifySuccess("Reset Workitems", $"Reset workitems for {members.Count()} members.");
+    }
+}

@@ -1,54 +1,31 @@
-﻿@inject EtherClient Client
-@inject JsUtils JsUtils
-@inject ILogger<VstsConfigurationSettings> Logger
-
-<EditForm Model="vstsDataSource" OnValidSubmit="Save">
-    <Card Title="Vsts configuration" AdditionalClasses="card-600">
-        <Body>
-            <div class="form-group">
-                <label>Instance Name</label>
-                <InputText Class="form-control" @bind-Value="vstsDataSource.InstanceName" />
-                <ValidationMessage For="@(() => vstsDataSource.InstanceName)" />
-            </div>
-            <div class="form-group">
-                <label>Default Token</label>
-                <SelectInput Class="form-control" @bind-Value="vstsDataSource.DefaultToken" Options="identitiesOptions" />
-                <ValidationMessage For="@(() => vstsDataSource.DefaultToken)" />
-            </div>
-        </Body>
-        <Footer><button type="submit" class="btn btn-success btn-fill pull-right">Save</button></Footer>
-    </Card>
-</EditForm>
+﻿<If Condition="VstsDataSource == null">
+    <Then>
+        <Spinner Text="Loading..." />
+    </Then>
+    <Else>
+        <EditForm Model="VstsDataSource" OnValidSubmit="@(async () => await OnUpdate.InvokeAsync(VstsDataSource))">
+            <Card Title="Vsts configuration" AdditionalClasses="card-600">
+                <Body>
+                    <div class="form-group">
+                        <label>Instance Name</label>
+                        <InputText Class="form-control" @bind-Value="VstsDataSource.InstanceName" />
+                        <ValidationMessage For="@(() => VstsDataSource.InstanceName)" />
+                    </div>
+                    <div class="form-group">
+                        <label>Default Token</label>
+                        <SelectInput Class="form-control" @bind-Value="VstsDataSource.DefaultToken" Options="IdentitiesOptions" />
+                        <ValidationMessage For="@(() => VstsDataSource.DefaultToken)" />
+                    </div>
+                </Body>
+                <Footer><button type="submit" class="btn btn-success btn-fill pull-right">Save</button></Footer>
+            </Card>
+        </EditForm>
+    </Else>
+</If>
 
 @code
 {
-    private Dictionary<Guid?, string> identitiesOptions = new Dictionary<Guid?, string>(10);
-    private VstsDataSourceViewModel vstsDataSource = new VstsDataSourceViewModel();
-
-    protected override async Task OnInitAsync()
-    {
-        base.OnParametersSet();
-        vstsDataSource = await Client.GetVstsDataSourceConfig();
-        var identities = await Client.GetAll<IdentityViewModel>();
-
-        identitiesOptions.Add(Guid.Empty, Constants.NoneLabel);
-        foreach (var identity in identities)
-        {
-            identitiesOptions.Add(identity.Id, identity.Name);
-        }
-    }
-
-    private async Task Save()
-    {
-        try
-        {
-            await Client.SaveVstsDataSourceConfig(vstsDataSource);
-            await JsUtils.NotifySuccess("Success", "Vsts configuration was updated successfully");
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError(ex, "Error updating VSTS configuration");
-            await JsUtils.NotifyError("Error updating VSTS configuration", ex.Message);
-        }
-    }
+    [Parameter] VstsDataSourceViewModel VstsDataSource { get; set; }
+    [Parameter] Dictionary<Guid?, string> IdentitiesOptions { get; set; }
+    [Parameter] EventCallback<VstsDataSourceViewModel> OnUpdate { get; set; }
 }

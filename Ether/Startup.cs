@@ -2,6 +2,7 @@
 using BlazorBootstrap.Modal;
 using Ether.Types;
 using Ether.Types.EditableTable;
+using Ether.Types.State;
 using Microsoft.AspNetCore.Components.Builder;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -19,6 +20,13 @@ namespace Ether
             services.AddSingleton<LocalStorage>();
 
             // State
+            services.AddSingleton<ReportStateService>();
+            services.AddSingleton<JobLogsStateService>();
+            services.AddSingleton<VstsDataSourceStateService>();
+            services.AddSingleton<IdentitiesStateService>();
+            services.AddSingleton<ProjectsStateService>();
+            services.AddSingleton<RepositoriesStateService>();
+            services.AddSingleton<ProfilesStateService>();
             services.AddSingleton<TeamMembersStateService>();
             services.AddSingleton<AppState>();
 

@@ -3,22 +3,20 @@
 
 <If Condition="!IsEditing">
     <Then>
-        <Card Title="@GridTitle">
+        <Card Title="@GridTitle" AdditionalClasses="card-600">
             <Header>
                 <div class="pull-right">
-                    <button class="btn btn-primary btn-fill" @onclick="@OnNew">New</button>
+                    @if (!IsReadOnly)
+                    {
+                        <button class="btn btn-primary btn-fill" @onclick="@OnNew">New</button>
+                    }
                     <button class="btn btn-success btn-fill" @onclick="@(async () => await OnRefresh.InvokeAsync(null))">Refresh</button>
                 </div>
             </Header>
             <Body>
                 <If Condition="IsLoading">
                     <Then>
-                        <div class="text-center" style="padding-top:15%">
-                            <div class="spinner-border text-primary" role="status">
-                                <span class="sr-only">Loading...</span>
-                            </div>
-                            <div>Loading...</div>
-                        </div>
+                        <Spinner Text="Loading..." />
                     </Then>
                     <Else>
                         @ListModeContent(this)
@@ -45,12 +43,7 @@
                 <Body>
                     <If Condition="IsSaving">
                         <Then>
-                            <div class="text-center" style="padding-top:15%">
-                                <div class="spinner-border text-primary" role="status">
-                                    <span class="sr-only">Loading...</span>
-                                </div>
-                                <div>Saving...</div>
-                            </div>
+                            <Spinner Text="Saving..." />
                         </Then>
                         <Else>
                             @FormModeContent(this)

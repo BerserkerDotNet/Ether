@@ -1,10 +1,56 @@
 ﻿@page "/settings"
+@inject IdentitiesStateService IdentityState
+@inject VstsDataSourceStateService VstsDataSourceState
+@inject JsUtils JsUtils
+@inject ILogger<Settings> Logger
 
 <div class="row">
     <div class="col-xl-6 col-md-12">
-        <Identities />
+        <Identities Items="IdentityState.Identities"
+                    OnChange="OnChange"
+                    OnDelete="OnDelete"
+                    OnRefresh="OnRefresh" />
     </div>
     <div class="col-xl-6 col-md-12">
-        <VstsConfigurationSettings />
+        <VstsConfigurationSettings VstsDataSource="VstsDataSourceState.VstsDataSource"
+                                   IdentitiesOptions="IdentityState.IdentitiesOptions"
+                                   OnUpdate="OnUpdateVstsDataSource" />
     </div>
 </div>
+
+@code{
+    protected override async Task OnInitAsync()
+    {
+        await IdentityState.LoadAsync();
+        await VstsDataSourceState.LoadAsync();
+    }
+
+    protected async Task OnChange(IdentityViewModel model)
+    {
+        await IdentityState.UpdateAsync(model);
+    }
+
+    protected async Task OnDelete(IdentityViewModel model)
+    {
+        await IdentityState.DeleteAsync(model);
+    }
+
+    protected async Task OnRefresh()
+    {
+        await IdentityState.LoadAsync(hard: true);
+    }
+
+    protected async Task OnUpdateVstsDataSource(VstsDataSourceViewModel model)
+    {
+        try
+        {
+            await VstsDataSourceState.UpdateAsync(model);
+            await JsUtils.NotifySuccess("Success", "Vsts configuration was updated successfully");
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error updating VSTS configuration");
+            await JsUtils.NotifyError("Error updating VSTS configuration", ex.Message);
+        }
+    }
+}

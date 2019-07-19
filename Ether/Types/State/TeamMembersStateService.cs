@@ -3,15 +3,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Ether.ViewModels;
 
-namespace Ether.Types
+namespace Ether.Types.State
 {
-    public class AppState
-    {
-        public IReadOnlyList<VstsProjectViewModel> Projects { get; set; }
-
-        public IEnumerable<TeamMemberViewModel> TeamMembers { get; set; }
-    }
-
     public class TeamMembersStateService
     {
         private readonly AppState _state;
@@ -38,7 +31,7 @@ namespace Ether.Types
             }
         }
 
-        public async Task UpdateMemberAsync(TeamMemberViewModel member)
+        public async Task UpdateAsync(TeamMemberViewModel member)
         {
             await _client.Save(member);
             if (!Members.Any(m => m.Id == member.Id))
@@ -47,15 +40,20 @@ namespace Ether.Types
             }
         }
 
-        public async Task DeleteMemberAsync(TeamMemberViewModel member)
+        public async Task DeleteAsync(TeamMemberViewModel member)
         {
             await _client.Delete<TeamMemberViewModel>(member.Id);
             await LoadAsync(hard: true);
         }
 
-        private void InvalidateState()
+        public async Task FetchWorkItems(TeamMemberViewModel member)
         {
-            _state.TeamMembers = null;
+            await _client.RunWorkitemsJob(new[] { member.Id }, isReset: false);
+        }
+
+        public async Task ResetWorkItems(TeamMemberViewModel member)
+        {
+            await _client.RunWorkitemsJob(new[] { member.Id }, isReset: true);
         }
     }
 }

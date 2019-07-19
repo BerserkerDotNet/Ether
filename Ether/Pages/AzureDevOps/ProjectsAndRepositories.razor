@@ -1,9 +1,78 @@
 ﻿@page "/azure-devops/projects-and-repositories"
+@inject ProjectsStateService ProjectsState
+@inject RepositoriesStateService RepositoriesState
+@inject IdentitiesStateService IdentityStateService
+
 <div class="row">
     <div class="col-md-6">
-        <Projects />
-    </div>    
+        <Projects Items="ProjectsState.Projects"
+                  IdentitiesOptions="IdentityStateService.IdentitiesOptions"
+                  OnChange="OnProjectChange"
+                  OnDelete="OnProjectDelete"
+                  OnRefresh="OnProjectRefresh" />
+    </div>
     <div class="col-md-6">
-        <Repositories />
+        <Repositories Items="RepositoriesState.Repositories"
+                      ProjectsOptions="ProjectsOptions"
+                      OnChange="OnRepositoryChange"
+                      OnDelete="OnRepositoryDelete"
+                      OnRefresh="OnRepositoryRefresh" />
     </div>
 </div>
+
+@code{
+
+    private Dictionary<Guid, string> ProjectsOptions
+    {
+        get
+        {
+            var projects = ProjectsState.Projects ?? Enumerable.Empty<VstsProjectViewModel>();
+            var projectsOptions = new Dictionary<Guid, string>(projects.Count() + 1);
+            projectsOptions.Add(Guid.Empty, Constants.NoneLabel);
+            foreach (var project in projects)
+            {
+                projectsOptions.Add(project.Id, project.Name);
+            }
+
+            return projectsOptions;
+        }
+    }
+
+    protected override async Task OnInitAsync()
+    {
+        await ProjectsState.LoadAsync();
+        await RepositoriesState.LoadAsync();
+        await IdentityStateService.LoadAsync();
+    }
+
+    protected async Task OnProjectChange(VstsProjectViewModel model)
+    {
+        await ProjectsState.UpdateAsync(model);
+    }
+
+    protected async Task OnProjectDelete(VstsProjectViewModel model)
+    {
+        await ProjectsState.DeleteAsync(model);
+    }
+
+    protected async Task OnProjectRefresh()
+    {
+        await ProjectsState.LoadAsync(hard: true);
+    }
+
+    protected async Task OnRepositoryChange(VstsRepositoryViewModel model)
+    {
+        await RepositoriesState.UpdateAsync(model);
+    }
+
+    protected async Task OnRepositoryDelete(VstsRepositoryViewModel model)
+    {
+        await RepositoriesState.DeleteAsync(model);
+    }
+
+    protected async Task OnRepositoryRefresh()
+    {
+        await RepositoriesState.LoadAsync(hard: true);
+    }
+
+}
