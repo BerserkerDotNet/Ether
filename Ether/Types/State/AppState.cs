@@ -20,5 +20,7 @@ namespace Ether.Types.State
         public IEnumerable<JobLogViewModel> JobLogs { get; set; }
 
         public IEnumerable<ReportViewModel> Reports { get; set; }
+
+        public IEnumerable<ReporterDescriptorViewModel> ReportTypes { get; set; }
     }
 }

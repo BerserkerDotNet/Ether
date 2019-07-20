@@ -1,6 +1,8 @@
 ﻿@page "/"
 
 @inject EtherClient Client
+@inject ProfilesStateService ProfilesState
+@inject ReportDescriptorStateService ReportDescriptorState
 @inject IUriHelper UriHelper
 @inject JsUtils JsUtils
 @inject ILogger<Index> Logger
@@ -13,13 +15,13 @@
                     <FluentValidationValidator />
                     <div class="form-group">
                         <label>Profile</label>
-                        <SelectInput Class="form-control" @bind-Value="model.Profile" Options="@profileOptions" />
+                        <SelectInput Class="form-control" @bind-Value="model.Profile" Options="ProfilesState.ProfileOptions" />
                         <ValidationMessage For="@(() => model.Profile)" />
                     </div>
                     @* TODO: Return supported report types from API*@
                     <div class="form-group">
                         <label>Report type</label>
-                        <SelectInput Class="form-control" @bind-Value="model.ReportType" Options="@reportTypes" />
+                        <SelectInput Class="form-control" @bind-Value="model.ReportType" Options="ReportDescriptorState.ReportTypeOptions" />
                         <ValidationMessage For="@(() => model.ReportType)" />
                     </div>
                     <div class="form-group">
@@ -28,15 +30,11 @@
                         <ValidationMessage For="@(() => model.Start)" />
                         <ValidationMessage For="@(() => model.End)" />
                     </div>
-                    @if (isGeneratingReport)
-                    {
-                        <div class="text-center">
-                            <div class="spinner-border text-primary" role="status">
-                                <span class="sr-only">Generating...</span>
-                            </div>
-                            <div>Generating...</div>
-                        </div>
-                    }
+                    <If Condition="isGeneratingReport">
+                        <Then>
+                            <Spinner Text="Generating..." />
+                        </Then>
+                    </If>
                     <button class="btn btn-success btn-fill pull-right" type="submit">Create a report</button>
                 </EditForm>
             </Body>
@@ -47,21 +45,15 @@
 @code
 {
     private bool isGeneratingReport;
-    private IEnumerable<ProfileViewModel> profiles = Enumerable.Empty<ProfileViewModel>();
-    private GenerateReportViewModel model = new GenerateReportViewModel { ReportType = "PullRequestsReport" };
-
-    private Dictionary<string, string> reportTypes = new Dictionary<string, string>(0);
-    private Dictionary<Guid, string> profileOptions = new Dictionary<Guid, string>(0);
+    private GenerateReportViewModel model = new GenerateReportViewModel();
 
     protected override async Task OnInitAsync()
     {
-        profiles = await Client.GetAll<ProfileViewModel>();
-        var reportDescriptors = await Client.GetReportTypes();
-        reportTypes = reportDescriptors.ToDictionary(k => k.UniqueName, v => v.DisplayName);
-
-        profileOptions = profiles.ToDictionary(k => k.Id, v => $"{v.Name} ({v.Type})");
-        // Select first profile
-        model.Profile = profiles.First().Id;
+        await ProfilesState.LoadAsync();
+        await ReportDescriptorState.LoadAsync();
+        // TODO: refactor this
+        model.Profile = ProfilesState.Profiles.First().Id;
+        model.ReportType = ReportDescriptorState.ReportTypes.First().UniqueName;
     }
 
     private async Task Create()

@@ -19,6 +19,21 @@ namespace Ether.Types.State
 
         public IEnumerable<ProfileViewModel> Profiles => _state.Profiles;
 
+        public Dictionary<Guid, string> ProfileOptions
+        {
+            get
+            {
+                var profiles = Profiles ?? Enumerable.Empty<ProfileViewModel>();
+                var result = new Dictionary<Guid, string>(profiles.Count());
+                foreach (var profile in profiles)
+                {
+                    result.Add(profile.Id, $"{profile.Name} ({profile.Type})");
+                }
+
+                return result;
+            }
+        }
+
         public async Task LoadAsync(bool hard = false)
         {
             if (hard)

@@ -20,6 +20,7 @@ namespace Ether
             services.AddSingleton<LocalStorage>();
 
             // State
+            services.AddSingleton<ReportDescriptorStateService>();
             services.AddSingleton<ReportStateService>();
             services.AddSingleton<JobLogsStateService>();
             services.AddSingleton<VstsDataSourceStateService>();
