@@ -116,11 +116,12 @@ namespace Ether.Api
                 app.UseDeveloperExceptionPage();
             }
 
+            // app.UseHttpsRedirection();
             app.UseRouting();
             app.UseStaticFiles();
             if (env.IsDevelopment())
             {
-                app.UseCors(b => b.WithOrigins("http://localhost:5001")
+                app.UseCors(b => b.WithOrigins("https://localhost:44316")
                              .AllowAnyHeader()
                              .AllowAnyMethod()
                              .AllowCredentials());

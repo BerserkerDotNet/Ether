@@ -202,9 +202,9 @@ namespace Ether.Types
         private Uri GetApiUrl()
         {
             var baseUrl = _navigation.GetBaseUri();
-            var isDevelopment = baseUrl.StartsWith("http://localhost");
+            var isDevelopment = baseUrl.StartsWith("https://localhost");
 
-            return isDevelopment ? new Uri("http://localhost:5000/api/") : new Uri($"{baseUrl}api/");
+            return isDevelopment ? new Uri("https://localhost:44315/api/") : new Uri($"{baseUrl}api/");
         }
     }
 }
