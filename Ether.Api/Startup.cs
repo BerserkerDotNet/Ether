@@ -8,6 +8,7 @@ using Ether.Contracts.Interfaces;
 using Ether.Contracts.Types.Configuration;
 using Ether.Core.Config;
 using Ether.Core.Extensions;
+using Ether.Core.Jobs;
 using Ether.Core.Types;
 using Ether.Core.Types.Commands;
 using Ether.ViewModels;
@@ -97,6 +98,7 @@ namespace Ether.Api
             {
                 cfg.RecurrentJob<PullRequestsSyncJob>(TimeSpan.FromMinutes(jobsConfig.PullRequestJobRecurrence));
                 cfg.RecurrentJob<WorkItemsSyncJob>(TimeSpan.FromMinutes(jobsConfig.WorkItemsJobRecurrence));
+                cfg.RecurrentJob<RetentionJob>(TimeSpan.FromMinutes(jobsConfig.RetentionJobRecurrence));
             });
         }
 
