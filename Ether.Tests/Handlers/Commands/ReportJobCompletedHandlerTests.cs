@@ -17,7 +17,7 @@ namespace Ether.Tests.Handlers.Commands
         [Test]
         public void ShouldThrowExceptionIfJobTypeIsEmpty([Values(null, "")] string jobType)
         {
-            _handler.Awaiting(h => h.Handle(ReportJobState.GetSuccessful(Guid.NewGuid(), jobType, TimeSpan.Zero)))
+            _handler.Awaiting(h => h.Handle(ReportJobState.GetSuccessful(Guid.NewGuid(), jobType, DateTime.UtcNow, DateTime.UtcNow, null)))
                 .Should().Throw<ArgumentNullException>();
         }
 
@@ -26,13 +26,12 @@ namespace Ether.Tests.Handlers.Commands
         {
             const string jobType = "Foo";
             const string message = "Exception";
-            var executionTime = TimeSpan.FromMinutes(1);
             RepositoryMock.Setup(r => r.CreateOrUpdateAsync(It.Is<JobLog>(l
-                => l.JobType == jobType && l.Result == JobExecutionState.Failed && l.Message == message && l.ExecutionTime == executionTime)))
+                => l.JobType == jobType && l.Result == JobExecutionState.Failed && l.Error == message)))
                 .ReturnsAsync(true)
                 .Verifiable();
 
-            await _handler.Handle(ReportJobState.GetFailed(Guid.NewGuid(), jobType, message, executionTime));
+            await _handler.Handle(ReportJobState.GetFailed(Guid.NewGuid(), jobType, message, DateTime.UtcNow, DateTime.UtcNow));
 
             RepositoryMock.Verify();
         }

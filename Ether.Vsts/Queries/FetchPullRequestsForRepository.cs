@@ -5,7 +5,7 @@ using Ether.Vsts.Types;
 
 namespace Ether.Vsts.Queries
 {
-    public class FetchPullRequestsForRepository : IQuery<IEnumerable<PullRequestViewModel>>
+    public class FetchPullRequestsForRepository : IQuery<FetchPullRequestsResult>
     {
         public FetchPullRequestsForRepository(RepositoryInfo info)
         {

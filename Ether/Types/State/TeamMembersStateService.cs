@@ -55,5 +55,15 @@ namespace Ether.Types.State
         {
             await _client.RunWorkitemsJob(new[] { member.Id }, isReset: true);
         }
+
+        public async Task FetchPullRequests(TeamMemberViewModel member)
+        {
+            await _client.RunPullRequestsJob(new[] { member.Id }, isReset: false);
+        }
+
+        public async Task ResetPullRequests(TeamMemberViewModel member)
+        {
+            await _client.RunPullRequestsJob(new[] { member.Id }, isReset: true);
+        }
     }
 }

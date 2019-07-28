@@ -31,14 +31,10 @@
             <FluentValidationValidator />
             <Card AdditionalClasses="card-600">
                 <Header>
-                    @if ((EditingItem as ViewModelWithId).Id == Guid.Empty)
-                    {
-                        @NewTitle
-                    }
-                    else
-                    {
-                        @ExistingTitle
-                    }
+                    <If Condition="@((EditingItem as ViewModelWithId).Id == Guid.Empty)">
+                        <Then>@NewTitle</Then>
+                        <Else>@ExistingTitle</Else>
+                    </If>
                 </Header>
                 <Body>
                     <If Condition="IsSaving">
@@ -52,8 +48,10 @@
                 </Body>
                 <Footer>
                     <div class="pull-right">
-                        <button type="submit" class="btn btn-success btn-fill">Save</button>
-                        <button class="btn btn-danger btn-fill" @onclick="@Cancel">Cancel</button>
+                        <If Condition="!IsReadOnly">
+                            <Then><button type="submit" class="btn btn-success btn-fill">Save</button></Then>
+                        </If>
+                        <button class="btn btn-danger btn-fill" @onclick="@Cancel">@CancelButtonText</button>
                     </div>
                 </Footer>
             </Card>

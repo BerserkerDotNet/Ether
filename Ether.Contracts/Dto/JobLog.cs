@@ -1,5 +1,6 @@
 ﻿using System;
 using Ether.Contracts.Types;
+using Ether.ViewModels.Types;
 
 namespace Ether.Contracts.Dto
 {
@@ -7,12 +8,14 @@ namespace Ether.Contracts.Dto
     {
         public string JobType { get; set; }
 
-        public DateTime CompletedOn { get; set; }
-
         public JobExecutionState Result { get; set; }
 
-        public string Message { get; set; }
+        public DateTime StartTime { get; set; }
 
-        public TimeSpan ExecutionTime { get; set; }
+        public DateTime? EndTime { get; set; }
+
+        public string Error { get; set; }
+
+        public JobDetails Details { get; set; }
     }
 }

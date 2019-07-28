@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Ether.ViewModels;
+using Ether.ViewModels.Types;
 
 namespace Ether.Types.State
 {
@@ -28,6 +30,17 @@ namespace Ether.Types.State
             {
                 _state.JobLogs = await _client.GetAll<JobLogViewModel>();
             }
+        }
+
+        public async Task<JobDetails> GetJobDetails(JobLogViewModel log)
+        {
+            Console.WriteLine("GetJobDetails " + log.JobType);
+            if (log.JobType == "PullRequestsSyncJob")
+            {
+                return await _client.GetJobDetailsById<PullRequestJobDetails>(log.Id);
+            }
+
+            return null;
         }
     }
 }

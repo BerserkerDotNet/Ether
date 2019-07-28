@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 using Ether.Contracts.Interfaces;
 using Ether.Contracts.Interfaces.CQS;
 using Ether.ViewModels;
+using Ether.ViewModels.Types;
 using Ether.Vsts.Commands;
-using Ether.Vsts.Interfaces;
 using Ether.Vsts.Queries;
 using Microsoft.Extensions.Logging;
 
@@ -19,13 +19,13 @@ namespace Ether.Vsts.Jobs
         private readonly IMediator _mediator;
         private readonly ILogger<WorkItemsSyncJob> _logger;
 
-        public WorkItemsSyncJob(IVstsClientFactory clientFactory, IMediator mediator, ILogger<WorkItemsSyncJob> logger)
+        public WorkItemsSyncJob(IMediator mediator, ILogger<WorkItemsSyncJob> logger)
         {
             _mediator = mediator;
             _logger = logger;
         }
 
-        public async Task Execute(IReadOnlyDictionary<string, object> parameters)
+        public async Task<JobDetails> Execute(IReadOnlyDictionary<string, object> parameters)
         {
             var allTeamMembers = await _mediator.RequestCollection<GetAllTeamMembers, TeamMemberViewModel>();
             if (parameters.ContainsKey(MembersParameterName))
@@ -34,7 +34,7 @@ namespace Ether.Vsts.Jobs
                 if (members == null || !members.Any())
                 {
                     _logger.LogWarning("Attempt to run a job for specific members, but with empty memebrs list.");
-                    return;
+                    return null;
                 }
 
                 _logger.LogInformation("Filtering members based on parameters");
@@ -46,6 +46,8 @@ namespace Ether.Vsts.Jobs
             {
                 await ExecuteForMemeber(teamMember);
             }
+
+            return null;
         }
 
         private async Task ExecuteForMemeber(TeamMemberViewModel teamMember)

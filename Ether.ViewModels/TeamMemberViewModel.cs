@@ -11,5 +11,7 @@ namespace Ether.ViewModels
         public int WorkItemsCount { get; set; }
 
         public DateTime? LastWorkitemsFetchDate { get; set; }
+
+        public DateTime? LastPullRequestsFetchDate { get; set; }
     }
 }

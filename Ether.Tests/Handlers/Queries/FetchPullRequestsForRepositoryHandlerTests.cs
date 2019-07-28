@@ -43,7 +43,7 @@ namespace Ether.Tests.Handlers.Queries
         {
             var result = await _handler.Handle(new FetchPullRequestsForRepository(repository));
 
-            result.Should().BeEmpty();
+            result.PullRequests.Should().BeEmpty();
         }
 
         [Test]
@@ -74,7 +74,7 @@ namespace Ether.Tests.Handlers.Queries
 
             var result = await _handler.Handle(new FetchPullRequestsForRepository(info));
 
-            result.Should().HaveCount(15);
+            result.PullRequests.Should().HaveCount(15);
 
             _clientFactoryMock.VerifyAll();
             _clientMock.VerifyAll();
@@ -127,8 +127,8 @@ namespace Ether.Tests.Handlers.Queries
             var result = await _handler.Handle(new FetchPullRequestsForRepository(info));
 
             // Only two comments are not deleted and of type 'text'
-            result.Should().HaveCount(1);
-            result.First().Comments.Should().Be(2);
+            result.PullRequests.Should().HaveCount(1);
+            result.PullRequests.First().Comments.Should().Be(2);
         }
 
         [Test]
@@ -151,7 +151,7 @@ namespace Ether.Tests.Handlers.Queries
 
             var result = await _handler.Handle(new FetchPullRequestsForRepository(info));
 
-            result.Should().HaveCount(0);
+            result.PullRequests.Should().HaveCount(0);
 
             _clientFactoryMock.VerifyAll();
         }
@@ -160,7 +160,7 @@ namespace Ether.Tests.Handlers.Queries
         {
             _clientFactoryMock = new Mock<IVstsClientFactory>(MockBehavior.Strict);
             _clientMock = new Mock<IVstsPullRequestsClient>(MockBehavior.Strict);
-            _handler = new FetchPullRequestsForRepositoryHandler(_clientFactoryMock.Object, Mock.Of<ILogger<FetchPullRequestsForRepositoryHandler>>());
+            _handler = new FetchPullRequestsForRepositoryHandler(_clientFactoryMock.Object, RepositoryMock.Object, Mock.Of<ILogger<FetchPullRequestsForRepositoryHandler>>());
         }
 
         private static IEnumerable EmptyCollectionTestCases()

@@ -3,7 +3,7 @@
 
 <div class="row">
     <div class="col-md-12">
-        <Ether.Components.Settings.JobLogs Items="JobLogsState.Logs" OnRefresh="HandleRefresh" />
+        <Ether.Components.Settings.JobLogs Items="JobLogsState.Logs" OnRefresh="HandleRefresh" OnDetailsRequested="HandleDetailsRequest" />
     </div>
 </div>
 
@@ -17,5 +17,10 @@
     protected async Task HandleRefresh()
     {
         await JobLogsState.LoadAsync(hard: true);
+    }
+
+    protected async Task<JobDetails> HandleDetailsRequest(JobLogViewModel log)
+    {
+        return await JobLogsState.GetJobDetails(log);
     }
 }

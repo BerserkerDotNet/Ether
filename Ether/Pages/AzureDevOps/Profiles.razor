@@ -12,7 +12,9 @@
                                             OnDelete="OnDelete"
                                             OnRefresh="OnRefresh"
                                             OnFetchWorkItems="OnFetchWorkItems"
-                                            OnResetWorkItems="OnResetWorkItems" />
+                                            OnResetWorkItems="OnResetWorkItems"
+                                            OnFetchPullRequests="OnFetchPullRequests"
+                                            OnResetPullRequests="OnResetPullRequests" />
     </div>
 </div>
 
@@ -59,5 +61,18 @@
         await ProfilesState.ResetWorkItems(members);
         await ProfilesState.LoadAsync(hard: true);
         await JsUtils.NotifySuccess("Reset Workitems", $"Reset workitems for {members.Count()} members.");
+    }
+
+    protected async Task OnFetchPullRequests(IEnumerable<Guid> members)
+    {
+        await ProfilesState.FetchPullRequests(members);
+        await JsUtils.NotifySuccess("Fetch PullRequests", $"Started to fetch pull requests for {members.Count()} members.");
+    }
+
+    protected async Task OnResetPullRequests(IEnumerable<Guid> members)
+    {
+        await ProfilesState.ResetPullRequests(members);
+        await ProfilesState.LoadAsync(hard: true);
+        await JsUtils.NotifySuccess("Reset PullRequests", $"Reset pull requests for {members.Count()} members.");
     }
 }

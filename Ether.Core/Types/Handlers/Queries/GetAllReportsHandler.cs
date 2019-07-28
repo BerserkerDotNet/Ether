@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using AutoMapper;
 using Ether.Contracts.Dto.Reports;
 using Ether.Contracts.Interfaces;
@@ -15,9 +16,9 @@ namespace Ether.Core.Types.Handlers.Queries
         {
         }
 
-        protected override IEnumerable<ReportViewModel> PostProcessData(IEnumerable<ReportViewModel> data)
+        protected override Task<IEnumerable<ReportViewModel>> PostProcessData(IEnumerable<ReportViewModel> data)
         {
-            return data.OrderByDescending(o => o.DateTaken);
+            return Task.FromResult((IEnumerable<ReportViewModel>)data.OrderByDescending(o => o.DateTaken));
         }
     }
 }

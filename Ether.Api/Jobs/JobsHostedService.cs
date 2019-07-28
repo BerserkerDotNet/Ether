@@ -65,26 +65,7 @@ namespace Ether.Api.Jobs
                 using (var scope = _services.CreateScope())
                 {
                     var jobType = typeof(T);
-                    var job = (IJob)scope.ServiceProvider.GetService(jobType);
-                    var jobName = jobType.Name;
-                    var mediator = scope.ServiceProvider.GetService<IMediator>();
-                    var sw = new Stopwatch();
-                    var jobId = Guid.NewGuid();
-                    sw.Restart();
-                    try
-                    {
-                        await mediator.Execute(ReportJobState.GetRunning(jobId, jobName));
-                        _logger.LogInformation($"Executing '{jobName}'");
-                        await job.Execute(parameters);
-                        await mediator.Execute(ReportJobState.GetSuccessful(jobId, jobName, sw.Elapsed));
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex, $"Error while executing '{jobName}'");
-                        await mediator.Execute(ReportJobState.GetFailed(jobId, jobName, ex.Message, sw.Elapsed));
-                    }
-
-                    sw.Stop();
+                    await RunJob(scope, jobType, parameters);
                 }
             });
         }
@@ -99,31 +80,34 @@ namespace Ether.Api.Jobs
         {
             using (var scope = _services.CreateScope())
             {
-                var job = (IJob)scope.ServiceProvider.GetService(configuration.JobType);
                 var jobName = configuration.JobType.Name;
-                var mediator = scope.ServiceProvider.GetService<IMediator>();
-                var sw = new Stopwatch();
                 while (!cancellationToken.IsCancellationRequested)
                 {
-                    var jobId = Guid.NewGuid();
-                    sw.Restart();
-                    try
-                    {
-                        await mediator.Execute(ReportJobState.GetRunning(jobId, jobName));
-                        _logger.LogInformation($"Executing '{jobName}'");
-                        await job.Execute(new Dictionary<string, object>(0));
-                        await mediator.Execute(ReportJobState.GetSuccessful(jobId, jobName, sw.Elapsed));
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex, $"Error while executing '{jobName}'");
-                        await mediator.Execute(ReportJobState.GetFailed(jobId, jobName, ex.Message, sw.Elapsed));
-                    }
-
-                    sw.Stop();
-                    _logger.LogInformation($"Finished executing '{jobName}' in {sw.Elapsed}. Next execution in {configuration.Period}");
+                    await RunJob(scope, configuration.JobType, new Dictionary<string, object>(0));
+                    _logger.LogInformation($"Finished executing '{jobName}'. Next execution in {configuration.Period}");
                     await Task.Delay(configuration.Period, cancellationToken);
                 }
+            }
+        }
+
+        private async Task RunJob(IServiceScope scope, Type jobType, Dictionary<string, object> parameters)
+        {
+            var job = (IJob)scope.ServiceProvider.GetService(jobType);
+            var jobName = jobType.Name;
+            var mediator = scope.ServiceProvider.GetService<IMediator>();
+            var jobId = Guid.NewGuid();
+            var startTime = DateTime.UtcNow;
+            try
+            {
+                await mediator.Execute(ReportJobState.GetRunning(jobId, jobName, startTime));
+                _logger.LogInformation($"Executing '{jobName}'");
+                var details = await job.Execute(parameters);
+                await mediator.Execute(ReportJobState.GetSuccessful(jobId, jobName, startTime, DateTime.UtcNow, details));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error while executing '{jobName}'");
+                await mediator.Execute(ReportJobState.GetFailed(jobId, jobName, ex.Message, startTime, DateTime.UtcNow));
             }
         }
     }

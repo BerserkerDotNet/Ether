@@ -28,6 +28,9 @@ namespace Ether.Components
         protected string ExistingTitle { get; set; }
 
         [Parameter]
+        protected string CancelButtonText { get; set; } = "Cancel";
+
+        [Parameter]
         protected bool IsReadOnly { get; set; }
 
         [Parameter]

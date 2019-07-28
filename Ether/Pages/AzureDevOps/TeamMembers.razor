@@ -8,44 +8,59 @@
                                                OnChange="OnChange"
                                                OnDelete="OnDelete"
                                                OnRefresh="OnRefresh"
-                                               OnFetchWorkItems="OnFetchWorkItems"
-                                               OnResetWorkItems="OnResetWorkItems" />
+                                               OnFetchWorkItems="HandleFetchWorkItems"
+                                               OnResetWorkItems="HandleResetWorkItems"
+                                               OnFetchPullRequests="HandleFetchPullRequests"
+                                               OnResetPullRequests="HandleResetPullRequests" />
     </div>
 </div>
 
 @code {
 
-protected override async Task OnInitAsync()
-{
-    await State.LoadAsync();
-}
+    protected override async Task OnInitAsync()
+    {
+        await State.LoadAsync();
+    }
 
-protected async Task OnChange(TeamMemberViewModel model)
-{
-    await State.UpdateAsync(model);
-}
+    protected async Task OnChange(TeamMemberViewModel model)
+    {
+        await State.UpdateAsync(model);
+    }
 
-protected async Task OnDelete(TeamMemberViewModel model)
-{
-    await State.DeleteAsync(model);
-}
+    protected async Task OnDelete(TeamMemberViewModel model)
+    {
+        await State.DeleteAsync(model);
+    }
 
-protected async Task OnRefresh()
-{
-    await State.LoadAsync(hard: true);
-}
+    protected async Task OnRefresh()
+    {
+        await State.LoadAsync(hard: true);
+    }
 
-protected async Task OnFetchWorkItems(TeamMemberViewModel model)
-{
-    await State.FetchWorkItems(model);
-    await JsUtils.NotifySuccess("Fetch Workitems", $"Started to fetch workitems for {model.DisplayName}");
-}
+    protected async Task HandleFetchWorkItems(TeamMemberViewModel model)
+    {
+        await State.FetchWorkItems(model);
+        await JsUtils.NotifySuccess("Fetch Workitems", $"Started to fetch workitems for {model.DisplayName}");
+    }
 
-protected async Task OnResetWorkItems(TeamMemberViewModel model)
-{
-    await State.ResetWorkItems(model);
-    await State.LoadAsync(hard: true);
-    await JsUtils.NotifySuccess("Reset Workitems", $"Reset workitems for {model.DisplayName}");
-}
+    protected async Task HandleResetWorkItems(TeamMemberViewModel model)
+    {
+        await State.ResetWorkItems(model);
+        await State.LoadAsync(hard: true);
+        await JsUtils.NotifySuccess("Reset Workitems", $"Reset workitems for {model.DisplayName}");
+    }
+
+    protected async Task HandleFetchPullRequests(TeamMemberViewModel model)
+    {
+        await State.FetchPullRequests(model);
+        await JsUtils.NotifySuccess("Fetch PullRequests", $"Started to fetch pull requests for {model.DisplayName}");
+    }
+
+    protected async Task HandleResetPullRequests(TeamMemberViewModel model)
+    {
+        await State.ResetPullRequests(model);
+        await State.LoadAsync(hard: true);
+        await JsUtils.NotifySuccess("Reset PullRequests", $"Reset pull requests for {model.DisplayName}");
+    }
 
 }

@@ -25,11 +25,14 @@
                 <div>
                     <div class="dropdown btn-group" role="group">
                         <button id="btnGroupWorkItemsProfile" type="button" class="btn btn-info btn-fill dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Work items
+                            Actions
                         </button>
                         <div class="dropdown-menu" aria-labelledby="btnGroupWorkItemsProfile">
                             <button class="dropdown-item" @onclick="@(async () => await OnFetchWorkItems.InvokeAsync(profile.Members))">Fetch work items</button>
                             <button class="dropdown-item" @onclick="@(async () => await OnResetWorkItems.InvokeAsync(profile.Members))">Reset work items</button>
+                            <div class="dropdown-divider"></div>
+                            <button class="dropdown-item" @onclick="@(async () => await OnFetchPullRequests.InvokeAsync(profile.Members))">Fetch pull requests</button>
+                            <button class="dropdown-item" @onclick="@(async () => await OnResetPullRequests.InvokeAsync(profile.Members))">Reset pull requests</button>
                         </div>
                     </div>
                     <button class="btn btn-warning btn-fill" @onclick="@(() => ctx.Edit(profile))">Edit</button>
@@ -73,5 +76,7 @@
     [Parameter] EventCallback<ProfileViewModel> OnDelete { get; set; }
     [Parameter] EventCallback<IEnumerable<Guid>> OnFetchWorkItems { get; set; }
     [Parameter] EventCallback<IEnumerable<Guid>> OnResetWorkItems { get; set; }
+    [Parameter] EventCallback<IEnumerable<Guid>> OnFetchPullRequests { get; set; }
+    [Parameter] EventCallback<IEnumerable<Guid>> OnResetPullRequests { get; set; }
     [Parameter] EventCallback OnRefresh { get; set; }
 }

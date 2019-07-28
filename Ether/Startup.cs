@@ -5,6 +5,7 @@ using Ether.Types.EditableTable;
 using Ether.Types.State;
 using Microsoft.AspNetCore.Components.Builder;
 using Microsoft.Extensions.DependencyInjection;
+using Toolbelt.Blazor.Extensions.DependencyInjection;
 
 namespace Ether
 {
@@ -43,6 +44,7 @@ namespace Ether
 
         public void Configure(IComponentsApplicationBuilder app)
         {
+            app.UseLocalTimeZone();
             app.AddComponent<App>("app");
         }
     }

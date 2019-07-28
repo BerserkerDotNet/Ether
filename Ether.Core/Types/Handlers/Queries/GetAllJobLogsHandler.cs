@@ -1,8 +1,11 @@
-﻿using AutoMapper;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using AutoMapper;
 using Ether.Contracts.Dto;
 using Ether.Contracts.Interfaces;
 using Ether.Core.Types.Queries;
 using Ether.ViewModels;
+using Ether.ViewModels.Types;
 
 namespace Ether.Core.Types.Handlers.Queries
 {

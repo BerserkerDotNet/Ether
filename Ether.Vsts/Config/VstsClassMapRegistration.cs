@@ -2,6 +2,7 @@
 using Ether.Contracts.Dto.Reports;
 using Ether.Contracts.Interfaces;
 using Ether.ViewModels;
+using Ether.ViewModels.Types;
 using Ether.Vsts.Dto;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Options;
@@ -29,6 +30,7 @@ namespace Ether.Vsts.Config
             });
 
             BsonClassMap.RegisterClassMap<WorkItemFieldUpdate>();
+            BsonClassMap.RegisterClassMap<PullRequestJobDetails>();
         }
 
         private void SafeRegisterClassMap<T>()

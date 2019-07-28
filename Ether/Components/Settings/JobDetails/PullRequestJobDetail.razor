@@ -1,0 +1,88 @@
+﻿<div>
+    <DataTable Items="Repositories">
+        <TableHeader>
+            <th>Name</th>
+            <th> # of Members</th>
+        </TableHeader>
+        <RowTemplate Context="item">
+            <td>@item.Name</td>
+            <td>@item.Items.Count()</td>
+        </RowTemplate>
+        <RowDetailTemplate Context="item">
+            <DataTable Items="item.Items">
+                <TableHeader>
+                    <th>Member</th>
+                    <th># of Pull Requests</th>
+                </TableHeader>
+                <RowTemplate Context="childItem">
+                    <td>@childItem.Name</td>
+                    <td>@childItem.Items.Count()</td>
+                </RowTemplate>
+                <RowDetailTemplate Context="childItem">
+                    <DataTable Items="childItem.Items">
+                        <TableHeader>
+                            <th>Id</th>
+                            <th>Title</th>
+                            <th>State</th>
+                        </TableHeader>
+                        <RowTemplate Context="pr">
+                            <td>@pr.PullRequestId</td>
+                            <td>@pr.PullRequestTitle</td>
+                            <td>@pr.PullRequestState</td>
+                        </RowTemplate>
+                    </DataTable>
+                </RowDetailTemplate>
+                <ActionsTemplate>
+                </ActionsTemplate>
+            </DataTable>
+        </RowDetailTemplate>
+        <ActionsTemplate>
+        </ActionsTemplate>
+    </DataTable>
+    <DataTable Items="Details.Errors" NoItemsText="No errors">
+        <TableHeader>
+            <th>Repository</th>
+            <th>Member</th>
+            <th>Message</th>
+        </TableHeader>
+        <RowTemplate Context="item">
+            <td>@item.Repository</td>
+            <td>@item.Member</td>
+            <td class="table-danger">@item.Error</td>
+        </RowTemplate>
+    </DataTable>
+</div>
+
+@code{
+    [Parameter] PullRequestJobDetails Details { get; set; }
+
+    protected IEnumerable<RepositoriesGroup> Repositories
+    {
+        get
+        {
+            return Details.PullRequests.GroupBy(p => p.Repository).Select(g => new RepositoriesGroup
+            {
+                Name = g.Key,
+                Items = g.GroupBy(r => r.Member).Select(m => new MemberGroup
+                {
+                    Name = m.Key,
+                    Items = m
+                }).ToList()
+            }).ToList();
+        }
+    }
+
+    public class RepositoriesGroup
+    {
+        public string Name { get; set; }
+
+        public IEnumerable<MemberGroup> Items { get; set; }
+    }
+
+    public class MemberGroup
+    {
+        public string Name { get; set; }
+
+        public IEnumerable<PullRequestJobDetails.PullRequestDetail> Items { get; set; }
+    }
+}

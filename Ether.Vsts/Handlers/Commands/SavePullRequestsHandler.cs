@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -6,6 +7,7 @@ using Ether.Contracts.Interfaces;
 using Ether.Contracts.Interfaces.CQS;
 using Ether.Vsts.Commands;
 using Ether.Vsts.Dto;
+using Microsoft.Extensions.Logging;
 
 namespace Ether.Vsts.Handlers.Commands
 {
@@ -13,11 +15,13 @@ namespace Ether.Vsts.Handlers.Commands
     {
         private readonly IRepository _repository;
         private readonly IMapper _mapper;
+        private readonly ILogger<SavePullRequestsHandler> _logger;
 
-        public SavePullRequestsHandler(IRepository repository, IMapper mapper)
+        public SavePullRequestsHandler(IRepository repository, IMapper mapper, ILogger<SavePullRequestsHandler> logger)
         {
             _repository = repository;
             _mapper = mapper;
+            _logger = logger;
         }
 
         public async Task Handle(SavePullRequests command)
@@ -32,13 +36,14 @@ namespace Ether.Vsts.Handlers.Commands
                 return;
             }
 
+            _logger.LogInformation("Saving pull requests. Totasl to save: {Count}", command.PullRequests.Count());
             foreach (var pullRequest in command.PullRequests)
             {
                 var pr = _mapper.Map<PullRequest>(pullRequest);
                 await _repository.CreateOrUpdateIfAsync(p => p.PullRequestId == pr.PullRequestId, pr);
             }
 
-            return;
+            _logger.LogInformation("Finished saving memeber pull request statistics.");
         }
     }
 }

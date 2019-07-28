@@ -11,30 +11,35 @@
             <FilterTemplate Context="dt">
                 <div class="form-group">
                     <input class="form-control" type="text" placeholder="Type to search..."
-                           @oninput="@(e => dt.Filter(i => i.DisplayName.Contains(e.Value.ToString()) || i.Email.Contains(e.Value.ToString())))" />
+                           @oninput="@(e => dt.Filter(i => i.DisplayName.ToLower().Contains(e.Value.ToString().ToLower()) || i.Email.Contains(e.Value.ToString())))" />
                 </div>
             </FilterTemplate>
             <TableHeader>
                 <th>Display Name</th>
                 <th>Email</th>
                 <th>Workitems count</th>
-                <th>Last workitems fetch</th> 
+                <th>Last workitems fetch</th>
+                <th>Last pull requests fetch</th>
             </TableHeader>
             <RowTemplate Context="member">
                 <td>@member.DisplayName</td>
-                <td>@member.Email</td> 
+                <td>@member.Email</td>
                 <td>@member.WorkItemsCount</td>
-                <td>@member.LastWorkitemsFetchDate</td>
+                <td>@member.LastWorkitemsFetchDate?.ToLocalTime()</td>
+                <td>@member.LastPullRequestsFetchDate?.ToLocalTime()</td>
             </RowTemplate>
             <ActionsTemplate Context="member">
                 <div>
                     <div class=" dropdown btn-group" role="group">
                         <button id="btnGroupWorkItemsMember" type="button" class="btn btn-info btn-fill dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Work items
+                            Actions
                         </button>
                         <div class="dropdown-menu" aria-labelledby="btnGroupWorkItemsMember">
                             <button class="dropdown-item" @onclick="@(async () => await OnFetchWorkItems.InvokeAsync(member))">Fetch work items</button>
                             <button class="dropdown-item" @onclick="@(async () => await OnResetWorkItems.InvokeAsync(member))">Reset work items</button>
+                            <div class="dropdown-divider"></div>
+                            <button class="dropdown-item" @onclick="@(async () => await OnFetchPullRequests.InvokeAsync(member))">Fetch pull requests</button>
+                            <button class="dropdown-item" @onclick="@(async () => await OnResetPullRequests.InvokeAsync(member))">Reset pull requests</button>
                         </div>
                     </div>
                     <button class="btn btn-warning btn-fill" @onclick="@(() => ctx.Edit(member))">Edit</button>
@@ -63,5 +68,7 @@
 [Parameter] EventCallback<TeamMemberViewModel> OnDelete { get; set; }
 [Parameter] EventCallback<TeamMemberViewModel> OnFetchWorkItems { get; set; }
 [Parameter] EventCallback<TeamMemberViewModel> OnResetWorkItems { get; set; }
+[Parameter] EventCallback<TeamMemberViewModel> OnFetchPullRequests { get; set; }
+[Parameter] EventCallback<TeamMemberViewModel> OnResetPullRequests { get; set; }
 [Parameter] EventCallback OnRefresh { get; set; }
 }

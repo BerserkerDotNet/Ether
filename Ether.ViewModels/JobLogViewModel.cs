@@ -7,12 +7,14 @@ namespace Ether.ViewModels
     {
         public string JobType { get; set; }
 
-        public DateTime CompletedOn { get; set; }
+        public DateTime StartTime { get; set; }
+
+        public DateTime? EndTime { get; set; }
 
         public JobExecutionResult Result { get; set; }
 
-        public string Message { get; set; }
+        public string Error { get; set; }
 
-        public TimeSpan ExecutionTime { get; set; }
+        public JobDetails Details { get; set; }
     }
 }

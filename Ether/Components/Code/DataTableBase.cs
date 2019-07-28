@@ -80,11 +80,13 @@ namespace Ether.Components.Code
 
         protected void ToggleDetails(TItem item)
         {
+            Console.WriteLine("Toggle Details" + item);
             ItemWithDetailsVisible = IsItemDetailsVisible(item) ? default : item;
         }
 
         protected bool IsItemDetailsVisible(TItem item)
         {
+            Console.WriteLine("IsItemVisible" + item);
             return Equals(ItemWithDetailsVisible, item);
         }
     }

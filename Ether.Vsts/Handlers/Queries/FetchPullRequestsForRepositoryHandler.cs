@@ -8,25 +8,28 @@ using Ether.ViewModels;
 using Ether.ViewModels.Types;
 using Ether.Vsts.Interfaces;
 using Ether.Vsts.Queries;
+using Ether.Vsts.Types;
 using Microsoft.Extensions.Logging;
 using VSTS.Net.Models.Request;
 
 namespace Ether.Vsts.Handlers.Queries
 {
-    public class FetchPullRequestsForRepositoryHandler : IQueryHandler<FetchPullRequestsForRepository, IEnumerable<PullRequestViewModel>>
+    public class FetchPullRequestsForRepositoryHandler : IQueryHandler<FetchPullRequestsForRepository, FetchPullRequestsResult>
     {
         private const string UserCommentType = "text";
 
         private readonly IVstsClientFactory _clientFactory;
+        private readonly IRepository _repository;
         private readonly ILogger<FetchPullRequestsForRepositoryHandler> _logger;
 
-        public FetchPullRequestsForRepositoryHandler(IVstsClientFactory clientFactory, ILogger<FetchPullRequestsForRepositoryHandler> logger)
+        public FetchPullRequestsForRepositoryHandler(IVstsClientFactory clientFactory, IRepository repository, ILogger<FetchPullRequestsForRepositoryHandler> logger)
         {
             _clientFactory = clientFactory;
+            _repository = repository;
             _logger = logger;
         }
 
-        public async Task<IEnumerable<PullRequestViewModel>> Handle(FetchPullRequestsForRepository query)
+        public async Task<FetchPullRequestsResult> Handle(FetchPullRequestsForRepository query)
         {
             if (query.Repository == null)
             {
@@ -36,42 +39,65 @@ namespace Ether.Vsts.Handlers.Queries
             var info = query.Repository;
             if (string.IsNullOrEmpty(info.Name) || info.Members == null || !info.Members.Any() || info.Project == null || string.IsNullOrEmpty(info.Project.Name))
             {
-                return Enumerable.Empty<PullRequestViewModel>();
+                return new FetchPullRequestsResult { PullRequests = Enumerable.Empty<PullRequestViewModel>(), Details = Enumerable.Empty<PullRequestJobDetails.PullRequestDetail>() };
             }
 
             var token = info.Project.Identity != null && !string.IsNullOrEmpty(info.Project.Identity.Token) ? info.Project.Identity.Token : null;
             var client = await _clientFactory.GetPullRequestsClient(token);
-            var result = new List<PullRequestViewModel>();
+            var pullRequests = new List<PullRequestViewModel>();
+            var details = new List<PullRequestJobDetails.PullRequestDetail>();
+            var errors = new List<PullRequestJobDetails.ErrorDetail>();
+            var timeLogs = new List<PullRequestJobDetails.TimeEntry>();
             foreach (var member in info.Members)
             {
-                var prs = await client.GetPullRequestsAsync(info.Project.Name, info.Name, new PullRequestQuery
+                var startTime = DateTime.UtcNow;
+                try
                 {
-                    CreatorId = member.Id,
-                    Status = "all"
-                });
-
-                foreach (var pr in prs)
-                {
-                    var iterations = await client.GetPullRequestIterationsAsync(info.Project.Name, info.Name, pr.PullRequestId);
-                    var threads = await client.GetPullRequestThreadsAsync(info.Project.Name, info.Name, pr.PullRequestId);
-
-                    result.Add(new PullRequestViewModel
+                    var prs = await client.GetPullRequestsAsync(info.Project.Name, info.Name, new PullRequestQuery
                     {
-                        PullRequestId = pr.PullRequestId,
-                        Author = pr.CreatedBy.UniqueName,
-                        AuthorId = pr.CreatedBy.Id,
-                        Created = pr.CreationDate,
-                        Title = pr.Title,
-                        State = (PullRequestState)Enum.Parse(typeof(PullRequestState), pr.Status, true),
-                        Completed = pr.ClosedDate,
-                        Repository = info.Id,
-                        Iterations = iterations.Count(),
-                        Comments = threads.Sum(t => t.Comments.Count(c => !c.IsDeleted && string.Equals(c.CommentType, UserCommentType, StringComparison.OrdinalIgnoreCase)))
+                        CreatorId = member.Id,
+                        CreatedAfter = member.LastPullRequestsFetchDate,
+                        Status = "all"
                     });
+
+                    foreach (var pr in prs)
+                    {
+                        details.Add(new PullRequestJobDetails.PullRequestDetail
+                        {
+                            Member = member.DisplayName,
+                            Repository = info.Name,
+                            PullRequestId = pr.PullRequestId,
+                            PullRequestTitle = pr.Title,
+                            PullRequestState = pr.Status
+                        });
+
+                        var iterations = await client.GetPullRequestIterationsAsync(info.Project.Name, info.Name, pr.PullRequestId);
+                        var threads = await client.GetPullRequestThreadsAsync(info.Project.Name, info.Name, pr.PullRequestId);
+
+                        pullRequests.Add(new PullRequestViewModel
+                        {
+                            PullRequestId = pr.PullRequestId,
+                            Author = pr.CreatedBy.UniqueName,
+                            AuthorId = pr.CreatedBy.Id,
+                            Created = pr.CreationDate,
+                            Title = pr.Title,
+                            State = (ViewModels.Types.PullRequestState)Enum.Parse(typeof(ViewModels.Types.PullRequestState), pr.Status, true),
+                            Completed = pr.ClosedDate,
+                            Repository = info.Id,
+                            Iterations = iterations.Count(),
+                            Comments = threads.Sum(t => t.Comments.Count(c => !c.IsDeleted && string.Equals(c.CommentType, UserCommentType, StringComparison.OrdinalIgnoreCase)))
+                        });
+                    }
                 }
+                catch (Exception ex)
+                {
+                    errors.Add(new PullRequestJobDetails.ErrorDetail { Repository = info.Name, Member = member.DisplayName, Error = ex.Message });
+                }
+
+                timeLogs.Add(new PullRequestJobDetails.MemberTimeEntry { Member = member.DisplayName, Repository = info.Name, Start = startTime, End = DateTime.UtcNow });
             }
 
-            return result;
+            return new FetchPullRequestsResult { PullRequests = pullRequests, Details = details, Errors = errors, TimeLogs = timeLogs };
         }
     }
 }

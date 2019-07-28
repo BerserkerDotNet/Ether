@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Ether.ViewModels;
+using Ether.ViewModels.Types;
 using IdentityModel.Client;
 using Microsoft.AspNetCore.Blazor.Http;
 using Microsoft.AspNetCore.Components;
@@ -29,6 +30,7 @@ namespace Ether.Types
             { typeof(GenerateReportViewModel), "report" },
             { typeof(ReporterDescriptorViewModel), "report" },
             { typeof(JobLogViewModel), "jobs/logs" },
+            { typeof(PullRequestJobDetails), "jobs/logs" },
             { typeof(DashboardSettingsViewModel), "dashboard" }
         };
 
@@ -103,9 +105,19 @@ namespace Ether.Types
             return HttpPost<Guid>($"{GetPathFor<GenerateReportViewModel>()}/Generate", model);
         }
 
+        public Task<T> GetJobDetailsById<T>(Guid id)
+        {
+            return HttpGet<T>($"{GetPathFor<T>()}/GetJobDetails?id={id}");
+        }
+
         public Task RunWorkitemsJob(IEnumerable<Guid> members, bool isReset)
         {
             return HttpPost("jobs/vsts/runworkitemsjob", new { Members = members, IsReset = isReset });
+        }
+
+        public Task RunPullRequestsJob(IEnumerable<Guid> members, bool isReset)
+        {
+            return HttpPost("jobs/vsts/runpullrequestsjob", new { Members = members, IsReset = isReset });
         }
 
         public Task<IEnumerable<ReporterDescriptorViewModel>> GetReportTypes()

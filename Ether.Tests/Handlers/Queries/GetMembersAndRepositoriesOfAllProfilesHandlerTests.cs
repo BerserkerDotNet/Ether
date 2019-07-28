@@ -28,7 +28,7 @@ namespace Ether.Tests.Handlers.Queries
         {
             var data = SetupData();
 
-            var result = await _handler.Handle(new GetMembersAndRepositoriesOfAllProfiles());
+            var result = await _handler.Handle(new GetMembersAndRepositoriesOfAllProfiles(new Guid[0]));
 
             var expectedRepositories = data.profiles
                 .SelectMany(p => p.Repositories)
@@ -68,7 +68,7 @@ namespace Ether.Tests.Handlers.Queries
             var data = SetupData();
             SetupMultiple(PredicateValidator, new VstsProfile[0]);
 
-            var result = await _handler.Handle(new GetMembersAndRepositoriesOfAllProfiles());
+            var result = await _handler.Handle(new GetMembersAndRepositoriesOfAllProfiles(new Guid[0]));
 
             result.Should().NotBeNull();
             result.Should().BeEmpty();
@@ -80,7 +80,7 @@ namespace Ether.Tests.Handlers.Queries
             var data = SetupData();
             data.profiles.ElementAt(0).Members = Enumerable.Empty<Guid>();
 
-            var result = await _handler.Handle(new GetMembersAndRepositoriesOfAllProfiles());
+            var result = await _handler.Handle(new GetMembersAndRepositoriesOfAllProfiles(new Guid[0]));
 
             result.Should().NotContain(r => !r.Members.Any());
         }

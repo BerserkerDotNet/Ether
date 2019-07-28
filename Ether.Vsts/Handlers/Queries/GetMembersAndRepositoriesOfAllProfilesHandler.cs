@@ -32,7 +32,12 @@ namespace Ether.Vsts.Handlers.Queries
                 .SelectMany(p => p.Members)
                 .Distinct()
                 .ToArray();
+
             var members = await _repository.GetAsync<TeamMember>(m => membersToFetch.Contains(m.Id));
+            if (query.IncludeMembers != null && query.IncludeMembers.Any())
+            {
+                members = members.Where(m => query.IncludeMembers.Contains(m.Id)).ToArray();
+            }
 
             var repositoriesToFetch = profiles
                 .SelectMany(p => p.Repositories)

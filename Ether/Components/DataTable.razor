@@ -35,7 +35,7 @@
                     <td class="pull-right">
                         @if (RowDetailTemplate != null)
                         {
-                            <button class="btn btn-success btn-fill" @onclick="@(() => ToggleDetails(item))">
+                            <button type="button" class="btn btn-success btn-fill" @onclick="@(() => ToggleDetails(item))">
                                 @if (IsItemDetailsVisible(item))
                                 {
                                     <i class="far fa-minus-square"></i>
@@ -71,9 +71,9 @@
             <tr>
                 <td colspan="100">
                     <div class="pull-right">
-                        <button class="btn btn-simple" disabled="@(CurrentPage == 1)" @onclick="@(() => PrevPage())">Prev</button>
+                        <button type="button" class="btn btn-simple" disabled="@(CurrentPage == 1)" @onclick="@(() => PrevPage())">Prev</button>
                         <span>@CurrentPage of @TotalPages</span>
-                        <button class="btn btn-simple" disabled="@(CurrentPage >= TotalPages)" @onclick="@(() => NextPage())">Next</button>
+                        <button type="button" class="btn btn-simple" disabled="@(CurrentPage >= TotalPages)" @onclick="@(() => NextPage())">Next</button>
                     </div>
                 </td>
             </tr>

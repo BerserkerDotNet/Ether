@@ -11,24 +11,25 @@ namespace Ether.Core.Types.Handlers.Queries
         where TQuery : IQuery<IEnumerable<TModel>>
         where TData : BaseDto
     {
-        private readonly IRepository _repository;
-        private readonly IMapper _mapper;
-
         public GetAllHandler(IRepository repository, IMapper mapper)
         {
-            _repository = repository;
-            _mapper = mapper;
+            Repository = repository;
+            Mapper = mapper;
         }
+
+        public IRepository Repository { get; private set; }
+
+        public IMapper Mapper { get; private set; }
 
         public async Task<IEnumerable<TModel>> Handle(TQuery query)
         {
-            var result = await _repository.GetAllAsync<TData>();
-            return PostProcessData(_mapper.Map<IEnumerable<TModel>>(result));
+            var result = await Repository.GetAllAsync<TData>();
+            return await PostProcessData(Mapper.Map<IEnumerable<TModel>>(result));
         }
 
-        protected virtual IEnumerable<TModel> PostProcessData(IEnumerable<TModel> data)
+        protected virtual Task<IEnumerable<TModel>> PostProcessData(IEnumerable<TModel> data)
         {
-            return data;
+            return Task.FromResult(data);
         }
     }
 }

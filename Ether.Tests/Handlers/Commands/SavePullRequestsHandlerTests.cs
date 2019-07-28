@@ -40,6 +40,8 @@ namespace Ether.Tests.Handlers.Commands
             var pullRequests = Builder<PullRequestViewModel>
                 .CreateListOfSize(expectedCallsToDB)
                 .Build();
+            RepositoryMock.Setup(r => r.UpdateFieldValue<TeamMember, DateTime?>(It.IsAny<Expression<Func<TeamMember, bool>>>(), m => m.LastPullRequestsFetchDate, It.IsAny<DateTime?>()))
+                .Returns(Task.CompletedTask);
             SetupCreateOrUpdateIf<PullRequest>(e => ValidateExpression(e), p => pullRequests.Any(pr => pr.PullRequestId == p.PullRequestId));
 
             await _handler.Handle(new SavePullRequests(pullRequests));
@@ -49,7 +51,7 @@ namespace Ether.Tests.Handlers.Commands
 
         protected override void Initialize()
         {
-            _handler = new SavePullRequestsHandler(RepositoryMock.Object, Mapper);
+            _handler = new SavePullRequestsHandler(RepositoryMock.Object, Mapper, GetLoggerMock<SavePullRequestsHandler>());
         }
 
         private bool ValidateExpression(Expression e)

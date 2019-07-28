@@ -12,5 +12,7 @@ namespace Ether.Vsts.Dto
         public int[] RelatedWorkItems { get; set; }
 
         public DateTime? LastWorkitemsFetchDate { get; set; }
+
+        public DateTime? LastPullRequestsFetchDate { get; set; }
     }
 }
