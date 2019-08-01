@@ -1,10 +1,12 @@
 ﻿@page "/azure-devops/teammembers"
 @inject TeamMembersStateService State
+@inject ProfilesStateService ProfileState
 @inject JsUtils JsUtils
 
 <div class="row">
     <div class="col-md-12">
         <Ether.Components.Settings.TeamMembers Members="State.Members"
+                                               Profiles="ProfileState.Profiles"
                                                OnChange="OnChange"
                                                OnDelete="OnDelete"
                                                OnRefresh="OnRefresh"
@@ -19,6 +21,7 @@
 
     protected override async Task OnInitAsync()
     {
+        await ProfileState.LoadAsync();
         await State.LoadAsync();
     }
 

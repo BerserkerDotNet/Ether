@@ -1,17 +1,26 @@
 ﻿<EditableGrid Items="Members"
-               GridTitle="Team members"
-               NewTitle="New member"
-               ExistingTitle="Editing member"
-               OnSave="@(async (TeamMemberViewModel m) => await OnChange.InvokeAsync(m))"
-               OnDelete="@(async (TeamMemberViewModel m) => await OnDelete.InvokeAsync(m))"
-               OnRefresh="@(async () => await OnRefresh.InvokeAsync(null))"
-              >
+              GridTitle="Team members"
+              NewTitle="New member"
+              ExistingTitle="Editing member"
+              OnSave="@(async (TeamMemberViewModel m) => await OnChange.InvokeAsync(m))"
+              OnDelete="@(async (TeamMemberViewModel m) => await OnDelete.InvokeAsync(m))"
+              OnRefresh="@(async () => await OnRefresh.InvokeAsync(null))">
     <ListModeContent Context="ctx">
         <DataTable Items="ctx.Items" PageSize="10">
             <FilterTemplate Context="dt">
                 <div class="form-group">
                     <input class="form-control" type="text" placeholder="Type to search..."
-                           @oninput="@(e => dt.Filter(i => i.DisplayName.ToLower().Contains(e.Value.ToString().ToLower()) || i.Email.Contains(e.Value.ToString())))" />
+                           @oninput="@(e => ApplyFilter(e, dt, false))" />
+                </div>
+                <div class="form-group">
+                    <label>Profiles:</label>
+                    <select class="form-control" @onchange="@((args) => ApplyFilter(args, dt, true))">
+                        <option>None</option>
+                        @foreach (var profile in Profiles)
+                        {
+                            <option value="@profile.Id">@profile.Name</option>
+                        }
+                    </select>
                 </div>
             </FilterTemplate>
             <TableHeader>
@@ -63,12 +72,55 @@
 </EditableGrid>
 
 @code{
-[Parameter] IEnumerable<TeamMemberViewModel> Members { get; set; }
-[Parameter] EventCallback<TeamMemberViewModel> OnChange { get; set; }
-[Parameter] EventCallback<TeamMemberViewModel> OnDelete { get; set; }
-[Parameter] EventCallback<TeamMemberViewModel> OnFetchWorkItems { get; set; }
-[Parameter] EventCallback<TeamMemberViewModel> OnResetWorkItems { get; set; }
-[Parameter] EventCallback<TeamMemberViewModel> OnFetchPullRequests { get; set; }
-[Parameter] EventCallback<TeamMemberViewModel> OnResetPullRequests { get; set; }
-[Parameter] EventCallback OnRefresh { get; set; }
+    [Parameter] IEnumerable<TeamMemberViewModel> Members { get; set; }
+    [Parameter] IEnumerable<ProfileViewModel> Profiles { get; set; }
+    [Parameter] EventCallback<TeamMemberViewModel> OnChange { get; set; }
+    [Parameter] EventCallback<TeamMemberViewModel> OnDelete { get; set; }
+    [Parameter] EventCallback<TeamMemberViewModel> OnFetchWorkItems { get; set; }
+    [Parameter] EventCallback<TeamMemberViewModel> OnResetWorkItems { get; set; }
+    [Parameter] EventCallback<TeamMemberViewModel> OnFetchPullRequests { get; set; }
+    [Parameter] EventCallback<TeamMemberViewModel> OnResetPullRequests { get; set; }
+    [Parameter] EventCallback OnRefresh { get; set; }
+
+    private string searchText = string.Empty;
+    private string selectedProfile = string.Empty;
+
+    private void ApplyFilter(UIChangeEventArgs args, DataTableBase<TeamMemberViewModel> dataTable, bool isProfile)
+    {
+        if (isProfile)
+        {
+            selectedProfile = args.Value.ToString();
+        }
+        else
+        {
+            searchText = args.Value.ToString();
+        }
+
+        dataTable.Filter(t => ProfileFilter(t) && SearchBoxFilter(t));
+    }
+
+    private Func<TeamMemberViewModel, bool> ProfileFilter
+    {
+        get
+        {
+            var isGuid = Guid.TryParse(selectedProfile, out var profileId);
+            if (isGuid)
+            {
+                var profile = Profiles.Single(p => p.Id == profileId);
+                return t => profile.Members.Contains(t.Id);
+            }
+            else
+            {
+                return _ => true;
+            }
+        }
+    }
+
+    private Func<TeamMemberViewModel, bool> SearchBoxFilter
+    {
+        get
+        {
+            return i => i.DisplayName.ToLower().Contains(searchText.ToLower()) || i.Email.Contains(searchText);
+        }
+    }
 }
