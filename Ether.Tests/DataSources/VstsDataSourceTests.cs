@@ -237,6 +237,29 @@ namespace Ether.Tests.DataSources
         }
 
         [Test]
+        public void GetActiveDurationShouldCorrectlyHandleOnHoldToCodeReviewInOneUpdate()
+        {
+            const int expectedDuration = 2;
+            var john = Builder<TeamMemberViewModel>.CreateNew().Build();
+            var taskData = WorkItemsFactory
+                .CreateTask();
+
+            taskData.WorkItem.Updates = UpdateBuilder.Create()
+                .New()
+                .With(WorkItemAssignedToField, john.Email, string.Empty)
+                .On(new DateTime(2019, 7, 18))
+                .Then().Activated().On(new DateTime(2019, 7, 19))
+                .Then().AddTag(OnHoldTag).On(new DateTime(2019, 7, 23))
+                .Then().RemoveTag(OnHoldTag).AddTag(CodeReviewTag).On(new DateTime(2019, 7, 25))
+                .Then().Closed(john, "Active").On(new DateTime(2019, 8, 1))
+                .Build();
+
+            var result = _dataSource.GetActiveDuration(taskData.WorkItem, new[] { john });
+
+            result.Should().Be(expectedDuration);
+        }
+
+        [Test]
         public void GetActiveDurationShouldNotCountTimeWhileOnHold()
         {
             const int expectedDuration = 7;

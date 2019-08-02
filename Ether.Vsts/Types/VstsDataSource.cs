@@ -106,6 +106,8 @@ namespace Ether.Vsts.Types
                     (ContainsTag(update[WorkItemTagsField].OldValue, BlockedTag) && !ContainsTag(update[WorkItemTagsField].NewValue, BlockedTag) ||
                     ContainsTag(update[WorkItemTagsField].OldValue, OnHoldTag) && !ContainsTag(update[WorkItemTagsField].NewValue, OnHoldTag));
 
+                var isInCodeReviewOrResolved = isResolved || isCodeReview;
+
                 if (!assignedToTeam && !string.IsNullOrWhiteSpace(update[WorkItemAssignedToField].NewValue))
                 {
                     assignedToTeam = team.Any(m => update[WorkItemAssignedToField].NewValue.Contains(m.Email));
@@ -123,12 +125,12 @@ namespace Ether.Vsts.Types
                         activeTime += CountBusinessDaysBetween(lastActivated.Value, DateTime.Parse(update[WorkItemChangedDateField].NewValue));
                     }
                 }
-                else if ((isActivation && !isBlocked) || isUnBlocked)
+                else if ((isActivation && !isBlocked) || (isUnBlocked && !isInCodeReviewOrResolved))
                 {
                     lastActivated = DateTime.Parse(update[WorkItemChangedDateField].NewValue);
                     isActive = true;
                 }
-                else if (isResolved || isCodeReview)
+                else if (isInCodeReviewOrResolved)
                 {
                     if (isActive && lastActivated != null && assignedToTeam)
                     {

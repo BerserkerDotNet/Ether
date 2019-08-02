@@ -145,14 +145,22 @@ namespace Ether.Tests
 
         private UpdateBuilder Tag(string tag, bool isAdd)
         {
-            var lastTagsUpdate = _updates.LastOrDefault(u => u.Fields.ContainsKey(Constants.WorkItemTagsField));
-            if (lastTagsUpdate == null)
+            var hasTagsInCurrentUpdate = _fields.ContainsKey(Constants.WorkItemTagsField);
+            var tagsString = hasTagsInCurrentUpdate ? _fields[Constants.WorkItemTagsField].NewValue : string.Empty;
+            var oldTags = hasTagsInCurrentUpdate ? _fields[Constants.WorkItemTagsField].OldValue : string.Empty;
+
+            if (!hasTagsInCurrentUpdate)
             {
-                With(Constants.WorkItemTagsField, tag, string.Empty);
-                return this;
+                var lastTagsUpdate = _updates.LastOrDefault(u => u.Fields.ContainsKey(Constants.WorkItemTagsField));
+                if (lastTagsUpdate == null)
+                {
+                    With(Constants.WorkItemTagsField, tag, string.Empty);
+                    return this;
+                }
+
+                tagsString = oldTags = lastTagsUpdate.Fields[Constants.WorkItemTagsField].NewValue;
             }
 
-            var tagsString = lastTagsUpdate.Fields[Constants.WorkItemTagsField].NewValue;
             var tags = tagsString.Split(';').ToList();
 
             if (isAdd)
@@ -164,7 +172,7 @@ namespace Ether.Tests
                 tags.Remove(tag);
             }
 
-            With(Constants.WorkItemTagsField, string.Join(';', tags), tagsString);
+            With(Constants.WorkItemTagsField, string.Join(';', tags), oldTags);
             return this;
         }
     }
