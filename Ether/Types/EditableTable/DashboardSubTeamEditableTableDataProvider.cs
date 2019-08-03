@@ -18,10 +18,7 @@ namespace Ether.Types.EditableTable
 
         public override async Task<IEnumerable<T>> Load<T>()
         {
-            Console.WriteLine("Provider load");
             var settings = await GetSettings();
-
-            Console.WriteLine("Loaded: " + settings.SubTeams == null);
             return (IEnumerable<T>)settings.SubTeams;
         }
 

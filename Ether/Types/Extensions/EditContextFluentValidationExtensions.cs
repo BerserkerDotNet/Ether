@@ -63,7 +63,6 @@ namespace Ether.Types.Extensions
             var validator = GetValidatorFor(editContext.Model);
             if (validator == null)
             {
-                Console.WriteLine("ERROR: No validator found for", editContext.Model.GetType());
                 messages.Clear();
                 return;
             }

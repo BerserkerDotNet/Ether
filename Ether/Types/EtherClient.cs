@@ -10,10 +10,11 @@ using Microsoft.AspNetCore.Blazor.Http;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Ether.Types
 {
-    public class EtherClient
+    public partial class EtherClient
     {
         // TODO: Better mapping
         private static readonly Dictionary<Type, string> _typeRoutes = new Dictionary<Type, string>(9)
@@ -150,7 +151,7 @@ namespace Ether.Types
 
             if (tokenResponse.IsError)
             {
-                throw new Exception(tokenResponse.Error);
+                throw new Exception(tokenResponse.ErrorDescription);
             }
 
             SetAccessToken(tokenResponse.AccessToken);

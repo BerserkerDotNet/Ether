@@ -76,17 +76,13 @@ namespace Ether.Components.Code
 
         public virtual async Task Refresh()
         {
-            Console.WriteLine("EDT: Refresh");
             try
             {
                 IsLoading = true;
                 if (_dataProvider == null)
                 {
-                    Console.WriteLine("Data provider is null. Exit.");
                     return;
                 }
-
-                Console.WriteLine("Loading data with " + _dataProvider.GetType());
 
                 var items = await _dataProvider.Load<T>();
                 if (OrderByDescending != null)
@@ -117,7 +113,6 @@ namespace Ether.Components.Code
 
         protected override async Task OnParametersSetAsync()
         {
-            Console.WriteLine("Settings up data provider. ");
             _dataProvider = DataProvider ?? DefaultDataProvider;
 
             await Refresh();

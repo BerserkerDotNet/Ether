@@ -34,7 +34,6 @@ namespace Ether.Types.State
 
         public async Task<JobDetails> GetJobDetails(JobLogViewModel log)
         {
-            Console.WriteLine("GetJobDetails " + log.JobType);
             if (log.JobType == "PullRequestsSyncJob")
             {
                 return await _client.GetJobDetailsById<PullRequestJobDetails>(log.Id);

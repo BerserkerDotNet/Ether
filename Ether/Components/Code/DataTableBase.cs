@@ -41,7 +41,6 @@ namespace Ether.Components.Code
 
         protected override void OnParametersSet()
         {
-            Console.WriteLine("DT: Parameters set");
             base.OnParametersSet();
             ItemsToShow = Items;
             if (_filterPredicate != null)
@@ -80,13 +79,11 @@ namespace Ether.Components.Code
 
         protected void ToggleDetails(TItem item)
         {
-            Console.WriteLine("Toggle Details" + item);
             ItemWithDetailsVisible = IsItemDetailsVisible(item) ? default : item;
         }
 
         protected bool IsItemDetailsVisible(TItem item)
         {
-            Console.WriteLine("IsItemVisible" + item);
             return Equals(ItemWithDetailsVisible, item);
         }
     }
