@@ -14,5 +14,7 @@ namespace Ether.Vsts.Dto
 
         [BsonDictionaryOptions(DictionaryRepresentation.ArrayOfDocuments)]
         public Dictionary<string, WorkItemFieldUpdate> Fields { get; set; }
+
+        public WorkItemUpdateRelations Relations { get; set; }
     }
 }

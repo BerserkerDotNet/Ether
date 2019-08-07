@@ -260,6 +260,70 @@ namespace Ether.Tests.DataSources
         }
 
         [Test]
+        public void GetActiveDurationShouldCorrectlyHandleAddedPullRequest()
+        {
+            const int expectedDuration = 2;
+            var john = Builder<TeamMemberViewModel>.CreateNew().Build();
+            var taskData = WorkItemsFactory
+                .CreateTask();
+
+            taskData.WorkItem.Updates = UpdateBuilder.Create()
+                .New()
+                .With(WorkItemAssignedToField, john.Email, string.Empty)
+                .On(new DateTime(2019, 7, 9))
+                .Then().Activated().On(new DateTime(2019, 7, 10))
+                .Then().WithPullRequest(111111).On(new DateTime(2019, 7, 12))
+                .Then().Closed(john, "Active").On(new DateTime(2019, 7, 26))
+                .Build();
+
+            var result = _dataSource.GetActiveDuration(taskData.WorkItem, new[] { john });
+
+            result.Should().Be(expectedDuration);
+        }
+
+        [Test]
+        public void GetActiveDurationShouldCorrectlyHandleWhenPullRequestAddedBeforeActivation()
+        {
+            const int expectedDuration = 2;
+            var john = Builder<TeamMemberViewModel>.CreateNew().Build();
+            var taskData = WorkItemsFactory
+                .CreateTask();
+
+            taskData.WorkItem.Updates = UpdateBuilder.Create()
+                .New()
+                .With(WorkItemAssignedToField, john.Email, string.Empty).On(new DateTime(2019, 7, 9))
+                .WithPullRequest(2222222).On(new DateTime(2019, 7, 09))
+                .Then().Activated().On(new DateTime(2019, 7, 10))
+                .Then().Closed(john, "Active").On(new DateTime(2019, 7, 12))
+                .Build();
+
+            var result = _dataSource.GetActiveDuration(taskData.WorkItem, new[] { john });
+
+            result.Should().Be(expectedDuration);
+        }
+
+        [Test]
+        public void GetActiveDurationShouldCorrectlyHandleWhenPullRequestAddedAfterActivation()
+        {
+            const int expectedDuration = 2;
+            var john = Builder<TeamMemberViewModel>.CreateNew().Build();
+            var taskData = WorkItemsFactory
+                .CreateTask();
+
+            taskData.WorkItem.Updates = UpdateBuilder.Create()
+                .New().On(new DateTime(2019, 7, 9))
+                .Then().Activated().On(new DateTime(2019, 7, 10))
+                .Then().WithPullRequest(2222222).On(new DateTime(2019, 7, 11))
+                .Then().With(WorkItemAssignedToField, john.Email, string.Empty).On(new DateTime(2019, 7, 12))
+                .Then().Closed(john, "Active").On(new DateTime(2019, 7, 16))
+                .Build();
+
+            var result = _dataSource.GetActiveDuration(taskData.WorkItem, new[] { john });
+
+            result.Should().Be(expectedDuration);
+        }
+
+        [Test]
         public void GetActiveDurationShouldNotCountTimeWhileOnHold()
         {
             const int expectedDuration = 7;

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Ether.Contracts.Interfaces.CQS;
 using Ether.ViewModels;
 using Ether.ViewModels.Types;
@@ -40,11 +41,13 @@ namespace Ether.Vsts.Handlers.Queries
 
         private readonly IVstsClientFactory _clientFactory;
         private readonly ILogger<FetchWorkItemsFromProjectHandler> _logger;
+        private readonly IMapper _mapper;
 
-        public FetchWorkItemsFromProjectHandler(IVstsClientFactory clientFactory, ILogger<FetchWorkItemsFromProjectHandler> logger)
+        public FetchWorkItemsFromProjectHandler(IVstsClientFactory clientFactory, ILogger<FetchWorkItemsFromProjectHandler> logger, IMapper mapper)
         {
             _clientFactory = clientFactory;
             _logger = logger;
+            _mapper = mapper;
         }
 
         public async Task<IEnumerable<WorkItemViewModel>> Handle(FetchWorkItemsFromProject query)
@@ -77,14 +80,7 @@ namespace Ether.Vsts.Handlers.Queries
                         RelationType = r.RelationType,
                         Url = r.Url
                     }),
-                    Updates = updates.Select(u => new WorkItemUpdateViewModel
-                    {
-                        WorkItemId = workItem.Id,
-                        Id = u.Id,
-                        Fields = u.Fields == null ?
-                            new Dictionary<string, WorkItemFieldUpdate>() :
-                            u.Fields.ToDictionary(k => k.Key, v => new WorkItemFieldUpdate { OldValue = v.Value.OldValue, NewValue = v.Value.NewValue })
-                    })
+                    Updates = updates.Select(u => _mapper.Map<WorkItemUpdateViewModel>(u))
                 };
                 result.Add(viewModel);
             }

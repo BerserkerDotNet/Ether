@@ -11,6 +11,8 @@ namespace Ether.ViewModels
 
         public Dictionary<string, WorkItemFieldUpdate> Fields { get; set; }
 
+        public WorkItemUpdateRelations Relations { get; set; }
+
         public WorkItemFieldUpdate this[string key]
         {
             get

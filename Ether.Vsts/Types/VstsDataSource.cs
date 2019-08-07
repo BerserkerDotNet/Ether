@@ -99,7 +99,8 @@ namespace Ether.Vsts.Types
                 var isActivation = !update[WorkItemStateField].IsEmpty() && update[WorkItemStateField].NewValue == WorkItemStateActive;
                 var isOnHold = !update[WorkItemStateField].IsEmpty() && update[WorkItemStateField].NewValue == WorkItemStateNew;
                 var isResolved = !update[WorkItemStateField].IsEmpty() && (update[WorkItemStateField].NewValue == WorkItemStateResolved || update[WorkItemStateField].NewValue == WorkItemStateClosed);
-                var isCodeReview = !update[WorkItemTagsField].IsEmpty() && ContainsTag(update[WorkItemTagsField].NewValue, CodeReviewTag);
+                var isCodeReview = !update[WorkItemTagsField].IsEmpty() && ContainsTag(update[WorkItemTagsField].NewValue, CodeReviewTag) ||
+                    (update.Relations?.Added != null && update.Relations.Added.Any(i => !string.IsNullOrWhiteSpace(i.Attributes["name"]) && i.Attributes["name"].Equals("Pull Request", StringComparison.InvariantCultureIgnoreCase)));
                 var isBlocked = !update[WorkItemTagsField].IsEmpty() &&
                     (ContainsTag(update[WorkItemTagsField].NewValue, BlockedTag) || ContainsTag(update[WorkItemTagsField].NewValue, OnHoldTag));
                 var isUnBlocked = !isBlocked && !update[WorkItemTagsField].IsEmpty() &&
@@ -137,7 +138,11 @@ namespace Ether.Vsts.Types
                         activeTime += CountBusinessDaysBetween(lastActivated.Value, DateTime.Parse(update[WorkItemChangedDateField].NewValue));
                     }
 
-                    break;
+                    // Prevent short circuiting when pull request is added before the work item activated by team member.
+                    if (lastActivated != null && assignedToTeam)
+                    {
+                        break;
+                    }
                 }
             }
 

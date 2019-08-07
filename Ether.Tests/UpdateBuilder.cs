@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Ether.Tests.Extensions;
 using Ether.ViewModels;
+using Ether.ViewModels.Types;
 using Ether.Vsts;
 
 namespace Ether.Tests
@@ -19,6 +20,7 @@ namespace Ether.Tests
 
         private List<WorkItemUpdateViewModel> _updates = new List<WorkItemUpdateViewModel>();
         private Dictionary<string, WorkItemFieldUpdate> _fields = new Dictionary<string, WorkItemFieldUpdate>();
+        private WorkItemUpdateRelations _relations = null;
 
         public static UpdateBuilder Create()
         {
@@ -119,6 +121,22 @@ namespace Ether.Tests
             return this;
         }
 
+        public UpdateBuilder WithPullRequest(int id)
+        {
+            InitializeRelations();
+            _relations.Added = new[]
+            {
+                new WorkItemRelation
+                {
+                    RelationType = "ArtifactLink",
+                    Url = new Uri($"vstfs:///Git/PullRequestId/00000000-0000-0000-0000-000000000000%2f00000000-0000-0000-0000-000000000000%2f{id}"),
+                    Attributes = new Dictionary<string, string>() { { "name", "Pull Request" }, { "id", id.ToString() } }
+                }
+            };
+
+            return this;
+        }
+
         public UpdateBuilder Then()
         {
             AddNewUpdate();
@@ -132,15 +150,21 @@ namespace Ether.Tests
             return _updates;
         }
 
+        private void InitializeRelations()
+        {
+            _relations = _relations ?? new WorkItemUpdateRelations();
+        }
+
         private void AddNewUpdate()
         {
-            var wi = new WorkItemUpdateViewModel { Fields = _fields };
+            var wi = new WorkItemUpdateViewModel { Fields = _fields, Relations = _relations };
             _updates.Add(wi);
         }
 
         private void Reset()
         {
             _fields = new Dictionary<string, WorkItemFieldUpdate>();
+            _relations = null;
         }
 
         private UpdateBuilder Tag(string tag, bool isAdd)
