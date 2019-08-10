@@ -1,0 +1,39 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "Ether.EmailGenerator";
+
+package EmailGenerator;
+
+service EmailGenerator {
+	rpc Generate(EmailRequest) returns (EmailReply) {}
+}
+
+message EmailRequest {
+	string id = 1;
+	string name = 2;
+	EmailTemplate template = 3;
+	Report report = 4;
+}
+
+message EmailTemplate {
+	string subject = 1;
+	string Body = 2;
+}
+
+message Report {
+	repeated WorkItem completed = 1;
+	repeated WorkItem inreview = 2;
+	repeated WorkItem active = 3;
+}
+
+message WorkItem {
+	int32 id = 1;
+	string title = 2;
+	string type = 3;
+	int32 estimated = 4;
+	int32 spent = 5;
+}
+
+message EmailReply {
+	bytes file = 1;
+}

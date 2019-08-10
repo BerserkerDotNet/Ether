@@ -132,6 +132,12 @@ namespace Ether.Types
             return await HttpGet<byte[]>(url);
         }
 
+        public async Task<byte[]> GenerateEmail(Guid id)
+        {
+            var url = $"{GetApiUrl()}report/generateemail?id={id}";
+            return await HttpGet<byte[]>(url);
+        }
+
         public async Task<ActiveWorkitemsViewModel> GetActiveWorkitems(Guid profileId)
         {
             var url = $"{GetApiUrl()}dashboard/activeworkitems?profileId={profileId}";

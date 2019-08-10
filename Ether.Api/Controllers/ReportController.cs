@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Ether.Api.Types.Email;
 using Ether.Contracts.Interfaces.CQS;
 using Ether.Core.Extensions;
 using Ether.Core.Types;
@@ -77,7 +78,7 @@ namespace Ether.Api.Controllers
             return Ok(report);
         }
 
-        [HttpGet]
+        [HttpGet] // TODO: POST?
         [Route(nameof(GenerateExcel))]
         [ProducesResponseType(200)]
         public async Task<IActionResult> GenerateExcel(Guid id)
@@ -99,6 +100,22 @@ namespace Ether.Api.Controllers
             }
 
             return Ok(excelConverter.Convert(report));
+        }
+
+        [HttpGet]
+        [Route(nameof(GenerateEmail))]
+        [ProducesResponseType(200)]
+        public async Task<IActionResult> GenerateEmail(Guid id)
+        {
+            var emailGenerator = (Types.Email.EmailGenerator)HttpContext.RequestServices.GetService(typeof(Types.Email.EmailGenerator));
+            var report = await _mediator.Request<GetReportById, ReportViewModel>(new GetReportById(id));
+            if (report.ReportType == "WorkitemsReporter")
+            {
+                var email = await emailGenerator.Generate(report as WorkItemsReportViewModel);
+                return Ok(email);
+            }
+
+            throw new NotSupportedException($"Report of type '{report.ReportType}' is not supported.");
         }
 
         private Task<Guid> GenerateReport(Type generateCommandType, GenerateReportViewModel requestModel)
