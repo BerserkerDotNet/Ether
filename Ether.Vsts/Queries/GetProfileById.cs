@@ -2,7 +2,7 @@
 using Ether.Contracts.Interfaces.CQS;
 using Ether.ViewModels;
 
-namespace Ether.Core.Types.Queries
+namespace Ether.Vsts.Queries
 {
     public class GetProfileById : IQuery<ProfileViewModel>
     {

@@ -36,11 +36,11 @@
   <ItemGroup>
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.4.0" />
     <PackageReference Include="AutoMapper" Version="8.0.0" />
-    <PackageReference Include="FluentValidation.AspNetCore" Version="8.1.2-dev" />
-    <PackageReference Include="Google.Protobuf" Version="3.8.0" />
+    <PackageReference Include="FluentValidation.AspNetCore" Version="8.5.0-preview4" />
+    <PackageReference Include="Google.Protobuf" Version="3.9.1" />
     <PackageReference Include="Grpc.AspNetCore.Server" Version="0.1.22-pre2" />
     <PackageReference Include="Grpc.Core" Version="2.23.0-pre1" />
-    <PackageReference Include="Grpc.Tools" Version="1.22.0">
+    <PackageReference Include="Grpc.Tools" Version="2.23.0-pre1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -51,7 +51,7 @@
     <PackageReference Include="Microsoft.Windows.Compatibility" Version="3.0.0-preview5.19224.8" />
     <PackageReference Include="NPOI" Version="2.4.1" />
     <PackageReference Include="Seq.Extensions.Logging" Version="4.0.1" />
-    <PackageReference Include="StyleCop.Analyzers" Version="1.1.1-rc.114">
+    <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>

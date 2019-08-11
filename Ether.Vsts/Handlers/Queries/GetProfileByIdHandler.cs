@@ -3,10 +3,11 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Ether.Contracts.Interfaces;
 using Ether.Contracts.Interfaces.CQS;
-using Ether.Core.Types.Queries;
 using Ether.ViewModels;
+using Ether.Vsts.Dto;
+using Ether.Vsts.Queries;
 
-namespace Ether.Core.Types.Handlers.Queries
+namespace Ether.Vsts.Handlers.Queries
 {
     public class GetProfileByIdHandler : IQueryHandler<GetProfileById, ProfileViewModel>
     {
@@ -31,7 +32,7 @@ namespace Ether.Core.Types.Handlers.Queries
                 return null;
             }
 
-            var result = await _repository.GetSingleAsync<Contracts.Dto.Profile>(input.Id);
+            var result = await _repository.GetSingleAsync<VstsProfile>(input.Id);
             return _mapper.Map<ProfileViewModel>(result);
         }
     }

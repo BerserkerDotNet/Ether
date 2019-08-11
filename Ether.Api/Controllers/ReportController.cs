@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using Ether.Api.Types.Email;
 using Ether.Contracts.Interfaces.CQS;
 using Ether.Core.Extensions;
 using Ether.Core.Types;
@@ -11,6 +10,7 @@ using Ether.Core.Types.Commands;
 using Ether.Core.Types.Queries;
 using Ether.Types.Excel;
 using Ether.ViewModels;
+using Ether.Vsts.Queries;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
