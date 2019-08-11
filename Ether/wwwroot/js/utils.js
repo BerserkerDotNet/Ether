@@ -103,3 +103,54 @@ window.BlazorComponents.DateRangePicker = {
         return $(element).data('daterangepicker').endDate.format('MM/DD/YYYY');
     }
 };
+
+window.BlazorComponents.SummerNoteBootstrap = {
+    init: function (element, value, blazorComponent) {
+        function getButtons() {
+            return {
+                Profile: createButton("Profile", "{Profile}"),
+                Points: createButton("Points", "{Points}"),
+                WorkItems: createButton("Work Items", "{WorkItems}")
+            }
+        };
+
+        function createButton(text, content) {
+            return function (context) {
+                var ui = $.summernote.ui;
+
+                var button = ui.button({
+                    contents: '<i class="fa fa-child"/> ' + text,
+                    tooltip: text,
+                    click: function () {
+                        context.invoke('editor.insertText', content);
+                    }
+                });
+
+                return button.render();
+            }
+        };
+
+        var buttons = getButtons();
+        $(element).summernote({
+            placeholder: '',
+            tabsize: 1,
+            height: 500,
+            callbacks: {
+                onChange: function (contents, $editable) {
+                    blazorComponent.invokeMethod("OnChanged", contents);
+                }
+            },
+            toolbar: [
+                ['style', ['bold', 'italic', 'underline', 'clear']],
+                ['font', ['strikethrough', 'superscript', 'subscript']],
+                ['para', ['ul', 'ol', 'paragraph']],
+                ['misc', ['undo', 'redo', 'fullscreen', 'codeview']],
+            ],
+
+            buttons: buttons
+        });
+        $(element).summernote('code', value);
+        $('#summernote').summernote('fontSize', 11);
+        $('#summernote').summernote('fontName', 'Calibri (Body)');
+    }
+};

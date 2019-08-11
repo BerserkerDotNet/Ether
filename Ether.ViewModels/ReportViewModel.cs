@@ -11,6 +11,8 @@ namespace Ether.ViewModels
 
         public string ProfileName { get; set; }
 
+        public Guid ProfileId { get; set; }
+
         public DateTime DateTaken { get; set; }
 
         public string ReportType { get; set; }

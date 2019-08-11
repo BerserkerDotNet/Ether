@@ -1,0 +1,33 @@
+﻿@inject JsUtils Js
+
+<div @ref="bodyContent"></div>
+@code {
+    private ElementRef bodyContent;
+    private bool isInitilized = false;
+
+    [Parameter] public string Value { get; private set; }
+
+    [Parameter] public EventCallback<string> ValueChanged { get; private set; }
+
+    [Parameter] public Expression<Func<string>> ValueExpression { get; private set; }
+
+    [JSInvokable]
+    public async Task OnChanged(string value)
+    {
+        if (!string.Equals(value, Value))
+        {
+            Value = value;
+            await ValueChanged.InvokeAsync(value);
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync()
+    {
+        if (!isInitilized)
+        {
+            isInitilized = true;
+            await Js.SummerNoteBootstrap(bodyContent, Value, DotNetObjectRef.Create<object>(this));
+            
+        }
+    }
+}

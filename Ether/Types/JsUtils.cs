@@ -75,6 +75,11 @@ namespace Ether.Types
             return _jsRuntime.InvokeAsync<object>("window.BlazorComponents.DateRangePicker.init", element, component);
         }
 
+        public Task SummerNoteBootstrap(ElementRef element, string value, DotNetObjectRef<object> component)
+        {
+            return _jsRuntime.InvokeAsync<object>("window.BlazorComponents.SummerNoteBootstrap.init", element, value, component);
+        }
+
         public Task<DateTime> GetDatePickerStartDate(ElementRef element)
         {
             return _jsRuntime.InvokeAsync<DateTime>("window.BlazorComponents.DateRangePicker.getStartDate", element);

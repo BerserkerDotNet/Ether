@@ -21,7 +21,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ether.Core", "Ether.Core\Et
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ether.ViewModels", "Ether.ViewModels\Ether.ViewModels.csproj", "{16B24C64-9C2C-4676-8F52-48DD7DBBF392}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ether.EmailGenerator", "Ether.EmailGenerator\Ether.EmailGenerator.csproj", "{568E5103-8884-4AE2-8ADB-E93CED473510}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ether.EmailGenerator", "Ether.EmailGenerator\Ether.EmailGenerator.csproj", "{568E5103-8884-4AE2-8ADB-E93CED473510}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "protos", "protos", "{AC1B8896-3C45-47B9-828C-B5966C475699}"
 	ProjectSection(SolutionItems) = preProject

@@ -109,9 +109,10 @@ namespace Ether.Api.Controllers
         {
             var emailGenerator = (Types.Email.EmailGenerator)HttpContext.RequestServices.GetService(typeof(Types.Email.EmailGenerator));
             var report = await _mediator.Request<GetReportById, ReportViewModel>(new GetReportById(id));
+            var profile = await _mediator.Request<GetProfileById, ProfileViewModel>(new GetProfileById(report.ProfileId));
             if (report.ReportType == "WorkitemsReporter")
             {
-                var email = await emailGenerator.Generate(report as WorkItemsReportViewModel);
+                var email = await emailGenerator.Generate(profile, report as WorkItemsReportViewModel);
                 return Ok(email);
             }
 

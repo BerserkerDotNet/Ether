@@ -18,7 +18,7 @@ namespace Ether.Api.Types.Email
             _logger = logger;
         }
 
-        public Task<byte[]> Generate(WorkItemsReportViewModel report)
+        public Task<byte[]> Generate(ProfileViewModel profile, WorkItemsReportViewModel report)
         {
             _logger.LogInformation("Requesting email for {ProfileId} - {ProfileName}");
             var reportExt = new Report();
@@ -52,7 +52,7 @@ namespace Ether.Api.Types.Email
                 Id = report.Id.ToString(),
                 Name = report.ProfileName,
                 Report = reportExt,
-                Template = new EmailTemplate { Subject = "Weekly status report - {Profile} - {Date}", Body = "dfssdf" }
+                Template = new EmailTemplate { Subject = profile.EmailSubject, Body = profile.EmailBody }
             });
 
             return Task.FromResult(reply.File.ToByteArray());
