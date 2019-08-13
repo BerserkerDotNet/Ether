@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
@@ -132,10 +133,10 @@ namespace Ether.Types
             return await HttpGet<byte[]>(url);
         }
 
-        public async Task<byte[]> GenerateEmail(Guid id)
+        public async Task<byte[]> GenerateEmail(GenerateEmailViewModel model)
         {
-            var url = $"{GetApiUrl()}report/generateemail?id={id}";
-            return await HttpGet<byte[]>(url);
+            var url = $"{GetApiUrl()}report/generateemail";
+            return await HttpPost<byte[]>(url, model);
         }
 
         public async Task<ActiveWorkitemsViewModel> GetActiveWorkitems(Guid profileId)

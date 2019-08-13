@@ -1,0 +1,75 @@
+﻿@page "/reports/email/{id:guid}"
+@inject EtherClient Client
+@inject IUriHelper UriHelper
+@inject JsUtils JsUtils
+@inject TeamMembersStateService TeamMemberState
+@inject ProfilesStateService ProfileState
+
+<Card>
+    <Header>Options</Header>
+    <Body>
+        <div class="form-group">
+            <label>Points:</label>
+            <textarea class="form-control" @bind="model.Points"></textarea>
+        </div>
+        <div class="form-group">
+            <label>Team attendance:</label>
+            <TeamAttendance Team="Team" Attendance="model.Attendance" />
+        </div>
+    </Body>
+    <Footer>
+        <div class="pull-right">
+            <button @onclick="Generate" class="btn btn-success">Generate</button>
+            <button @onclick="Cancel" class="btn btn-danger">Cancel</button>
+        </div>
+    </Footer>
+</Card>
+
+@code {
+
+    [Parameter] Guid? Id { get; set; }
+
+    private WorkItemsReportViewModel report = null;
+    private GenerateEmailViewModel model = new GenerateEmailViewModel();
+    private IEnumerable<TeamMemberViewModel> Team { get; set; } = Enumerable.Empty<TeamMemberViewModel>();
+
+    protected override async Task OnInitAsync()
+    {
+        model.Id = Id.Value;
+        model.Points = string.Empty;
+        model.Attendance = Enumerable.Empty<TeamAttendanceViewModel>();
+        await ProfileState.LoadAsync();
+        await TeamMemberState.LoadAsync();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        report = await Client.GetById<WorkItemsReportViewModel>(Id.Value);
+        var profile = ProfileState.Profiles.SingleOrDefault(p => p.Id == report.ProfileId);
+        var members = TeamMemberState.Members.Where(m => profile.Members.Contains(m.Id)).ToList();
+        var attendanceMap = members.Select(m => new TeamAttendanceViewModel
+        {
+            MemberId = m.Id,
+            MemberName = m.DisplayName,
+            Attendance = new[] { true, true, true, true, true }
+        }).ToList();
+
+
+        Team = members;
+        model.Attendance = attendanceMap;
+
+    }
+
+    private void Cancel()
+    {
+        UriHelper.NavigateTo($"/reports/view/{report.ReportType}/{Id.Value}");
+    }
+
+    private async Task Generate()
+    {
+        var email = await Client.GenerateEmail(model);
+        var base64EncodedEmail = Convert.ToBase64String(email);
+        await JsUtils.SaveAsFile($"{report.ReportName}.msg", base64EncodedEmail);
+        Cancel();
+    }
+}

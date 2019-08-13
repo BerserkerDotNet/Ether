@@ -102,17 +102,18 @@ namespace Ether.Api.Controllers
             return Ok(excelConverter.Convert(report));
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route(nameof(GenerateEmail))]
         [ProducesResponseType(200)]
-        public async Task<IActionResult> GenerateEmail(Guid id)
+        public async Task<IActionResult> GenerateEmail(GenerateEmailViewModel model)
         {
             var emailGenerator = (Types.Email.EmailGenerator)HttpContext.RequestServices.GetService(typeof(Types.Email.EmailGenerator));
-            var report = await _mediator.Request<GetReportById, ReportViewModel>(new GetReportById(id));
+            var report = await _mediator.Request<GetReportById, ReportViewModel>(new GetReportById(model.Id));
             var profile = await _mediator.Request<GetProfileById, ProfileViewModel>(new GetProfileById(report.ProfileId));
+            var vstsConfig = await _mediator.Request<GetVstsDataSourceConfiguration, VstsDataSourceViewModel>(new GetVstsDataSourceConfiguration());
             if (report.ReportType == "WorkitemsReporter")
             {
-                var email = await emailGenerator.Generate(profile, report as WorkItemsReportViewModel);
+                var email = await emailGenerator.Generate(profile, report as WorkItemsReportViewModel, model, vstsConfig);
                 return Ok(email);
             }
 

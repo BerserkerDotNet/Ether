@@ -11,13 +11,20 @@ service EmailGenerator {
 message EmailRequest {
 	string id = 1;
 	string name = 2;
-	EmailTemplate template = 3;
-	Report report = 4;
+	string points = 3;
+	EmailTemplate template = 4;
+	Report report = 5;
+	repeated TeamAttendance attendance = 6;
 }
 
 message EmailTemplate {
 	string subject = 1;
 	string Body = 2;
+}
+
+message TeamAttendance {
+	string name = 1;
+	repeated bool attendance =2;
 }
 
 message Report {
@@ -29,9 +36,10 @@ message Report {
 message WorkItem {
 	int32 id = 1;
 	string title = 2;
-	string type = 3;
-	int32 estimated = 4;
-	int32 spent = 5;
+	string url =3;
+	string type = 4;
+	int32 estimated = 5;
+	int32 spent = 6;
 }
 
 message EmailReply {

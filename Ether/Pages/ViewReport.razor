@@ -124,10 +124,8 @@ else
         await JsUtils.SaveAsFile("report.xlsx", base64EncodedReport);
     }
 
-    protected async Task GenerateEmail()
+    protected void GenerateEmail()
     {
-        var email = await Client.GenerateEmail(report.Id);
-        var base64EncodedEmail = Convert.ToBase64String(email);
-        await JsUtils.SaveAsFile($"{report.ReportName}.msg", base64EncodedEmail);
+         UriHelper.NavigateTo($"/reports/email/{Id.Value}");
     }
 }
