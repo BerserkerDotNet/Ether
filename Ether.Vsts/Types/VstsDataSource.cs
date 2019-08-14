@@ -100,7 +100,7 @@ namespace Ether.Vsts.Types
                 var isOnHold = !update[WorkItemStateField].IsEmpty() && update[WorkItemStateField].NewValue == WorkItemStateNew;
                 var isResolved = !update[WorkItemStateField].IsEmpty() && (update[WorkItemStateField].NewValue == WorkItemStateResolved || update[WorkItemStateField].NewValue == WorkItemStateClosed);
                 var isCodeReview = !update[WorkItemTagsField].IsEmpty() && ContainsTag(update[WorkItemTagsField].NewValue, CodeReviewTag) ||
-                    (update.Relations?.Added != null && update.Relations.Added.Any(i => !string.IsNullOrWhiteSpace(i.Attributes["name"]) && i.Attributes["name"].Equals("Pull Request", StringComparison.InvariantCultureIgnoreCase)));
+                    (update.Relations?.Added != null && update.Relations.Added.Any(i => i.Attributes.ContainsKey("name") && !string.IsNullOrWhiteSpace(i.Attributes["name"]) && i.Attributes["name"].Equals("Pull Request", StringComparison.InvariantCultureIgnoreCase)));
                 var isBlocked = !update[WorkItemTagsField].IsEmpty() &&
                     (ContainsTag(update[WorkItemTagsField].NewValue, BlockedTag) || ContainsTag(update[WorkItemTagsField].NewValue, OnHoldTag));
                 var isUnBlocked = !isBlocked && !update[WorkItemTagsField].IsEmpty() &&

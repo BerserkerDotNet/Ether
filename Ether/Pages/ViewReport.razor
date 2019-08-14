@@ -10,11 +10,16 @@
             <div class="d-print-none pull-right d-print-none">
                 @if (supportsExcel != null)
                 {
-                    <button class="btn btn-fill btn-primary" onclick="@ExportToExcel">Export to Excel</button>
+                    <button class="btn btn-fill btn-primary" @onclick="ExportToExcel">Export to Excel</button>
                 }
-                <button class="btn btn-fill btn-secondary" onclick="@Print">Print</button>
-                <button class="btn btn-fill btn-info" onclick="@NewReport">New report</button>
-                <button class="btn btn-fill btn-success" onclick="@BackToList">Back to list</button>
+                <If Condition="supportsEmail">
+                    <Then>
+                        <button class="btn btn-fill btn-primary" @onclick="GenerateEmail">Generate Email</button>
+                    </Then>
+                </If>
+                <button class="btn btn-fill btn-secondary" @onclick="Print">Print</button>
+                <button class="btn btn-fill btn-info" @onclick="NewReport">New report</button>
+                <button class="btn btn-fill btn-success" @onclick="BackToList">Back to list</button>
             </div>
         </Header>
     </Ether.Components.Card>
@@ -25,13 +30,18 @@ else
     <Ether.Components.Card Title="@reportDisplayName">
         <Header>
             <div class="d-print-none pull-right d-print-none">
-                @if (supportsExcel != null)
+                @if (supportsExcel)
                 {
-                    <button class="btn btn-fill btn-primary" onclick="@ExportToExcel">Export to Excel</button>
+                    <button class="btn btn-fill btn-primary" @onclick="ExportToExcel">Export to Excel</button>
                 }
-                <button class="btn btn-fill btn-secondary" onclick="@Print">Print</button>
-                <button class="btn btn-fill btn-info" onclick="@NewReport">New report</button>
-                <button class="btn btn-fill btn-success" onclick="@BackToList">Back to list</button>
+                <If Condition="supportsEmail">
+                    <Then>
+                        <button class="btn btn-fill btn-primary" @onclick="GenerateEmail">Generate Email</button>
+                    </Then>
+                </If>
+                <button class="btn btn-fill btn-secondary" @onclick="Print">Print</button>
+                <button class="btn btn-fill btn-info" @onclick="NewReport">New report</button>
+                <button class="btn btn-fill btn-success" @onclick="BackToList">Back to list</button>
             </div>
         </Header>
         <Body>
@@ -44,6 +54,7 @@ else
 {
     private string reportDisplayName = string.Empty;
     private bool supportsExcel = false;
+    private bool supportsEmail = false;
     private RenderFragment componentToRender;
     private ReportViewModel report;
 
@@ -61,6 +72,7 @@ else
             reportDisplayName = "Pull requests report";
             report = await Client.GetById<PullRequestReportViewModel>(Id.Value);
             supportsExcel = true;
+            supportsEmail = false;
             componentToRender = b => RenderComponent<Ether.Components.Reports.PullRequestsReport>(b);
         }
         else if (string.Equals(Type, "AggregatedWorkitemsETAReport", StringComparison.OrdinalIgnoreCase))
@@ -68,6 +80,7 @@ else
             reportDisplayName = "Aggregated workitems ETA report";
             report = await Client.GetById<AggregatedWorkitemsETAReportViewModel>(Id.Value);
             supportsExcel = false;
+            supportsEmail = false;
             componentToRender = b => RenderComponent<Ether.Components.Reports.AggregatedWorkitemsETAReport>(b);
         }
         else if (string.Equals(Type, "WorkitemsReporter", StringComparison.OrdinalIgnoreCase))
@@ -75,6 +88,7 @@ else
             reportDisplayName = "Workitems report";
             report = await Client.GetById<WorkItemsReportViewModel>(Id.Value);
             supportsExcel = true;
+            supportsEmail = true;
             componentToRender = b => RenderComponent<Ether.Components.Reports.WorkitemsReport>(b);
         }
     }
@@ -108,5 +122,10 @@ else
         var excelReport = await Client.GenerateExcel(report.Id);
         var base64EncodedReport = Convert.ToBase64String(excelReport);
         await JsUtils.SaveAsFile("report.xlsx", base64EncodedReport);
+    }
+
+    protected void GenerateEmail()
+    {
+         UriHelper.NavigateTo($"/reports/email/{Id.Value}");
     }
 }

@@ -3,6 +3,7 @@ using Autofac;
 using AutoMapper;
 using Ether.Api.Jobs;
 using Ether.Api.Types;
+using Ether.Api.Types.Email;
 using Ether.Contracts.Dto.Reports;
 using Ether.Contracts.Interfaces;
 using Ether.Contracts.Types.Configuration;
@@ -48,6 +49,7 @@ namespace Ether.Api
             services.AddOptions();
             services.Configure<DbConfiguration>(Configuration.GetSection("DbConfig"));
             services.Configure<ADConfiguration>(Configuration.GetSection("ADConfig"));
+            services.Configure<EmailGeneratorConfiguration>(Configuration.GetSection("EmailGenerator"));
 
             // Auto Mapper Configurations
             var mappingConfig = new MapperConfiguration(mc =>
@@ -87,6 +89,8 @@ namespace Ether.Api
             {
                 c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "Ether API", Version = "v1" });
             });
+
+            services.AddEmailGeneratorClient();
 
             services.AddReporter<GeneratePullRequestsReport, PullRequestsReport, PullRequestReportViewModel>(Constants.PullRequestsReportType, Constants.PullRequestsReportName);
             services.AddReporter<GenerateAggregatedWorkitemsETAReport, AggregatedWorkitemsETAReport, AggregatedWorkitemsETAReportViewModel>(Constants.ETAReportType, Constants.ETAReportName);

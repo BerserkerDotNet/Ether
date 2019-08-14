@@ -1,0 +1,13 @@
+﻿<div class="form-group">
+    <label>Subject</label>
+    <input type="text" class="form-control" @bind-value="Model.EmailSubject" />
+</div>
+
+<div class="form-group">
+    <label>Body</label>
+    <SummerNoteBootstrap @bind-Value="Model.EmailBody" />
+</div>
+
+@code {
+    [Parameter] ProfileViewModel Model { get; set; }
+}

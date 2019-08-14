@@ -70,3 +70,7 @@ li.dropdown-item {
     display: inline-block;
     padding-top: 7px;
 }
+
+.table-centered {
+    text-align: center;
+}

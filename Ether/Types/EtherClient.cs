@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
@@ -130,6 +131,12 @@ namespace Ether.Types
         {
             var url = $"{GetApiUrl()}report/generateexcel?id={id}";
             return await HttpGet<byte[]>(url);
+        }
+
+        public async Task<byte[]> GenerateEmail(GenerateEmailViewModel model)
+        {
+            var url = $"{GetApiUrl()}report/generateemail";
+            return await HttpPost<byte[]>(url, model);
         }
 
         public async Task<ActiveWorkitemsViewModel> GetActiveWorkitems(Guid profileId)

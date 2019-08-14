@@ -13,5 +13,9 @@ namespace Ether.ViewModels
         public IEnumerable<Guid> Members { get; set; }
 
         public IEnumerable<Guid> Repositories { get; set; }
+
+        public string EmailSubject { get; set; }
+
+        public string EmailBody { get; set; }
     }
 }
