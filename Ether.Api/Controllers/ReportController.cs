@@ -13,6 +13,7 @@ using Ether.ViewModels;
 using Ether.Vsts.Queries;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace Ether.Api.Controllers
 {
@@ -25,12 +26,14 @@ namespace Ether.Api.Controllers
         private readonly IMediator _mediator;
         private readonly IEnumerable<ReporterDescriptor> _reporters;
         private readonly IMapper _mapper;
+        private readonly ILogger<ReportController> _logger;
 
-        public ReportController(IMediator mediator, IEnumerable<ReporterDescriptor> reporters, IMapper mapper)
+        public ReportController(IMediator mediator, IEnumerable<ReporterDescriptor> reporters, IMapper mapper, ILogger<ReportController> logger)
         {
             _mediator = mediator;
             _reporters = reporters;
             _mapper = mapper;
+            _logger = logger;
         }
 
         [HttpPost]
@@ -107,17 +110,25 @@ namespace Ether.Api.Controllers
         [ProducesResponseType(200)]
         public async Task<IActionResult> GenerateEmail(GenerateEmailViewModel model)
         {
-            var emailGenerator = (Types.Email.EmailGenerator)HttpContext.RequestServices.GetService(typeof(Types.Email.EmailGenerator));
-            var report = await _mediator.Request<GetReportById, ReportViewModel>(new GetReportById(model.Id));
-            var profile = await _mediator.Request<GetProfileById, ProfileViewModel>(new GetProfileById(report.ProfileId));
-            var vstsConfig = await _mediator.Request<GetVstsDataSourceConfiguration, VstsDataSourceViewModel>(new GetVstsDataSourceConfiguration());
-            if (report.ReportType == "WorkitemsReporter")
+            try
             {
-                var email = await emailGenerator.Generate(profile, report as WorkItemsReportViewModel, model, vstsConfig);
-                return Ok(email);
-            }
+                var emailGenerator = (Types.Email.EmailGenerator)HttpContext.RequestServices.GetService(typeof(Types.Email.EmailGenerator));
+                var report = await _mediator.Request<GetReportById, ReportViewModel>(new GetReportById(model.Id));
+                var profile = await _mediator.Request<GetProfileById, ProfileViewModel>(new GetProfileById(report.ProfileId));
+                var vstsConfig = await _mediator.Request<GetVstsDataSourceConfiguration, VstsDataSourceViewModel>(new GetVstsDataSourceConfiguration());
+                if (report.ReportType == "WorkitemsReporter")
+                {
+                    var email = await emailGenerator.Generate(profile, report as WorkItemsReportViewModel, model, vstsConfig);
+                    return Ok(email);
+                }
 
-            throw new NotSupportedException($"Report of type '{report.ReportType}' is not supported.");
+                throw new NotSupportedException($"Report of type '{report.ReportType}' is not supported.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error generating email for report.");
+                throw;
+            }
         }
 
         private Task<Guid> GenerateReport(Type generateCommandType, GenerateReportViewModel requestModel)

@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
+using System.Runtime.ExceptionServices;
 using System.Text;
 using System.Threading.Tasks;
 using Google.Protobuf;
@@ -41,6 +42,8 @@ namespace Ether.EmailGenerator
 
                 var app = new Application();
                 var mailItem = (MailItem)app.CreateItem(OlItemType.olMailItem);
+
+                _logger.LogInformation("Outlook object created. Processing placeholders. ID: {Id}", request.Id);
                 var subject = ApplyCommonPlaceholders(request.Template.Subject, request);
                 var body = ApplyCommonPlaceholders(request.Template.Body, request);
                 body = ApplyBodyPlaceholders(body, request);
@@ -49,12 +52,13 @@ namespace Ether.EmailGenerator
                 mailItem.SaveAs(filePath);
 
                 var bytes = File.ReadAllBytes(filePath);
-
+                _logger.LogInformation("Report generated, sending results back. ID: {Id}", request.Id);
                 return Task.FromResult(new EmailReply { File = ByteString.CopyFrom(bytes) });
             }
             catch (System.Exception ex)
             {
                 _logger.LogError(ex, "Error while generating report.");
+                ExceptionDispatchInfo.Capture(ex).Throw();
                 throw;
             }
         }
