@@ -1,18 +1,14 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
 using System.Runtime.ExceptionServices;
 using System.Text;
 using System.Threading.Tasks;
+using Ether.EmailGenerator.Outlook;
 using Google.Protobuf;
 using Grpc.Core;
 using Microsoft.Extensions.Logging;
-using NetOffice.OutlookApi;
-using NetOffice.OutlookApi.Enums;
 
 namespace Ether.EmailGenerator
 {
@@ -32,27 +28,15 @@ namespace Ether.EmailGenerator
 
             try
             {
-                var tempDir = Path.Combine(Path.GetTempPath(), "EtherEmailGenerator");
-                if (!Directory.Exists(tempDir))
-                {
-                    Directory.CreateDirectory(tempDir);
-                }
-
-                var filePath = Path.Combine(tempDir, $"{request.Id}.msg");
-
-                var app = new Application();
-                var mailItem = (MailItem)app.CreateItem(OlItemType.olMailItem);
-
-                _logger.LogInformation("Outlook object created. Processing placeholders. ID: {Id}", request.Id);
                 var subject = ApplyCommonPlaceholders(request.Template.Subject, request);
                 var body = ApplyCommonPlaceholders(request.Template.Body, request);
                 body = ApplyBodyPlaceholders(body, request);
-                mailItem.Subject = subject;
-                mailItem.HTMLBody = body;
-                mailItem.SaveAs(filePath);
+                body = body.Replace("style=\"\"", string.Empty);
 
-                var bytes = File.ReadAllBytes(filePath);
-                _logger.LogInformation("Report generated, sending results back. ID: {Id}", request.Id);
+                var msg = OutlookMsgFile.New(request.Id);
+                msg.SetSubjectAndBody(subject, body);
+                var bytes = File.ReadAllBytes(msg.FilePath);
+
                 return Task.FromResult(new EmailReply { File = ByteString.CopyFrom(bytes) });
             }
             catch (System.Exception ex)
@@ -79,39 +63,40 @@ namespace Ether.EmailGenerator
             var createTeam = CreateTeamTable(request.Attendance);
             var teamCount = GetTeamCount(request.Attendance);
 
-            return value.Replace("{ResolvedItems}", resolvedTable)
-                .Replace("{InReviewItems}", codeReviewTable)
-                .Replace("{ActiveItems}", activeTable)
-                .Replace("{ResolvedCount}", request.Report.Completed.Count.ToString())
-                .Replace("{InReviewCount}", request.Report.Inreview.Count.ToString())
-                .Replace("{ActiveCount}", request.Report.Active.Count.ToString())
-                .Replace("{TeamCount}", teamCount.ToString())
-                .Replace("{Points}", points)
+            return value
+                 .Replace("{ResolvedItems}", resolvedTable)
+                 .Replace("{InReviewItems}", codeReviewTable)
+                 .Replace("{ActiveItems}", activeTable)
+                 .Replace("{ResolvedCount}", request.Report.Completed.Count.ToString())
+                 .Replace("{InReviewCount}", request.Report.Inreview.Count.ToString())
+                 .Replace("{ActiveCount}", request.Report.Active.Count.ToString())
+                 .Replace("{TeamCount}", teamCount.ToString())
+                 .Replace("{Points}", points)
                 .Replace("{Team}", createTeam);
         }
 
         private string CreateTable(IEnumerable<WorkItem> items, string color)
         {
             var table = new StringBuilder();
-            table.Append($"<table style='border: 1px solid {color};border-collapse: collapse;'>");
-            table.Append($"<thead style='background: {color};color: white;'>");
+            table.Append($"<table style=\"border: 1px solid {color};border-collapse: collapse;\">");
+            table.Append($"<thead style=\"background: {color};color: white;\">");
             table.Append("<tr>");
-            table.Append($"<th style='border: 1px solid {color};border-right: 1px solid white;'>Id</th>");
-            table.Append($"<th style='border: 1px solid {color};border-right: 1px solid white;'>Title</th>");
-            table.Append($"<th style='border: 1px solid {color};border-right: 1px solid white;'>Type</th>");
-            table.Append($"<th style='border: 1px solid {color};border-right: 1px solid white;'>Estimated (Days)</th>");
-            table.Append($"<th style='border: 1px solid {color};border-right: 1px solid white;'>Time Spent (Days)</th>");
+            table.Append($"<th style=\"border: 1px solid {color};border-right: 1px solid white;\">Id</th>");
+            table.Append($"<th style=\"border: 1px solid {color};border-right: 1px solid white;\">Title</th>");
+            table.Append($"<th style=\"border: 1px solid {color};border-right: 1px solid white;\">Type</th>");
+            table.Append($"<th style=\"border: 1px solid {color};border-right: 1px solid white;\">Estimated (Days)</th>");
+            table.Append($"<th style=\"border: 1px solid {color};border-right: 1px solid white;\">Time Spent (Days)</th>");
             table.Append("</tr>");
             table.Append("</thead>");
             table.Append("<tbody>");
             foreach (var item in items)
             {
                 table.Append($"<tr>");
-                table.Append($"<td style='border: solid {color} 1.0pt;border-right: none;margin-left:5pt;margin-right:5pt;'><a href='{item.Url}'>{item.Id}</a></td>");
-                table.Append($"<td style='border: solid {color} 1.0pt;border-right: none;margin-left:5pt;margin-right:5pt;'>{item.Title}</td>");
-                table.Append($"<td style='border: solid {color} 1.0pt;border-right: none;margin-left:5pt;margin-right:5pt;'>{item.Type}</td>");
-                table.Append($"<td style='border: solid {color} 1.0pt;border-right: none;margin-left:5pt;margin-right:5pt;'>{item.Estimated}</td>");
-                table.Append($"<td style='border: solid {color} 1.0pt;margin-left:5pt;margin-right:5pt;'>{item.Spent}</td>");
+                table.Append($"<td style=\"border: solid {color} 1.0pt;border-right: none;margin-left:5pt;margin-right:5pt;\"><a href=\"{item.Url}\">{item.Id}</a></td>");
+                table.Append($"<td style=\"border: solid {color} 1.0pt;border-right: none;margin-left:5pt;margin-right:5pt;\">{item.Title}</td>");
+                table.Append($"<td style=\"border: solid {color} 1.0pt;border-right: none;margin-left:5pt;margin-right:5pt;\">{item.Type}</td>");
+                table.Append($"<td style=\"border: solid {color} 1.0pt;border-right: none;margin-left:5pt;margin-right:5pt;\">{item.Estimated}</td>");
+                table.Append($"<td style=\"border: solid {color} 1.0pt;margin-left:5pt;margin-right:5pt;\">{item.Spent}</td>");
                 table.Append("</tr>");
             }
 
@@ -124,31 +109,31 @@ namespace Ether.EmailGenerator
         private string CreateTeamTable(IEnumerable<TeamAttendance> attendance)
         {
             var table = new StringBuilder();
-            table.Append("<table style='border: 1px solid black; border-collapse: collapse;'>");
+            table.Append("<table>");
             table.Append("<thead>");
             table.Append("<tr>");
-            table.Append("<th style='border: 1px solid black;'></th>");
-            table.Append("<th style='border: 1px solid black;'>Monday</th>");
-            table.Append("<th style='border: 1px solid black;'>Tuesday</th>");
-            table.Append("<th style='border: 1px solid black;'>Wednesday</th>");
-            table.Append("<th style='border: 1px solid black;'>Thursday</th>");
-            table.Append("<th style='border: 1px solid black;'>Friday</th>");
-            table.Append("<th style='border: 1px solid black;'>Saturday</th>");
-            table.Append("<th style='border: 1px solid black;'>Sunday</th>");
+            table.Append("<th style=\"border: 1px solid black;\">Member</th>");
+            table.Append("<th style=\"border: 1px solid black;\">Monday</th>");
+            table.Append("<th style=\"border: 1px solid black;\">Tuesday</th>");
+            table.Append("<th style=\"border: 1px solid black;\">Wednesday</th>");
+            table.Append("<th style=\"border: 1px solid black;\">Thursday</th>");
+            table.Append("<th style=\"border: 1px solid black;\">Friday</th>");
+            table.Append("<th style=\"border: 1px solid black;\">Saturday</th>");
+            table.Append("<th style=\"border: 1px solid black;\">Sunday</th>");
             table.Append("</tr>");
             table.Append("</thead>");
             table.Append("<tbody>");
             foreach (var memberAttendance in attendance)
             {
                 table.Append("<tr>");
-                table.Append($"<td style='border: 1px solid black;width: 120.7pt;'>{memberAttendance.Name}</td>");
-                table.Append($"<td style='background:{GetColor(memberAttendance.Attendance[0])}; border: 1px solid black;width: 60.7pt;'>{(memberAttendance.Attendance[0] ? "V" : "OOF")}</td>");
-                table.Append($"<td style='background:{GetColor(memberAttendance.Attendance[1])}; border: 1px solid black;width: 60.7pt;'>{(memberAttendance.Attendance[1] ? "V" : "OOF")}</td>");
-                table.Append($"<td style='background:{GetColor(memberAttendance.Attendance[2])}; border: 1px solid black;width: 60.7pt;'>{(memberAttendance.Attendance[2] ? "V" : "OOF")}</td>");
-                table.Append($"<td style='background:{GetColor(memberAttendance.Attendance[3])}; border: 1px solid black;width: 60.7pt;'>{(memberAttendance.Attendance[3] ? "V" : "OOF")}</td>");
-                table.Append($"<td style='background:{GetColor(memberAttendance.Attendance[4])}; border: 1px solid black;width: 60.7pt;'>{(memberAttendance.Attendance[4] ? "V" : "OOF")}</td>");
-                table.Append("<td style='background:#A6A6A6; border: 1px solid black;width: 60.7pt;'> </td>");
-                table.Append("<td style='background:#A6A6A6; border: 1px solid black;width: 60.7pt;'> </td>");
+                table.Append($"<td style=\"border: 1px solid black;\">{memberAttendance.Name}</td>");
+                table.Append($"<td style=\"background:{GetColor(memberAttendance.Attendance[0])}; border: 1px solid black;width: 60pt;\">{(memberAttendance.Attendance[0] ? "V" : "OOF")}</td>");
+                table.Append($"<td style=\"background:{GetColor(memberAttendance.Attendance[1])}; border: 1px solid black;width: 60pt;\">{(memberAttendance.Attendance[1] ? "V" : "OOF")}</td>");
+                table.Append($"<td style=\"background:{GetColor(memberAttendance.Attendance[2])}; border: 1px solid black;width: 60pt;\">{(memberAttendance.Attendance[2] ? "V" : "OOF")}</td>");
+                table.Append($"<td style=\"background:{GetColor(memberAttendance.Attendance[3])}; border: 1px solid black;width: 60pt;\">{(memberAttendance.Attendance[3] ? "V" : "OOF")}</td>");
+                table.Append($"<td style=\"background:{GetColor(memberAttendance.Attendance[4])}; border: 1px solid black;width: 60pt;\">{(memberAttendance.Attendance[4] ? "V" : "OOF")}</td>");
+                table.Append("<td style=\"background:#A6A6A6; border: 1px solid black;width: 60pt;\">OOF</td>");
+                table.Append("<td style=\"background:#A6A6A6; border: 1px solid black;width: 60pt;\">OOF</td>");
                 table.Append("</tr>");
             }
 
