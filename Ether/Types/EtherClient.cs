@@ -87,6 +87,11 @@ namespace Ether.Types
             return HttpGet<IEnumerable<T>>($"{GetPathFor<T>()}/GetAll");
         }
 
+        public Task<PageViewModel<T>> GetAllPaged<T>(int page = 1, int itemsPerPage = 10)
+        {
+            return HttpGet<PageViewModel<T>>($"{GetPathFor<T>()}/GetAll?page={page}&itemsPerPage={itemsPerPage}");
+        }
+
         public Task<T> GetById<T>(Guid id)
         {
             return HttpGet<T>($"{GetPathFor<T>()}/GetById?id={id}");

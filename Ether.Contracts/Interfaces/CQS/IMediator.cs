@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Ether.ViewModels;
 
 namespace Ether.Contracts.Interfaces.CQS
 {
@@ -13,6 +14,9 @@ namespace Ether.Contracts.Interfaces.CQS
 
         Task<IEnumerable<TResult>> RequestCollection<TQuery, TResult>(IQuery<IEnumerable<TResult>> query)
             where TQuery : IQuery<IEnumerable<TResult>>;
+
+        Task<PageViewModel<TResult>> RequestPagedCollection<TQuery, TResult>(IQuery<PageViewModel<TResult>> query)
+             where TQuery : IQuery<PageViewModel<TResult>>;
 
         Task<IEnumerable<TResult>> RequestCollection<TQuery, TResult>()
             where TQuery : IQuery<IEnumerable<TResult>>, new();

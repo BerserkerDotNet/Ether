@@ -12,6 +12,9 @@ namespace Ether.Contracts.Interfaces
         Task<IEnumerable<T>> GetAllAsync<T>()
             where T : BaseDto;
 
+        Task<IEnumerable<T>> GetAllPagedAsync<T>(int page = 1, int itemsPerPage = 10)
+            where T : BaseDto;
+
         IEnumerable<T> GetAll<T>()
             where T : BaseDto;
 
@@ -68,6 +71,9 @@ namespace Ether.Contracts.Interfaces
             where T : BaseDto;
 
         long Delete<T>(Expression<Func<T, bool>> predicate)
+            where T : BaseDto;
+
+        Task<long> CountAsync<T>()
             where T : BaseDto;
     }
 }

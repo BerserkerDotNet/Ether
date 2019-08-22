@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Ether.Types;
 using Ether.Types.Exceptions;
 using Microsoft.AspNetCore.Components;
@@ -11,15 +12,15 @@ namespace Ether.Components.Code
     {
         private Func<TItem, bool> _filterPredicate;
 
-        protected int CurrentPage { get; private set; } = 1;
-
-        protected int TotalPages { get; private set; } = 0;
-
-        protected int ItemsCount { get; private set; } = 0;
-
         protected TItem ItemWithDetailsVisible { get; set; } = default;
 
         protected IEnumerable<TItem> ItemsToShow { get; private set; } = Enumerable.Empty<TItem>();
+
+        [Parameter]
+        protected int CurrentPage { get; set; }
+
+        [Parameter]
+        protected int TotalPages { get; set; }
 
         [Parameter] protected RenderFragment TableHeader { get; set; }
         [Parameter] protected RenderFragment<TItem> RowTemplate { get; set; }
@@ -28,10 +29,13 @@ namespace Ether.Components.Code
         [Parameter] protected RenderFragment TableFooter { get; set; }
         [Parameter] protected RenderFragment<DataTableBase<TItem>> FilterTemplate { get; set; }
         [Parameter] protected IEnumerable<TItem> Items { get; set; }
+        [Parameter] protected bool IsServerPaging { get; set; }
         [Parameter] protected int PageSize { get; set; } = 10;
         [Parameter] protected string NoItemsText { get; set; }
         [Parameter] protected Func<TItem, string> RowClass { get; set; }
         [Parameter] protected OrderByConfiguration<TItem>[] OrderBy { get; set; }
+        [Parameter] protected EventCallback OnNextPage { get; set; }
+        [Parameter] protected EventCallback OnPreviousPage { get; set; }
 
         public void Filter(Func<TItem, bool> predicate)
         {
@@ -42,7 +46,20 @@ namespace Ether.Components.Code
         protected override void OnParametersSet()
         {
             base.OnParametersSet();
+
+            if (IsServerPaging && (!OnNextPage.HasDelegate || !OnPreviousPage.HasDelegate))
+            {
+                throw new ArgumentException("When server paging is enabled OnNextPage and OnPreviousPage have to be bound.");
+            }
+
+            if (!IsServerPaging)
+            {
+                CurrentPage = 1;
+            }
+
             ItemsToShow = Items;
+
+            // TODO: Filtering and sorting needs to be server side
             if (_filterPredicate != null)
             {
                 ItemsToShow = ItemsToShow.Where(_filterPredicate);
@@ -56,19 +73,41 @@ namespace Ether.Components.Code
                 }
             }
 
-            ItemsCount = ItemsToShow.Count();
-            TotalPages = (int)Math.Ceiling(ItemsCount / (decimal)PageSize);
+            if (!IsServerPaging)
+            {
+                TotalPages = (int)Math.Ceiling(Items.Count() / (decimal)PageSize);
+            }
         }
 
-        protected void NextPage()
+        protected async Task NextPage()
         {
-            CurrentPage++;
+            if (!IsServerPaging)
+            {
+                CurrentPage++;
+            }
+            else
+            {
+                await OnNextPage.InvokeAsync(this);
+            }
+
+            Console.WriteLine("Going to next page");
+
             StateHasChanged();
         }
 
-        protected void PrevPage()
+        protected async Task PrevPage()
         {
-            CurrentPage--;
+            if (!IsServerPaging)
+            {
+                CurrentPage--;
+            }
+            else
+            {
+                await OnPreviousPage.InvokeAsync(this);
+            }
+
+            Console.WriteLine("Going to prev page");
+
             StateHasChanged();
         }
 

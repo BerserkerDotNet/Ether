@@ -5,7 +5,14 @@
               CancelButtonText="Back"
               OnRefresh="@(async () => await OnRefresh.InvokeAsync(null))">
     <ListModeContent Context="ctx">
-        <DataTable Items="@ctx.Items" PageSize="8" OrderBy="orderByConfig">
+        <DataTable Items="@ctx.Items" 
+                   PageSize="10"
+                   TotalPages="TotalPages"
+                   CurrentPage="CurrentPage"
+                   IsServerPaging="true"
+                   OnNextPage="OnNextPage"
+                   OnPreviousPage="OnPreviousPage"
+                   OrderBy="orderByConfig">
             <TableHeader>
                 <th>Type</th>
                 <th>Result</th>
@@ -51,6 +58,10 @@
 
     [Parameter] IEnumerable<JobLogViewModel> Items { get; set; }
     [Parameter] EventCallback OnRefresh { get; set; }
+    [Parameter] protected EventCallback OnNextPage { get; set; }
+    [Parameter] protected EventCallback OnPreviousPage { get; set; }
+    [Parameter] protected int CurrentPage { get; set; }
+    [Parameter] protected int TotalPages { get; set; }
     [Parameter] Func<JobLogViewModel, Task<ViewModels.Types.JobDetails>> OnDetailsRequested { get; set; }
 
 

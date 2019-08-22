@@ -20,7 +20,7 @@ namespace Ether.Types.State
 
         public VstsDataSourceViewModel VstsDataSource { get; set; }
 
-        public IEnumerable<JobLogViewModel> JobLogs { get; set; }
+        public JobLogsState JobLogs { get; set; }
 
         public IEnumerable<ReportViewModel> Reports { get; set; }
 

@@ -1,15 +1,12 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using Ether.Contracts.Dto;
 using Ether.Contracts.Interfaces;
 using Ether.Core.Types.Queries;
 using Ether.ViewModels;
-using Ether.ViewModels.Types;
 
 namespace Ether.Core.Types.Handlers.Queries
 {
-    public class GetAllJobLogsHandler : GetAllHandler<JobLog, JobLogViewModel, GetAllJobLogs>
+    public class GetAllJobLogsHandler : GetAllPagedHandler<JobLog, JobLogViewModel, GetAllJobLogs>
     {
         public GetAllJobLogsHandler(IRepository repository, IMapper mapper)
             : base(repository, mapper)
