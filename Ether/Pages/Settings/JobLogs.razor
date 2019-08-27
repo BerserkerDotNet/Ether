@@ -1,5 +1,6 @@
 ﻿@page "/job-logs"
 @inject JobLogsStateService JobLogsState
+@inject IStore<RootState> Store
 
 <div class="row">
     <div class="col-md-12">
@@ -17,6 +18,12 @@
 
     protected override async Task OnInitAsync()
     {
+        Store.Dispatch(new Actions.LoadJobLogs
+        {
+            Logs = new JobLogViewModel[0],
+            TotalPages = 1
+        });
+
         await JobLogsState.LoadAsync();
     }
 

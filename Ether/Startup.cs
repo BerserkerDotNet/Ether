@@ -1,5 +1,7 @@
 //using Blazor.Extensions.Logging;
 using BlazorBootstrap.Modal;
+using Ether.Reducers;
+using Ether.Redux.Extensions;
 using Ether.Types;
 using Ether.Types.EditableTable;
 using Ether.Types.State;
@@ -21,6 +23,12 @@ namespace Ether
             services.AddSingleton<LocalStorage>();
 
             // State
+            services.AddReduxStore<RootState>(cfg =>
+            {
+                cfg.Map(s => s.JobLogs, new LoadJobLogsReducer());
+            });
+
+            // Old State
             services.AddSingleton<ReportDescriptorStateService>();
             services.AddSingleton<ReportStateService>();
             services.AddSingleton<JobLogsStateService>();

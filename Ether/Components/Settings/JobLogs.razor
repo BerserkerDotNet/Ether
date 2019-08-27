@@ -22,7 +22,7 @@
             </TableHeader>
             <RowTemplate Context="log">
                 <td>
-                    <If Condition="log.Result == ViewModels.Types.JobExecutionResult.Successful">
+                    <If Condition="@(log.Result == ViewModels.Types.JobExecutionResult.Successful)">
                         <Then>
                             <button class="btn btn-link" @onclick="@(() => OnViewDetails(ctx, log))">@log.JobType</button>
                         </Then>

@@ -43,11 +43,6 @@ namespace Ether.Types.State
 
         public async Task GoToNextPage()
         {
-            if (State == null)
-            {
-                throw new ArgumentException("State is not initialized. Call 'Load' before going to next page.");
-            }
-
             if (State.CurrentPage + 1 > State.TotalPages)
             {
                 return;
@@ -68,11 +63,6 @@ namespace Ether.Types.State
 
         public Task GoToPreviousPage()
         {
-            if (State == null)
-            {
-                throw new ArgumentException("State is not initialized. Call 'Load' before going to prev page.");
-            }
-
             if (State.CurrentPage - 1 == 0)
             {
                 return Task.CompletedTask;
