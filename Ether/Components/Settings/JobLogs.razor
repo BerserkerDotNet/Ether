@@ -1,17 +1,17 @@
-﻿<EditableGrid Items="Items"
+﻿<EditableGrid Items="Props.Items"
               IsReadOnly="true"
               GridTitle="Job Logs"
               ExistingTitle="Job Details"
               CancelButtonText="Back"
-              OnRefresh="@(async () => await OnRefresh.InvokeAsync(null))">
+              OnRefresh="@(async () => await Props.OnRefresh.InvokeAsync(null))">
     <ListModeContent Context="ctx">
         <DataTable Items="@ctx.Items" 
                    PageSize="10"
-                   TotalPages="TotalPages"
-                   CurrentPage="CurrentPage"
+                   TotalPages="Props.TotalPages"
+                   CurrentPage="Props.CurrentPage"
                    IsServerPaging="true"
-                   OnNextPage="OnNextPage"
-                   OnPreviousPage="OnPreviousPage"
+                   OnNextPage="Props.OnNextPage"
+                   OnPreviousPage="Props.OnPreviousPage"
                    OrderBy="orderByConfig">
             <TableHeader>
                 <th>Type</th>
@@ -24,7 +24,7 @@
                 <td>
                     <If Condition="@(log.Result == ViewModels.Types.JobExecutionResult.Successful)">
                         <Then>
-                            <button class="btn btn-link" @onclick="@(() => OnViewDetails(ctx, log))">@log.JobType</button>
+                            <button class="btn btn-link" @onclick="@(() => { })">@log.JobType</button>
                         </Then>
                         <Else>
                             @log.JobType
@@ -56,19 +56,21 @@
         .OrderByDescending(l => l.StartTime)
         .Build();
 
-    [Parameter] IEnumerable<JobLogViewModel> Items { get; set; }
-    [Parameter] EventCallback OnRefresh { get; set; }
-    [Parameter] protected EventCallback OnNextPage { get; set; }
-    [Parameter] protected EventCallback OnPreviousPage { get; set; }
-    [Parameter] protected int CurrentPage { get; set; }
-    [Parameter] protected int TotalPages { get; set; }
-    [Parameter] Func<JobLogViewModel, Task<ViewModels.Types.JobDetails>> OnDetailsRequested { get; set; }
+    [Parameter] JobLogsProps Props { get; set; }
 
-
-    protected async Task OnViewDetails(EditableGridBase<JobLogViewModel> context, JobLogViewModel log)
+    protected override async Task OnParametersSetAsync()
     {
-        var details = await OnDetailsRequested(log);
-        log.Details = details;
-        context.Edit(log);
+        if (Props.CurrentPage == 0)
+        {
+            Console.WriteLine("Initializing logs");
+            await Props.OnRefresh.InvokeAsync(null);
+        }
     }
+
+    //protected async Task OnViewDetails(EditableGridBase<JobLogViewModel> context, JobLogViewModel log)
+    //{
+    //    var details = await OnDetailsRequested(log);
+    //    log.Details = details;
+    //    context.Edit(log);
+    //}
 }

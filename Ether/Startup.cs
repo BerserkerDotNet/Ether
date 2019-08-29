@@ -1,5 +1,6 @@
 //using Blazor.Extensions.Logging;
 using BlazorBootstrap.Modal;
+using Ether.Actions.Async;
 using Ether.Reducers;
 using Ether.Redux.Extensions;
 using Ether.Types;
@@ -25,7 +26,8 @@ namespace Ether
             // State
             services.AddReduxStore<RootState>(cfg =>
             {
-                cfg.Map(s => s.JobLogs, new LoadJobLogsReducer());
+                cfg.Map(s => s.JobLogs, new JobLogsReducer());
+                cfg.RegisterAsyncAction<FetchJobLogs, FetchJobLogsCommand>();
             });
 
             // Old State

@@ -1,50 +1,12 @@
 ﻿@page "/job-logs"
-@inject JobLogsStateService JobLogsState
-@inject IStore<RootState> Store
 
 <div class="row">
     <div class="col-md-12">
-        <Ether.Components.Settings.JobLogs Items="JobLogsState.Logs"
-                                           OnRefresh="HandleRefresh"
-                                           OnNextPage="HandleNextPage"
-                                           OnPreviousPage="HandlePreviousPage"
-                                           TotalPages="JobLogsState.TotalPages"
-                                           CurrentPage="JobLogsState.CurrentPage"
-                                           OnDetailsRequested="HandleDetailsRequest" />
+        @JobLogsComponent
     </div>
 </div>
 
+
 @code{
-
-    protected override async Task OnInitAsync()
-    {
-        Store.Dispatch(new Actions.LoadJobLogs
-        {
-            Logs = new JobLogViewModel[0],
-            TotalPages = 1
-        });
-
-        await JobLogsState.LoadAsync();
-    }
-
-    protected async Task HandleRefresh()
-    {
-        await JobLogsState.LoadAsync(hard: true);
-    }
-
-    protected async Task HandleNextPage()
-    {
-        await JobLogsState.GoToNextPage();
-    }
-
-    protected async Task HandlePreviousPage()
-    {
-        Console.WriteLine("Going to prev page");
-        await JobLogsState.GoToPreviousPage();
-    }
-
-    protected async Task<JobDetails> HandleDetailsRequest(JobLogViewModel log)
-    {
-        return await JobLogsState.GetJobDetails(log);
-    }
+    RenderFragment JobLogsComponent = JobLogsConnected.Get();
 }
