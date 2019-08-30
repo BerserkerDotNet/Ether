@@ -11,8 +11,7 @@
                    CurrentPage="Props.CurrentPage"
                    IsServerPaging="true"
                    OnNextPage="Props.OnNextPage"
-                   OnPreviousPage="Props.OnPreviousPage"
-                   OrderBy="orderByConfig">
+                   OnPreviousPage="Props.OnPreviousPage">
             <TableHeader>
                 <th>Type</th>
                 <th>Result</th>
@@ -51,6 +50,7 @@
 
 @code
 {
+    private bool isInitialized = false;
     private OrderByConfiguration<JobLogViewModel>[] orderByConfig = OrderByConfigurationBuilder<JobLogViewModel>
         .New()
         .OrderByDescending(l => l.StartTime)
@@ -60,8 +60,9 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        if (Props.CurrentPage == 0)
+        if (!isInitialized)
         {
+            isInitialized = true;
             Console.WriteLine("Initializing logs");
             await Props.OnRefresh.InvokeAsync(null);
         }

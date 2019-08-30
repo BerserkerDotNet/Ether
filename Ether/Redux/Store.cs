@@ -31,6 +31,7 @@ namespace Ether.Redux
 
             State = _rootReducer.Reduce(State, action);
             _localStorage.SetItem("State", State);
+            Console.WriteLine($"[Redux Store] - Executed action {action.GetType().Name}");
             OnStateChanged?.Invoke(this, EventArgs.Empty); // TODO: concrete type for event handler
         }
 

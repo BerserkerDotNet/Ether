@@ -41,7 +41,7 @@ namespace Ether.Components.Settings
 
         private async Task HandleRefresh(IStore<RootState> store)
         {
-            if (store.State?.JobLogs?.CurrentPage != 0)
+            if (store.State?.JobLogs != null)
             {
                 store.Dispatch(new ClearJobLogs());
             }

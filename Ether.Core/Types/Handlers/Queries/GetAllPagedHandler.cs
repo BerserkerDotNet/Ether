@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using AutoMapper;
 using Ether.Contracts.Dto;
@@ -26,7 +27,7 @@ namespace Ether.Core.Types.Handlers.Queries
 
         public async Task<PageViewModel<TModel>> Handle(TQuery query)
         {
-            var result = await Repository.GetAllPagedAsync<TData>(query.Page, query.ItemsPerPage);
+            var result = await Repository.GetAllPagedAsync(query.Page, query.ItemsPerPage, GetSorting());
             var data = await PostProcessData(Mapper.Map<IEnumerable<TModel>>(result));
 
             var count = await Repository.CountAsync<TData>();
@@ -36,6 +37,11 @@ namespace Ether.Core.Types.Handlers.Queries
                 CurrentPage = query.Page,
                 TotalPages = (int)Math.Ceiling(count / (double)query.ItemsPerPage)
             };
+        }
+
+        protected virtual Expression<Func<TData, object>> GetSorting()
+        {
+            return d => d.Id;
         }
 
         protected virtual Task<IEnumerable<TModel>> PostProcessData(IEnumerable<TModel> data)

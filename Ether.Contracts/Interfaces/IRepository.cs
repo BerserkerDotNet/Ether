@@ -12,7 +12,7 @@ namespace Ether.Contracts.Interfaces
         Task<IEnumerable<T>> GetAllAsync<T>()
             where T : BaseDto;
 
-        Task<IEnumerable<T>> GetAllPagedAsync<T>(int page = 1, int itemsPerPage = 10)
+        Task<IEnumerable<T>> GetAllPagedAsync<T>(int page = 1, int itemsPerPage = 10, Expression<Func<T, object>> orderBy = null)
             where T : BaseDto;
 
         IEnumerable<T> GetAll<T>()
