@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq.Expressions;
+using Ether.Redux.Blazor;
 using Ether.Redux.Interfaces;
 using Ether.Types;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,7 +16,8 @@ namespace Ether.Redux.Extensions
             var config = new ReduxStoreConfig<TRootState>(services, reducerMapping);
             cfg(config);
             var rootReducer = reducerMapping.Build();
-            services.AddSingleton<IStore<TRootState>>(s => new Store<TRootState>(rootReducer, new BlazorActionResolver(s), s.GetService<LocalStorage>()));
+            services.AddSingleton<IStore<TRootState>>(s => new Store<TRootState>(rootReducer, new BlazorActionResolver(s), s.GetService<LocalStorage>(), s.GetService<ReduxDevToolsInterop>()));
+            services.AddSingleton<ReduxDevToolsInterop>();
         }
     }
 
