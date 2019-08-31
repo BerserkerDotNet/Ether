@@ -50,23 +50,12 @@
 
 @code
 {
-    private bool isInitialized = false;
     private OrderByConfiguration<JobLogViewModel>[] orderByConfig = OrderByConfigurationBuilder<JobLogViewModel>
         .New()
         .OrderByDescending(l => l.StartTime)
         .Build();
 
     [Parameter] JobLogsProps Props { get; set; }
-
-    protected override async Task OnParametersSetAsync()
-    {
-        if (!isInitialized)
-        {
-            isInitialized = true;
-            Console.WriteLine("Initializing logs");
-            await Props.OnRefresh.InvokeAsync(null);
-        }
-    }
 
     //protected async Task OnViewDetails(EditableGridBase<JobLogViewModel> context, JobLogViewModel log)
     //{

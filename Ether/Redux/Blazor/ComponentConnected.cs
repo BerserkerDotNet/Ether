@@ -55,8 +55,6 @@ namespace Ether.Redux.Blazor
         {
             base.BuildRenderTree(builder);
 
-            InitializeProps();
-
             Console.WriteLine($"[ComponentConnected] - Rendering");
             builder.OpenComponent<TComponent>(1);
             builder.AddAttribute(2, "Props", _props);
@@ -67,7 +65,6 @@ namespace Ether.Redux.Blazor
         {
             Console.WriteLine($"[ComponentConnected] - {nameof(OnStateChanged)}");
 
-            InitializeProps();
             MapStateToProps(Store.State, _props);
             this.StateHasChanged();
         }

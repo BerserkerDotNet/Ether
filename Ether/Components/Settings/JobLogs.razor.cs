@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Ether.Actions;
@@ -11,6 +12,23 @@ using static Ether.Redux.Blazor.ComponentConnector;
 
 namespace Ether.Components.Settings
 {
+    public class JobLogsProps
+    {
+        public IEnumerable<JobLogViewModel> Items { get; set; }
+
+        public int CurrentPage { get; set; }
+
+        public int TotalPages { get; set; }
+
+        public Func<JobLogViewModel, Task<ViewModels.Types.JobDetails>> OnDetailsRequested { get; set; }
+
+        public EventCallback OnRefresh { get; set; }
+
+        public EventCallback OnNextPage { get; set; }
+
+        public EventCallback OnPreviousPage { get; set; }
+    }
+
     public class JobLogsConnected
     {
         private const int ItemsPerPage = 10;
@@ -18,20 +36,29 @@ namespace Ether.Components.Settings
         public static RenderFragment Get()
         {
             var instance = new JobLogsConnected();
-            return Connect<JobLogs, RootState, JobLogsProps>(instance.MapStateToProps, instance.MapDispatchToProps);
+            return Connect<JobLogs, RootState, JobLogsProps>(instance.MapStateToProps, instance.MapDispatchToProps, instance.Init);
         }
 
-        public void MapStateToProps(RootState state, JobLogsProps props)
+        private async Task Init(IStore<RootState> store)
         {
-            var jobLogsState = state.JobLogs;
-            Console.WriteLine($"Mapping state. CurrentPage: {jobLogsState.CurrentPage}; Items: {jobLogsState.Items?.Count()}");
-
-            props.CurrentPage = jobLogsState.CurrentPage;
-            props.TotalPages = jobLogsState.TotalPages;
-            props.Items = jobLogsState.Items;
+            if (!IsJobLogsStateInitialized(store.State))
+            {
+                await store.Dispatch<FetchJobLogs, FetchJobLogsCommand>(new FetchJobLogsCommand());
+            }
         }
 
-        public void MapDispatchToProps(IStore<RootState> store, JobLogsProps props)
+        private void MapStateToProps(RootState state, JobLogsProps props)
+        {
+            var jobLogsState = state?.JobLogs;
+            if (jobLogsState != null)
+            {
+                props.CurrentPage = jobLogsState.CurrentPage;
+                props.TotalPages = jobLogsState.TotalPages;
+                props.Items = jobLogsState.Items;
+            }
+        }
+
+        private void MapDispatchToProps(IStore<RootState> store, JobLogsProps props)
         {
             props.OnRefresh = EventCallback.Factory.Create(this, () => HandleRefresh(store));
             props.OnNextPage = EventCallback.Factory.Create(this, () => HandleNextPage(store));
@@ -83,6 +110,11 @@ namespace Ether.Components.Settings
         private async Task<Ether.ViewModels.Types.JobDetails> HandleDetailsRequest(JobLogViewModel log)
         {
             throw new Exception();
+        }
+
+        private bool IsJobLogsStateInitialized(RootState state)
+        {
+            return state?.JobLogs != null;
         }
     }
 }
