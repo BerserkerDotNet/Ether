@@ -6,4 +6,9 @@ namespace Ether.Redux.Interfaces
     {
         Task Execute(IDispatcher dispatcher, TProperty property);
     }
+
+    public interface IAsyncAction
+    {
+        Task Execute(IDispatcher dispatcher);
+    }
 }

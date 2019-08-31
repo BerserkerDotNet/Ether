@@ -6,6 +6,7 @@ using Ether.Redux.Extensions;
 using Ether.Types;
 using Ether.Types.EditableTable;
 using Ether.Types.State;
+using Ether.ViewModels;
 using Microsoft.AspNetCore.Components.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Toolbelt.Blazor.Extensions.DependencyInjection;
@@ -26,8 +27,16 @@ namespace Ether
             // State
             services.AddReduxStore<RootState>(cfg =>
             {
+                // TODO: map to reducer type, e.g. cfg.Map<JobLogsReducer>(s => s.JobLogs)
                 cfg.Map(s => s.JobLogs, new JobLogsReducer());
-                cfg.RegisterAsyncAction<FetchJobLogs, FetchJobLogsCommand>();
+                cfg.Map(s => s.Profiles, new ProfilesReducer());
+                cfg.Map(s => s.GenerateReportForm, new GenerateReportFormReducer());
+
+                cfg.RegisterActionFromAssembly<FetchProfiles>();
+                // cfg.RegisterAsyncAction<FetchJobLogs, FetchJobLogsCommand>();
+                // cfg.RegisterAsyncAction<FetchProfiles>();
+                // cfg.RegisterAsyncAction<FetchReportDescriptors>();
+                // cfg.RegisterAsyncAction<GenerateReportAction, GenerateReportViewModel>();
             });
 
             // Old State

@@ -1,75 +1,7 @@
 ﻿@page "/"
 
-@inject EtherClient Client
-@inject ProfilesStateService ProfilesState
-@inject ReportDescriptorStateService ReportDescriptorState
-@inject IUriHelper UriHelper
-@inject JsUtils JsUtils
-@inject ILogger<Index> Logger
+@GenerateReportForm
 
-<div class="row">
-    <div class="col-md-12">
-        <Ether.Components.Card Title="New report">
-            <Body>
-                <EditForm OnValidSubmit="Create" Model="model">
-                    <FluentValidationValidator />
-                    <div class="form-group">
-                        <label>Profile</label>
-                        <SelectInput Class="form-control" @bind-Value="model.Profile" Options="ProfilesState.ProfileOptions" />
-                        <ValidationMessage For="@(() => model.Profile)" />
-                    </div>
-                    @* TODO: Return supported report types from API*@
-                    <div class="form-group">
-                        <label>Report type</label>
-                        <SelectInput Class="form-control" @bind-Value="model.ReportType" Options="ReportDescriptorState.ReportTypeOptions" />
-                        <ValidationMessage For="@(() => model.ReportType)" />
-                    </div>
-                    <div class="form-group">
-                        <label>Date range</label>
-                        <DateRangeControl Class="form-control" @bind-Start="model.Start" @bind-End="model.End" />
-                        <ValidationMessage For="@(() => model.Start)" />
-                        <ValidationMessage For="@(() => model.End)" />
-                    </div>
-                    <If Condition="isGeneratingReport">
-                        <Then>
-                            <Spinner Text="Generating..." />
-                        </Then>
-                    </If>
-                    <button class="btn btn-success btn-fill pull-right" type="submit">Create a report</button>
-                </EditForm>
-            </Body>
-        </Ether.Components.Card>
-    </div>
-</div>
-
-@code
-{
-    private bool isGeneratingReport;
-    private GenerateReportViewModel model = new GenerateReportViewModel();
-
-    protected override async Task OnInitAsync()
-    {
-        await ProfilesState.LoadAsync();
-        await ReportDescriptorState.LoadAsync();
-        // TODO: refactor this
-        model.Profile = ProfilesState.Profiles.First().Id;
-        model.ReportType = ReportDescriptorState.ReportTypes.First().UniqueName;
-    }
-
-    private async Task Create()
-    {
-        try
-        {
-            isGeneratingReport = true;
-            var reportId = await Client.GenerateReport(model);
-            UriHelper.NavigateTo($"/reports/view/{model.ReportType}/{reportId}");
-            await JsUtils.NotifySuccess("Report", "Report generated successfully");
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError(ex, "Error generating report");
-            await JsUtils.NotifyError("Report", $"Error generating report: {ex.Message}");
-            isGeneratingReport = false;
-        }
-    }
+@code{
+    private RenderFragment GenerateReportForm = GenerateReportFormConnected.Get();
 }

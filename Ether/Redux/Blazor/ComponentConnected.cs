@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Ether.Components;
 using Ether.Redux.Interfaces;
 using Microsoft.AspNetCore.Components;
@@ -21,24 +22,32 @@ namespace Ether.Redux.Blazor
         [Parameter]
         protected Action<IStore<TState>, TProps> MapDispatchToProps { get; set; }
 
+        [Parameter]
+        protected Func<IStore<TState>, Task> Init { get; set; }
+
         public void Dispose()
         {
+            Console.WriteLine($"[ComponentConnected] - {nameof(Dispose)}");
             Store.OnStateChanged -= OnStateChanged;
         }
 
         protected override void OnInit()
         {
-            Store.OnStateChanged += OnStateChanged;
             Console.WriteLine($"[ComponentConnected] - {nameof(OnInitAsync)}");
+            InitializeProps();
+            Store.OnStateChanged += OnStateChanged;
         }
 
-        protected override void OnParametersSet()
+        protected override async Task OnParametersSetAsync()
         {
-            base.OnParametersSet();
-
             if (MapStateToProps == null || MapDispatchToProps == null)
             {
                 throw new ArgumentNullException($"Connect requires both {nameof(MapStateToProps)} and ${nameof(MapDispatchToProps)} to be set.");
+            }
+
+            if (Init != null)
+            {
+                await Init(Store);
             }
         }
 
@@ -48,7 +57,7 @@ namespace Ether.Redux.Blazor
 
             InitializeProps();
 
-            Console.WriteLine($"[ComponentConnected] - Rendering JobLogs");
+            Console.WriteLine($"[ComponentConnected] - Rendering");
             builder.OpenComponent<TComponent>(1);
             builder.AddAttribute(2, "Props", _props);
             builder.CloseComponent();
@@ -57,6 +66,7 @@ namespace Ether.Redux.Blazor
         private void OnStateChanged(object sender, EventArgs e)
         {
             Console.WriteLine($"[ComponentConnected] - {nameof(OnStateChanged)}");
+
             InitializeProps();
             MapStateToProps(Store.State, _props);
             this.StateHasChanged();
@@ -69,6 +79,7 @@ namespace Ether.Redux.Blazor
                 Console.WriteLine($"[ComponentConnected] - {nameof(InitializeProps)}");
                 _props = new TProps();
                 MapDispatchToProps(Store, _props);
+                MapStateToProps(Store.State, _props);
             }
         }
     }

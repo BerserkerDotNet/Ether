@@ -45,5 +45,12 @@ namespace Ether.Redux
             var action = _actionResolver.Resolve<TAsyncAction>();
             await action.Execute(this, property);
         }
+
+        public async Task Dispatch<TAsyncAction>()
+            where TAsyncAction : IAsyncAction
+        {
+            var action = _actionResolver.Resolve<TAsyncAction>();
+            await action.Execute(this);
+        }
     }
 }

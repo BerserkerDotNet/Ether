@@ -1,0 +1,65 @@
+﻿<div class="row">
+    <div class="col-md-12">
+        <Ether.Components.Card Title="New report">
+            <Body>
+                <EditForm OnValidSubmit="Generate" Model="reportRequest">
+                    <FluentValidationValidator />
+                    <div class="form-group">
+                        <label>Profile</label>
+                        <SelectInput Class="form-control" @bind-Value="reportRequest.Profile" Options="Props.Profiles" />
+                        <ValidationMessage For="@(() => reportRequest.Profile)" />
+                    </div>
+                    <div class="form-group">
+                        <label>Report type</label>
+                        <SelectInput Class="form-control" @bind-Value="reportRequest.ReportType" Options="Props.ReportTypes" />
+                        <ValidationMessage For="@(() => reportRequest.ReportType)" />
+                    </div>
+                    <div class="form-group">
+                        <label>Date range</label>
+                        <DateRangeControl Class="form-control" @bind-Start="reportRequest.Start" @bind-End="reportRequest.End" />
+                        <ValidationMessage For="@(() => reportRequest.Start)" />
+                        <ValidationMessage For="@(() => reportRequest.End)" />
+                    </div>
+                    <If Condition="isGeneratingReport">
+                        <Then>
+                            <Spinner Text="Generating..." />
+                        </Then>
+                    </If>
+                    <button class="btn btn-success btn-fill pull-right" type="submit">Create a report</button>
+                </EditForm>
+            </Body>
+        </Ether.Components.Card>
+    </div>
+</div>
+
+@code{
+
+    private bool isGeneratingReport;
+    private GenerateReportViewModel reportRequest = new GenerateReportViewModel();
+
+    [Parameter] GenerateReportFormProps Props { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        reportRequest.Profile = Props.Profile;
+        reportRequest.ReportType = Props.ReportType;
+        if (reportRequest.Start == default)
+        {
+            reportRequest.Start = Props.StartDate;
+        }
+
+        if (reportRequest.End == default)
+        {
+            reportRequest.End = Props.EndDate;
+        }
+    }
+
+    private async Task Generate()
+    {
+        isGeneratingReport = true;
+        await Props.OnGenerate.InvokeAsync(reportRequest);
+        isGeneratingReport = false;
+    }
+}

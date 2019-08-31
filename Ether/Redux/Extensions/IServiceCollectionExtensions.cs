@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Linq.Expressions;
 using Ether.Redux.Blazor;
 using Ether.Redux.Interfaces;
@@ -42,6 +43,53 @@ namespace Ether.Redux.Extensions
             where TAsyncAction : class, IAsyncAction<TProperty>
         {
             _services.AddTransient<TAsyncAction>();
+        }
+
+        public void RegisterAsyncAction<TAsyncAction>()
+            where TAsyncAction : class, IAsyncAction
+        {
+            _services.AddTransient<TAsyncAction>();
+        }
+
+        public void RegisterActionFromAssembly<TAsyncAction>()
+            where TAsyncAction : class, IAsyncAction
+        {
+            var actionType = typeof(IAsyncAction);
+            var actionTypeGeneric = typeof(IAsyncAction<>);
+            var asyncActions = typeof(TAsyncAction).Assembly
+                .GetTypes()
+                .Where(t => t.IsClass && (actionType.IsAssignableFrom(t) || IsAssignableToGenericType(t, actionTypeGeneric)))
+                .ToArray();
+
+            foreach (var action in asyncActions)
+            {
+                _services.AddTransient(action);
+            }
+        }
+
+        private static bool IsAssignableToGenericType(Type givenType, Type genericType)
+        {
+            var interfaceTypes = givenType.GetInterfaces();
+            foreach (var it in interfaceTypes)
+            {
+                if (it.IsGenericType && it.GetGenericTypeDefinition() == genericType)
+                {
+                    return true;
+                }
+            }
+
+            if (givenType.IsGenericType && givenType.GetGenericTypeDefinition() == genericType)
+            {
+                return true;
+            }
+
+            var baseType = givenType.BaseType;
+            if (baseType == null)
+            {
+                return false;
+            }
+
+            return IsAssignableToGenericType(baseType, genericType);
         }
     }
 }
