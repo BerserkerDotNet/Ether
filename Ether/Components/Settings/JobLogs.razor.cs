@@ -20,7 +20,7 @@ namespace Ether.Components.Settings
 
         public int TotalPages { get; set; }
 
-        public Func<JobLogViewModel, Task<ViewModels.Types.JobDetails>> OnDetailsRequested { get; set; }
+        public EventCallback<JobLogViewModel> OnDetailsRequested { get; set; }
 
         public EventCallback OnRefresh { get; set; }
 
@@ -63,7 +63,7 @@ namespace Ether.Components.Settings
             props.OnRefresh = EventCallback.Factory.Create(this, () => HandleRefresh(store));
             props.OnNextPage = EventCallback.Factory.Create(this, () => HandleNextPage(store));
             props.OnPreviousPage = EventCallback.Factory.Create(this, () => HandlePreviousPage(store));
-            props.OnDetailsRequested = HandleDetailsRequest;
+            props.OnDetailsRequested = EventCallback.Factory.Create<JobLogViewModel>(this, l => HandleDetailsRequest(store, l));
         }
 
         private async Task HandleRefresh(IStore<RootState> store)
@@ -107,9 +107,12 @@ namespace Ether.Components.Settings
             return Task.CompletedTask;
         }
 
-        private async Task<Ether.ViewModels.Types.JobDetails> HandleDetailsRequest(JobLogViewModel log)
+        private async Task HandleDetailsRequest(IStore<RootState> store, JobLogViewModel log)
         {
-            throw new Exception();
+            if (log.Details == null)
+            {
+                await store.Dispatch<FetchJobDetailsAction, JobLogViewModel>(log);
+            }
         }
 
         private bool IsJobLogsStateInitialized(RootState state)

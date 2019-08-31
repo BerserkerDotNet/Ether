@@ -1,7 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Ether.Redux.Interfaces;
 using Ether.Types;
-using Ether.ViewModels;
 
 namespace Ether.Actions.Async
 {

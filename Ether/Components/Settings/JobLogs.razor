@@ -23,7 +23,7 @@
                 <td>
                     <If Condition="@(log.Result == ViewModels.Types.JobExecutionResult.Successful)">
                         <Then>
-                            <button class="btn btn-link" @onclick="@(() => { })">@log.JobType</button>
+                            <button class="btn btn-link" @onclick="@(() => OnViewDetails(ctx, log))">@log.JobType</button>
                         </Then>
                         <Else>
                             @log.JobType
@@ -57,10 +57,9 @@
 
     [Parameter] JobLogsProps Props { get; set; }
 
-    //protected async Task OnViewDetails(EditableGridBase<JobLogViewModel> context, JobLogViewModel log)
-    //{
-    //    var details = await OnDetailsRequested(log);
-    //    log.Details = details;
-    //    context.Edit(log);
-    //}
+    protected async Task OnViewDetails(EditableGridBase<JobLogViewModel> context, JobLogViewModel log)
+    {
+        await Props.OnDetailsRequested.InvokeAsync(log);
+        context.Edit(log);
+    }
 }

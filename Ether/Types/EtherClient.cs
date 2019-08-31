@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -87,9 +88,21 @@ namespace Ether.Types
             return HttpGet<IEnumerable<T>>($"{GetPathFor<T>()}/GetAll");
         }
 
-        public Task<PageViewModel<T>> GetAllPaged<T>(int page = 1, int itemsPerPage = 10)
+        public async Task<PageViewModel<T>> GetAllPaged<T>(int page = 1, int itemsPerPage = 10, Func<JObject, T> converter = null)
         {
-            return HttpGet<PageViewModel<T>>($"{GetPathFor<T>()}/GetAll?page={page}&itemsPerPage={itemsPerPage}");
+            if (converter == null)
+            {
+                return await HttpGet<PageViewModel<T>>($"{GetPathFor<T>()}/GetAll?page={page}&itemsPerPage={itemsPerPage}");
+            }
+
+            var pageModel = await HttpGet<PageViewModel<JObject>>($"{GetPathFor<T>()}/GetAll?page={page}&itemsPerPage={itemsPerPage}");
+            var items = pageModel.Items.Select(i => converter(i)).ToArray();
+            return new PageViewModel<T>
+            {
+                Items = items,
+                CurrentPage = pageModel.CurrentPage,
+                TotalPages = pageModel.TotalPages
+            };
         }
 
         public Task<T> GetById<T>(Guid id)

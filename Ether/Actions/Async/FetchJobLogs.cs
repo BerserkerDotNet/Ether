@@ -1,7 +1,9 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Ether.Redux.Interfaces;
 using Ether.Types;
 using Ether.ViewModels;
+using Ether.ViewModels.Types;
 
 namespace Ether.Actions.Async
 {
@@ -16,7 +18,18 @@ namespace Ether.Actions.Async
 
         public async Task Execute(IDispatcher dispatcher, FetchJobLogsCommand command)
         {
-            var page = await _client.GetAllPaged<JobLogViewModel>(command.Page, command.ItemsPerPage);
+            var page = await _client.GetAllPaged(command.Page, command.ItemsPerPage, o =>
+            {
+                var log = o.ToObject<JobLogViewModel>();
+                if (log.JobType == "PullRequestsSyncJob")
+                {
+                    var details = o.GetValue(nameof(JobLogViewModel.Details), StringComparison.OrdinalIgnoreCase).ToObject<PullRequestJobDetails>();
+                    log.Details = details;
+                    Console.WriteLine($"Converting job tyep {log.Details}");
+                }
+
+                return log;
+            });
             dispatcher.Dispatch(new ReceivedJobLogsPage
             {
                 Logs = page.Items,

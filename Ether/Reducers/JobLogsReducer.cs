@@ -20,6 +20,11 @@ namespace Ether.Reducers
                     return new JobLogsState(Enumerable.Empty<JobLogViewModel>(), 0, 0);
                 case JobLogsMoveToPage a:
                     return new JobLogsState(state.Items, a.CurrentPage, state.TotalPages);
+                case UpdateJobLogDetail a:
+                    var items = state.Items;
+                    var itemToModify = items.Single(i => i.Id == a.JobLogId);
+                    itemToModify.Details = a.Details;
+                    return new JobLogsState(items, state.CurrentPage, state.TotalPages);
                 default:
                     return state;
             }
