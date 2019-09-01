@@ -9,5 +9,7 @@
         public ProfilesState Profiles { get; set; }
 
         public SettingsState Settings { get; set; }
+
+        public ReportsState Reports { get; set; }
     }
 }

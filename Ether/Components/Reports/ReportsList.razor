@@ -1,0 +1,34 @@
+﻿<EditableGrid Items="Props.Reports"
+              GridTitle="Reports"
+              IsReadOnly="true"
+              OnRefresh="Props.OnRefresh"
+              OnDelete="Props.OnDelete" >
+    <ListModeContent Context="ctx">
+        <Ether.Components.DataTable Items="ctx.Items" PageSize="8">
+            <TableHeader>
+                <th>Name</th>
+                <th>Taken</th>
+                <th>Profile</th>
+                <th>Start</th>
+                <th>End</th>
+            </TableHeader>
+            <RowTemplate Context="report">
+                <td>@report.ReportName</td>
+                <td>@report.DateTaken</td>
+                <td>@report.ProfileName</td>
+                <td>@report.StartDate</td>
+                <td>@report.EndDate</td>
+            </RowTemplate>
+            <ActionsTemplate Context="report">
+                <div>
+                    <button class="btn btn-success btn-fill" @onclick="@(() => Props.OnView.InvokeAsync(report))">View</button>
+                    <button class="btn btn-danger btn-fill" @onclick="@(() => ctx.Delete(report))">Delete</button>
+                </div>
+            </ActionsTemplate>
+        </Ether.Components.DataTable>
+    </ListModeContent>
+</EditableGrid>
+
+@code {
+    [Parameter] ReportsListProps Props { get; set; }
+}
