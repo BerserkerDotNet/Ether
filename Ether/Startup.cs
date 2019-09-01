@@ -34,6 +34,7 @@ namespace Ether
                 cfg.Map(s => s.Reports, new ReportsReducer());
                 cfg.Map(s => s.TeamMembers, new MembersReducer());
                 cfg.Map(s => s.Repositories, new RepositoriesReducer());
+                cfg.Map(s => s.Projects, new ProjectsReducer());
 
                 cfg.RegisterActionFromAssembly<FetchProfiles>();
             });

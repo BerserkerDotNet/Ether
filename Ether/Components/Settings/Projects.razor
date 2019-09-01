@@ -1,10 +1,10 @@
-﻿<EditableGrid Items="Items"
+﻿<EditableGrid Items="Props.Items"
               GridTitle="Projects"
               NewTitle="New Project"
               ExistingTitle="Editing Project"
-              OnSave="@(async (VstsProjectViewModel p) => await OnChange.InvokeAsync(p))"
-              OnDelete="@(async (VstsProjectViewModel p) => await OnDelete.InvokeAsync(p))"
-              OnRefresh="@(async () => await OnRefresh.InvokeAsync(null))">
+              OnSave="@(async (VstsProjectViewModel p) => await Props.OnSave.InvokeAsync(p))"
+              OnDelete="@(async (VstsProjectViewModel p) => await Props.OnDelete.InvokeAsync(p))"
+              OnRefresh="@(async () => await Props. OnRefresh.InvokeAsync(null))">
     <ListModeContent Context="ctx">
         <DataTable Items="@ctx.Items">
             <TableHeader>
@@ -38,7 +38,7 @@
         </div>
         <div class="form-group">
             <label>Identity</label>
-            <SelectInput Class="form-control" @bind-Value="ctx.EditingItem.Identity" Options="IdentitiesOptions" />
+            <SelectInput Class="form-control" @bind-Value="ctx.EditingItem.Identity" Options="Props.IdentitiesOptions" />
             <ValidationMessage For="@(() => ctx.EditingItem.Identity)" />
         </div>
     </FormModeContent>
@@ -46,11 +46,7 @@
 
 @code
 {
-    [Parameter] IEnumerable<VstsProjectViewModel> Items { get; set; }
-    [Parameter] Dictionary<Guid?, string> IdentitiesOptions { get; set; }
-    [Parameter] EventCallback<VstsProjectViewModel> OnChange { get; set; }
-    [Parameter] EventCallback<VstsProjectViewModel> OnDelete { get; set; }
-    [Parameter] EventCallback OnRefresh { get; set; }
+    [Parameter] ProjectsProps Props { get; set; }
 
     private string GetIdentityName(Guid? identityId)
     {
@@ -59,12 +55,12 @@
             return Constants.NoneLabel;
         }
 
-        if (!IdentitiesOptions.ContainsKey(identityId.Value))
+        if (!Props.IdentitiesOptions.ContainsKey(identityId.Value))
         {
             return "N/A";
         }
 
-        return IdentitiesOptions[identityId.Value];
+        return Props.IdentitiesOptions[identityId.Value];
     }
 
 }

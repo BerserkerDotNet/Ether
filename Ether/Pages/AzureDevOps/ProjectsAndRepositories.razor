@@ -5,11 +5,7 @@
 
 <div class="row">
     <div class="col-md-6">
-        <Projects Items="ProjectsState.Projects"
-                  IdentitiesOptions="IdentityStateService.IdentitiesOptions"
-                  OnChange="OnProjectChange"
-                  OnDelete="OnProjectDelete"
-                  OnRefresh="OnProjectRefresh" />
+        @Projects
     </div>
     <div class="col-md-6">
         <Repositories Items="RepositoriesState.Repositories"
@@ -21,6 +17,8 @@
 </div>
 
 @code{
+
+    private RenderFragment Projects = ProjectsConnected.Get();
 
     private Dictionary<Guid, string> ProjectsOptions
     {
@@ -40,24 +38,7 @@
 
     protected override async Task OnInitAsync()
     {
-        await ProjectsState.LoadAsync();
         await RepositoriesState.LoadAsync();
-        await IdentityStateService.LoadAsync();
-    }
-
-    protected async Task OnProjectChange(VstsProjectViewModel model)
-    {
-        await ProjectsState.UpdateAsync(model);
-    }
-
-    protected async Task OnProjectDelete(VstsProjectViewModel model)
-    {
-        await ProjectsState.DeleteAsync(model);
-    }
-
-    protected async Task OnProjectRefresh()
-    {
-        await ProjectsState.LoadAsync(hard: true);
     }
 
     protected async Task OnRepositoryChange(VstsRepositoryViewModel model)
