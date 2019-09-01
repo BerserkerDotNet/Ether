@@ -1,10 +1,10 @@
-﻿<EditableGrid Items="Members"
+﻿<EditableGrid Items="Props.Members"
               GridTitle="Team members"
               NewTitle="New member"
               ExistingTitle="Editing member"
-              OnSave="@(async (TeamMemberViewModel m) => await OnChange.InvokeAsync(m))"
-              OnDelete="@(async (TeamMemberViewModel m) => await OnDelete.InvokeAsync(m))"
-              OnRefresh="@(async () => await OnRefresh.InvokeAsync(null))">
+              OnSave="@(async (TeamMemberViewModel m) => await Props.OnChange.InvokeAsync(m))"
+              OnDelete="@(async (TeamMemberViewModel m) => await Props.OnDelete.InvokeAsync(m))"
+              OnRefresh="@(async () => await Props.OnRefresh.InvokeAsync(null))">
     <ListModeContent Context="ctx">
         <DataTable Items="ctx.Items" PageSize="10">
             <FilterTemplate Context="dt">
@@ -16,7 +16,7 @@
                     <label>Profiles:</label>
                     <select class="form-control" @onchange="@((args) => ApplyFilter(args, dt, true))">
                         <option>None</option>
-                        @foreach (var profile in Profiles)
+                        @foreach (var profile in Props.Profiles)
                         {
                             <option value="@profile.Id">@profile.Name</option>
                         }
@@ -44,11 +44,11 @@
                             Actions
                         </button>
                         <div class="dropdown-menu" aria-labelledby="btnGroupWorkItemsMember">
-                            <button class="dropdown-item" @onclick="@(async () => await OnFetchWorkItems.InvokeAsync(member))">Fetch work items</button>
-                            <button class="dropdown-item" @onclick="@(async () => await OnResetWorkItems.InvokeAsync(member))">Reset work items</button>
+                            <button class="dropdown-item" @onclick="@(async () => await Props.OnFetchWorkItems.InvokeAsync(member))">Fetch work items</button>
+                            <button class="dropdown-item" @onclick="@(async () => await Props.OnResetWorkItems.InvokeAsync(member))">Reset work items</button>
                             <div class="dropdown-divider"></div>
-                            <button class="dropdown-item" @onclick="@(async () => await OnFetchPullRequests.InvokeAsync(member))">Fetch pull requests</button>
-                            <button class="dropdown-item" @onclick="@(async () => await OnResetPullRequests.InvokeAsync(member))">Reset pull requests</button>
+                            <button class="dropdown-item" @onclick="@(async () => await Props.OnFetchPullRequests.InvokeAsync(member))">Fetch pull requests</button>
+                            <button class="dropdown-item" @onclick="@(async () => await Props.OnResetPullRequests.InvokeAsync(member))">Reset pull requests</button>
                         </div>
                     </div>
                     <button class="btn btn-warning btn-fill" @onclick="@(() => ctx.Edit(member))">Edit</button>
@@ -72,15 +72,7 @@
 </EditableGrid>
 
 @code{
-    [Parameter] IEnumerable<TeamMemberViewModel> Members { get; set; }
-    [Parameter] IEnumerable<ProfileViewModel> Profiles { get; set; }
-    [Parameter] EventCallback<TeamMemberViewModel> OnChange { get; set; }
-    [Parameter] EventCallback<TeamMemberViewModel> OnDelete { get; set; }
-    [Parameter] EventCallback<TeamMemberViewModel> OnFetchWorkItems { get; set; }
-    [Parameter] EventCallback<TeamMemberViewModel> OnResetWorkItems { get; set; }
-    [Parameter] EventCallback<TeamMemberViewModel> OnFetchPullRequests { get; set; }
-    [Parameter] EventCallback<TeamMemberViewModel> OnResetPullRequests { get; set; }
-    [Parameter] EventCallback OnRefresh { get; set; }
+    [Parameter] TeamMembersProps Props { get; set; }
 
     private string searchText = string.Empty;
     private string selectedProfile = string.Empty;
@@ -106,7 +98,7 @@
             var isGuid = Guid.TryParse(selectedProfile, out var profileId);
             if (isGuid)
             {
-                var profile = Profiles.Single(p => p.Id == profileId);
+                var profile = Props.Profiles.Single(p => p.Id == profileId);
                 return t => profile.Members.Contains(t.Id);
             }
             else
