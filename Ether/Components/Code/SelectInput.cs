@@ -42,9 +42,16 @@ namespace Ether.Components.Code
         {
             foreach (var option in Options)
             {
-                builder.OpenElement(0, "option");
-                builder.AddAttribute(1, "value", option.Key);
-                builder.AddContent(2, option.Value);
+                var seq = 0;
+                builder.OpenElement(seq++, "option");
+                builder.SetKey(option.Key);
+                builder.AddAttribute(seq++, "value", option.Key);
+                if (Equals(option.Key, CurrentValue))
+                {
+                    builder.AddAttribute(seq++, "selected", true);
+                }
+
+                builder.AddContent(seq++, option.Value);
                 builder.CloseElement();
             }
         }

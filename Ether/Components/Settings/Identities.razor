@@ -1,10 +1,10 @@
-﻿<EditableGrid Items="Items"
+﻿<EditableGrid Items="Props.Items"
               GridTitle="Identities"
               NewTitle="New identity"
               ExistingTitle="Editing identity"
-              OnSave="@(async (IdentityViewModel i) => await OnChange.InvokeAsync(i))"
-              OnDelete="@(async (IdentityViewModel i) => await OnDelete.InvokeAsync(i))"
-              OnRefresh="@(async () => await OnRefresh.InvokeAsync(null))">
+              OnSave="@(async (IdentityViewModel i) => await Props.OnSave.InvokeAsync(i))"
+              OnDelete="@(async (IdentityViewModel i) => await Props.OnDelete.InvokeAsync(i))"
+              OnRefresh="@(async () => await Props.OnRefresh.InvokeAsync(null))">
     <ListModeContent Context="ctx">
         <DataTable Items="@ctx.Items">
             <TableHeader>
@@ -44,8 +44,5 @@
 
 @code
 {
-    [Parameter] IEnumerable<IdentityViewModel> Items { get; set; }
-    [Parameter] EventCallback<IdentityViewModel> OnChange { get; set; }
-    [Parameter] EventCallback<IdentityViewModel> OnDelete { get; set; }
-    [Parameter] EventCallback OnRefresh { get; set; }
+    [Parameter] IdentitiesProps Props { get; set; }
 }

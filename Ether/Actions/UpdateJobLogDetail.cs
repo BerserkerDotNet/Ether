@@ -1,6 +1,6 @@
-﻿using Ether.Redux.Interfaces;
+﻿using System;
+using Ether.Redux.Interfaces;
 using Ether.ViewModels.Types;
-using System;
 
 namespace Ether.Actions
 {

@@ -31,12 +31,9 @@ namespace Ether
                 cfg.Map(s => s.JobLogs, new JobLogsReducer());
                 cfg.Map(s => s.Profiles, new ProfilesReducer());
                 cfg.Map(s => s.GenerateReportForm, new GenerateReportFormReducer());
+                cfg.Map(s => s.Settings, new SettingsReducer());
 
                 cfg.RegisterActionFromAssembly<FetchProfiles>();
-                // cfg.RegisterAsyncAction<FetchJobLogs, FetchJobLogsCommand>();
-                // cfg.RegisterAsyncAction<FetchProfiles>();
-                // cfg.RegisterAsyncAction<FetchReportDescriptors>();
-                // cfg.RegisterAsyncAction<GenerateReportAction, GenerateReportViewModel>();
             });
 
             // Old State

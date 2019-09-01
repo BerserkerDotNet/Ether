@@ -7,5 +7,7 @@
         public JobLogsState JobLogs { get; set; }
 
         public ProfilesState Profiles { get; set; }
+
+        public SettingsState Settings { get; set; }
     }
 }

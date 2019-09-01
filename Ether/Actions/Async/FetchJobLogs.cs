@@ -30,6 +30,7 @@ namespace Ether.Actions.Async
 
                 return log;
             });
+
             dispatcher.Dispatch(new ReceivedJobLogsPage
             {
                 Logs = page.Items,
