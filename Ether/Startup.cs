@@ -6,7 +6,6 @@ using Ether.Redux.Extensions;
 using Ether.Types;
 using Ether.Types.EditableTable;
 using Ether.Types.State;
-using Ether.ViewModels;
 using Microsoft.AspNetCore.Components.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Toolbelt.Blazor.Extensions.DependencyInjection;
@@ -33,6 +32,8 @@ namespace Ether
                 cfg.Map(s => s.GenerateReportForm, new GenerateReportFormReducer());
                 cfg.Map(s => s.Settings, new SettingsReducer());
                 cfg.Map(s => s.Reports, new ReportsReducer());
+                cfg.Map(s => s.TeamMembers, new MembersReducer());
+                cfg.Map(s => s.Repositories, new RepositoriesReducer());
 
                 cfg.RegisterActionFromAssembly<FetchProfiles>();
             });

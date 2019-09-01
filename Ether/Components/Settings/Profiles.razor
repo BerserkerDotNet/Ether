@@ -1,12 +1,12 @@
 ﻿@inject EtherClient Client
 
-<EditableGrid Items="Items"
+<EditableGrid Items="Props.Items"
               GridTitle="Profiles"
               ExistingTitle="Editing profile"
               NewTitle="New profile"
-              OnSave="@(async (ProfileViewModel p) => await OnChange.InvokeAsync(p))"
-              OnDelete="@(async (ProfileViewModel p) => await OnDelete.InvokeAsync(p))"
-              OnRefresh="@(async () => await OnRefresh.InvokeAsync(null))">
+              OnSave="@(async (ProfileViewModel p) => await Props.OnChange.InvokeAsync(p))"
+              OnDelete="@(async (ProfileViewModel p) => await Props.OnDelete.InvokeAsync(p))"
+              OnRefresh="@(async () => await Props.OnRefresh.InvokeAsync(null))">
     <ListModeContent Context="ctx">
         <DataTable Items="@ctx.Items">
             <TableHeader>
@@ -28,11 +28,11 @@
                             Actions
                         </button>
                         <div class="dropdown-menu" aria-labelledby="btnGroupWorkItemsProfile">
-                            <button class="dropdown-item" @onclick="@(async () => await OnFetchWorkItems.InvokeAsync(profile.Members))">Fetch work items</button>
-                            <button class="dropdown-item" @onclick="@(async () => await OnResetWorkItems.InvokeAsync(profile.Members))">Reset work items</button>
+                            <button class="dropdown-item" @onclick="@(async () => await Props.OnFetchWorkItems.InvokeAsync(profile.Members))">Fetch work items</button>
+                            <button class="dropdown-item" @onclick="@(async () => await Props.OnResetWorkItems.InvokeAsync(profile.Members))">Reset work items</button>
                             <div class="dropdown-divider"></div>
-                            <button class="dropdown-item" @onclick="@(async () => await OnFetchPullRequests.InvokeAsync(profile.Members))">Fetch pull requests</button>
-                            <button class="dropdown-item" @onclick="@(async () => await OnResetPullRequests.InvokeAsync(profile.Members))">Reset pull requests</button>
+                            <button class="dropdown-item" @onclick="@(async () => await Props.OnFetchPullRequests.InvokeAsync(profile.Members))">Fetch pull requests</button>
+                            <button class="dropdown-item" @onclick="@(async () => await Props.OnResetPullRequests.InvokeAsync(profile.Members))">Reset pull requests</button>
                         </div>
                     </div>
                     <button class="btn btn-warning btn-fill" @onclick="@(() => ctx.Edit(profile))">Edit</button>
@@ -56,13 +56,13 @@
                 </div>
                 <div class="form-group">
                     <label>Members</label>
-                    <Ether.Components.Form.OptionsSelector Options="@MembersOptions"
+                    <Ether.Components.Form.OptionsSelector Options="@Props.MembersOptions"
                                                            @bind-Value="ctx.EditingItem.Members" />
                     <ValidationMessage For="@(() => ctx.EditingItem.Members)" />
                 </div>
                 <div class="form-group">
                     <label>Repositories</label>
-                    <Ether.Components.Form.OptionsSelector Options="@RepositoriesOptions"
+                    <Ether.Components.Form.OptionsSelector Options="@Props.RepositoriesOptions"
                                                            @bind-Value="ctx.EditingItem.Repositories" />
                     <ValidationMessage For="@(() => ctx.EditingItem.Repositories)" />
                 </div>
@@ -76,14 +76,5 @@
 
 @code
 {
-    [Parameter] IEnumerable<ProfileViewModel> Items { get; set; }
-    [Parameter] Dictionary<Guid, string> MembersOptions { get; set; }
-    [Parameter] Dictionary<Guid, string> RepositoriesOptions { get; set; }
-    [Parameter] EventCallback<ProfileViewModel> OnChange { get; set; }
-    [Parameter] EventCallback<ProfileViewModel> OnDelete { get; set; }
-    [Parameter] EventCallback<IEnumerable<Guid>> OnFetchWorkItems { get; set; }
-    [Parameter] EventCallback<IEnumerable<Guid>> OnResetWorkItems { get; set; }
-    [Parameter] EventCallback<IEnumerable<Guid>> OnFetchPullRequests { get; set; }
-    [Parameter] EventCallback<IEnumerable<Guid>> OnResetPullRequests { get; set; }
-    [Parameter] EventCallback OnRefresh { get; set; }
+    [Parameter] ProfilesProps Props { get; set; }
 }
