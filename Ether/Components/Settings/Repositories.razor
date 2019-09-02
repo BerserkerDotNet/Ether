@@ -1,11 +1,11 @@
 ﻿@inject EtherClient Client
-<EditableGrid Items="Items"
+<EditableGrid Items="Props.Items"
               GridTitle="Repositories"
               NewTitle="New Repository"
               ExistingTitle="Edit Repository"
-              OnSave="@(async (VstsRepositoryViewModel r) => await OnChange.InvokeAsync(r))"
-              OnDelete="@(async (VstsRepositoryViewModel r) => await OnDelete.InvokeAsync(r))"
-              OnRefresh="@(async () => await OnRefresh.InvokeAsync(null))">
+              OnSave="@(async (VstsRepositoryViewModel r) => await Props.OnSave.InvokeAsync(r))"
+              OnDelete="@(async (VstsRepositoryViewModel r) => await Props.OnDelete.InvokeAsync(r))"
+              OnRefresh="@(async () => await Props.OnRefresh.InvokeAsync(null))">
     <ListModeContent Context="ctx">
         <DataTable Items="@ctx.Items">
             <TableHeader>
@@ -33,7 +33,7 @@
             </div>
             <div class="form-group">
                 <label>Project</label>
-                <SelectInput Class="form-control" @bind-Value="ctx.EditingItem.Project" Options="ProjectsOptions" />
+                <SelectInput Class="form-control" @bind-Value="ctx.EditingItem.Project" Options="Props.ProjectsOptions" />
                 <ValidationMessage For="@(() => ctx.EditingItem.Project)" />
             </div>
         </ModelValidation>
@@ -42,19 +42,15 @@
 
 @code
 {
-    [Parameter] IEnumerable<VstsRepositoryViewModel> Items { get; set; }
-    [Parameter] Dictionary<Guid, string> ProjectsOptions { get; set; }
-    [Parameter] EventCallback<VstsRepositoryViewModel> OnChange { get; set; }
-    [Parameter] EventCallback<VstsRepositoryViewModel> OnDelete { get; set; }
-    [Parameter] EventCallback OnRefresh { get; set; }
+    [Parameter] RepositoriesProps Props { get; set; }
 
     private string GetProjectName(Guid projectId)
     {
-        if (!ProjectsOptions.ContainsKey(projectId))
+        if (!Props.ProjectsOptions.ContainsKey(projectId))
         {
             return "N/A";
         }
 
-        return ProjectsOptions[projectId];
+        return Props.ProjectsOptions[projectId];
     }
 }

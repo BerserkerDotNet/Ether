@@ -1,18 +1,11 @@
 ﻿@page "/azure-devops/projects-and-repositories"
-@inject ProjectsStateService ProjectsState
-@inject RepositoriesStateService RepositoriesState
-@inject IdentitiesStateService IdentityStateService
 
 <div class="row">
     <div class="col-md-6">
         @Projects
     </div>
     <div class="col-md-6">
-        <Repositories Items="RepositoriesState.Repositories"
-                      ProjectsOptions="ProjectsOptions"
-                      OnChange="OnRepositoryChange"
-                      OnDelete="OnRepositoryDelete"
-                      OnRefresh="OnRepositoryRefresh" />
+        @Repositories
     </div>
 </div>
 
@@ -20,40 +13,5 @@
 
     private RenderFragment Projects = ProjectsConnected.Get();
 
-    private Dictionary<Guid, string> ProjectsOptions
-    {
-        get
-        {
-            var projects = ProjectsState.Projects ?? Enumerable.Empty<VstsProjectViewModel>();
-            var projectsOptions = new Dictionary<Guid, string>(projects.Count() + 1);
-            projectsOptions.Add(Guid.Empty, Constants.NoneLabel);
-            foreach (var project in projects)
-            {
-                projectsOptions.Add(project.Id, project.Name);
-            }
-
-            return projectsOptions;
-        }
-    }
-
-    protected override async Task OnInitAsync()
-    {
-        await RepositoriesState.LoadAsync();
-    }
-
-    protected async Task OnRepositoryChange(VstsRepositoryViewModel model)
-    {
-        await RepositoriesState.UpdateAsync(model);
-    }
-
-    protected async Task OnRepositoryDelete(VstsRepositoryViewModel model)
-    {
-        await RepositoriesState.DeleteAsync(model);
-    }
-
-    protected async Task OnRepositoryRefresh()
-    {
-        await RepositoriesState.LoadAsync(hard: true);
-    }
-
+    private RenderFragment Repositories = RepositoriesConnected.Get();
 }
