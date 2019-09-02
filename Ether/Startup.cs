@@ -39,18 +39,6 @@ namespace Ether
                 cfg.RegisterActionFromAssembly<FetchProfiles>();
             });
 
-            // Old State
-            services.AddSingleton<ReportDescriptorStateService>();
-            services.AddSingleton<ReportStateService>();
-            services.AddSingleton<JobLogsStateService>();
-            services.AddSingleton<VstsDataSourceStateService>();
-            services.AddSingleton<IdentitiesStateService>();
-            services.AddSingleton<ProjectsStateService>();
-            services.AddSingleton<RepositoriesStateService>();
-            services.AddSingleton<ProfilesStateService>();
-            services.AddSingleton<TeamMembersStateService>();
-            services.AddSingleton<AppState>();
-
             services.AddSingleton<EtherClientEditableTableDataProvider>();
             services.AddSingleton<NoOpEditableTableDataProvider>();
             services.AddBootstrapModal();

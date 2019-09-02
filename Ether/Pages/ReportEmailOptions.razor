@@ -2,8 +2,8 @@
 @inject EtherClient Client
 @inject IUriHelper UriHelper
 @inject JsUtils JsUtils
-@inject TeamMembersStateService TeamMemberState
-@inject ProfilesStateService ProfileState
+@inject IStore<RootState> Store
+
 
 <Card>
     <Header>Options</Header>
@@ -38,15 +38,15 @@
         model.Id = Id.Value;
         model.Points = string.Empty;
         model.Attendance = Enumerable.Empty<TeamAttendanceViewModel>();
-        await ProfileState.LoadAsync();
-        await TeamMemberState.LoadAsync();
+        await Store.Dispatch<Actions.Async.FetchProfiles>();
+        await Store.Dispatch<Actions.Async.FetchMembers>();
     }
 
     protected override async Task OnParametersSetAsync()
     {
         report = await Client.GetById<WorkItemsReportViewModel>(Id.Value);
-        var profile = ProfileState.Profiles.SingleOrDefault(p => p.Id == report.ProfileId);
-        var members = TeamMemberState.Members.Where(m => profile.Members.Contains(m.Id)).ToList();
+        var profile = Store.State.Profiles.Profiles.SingleOrDefault(p => p.Id == report.ProfileId);
+        var members = Store.State.TeamMembers.Members.Where(m => profile.Members.Contains(m.Id)).ToList();
         var attendanceMap = members.Select(m => new TeamAttendanceViewModel
         {
             MemberId = m.Id,
