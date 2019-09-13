@@ -20,13 +20,13 @@
 
 @code{
     private DashboardSettingsViewModel selected = null;
-    [Parameter] IEnumerable<DashboardSettingsViewModel> Dashboards { get; set; }
-    [Parameter] EventCallback OnNew { get; set; }
-    [Parameter] EventCallback<Guid> OnDelete { get; set; }
-    [Parameter] EventCallback<Guid> OnEdit { get; set; }
-    [Parameter] EventCallback<DashboardSettingsViewModel> OnSelected { get; set; }
+    [Parameter] public IEnumerable<DashboardSettingsViewModel> Dashboards { get; set; }
+    [Parameter] public EventCallback OnNew { get; set; }
+    [Parameter] public EventCallback<Guid> OnDelete { get; set; }
+    [Parameter] public EventCallback<Guid> OnEdit { get; set; }
+    [Parameter] public EventCallback<DashboardSettingsViewModel> OnSelected { get; set; }
 
-    protected async Task OnChange(UIChangeEventArgs args)
+    protected async Task OnChange(ChangeEventArgs args)
     {
         var dashboard = Dashboards.FirstOrDefault(d => d.Id == Guid.Parse(args.Value.ToString()));
         selected = dashboard;

@@ -55,7 +55,7 @@
         .OrderByDescending(l => l.StartTime)
         .Build();
 
-    [Parameter] JobLogsProps Props { get; set; }
+    [Parameter] public JobLogsProps Props { get; set; }
 
     protected async Task OnViewDetails(EditableGridBase<JobLogViewModel> context, JobLogViewModel log)
     {

@@ -2,14 +2,14 @@
 
 <div @ref="bodyContent"></div>
 @code {
-    private ElementRef bodyContent;
+    private ElementReference bodyContent;
     private bool isInitilized = false;
 
-    [Parameter] public string Value { get; private set; }
+    [Parameter] public string Value { get; set; }
 
-    [Parameter] public EventCallback<string> ValueChanged { get; private set; }
+    [Parameter] public EventCallback<string> ValueChanged { get; set; }
 
-    [Parameter] public Expression<Func<string>> ValueExpression { get; private set; }
+    [Parameter] public Expression<Func<string>> ValueExpression { get; set; }
 
     [JSInvokable]
     public async Task OnChanged(string value)
@@ -21,12 +21,12 @@
         }
     }
 
-    protected override async Task OnAfterRenderAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!isInitilized)
         {
             isInitilized = true;
-            await Js.SummerNoteBootstrap(bodyContent, Value, DotNetObjectRef.Create<object>(this));
+            await Js.SummerNoteBootstrap(bodyContent, Value, DotNetObjectReference.Create<object>(this));
             
         }
     }

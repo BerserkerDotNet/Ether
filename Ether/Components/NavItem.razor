@@ -2,12 +2,12 @@
 @implements IDisposable
 
 <li class="nav-item @(IsActive ? "active": "")"
-    onmouseenter="@(() => ShowMenu())"
-    onmouseleave="@(() => HideMenu())">
+    @onmouseover="@(() => ShowMenu())"
+    @onmouseout="@(() => HideMenu())">
     @if (Item.Children.Any())
     {
         <a class="nav-link @(isExpanded ? "": "collapsed")"
-           aria-expanded="@isExpanded"
+           aria-expanded="@isExpanded"               
            aria-controls="@(Item.Name)">
             <i class="fas fa-@Item.Icon"></i>
             <span>@Item.Name</span>
@@ -37,8 +37,8 @@
 {
     private bool isExpanded = false;
     private bool cancelHide = false;
-    [Parameter] RenderFragment ChildContent { get; set; }
-    [Parameter] MenuItem Item { get; set; }
+    [Parameter] public RenderFragment ChildContent { get; set; }
+    [Parameter] public MenuItem Item { get; set; }
 
     protected override string[] GetRelativeUrlPrefixes()
     {

@@ -38,10 +38,10 @@ namespace Ether.Types
         };
 
         private readonly HttpClient _httpClient;
-        private readonly IUriHelper _navigation;
+        private readonly NavigationManager _navigation;
         private readonly ILogger<EtherClient> _logger;
 
-        public EtherClient(HttpClient httpClient, IUriHelper navigation, ILogger<EtherClient> logger)
+        public EtherClient(HttpClient httpClient, NavigationManager navigation, ILogger<EtherClient> logger)
         {
             WebAssemblyHttpMessageHandler.DefaultCredentials = FetchCredentialsOption.Include;
             _httpClient = httpClient;
@@ -239,7 +239,7 @@ namespace Ether.Types
 
         private Uri GetApiUrl()
         {
-            var baseUrl = _navigation.GetBaseUri();
+            var baseUrl = _navigation.BaseUri;
             var isDevelopment = baseUrl.StartsWith("https://localhost");
 
             return isDevelopment ? new Uri("https://localhost:44315/api/") : new Uri($"{baseUrl}api/");

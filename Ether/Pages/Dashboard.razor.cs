@@ -47,7 +47,7 @@ namespace Ether.Pages
         [Inject]
         protected IModal Modal { get; set; }
 
-        protected override async Task OnInitAsync()
+        protected override async Task OnInitializedAsync()
         {
             IsLoading = true;
             Dashboards = new List<DashboardSettingsViewModel>(await Client.GetAll<DashboardSettingsViewModel>());

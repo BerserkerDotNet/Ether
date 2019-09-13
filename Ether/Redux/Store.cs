@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Blazor.Extensions.Storage;
 using Ether.Redux.Blazor;
 using Ether.Redux.Interfaces;
 using Ether.Types;

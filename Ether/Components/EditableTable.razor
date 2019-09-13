@@ -62,13 +62,13 @@ else
 }
 
 @code{
-    [Parameter] string GridTitle { get; set; }
-    [Parameter] string NewTitle { get; set; }
-    [Parameter] string ExistingTitle { get; set; }
+    [Parameter] public string GridTitle { get; set; }
+    [Parameter] public string NewTitle { get; set; }
+    [Parameter] public string ExistingTitle { get; set; }
 
-    [Parameter] bool IsReadOnly { get; set; }
-    [Parameter] bool FitToRecords { get; set; }
+    [Parameter] public bool IsReadOnly { get; set; }
+    [Parameter] public bool FitToRecords { get; set; }
 
-    [Parameter] RenderFragment<EditableTableBase<TItem>> ListModeContent { get; set; }
-    [Parameter] RenderFragment<EditableTableBase<TItem>> FormModeContent { get; set; }
+    [Parameter] public RenderFragment<EditableTableBase<TItem>> ListModeContent { get; set; }
+    [Parameter] public RenderFragment<EditableTableBase<TItem>> FormModeContent { get; set; }
 }

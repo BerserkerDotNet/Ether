@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using Blazor.Extensions.Storage;
+using System.Threading.Tasks;
 
 namespace Ether.Types
 {
@@ -12,12 +13,12 @@ namespace Ether.Types
             _storage = storage;
         }
 
-        public Task<AccessToken> GetToken()
+        public ValueTask<AccessToken> GetToken()
         {
             return _storage.GetItem<AccessToken>(TokenKey);
         }
 
-        public Task SetToken(AccessToken token)
+        public ValueTask SetToken(AccessToken token)
         {
             return _storage.SetItem(TokenKey, token);
         }

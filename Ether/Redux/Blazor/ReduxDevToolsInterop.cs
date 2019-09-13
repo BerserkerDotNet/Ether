@@ -1,6 +1,6 @@
-﻿using Ether.Redux.Interfaces;
+﻿using System.Threading.Tasks;
+using Ether.Redux.Interfaces;
 using Microsoft.JSInterop;
-using System.Threading.Tasks;
 
 namespace Ether.Redux.Blazor
 {
@@ -13,12 +13,12 @@ namespace Ether.Redux.Blazor
             _jSRuntime = jSRuntime;
         }
 
-        public Task Init(object state)
+        public ValueTask<object> Init(object state)
         {
             return _jSRuntime.InvokeAsync<object>("window.BlazorRedux.sendInitial", state);
         }
 
-        public Task Send(IAction action, object state)
+        public ValueTask<object> Send(IAction action, object state)
         {
             return _jSRuntime.InvokeAsync<object>("window.BlazorRedux.send", action.ToString(), action , state);
         }

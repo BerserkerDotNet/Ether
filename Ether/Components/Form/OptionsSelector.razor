@@ -34,13 +34,13 @@
     private Dictionary<T, string> selectedOptions = new Dictionary<T, string>();
     private IEnumerable<KeyValuePair<T, string>> filteredOptions = new Dictionary<T, string>();
 
-    [Parameter] public IEnumerable<T> Value { get; private set; }
+    [Parameter] public IEnumerable<T> Value { get; set; }
 
-    [Parameter] public EventCallback<IEnumerable<T>> ValueChanged { get; private set; }
+    [Parameter] public EventCallback<IEnumerable<T>> ValueChanged { get; set; }
 
-    [Parameter] public Expression<Func<IEnumerable<T>>> ValueExpression { get; private set; }
+    [Parameter] public Expression<Func<IEnumerable<T>>> ValueExpression { get; set; }
 
-    [Parameter] Dictionary<T, string> Options { get; set; }
+    [Parameter] public Dictionary<T, string> Options { get; set; }
 
     protected string SearchText
     {

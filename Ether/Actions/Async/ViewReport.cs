@@ -7,16 +7,16 @@ namespace Ether.Actions.Async
 {
     public class ViewReport : IAsyncAction<ReportViewModel>
     {
-        private readonly IUriHelper _uriHelper;
+        private readonly NavigationManager _navigation;
 
-        public ViewReport(IUriHelper uriHelper)
+        public ViewReport(NavigationManager uriHelper)
         {
-            _uriHelper = uriHelper;
+            _navigation = uriHelper;
         }
 
         public Task Execute(IDispatcher dispatcher, ReportViewModel report)
         {
-            _uriHelper.NavigateTo($"/reports/view/{report.ReportType}/{report.Id}");
+            _navigation.NavigateTo($"/reports/view/{report.ReportType}/{report.Id}");
             return Task.CompletedTask;
         }
     }

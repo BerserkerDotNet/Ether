@@ -37,7 +37,7 @@
     private bool isGeneratingReport;
     private GenerateReportViewModel reportRequest = new GenerateReportViewModel();
 
-    [Parameter] GenerateReportFormProps Props { get; set; }
+    [Parameter] public GenerateReportFormProps Props { get; set; }
 
     protected override void OnParametersSet()
     {

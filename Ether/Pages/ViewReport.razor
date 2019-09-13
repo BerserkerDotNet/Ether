@@ -1,6 +1,6 @@
 ﻿@page "/reports/view/{type}/{id:guid}"
 @inject EtherClient Client
-@inject IUriHelper UriHelper
+@inject NavigationManager UriHelper
 @inject JsUtils JsUtils
 
 @if (string.Equals(Type, "WorkitemsReporter"))
@@ -59,10 +59,10 @@ else
     private ReportViewModel report;
 
     [Parameter]
-    private Guid? Id { get; set; }
+    public Guid? Id { get; set; }
 
     [Parameter]
-    private string Type { get; set; }
+    public string Type { get; set; }
 
     protected override async Task OnParametersSetAsync()
     {
@@ -93,7 +93,7 @@ else
         }
     }
 
-    protected void RenderComponent<T>(Microsoft.AspNetCore.Components.RenderTree.RenderTreeBuilder builder)
+    protected void RenderComponent<T>(Microsoft.AspNetCore.Components.Rendering.RenderTreeBuilder builder)
         where T : IComponent
     {
         builder.OpenComponent<T>(1);

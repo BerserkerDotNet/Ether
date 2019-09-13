@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Ether.Components;
 using Ether.Redux.Interfaces;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.RenderTree;
+using Microsoft.AspNetCore.Components.Rendering;
 
 namespace Ether.Redux.Blazor
 {
@@ -17,13 +16,13 @@ namespace Ether.Redux.Blazor
         protected IStore<TState> Store { get; set; }
 
         [Parameter]
-        protected Action<TState, TProps> MapStateToProps { get; set; }
+        public Action<TState, TProps> MapStateToProps { get; set; }
 
         [Parameter]
-        protected Action<IStore<TState>, TProps> MapDispatchToProps { get; set; }
+        public Action<IStore<TState>, TProps> MapDispatchToProps { get; set; }
 
         [Parameter]
-        protected Func<IStore<TState>, Task> Init { get; set; }
+        public Func<IStore<TState>, Task> Init { get; set; }
 
         public void Dispose()
         {
@@ -31,9 +30,9 @@ namespace Ether.Redux.Blazor
             Store.OnStateChanged -= OnStateChanged;
         }
 
-        protected override void OnInit()
+        protected override void OnInitialized()
         {
-            Console.WriteLine($"[ComponentConnected] - {nameof(OnInitAsync)}");
+            Console.WriteLine($"[ComponentConnected] - {nameof(OnInitialized)}");
             InitializeProps();
             Store.OnStateChanged += OnStateChanged;
         }

@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using BlazorBootstrap.Modal.Services;
-using Ether.Components.Code;
 using Ether.ViewModels;
 using Microsoft.AspNetCore.Components;
 
@@ -12,18 +9,18 @@ namespace Ether.Components.Dashboard
     public class ActiveWorkitemsFilterBase : ComponentBase
     {
         [Parameter]
-        protected DashboardSettingsViewModel Settings { get; private set; }
+        public DashboardSettingsViewModel Settings { get; set; }
 
         [Parameter]
-        protected Guid DashboardId { get; private set; }
+        public Guid DashboardId { get; set; }
 
         [Parameter]
-        protected Dictionary<string, string> TeamMebmersOptions { get; set; }
+        public Dictionary<string, string> TeamMebmersOptions { get; set; }
 
         [Parameter]
-        protected EventCallback<object> OnFilter { get; set; }
+        public EventCallback<object> OnFilter { get; set; }
 
-        protected async Task OnChange(UIChangeEventArgs args)
+        protected async Task OnChange(ChangeEventArgs args)
         {
             await OnFilter.InvokeAsync(args.Value);
         }

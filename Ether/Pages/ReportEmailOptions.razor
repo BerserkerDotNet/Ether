@@ -1,6 +1,6 @@
 ﻿@page "/reports/email/{id:guid}"
 @inject EtherClient Client
-@inject IUriHelper UriHelper
+@inject NavigationManager UriHelper
 @inject JsUtils JsUtils
 @inject IStore<RootState> Store
 
@@ -27,13 +27,13 @@
 
 @code {
 
-    [Parameter] Guid? Id { get; set; }
+    [Parameter] public Guid? Id { get; set; }
 
     private WorkItemsReportViewModel report = null;
     private GenerateEmailViewModel model = new GenerateEmailViewModel();
     private IEnumerable<TeamMemberViewModel> Team { get; set; } = Enumerable.Empty<TeamMemberViewModel>();
 
-    protected override async Task OnInitAsync()
+    protected override async Task OnInitializedAsync()
     {
         model.Id = Id.Value;
         model.Points = string.Empty;

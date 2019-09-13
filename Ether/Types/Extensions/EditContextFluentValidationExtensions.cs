@@ -69,7 +69,10 @@ namespace Ether.Types.Extensions
 
             var result = validator.Validate(context);
             messages.Clear(fieldIdentifier);
-            messages.AddRange(fieldIdentifier, result.Errors.Select(e => e.ErrorMessage));
+            foreach (var message in result.Errors.Select(e => e.ErrorMessage))
+            {
+                messages.Add(fieldIdentifier, message);
+            }
 
             editContext.NotifyValidationStateChanged();
         }

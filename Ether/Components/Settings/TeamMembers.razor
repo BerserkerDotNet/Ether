@@ -72,12 +72,12 @@
 </EditableGrid>
 
 @code{
-    [Parameter] TeamMembersProps Props { get; set; }
+    [Parameter] public TeamMembersProps Props { get; set; }
 
     private string searchText = string.Empty;
     private string selectedProfile = string.Empty;
 
-    private void ApplyFilter(UIChangeEventArgs args, DataTableBase<TeamMemberViewModel> dataTable, bool isProfile)
+    private void ApplyFilter(ChangeEventArgs args, DataTableBase<TeamMemberViewModel> dataTable, bool isProfile)
     {
         if (isProfile)
         {

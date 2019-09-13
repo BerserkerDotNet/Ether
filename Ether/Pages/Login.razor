@@ -3,7 +3,7 @@
 
 @inject EtherClient Client
 @inject TokenService TokenService
-@inject IUriHelper UriHelper
+@inject NavigationManager Navigation
 @inject JsUtils JsUtils
 
 <EditForm class="text-center form-signin" Model="@model" OnValidSubmit="@DoLogin">
@@ -34,13 +34,13 @@
 @code{
 
     private LoginViewModel model;
-    private ElementRef submit;
+    private ElementReference submit;
     private string error = string.Empty;
 
-    protected override void OnInit()
+    protected override void OnInitialized()
     {
         model = new LoginViewModel();
-        base.OnInit();
+        base.OnInitialized();
     }
 
     private async Task DoLogin()
@@ -51,7 +51,7 @@
             error = string.Empty;
             var token = await Client.RequestAccessToken(model);
             await TokenService.SetToken(token);
-            UriHelper.NavigateTo("/");
+            Navigation.NavigateTo("/");
         }
         catch (Exception ex)
         {

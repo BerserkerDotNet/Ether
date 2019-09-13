@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Ether.Types;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.AspNetCore.Components.Rendering;
 using Microsoft.AspNetCore.Components.RenderTree;
 using Microsoft.JSInterop;
 
@@ -12,7 +13,7 @@ namespace Ether.Components.Code
 {
     public class DateRangeControl : ComponentBase
     {
-        private ElementRef _dateRange;
+        private ElementReference _dateRange;
         private FieldIdentifier _startIdentifier;
         private FieldIdentifier _endIdentifier;
         private bool _isInitialized = false;
@@ -20,32 +21,32 @@ namespace Ether.Components.Code
         [Inject]
         public JsUtils Js { get; set; }
 
-        [CascadingParameter] public EditContext EditContext { get; private set; }
+        [CascadingParameter] public EditContext EditContext { get; set; }
 
-        [Parameter(CaptureUnmatchedValues = true)] public IReadOnlyDictionary<string, object> AdditionalAttributes { get; private set; }
+        [Parameter(CaptureUnmatchedValues = true)] public IReadOnlyDictionary<string, object> AdditionalAttributes { get; set; }
 
-        [Parameter] public string Id { get; private set; }
+        [Parameter] public string Id { get; set; }
 
-        [Parameter] public string Class { get; private set; }
+        [Parameter] public string Class { get; set; }
 
-        [Parameter] public DateTime Start { get; private set; }
+        [Parameter] public DateTime Start { get; set; }
 
-        [Parameter] public EventCallback<DateTime> StartChanged { get; private set; }
+        [Parameter] public EventCallback<DateTime> StartChanged { get; set; }
 
-        [Parameter] public Expression<Func<DateTime>> StartExpression { get; private set; }
+        [Parameter] public Expression<Func<DateTime>> StartExpression { get; set; }
 
-        [Parameter] public DateTime End { get; private set; }
+        [Parameter] public DateTime End { get; set; }
 
-        [Parameter] public EventCallback<DateTime> EndChanged { get; private set; }
+        [Parameter] public EventCallback<DateTime> EndChanged { get; set; }
 
-        [Parameter] public Expression<Func<DateTime>> EndExpression { get; private set; }
+        [Parameter] public Expression<Func<DateTime>> EndExpression { get; set; }
 
         protected string FieldClass
         {
             get
             {
-                var startCls = EditContext.FieldClass(_startIdentifier);
-                var endCls = EditContext.FieldClass(_endIdentifier);
+                var startCls = EditContext.FieldCssClass(_startIdentifier);
+                var endCls = EditContext.FieldCssClass(_endIdentifier);
                 return startCls.Contains("invalid") ? startCls : endCls;
             }
         }
@@ -88,12 +89,12 @@ namespace Ether.Components.Code
             builder.CloseElement();
         }
 
-        protected override async Task OnAfterRenderAsync()
+        protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (!_isInitialized)
             {
                 _isInitialized = true;
-                await Js.DateRangePicker(_dateRange, DotNetObjectRef.Create<object>(this));
+                await Js.DateRangePicker(_dateRange, DotNetObjectReference.Create<object>(this));
             }
         }
     }

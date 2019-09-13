@@ -11,13 +11,13 @@ namespace Ether.Actions.Async
     public class GenerateReportAction : IAsyncAction<GenerateReportViewModel>
     {
         private readonly EtherClient _client;
-        private readonly IUriHelper _uriHelper;
+        private readonly NavigationManager _navigation;
         private readonly ILogger<GenerateReportAction> _logger;
 
-        public GenerateReportAction(EtherClient client, IUriHelper uriHelper, ILogger<GenerateReportAction> logger)
+        public GenerateReportAction(EtherClient client, NavigationManager uriHelper, ILogger<GenerateReportAction> logger)
         {
             _client = client;
-            _uriHelper = uriHelper;
+            _navigation = uriHelper;
             _logger = logger;
         }
 
@@ -31,7 +31,7 @@ namespace Ether.Actions.Async
                 });
 
                 var reportId = await _client.GenerateReport(request);
-                _uriHelper.NavigateTo($"/reports/view/{request.ReportType}/{reportId}");
+                _navigation.NavigateTo($"/reports/view/{request.ReportType}/{reportId}");
 
                 // await JsUtils.NotifySuccess("Report", "Report generated successfully");
             }
