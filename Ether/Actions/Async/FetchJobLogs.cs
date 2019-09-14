@@ -25,7 +25,6 @@ namespace Ether.Actions.Async
                 {
                     var details = o.GetValue(nameof(JobLogViewModel.Details), StringComparison.OrdinalIgnoreCase).ToObject<PullRequestJobDetails>();
                     log.Details = details;
-                    Console.WriteLine($"Converting job tyep {log.Details}");
                 }
 
                 return log;

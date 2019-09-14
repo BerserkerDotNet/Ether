@@ -19,5 +19,7 @@ namespace Ether.Types.State
         public RepositoriesState Repositories { get; set; }
 
         public ProjectsState Projects { get; set; }
+
+        public string Location { get; set; }
     }
 }

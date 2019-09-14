@@ -27,6 +27,10 @@ namespace Ether
             // State
             services.AddReduxStore<RootState>(cfg =>
             {
+                cfg.UseReduxDevTools();
+                cfg.PersistToLocalStorage();
+                cfg.TrackUserNavigation(s => s.Location);
+
                 // TODO: map to reducer type, e.g. cfg.Map<JobLogsReducer>(s => s.JobLogs)
                 cfg.Map(s => s.JobLogs, new JobLogsReducer());
                 cfg.Map(s => s.Profiles, new ProfilesReducer());

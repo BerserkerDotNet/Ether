@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using Ether.ViewModels;
+using Newtonsoft.Json;
 
 namespace Ether.Types.State
 {
     public class GenerateReportFormState
     {
+        [JsonConstructor]
         public GenerateReportFormState(GenerateReportViewModel form, IEnumerable<ReporterDescriptorViewModel> reportTypes)
         {
             Form = form;

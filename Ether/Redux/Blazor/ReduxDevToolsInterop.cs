@@ -1,10 +1,11 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Ether.Redux.Interfaces;
 using Microsoft.JSInterop;
 
 namespace Ether.Redux.Blazor
 {
-    public class ReduxDevToolsInterop
+    public class ReduxDevToolsInterop : IDevToolsInterop
     {
         private readonly IJSRuntime _jSRuntime;
 
@@ -13,14 +14,25 @@ namespace Ether.Redux.Blazor
             _jSRuntime = jSRuntime;
         }
 
-        public ValueTask<object> Init(object state)
+        public event EventHandler<JumpToStateEventArgs> OnJumpToStateChanged;
+
+        public ValueTask Init(object state)
         {
-            return _jSRuntime.InvokeAsync<object>("window.BlazorRedux.sendInitial", state);
+            return _jSRuntime.InvokeVoidAsync("window.BlazorRedux.sendInitial", state, DotNetObjectReference.Create(this));
         }
 
-        public ValueTask<object> Send(IAction action, object state)
+        public ValueTask Send(IAction action, object state)
         {
-            return _jSRuntime.InvokeAsync<object>("window.BlazorRedux.send", action.ToString(), action , state);
+            return _jSRuntime.InvokeVoidAsync("window.BlazorRedux.send", action.ToString(), action, state);
+        }
+
+        [JSInvokable]
+        public void ReceiveMessage(DevToolsMessage message)
+        {
+            if (string.Equals(message.Type, "DISPATCH", StringComparison.OrdinalIgnoreCase))
+            {
+                OnJumpToStateChanged?.Invoke(this, new JumpToStateEventArgs(message.State));
+            }
         }
     }
 }

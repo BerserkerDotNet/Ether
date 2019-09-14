@@ -90,8 +90,6 @@ namespace Ether.Components.Code
                 await OnNextPage.InvokeAsync(this);
             }
 
-            Console.WriteLine("Going to next page");
-
             StateHasChanged();
         }
 
@@ -105,8 +103,6 @@ namespace Ether.Components.Code
             {
                 await OnPreviousPage.InvokeAsync(this);
             }
-
-            Console.WriteLine("Going to prev page");
 
             StateHasChanged();
         }

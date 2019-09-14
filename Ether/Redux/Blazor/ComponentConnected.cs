@@ -26,15 +26,14 @@ namespace Ether.Redux.Blazor
 
         public void Dispose()
         {
-            Console.WriteLine($"[ComponentConnected] - {nameof(Dispose)}");
             Store.OnStateChanged -= OnStateChanged;
         }
 
-        protected override void OnInitialized()
+        protected override async Task OnInitializedAsync()
         {
-            Console.WriteLine($"[ComponentConnected] - {nameof(OnInitialized)}");
             InitializeProps();
             Store.OnStateChanged += OnStateChanged;
+            await Store.Initialize();
         }
 
         protected override async Task OnParametersSetAsync()
@@ -54,7 +53,6 @@ namespace Ether.Redux.Blazor
         {
             base.BuildRenderTree(builder);
 
-            Console.WriteLine($"[ComponentConnected] - Rendering");
             builder.OpenComponent<TComponent>(1);
             builder.AddAttribute(2, "Props", _props);
             builder.CloseComponent();
@@ -62,8 +60,6 @@ namespace Ether.Redux.Blazor
 
         private void OnStateChanged(object sender, EventArgs e)
         {
-            Console.WriteLine($"[ComponentConnected] - {nameof(OnStateChanged)}");
-
             MapStateToProps(Store.State, _props);
             this.StateHasChanged();
         }
@@ -72,7 +68,6 @@ namespace Ether.Redux.Blazor
         {
             if (_props == null)
             {
-                Console.WriteLine($"[ComponentConnected] - {nameof(InitializeProps)}");
                 _props = new TProps();
                 MapDispatchToProps(Store, _props);
                 MapStateToProps(Store.State, _props);

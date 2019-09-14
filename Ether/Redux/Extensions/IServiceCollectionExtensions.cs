@@ -3,8 +3,10 @@ using System.Linq;
 using System.Linq.Expressions;
 using Blazor.Extensions.Storage;
 using Ether.Redux.Blazor;
+using Ether.Redux.Blazor.Navigation;
 using Ether.Redux.Interfaces;
 using Ether.Types;
+using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Ether.Redux.Extensions
@@ -18,8 +20,43 @@ namespace Ether.Redux.Extensions
             var config = new ReduxStoreConfig<TRootState>(services, reducerMapping);
             cfg(config);
             var rootReducer = reducerMapping.Build();
-            services.AddSingleton<IStore<TRootState>>(s => new Store<TRootState>(rootReducer, new BlazorActionResolver(s), s.GetService<LocalStorage>(), s.GetService<ReduxDevToolsInterop>()));
-            services.AddSingleton<ReduxDevToolsInterop>();
+
+            if (config.UseLocalStorage)
+            {
+                services.AddSingleton<IStateStorage, LocalStorageProvider>();
+            }
+            else
+            {
+                services.AddSingleton<IStateStorage, NullStateStorage>();
+            }
+
+            if (config.UseDevTools)
+            {
+                services.AddSingleton<IDevToolsInterop, ReduxDevToolsInterop>();
+            }
+            else
+            {
+                services.AddSingleton<IDevToolsInterop, NullDevToolsInterop>();
+            }
+
+            if (config.LocationProperty is object)
+            {
+                services.AddSingleton<INavigationTracker<TRootState>>(s => new NavigationTracker<TRootState>(config.LocationProperty, s.GetService<NavigationManager>()));
+            }
+            else
+            {
+                services.AddSingleton<INavigationTracker<TRootState>, NullNavigationTracker<TRootState>>();
+            }
+
+            var storeActivator = config.StoreActivator ?? (s => new Store<TRootState>(
+                rootReducer,
+                s.GetService<IActionResolver>(),
+                s.GetService<IStateStorage>(),
+                s.GetService<INavigationTracker<TRootState>>(),
+                s.GetService<IDevToolsInterop>()));
+
+            services.AddSingleton(storeActivator);
+            services.AddSingleton<IActionResolver, BlazorActionResolver>();
         }
     }
 
@@ -33,6 +70,38 @@ namespace Ether.Redux.Extensions
         {
             _services = services;
             _reducerMapper = reducerMapper;
+        }
+
+        public bool UseDevTools { get; private set; }
+
+        public Func<TRootState, string> LocationProperty { get; private set; }
+
+        public bool UseLocalStorage { get; private set; }
+
+        public string StorageKeyName { get; private set; }
+
+        public Func<IServiceProvider, IStore<TRootState>> StoreActivator { get; private set; }
+
+        public void UseReduxDevTools()
+        {
+            UseDevTools = true;
+        }
+
+        public void UseCustomStoreActivator(Func<IServiceProvider, IStore<TRootState>> storeActivator)
+        {
+            StoreActivator = storeActivator;
+        }
+
+        public void PersistToLocalStorage(string key = "AppState")
+        {
+            StorageKeyName = key;
+            UseLocalStorage = true;
+        }
+
+        public void TrackUserNavigation(Expression<Func<TRootState, string>> property)
+        {
+            LocationProperty = property.Compile();
+            Map(property, new UserNavigationReducer());
         }
 
         public void Map<TProperty>(Expression<Func<TRootState, TProperty>> property, IReducer<TProperty> reducer)

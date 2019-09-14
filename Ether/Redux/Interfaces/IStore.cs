@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace Ether.Redux.Interfaces
 {
@@ -7,5 +8,7 @@ namespace Ether.Redux.Interfaces
         event EventHandler<EventArgs> OnStateChanged;
 
         TState State { get; }
+
+        ValueTask Initialize();
     }
 }

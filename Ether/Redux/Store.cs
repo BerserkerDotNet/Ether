@@ -1,30 +1,45 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Blazor.Extensions.Storage;
 using Ether.Redux.Blazor;
 using Ether.Redux.Interfaces;
-using Ether.Types;
+using Newtonsoft.Json;
 
 namespace Ether.Redux
 {
-    public class Store<TState> : IStore<TState>
+    public class Store<TState> : IStore<TState>, IDisposable
     {
         private readonly IReducer<TState> _rootReducer;
         private readonly IActionResolver _actionResolver;
-        private readonly LocalStorage _localStorage;
-        private readonly ReduxDevToolsInterop _reduxDevToolsInterop;
+        private readonly IStateStorage _storage;
+        private readonly INavigationTracker<TState> _navigationTracker;
+        private readonly IDevToolsInterop _devToolsInterop;
+        private bool _isInitialized = false;
 
-        public Store(IReducer<TState> rootReducer, IActionResolver actionResolver, LocalStorage localStorage, ReduxDevToolsInterop reduxDevToolsInterop)
+        public Store(IReducer<TState> rootReducer, IActionResolver actionResolver, IStateStorage storage, INavigationTracker<TState> navigationTracker, IDevToolsInterop devToolsInterop)
         {
             _rootReducer = rootReducer;
             _actionResolver = actionResolver;
-            _localStorage = localStorage;
-            _reduxDevToolsInterop = reduxDevToolsInterop;
+            _storage = storage;
+            _navigationTracker = navigationTracker;
+            _devToolsInterop = devToolsInterop;
         }
 
         public event EventHandler<EventArgs> OnStateChanged;
 
         public TState State { get; private set; }
+
+        public async ValueTask Initialize()
+        {
+            if (!_isInitialized)
+            {
+                _isInitialized = true;
+                _navigationTracker.Start(this);
+                var state = await _storage.Get<TState>("AppState");
+                SetState(state);
+                await _devToolsInterop.Init(state);
+                _devToolsInterop.OnJumpToStateChanged += InteropOnJumpToStateChanged;
+            }
+        }
 
         public void Dispatch(IAction action)
         {
@@ -33,11 +48,9 @@ namespace Ether.Redux
                 throw new ArgumentNullException(nameof(action));
             }
 
-            State = _rootReducer.Reduce(State, action);
-            _localStorage.SetItem("State", State);
-            Console.WriteLine($"[Redux Store] - Executed action {action.GetType().Name}");
-            _reduxDevToolsInterop.Send(action, State);
-            OnStateChanged?.Invoke(this, EventArgs.Empty); // TODO: concrete type for event handler
+            SetState(_rootReducer.Reduce(State, action));
+            _storage.Save("AppState", State);
+            _devToolsInterop.Send(action, State);
         }
 
         public async Task Dispatch<TAsyncAction, TProperty>(TProperty property)
@@ -52,6 +65,24 @@ namespace Ether.Redux
         {
             var action = _actionResolver.Resolve<TAsyncAction>();
             await action.Execute(this);
+        }
+
+        public void Dispose()
+        {
+            _devToolsInterop.OnJumpToStateChanged -= InteropOnJumpToStateChanged;
+        }
+
+        private void InteropOnJumpToStateChanged(object sender, JumpToStateEventArgs e)
+        {
+            var state = string.IsNullOrEmpty(e.StateJson) ? default : JsonConvert.DeserializeObject<TState>(e.StateJson);
+            SetState(state);
+            _navigationTracker.Navigate(state);
+        }
+
+        private void SetState(TState state)
+        {
+            State = state;
+            OnStateChanged?.Invoke(this, EventArgs.Empty);
         }
     }
 }
