@@ -1,6 +1,6 @@
 ﻿using Ether.Actions.Async;
-using Ether.Redux.Blazor;
-using Ether.Redux.Interfaces;
+using BlazorState.Redux.Blazor;
+using BlazorState.Redux.Interfaces;
 using Ether.Types.State;
 using Ether.ViewModels;
 using Microsoft.AspNetCore.Components;

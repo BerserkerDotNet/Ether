@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using Ether.Redux.Interfaces;
+using BlazorState.Redux.Interfaces;
 using Ether.Types;
 
 namespace Ether.Actions.Async

@@ -1,5 +1,5 @@
 ﻿using System;
-using Ether.Redux.Interfaces;
+using BlazorState.Redux.Interfaces;
 using Ether.ViewModels.Types;
 
 namespace Ether.Actions

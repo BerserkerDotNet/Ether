@@ -1,4 +1,4 @@
-﻿using Ether.Redux.Interfaces;
+﻿using BlazorState.Redux.Interfaces;
 
 namespace Ether.Actions
 {

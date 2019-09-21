@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 using Ether.Actions;
-using Ether.Redux.Interfaces;
+using BlazorState.Redux.Interfaces;
 using Ether.Types.State;
 using Ether.ViewModels;
 

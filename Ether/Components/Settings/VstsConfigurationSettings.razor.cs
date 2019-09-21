@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Ether.Actions.Async;
-using Ether.Redux.Interfaces;
+using BlazorState.Redux.Interfaces;
 using Ether.Types.State;
 using Ether.ViewModels;
 using Microsoft.AspNetCore.Components;
-using static Ether.Redux.Blazor.ComponentConnector;
+using static BlazorState.Redux.Blazor.ComponentConnector;
 
 namespace Ether.Components.Settings
 {

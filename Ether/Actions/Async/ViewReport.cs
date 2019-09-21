@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using Ether.Redux.Interfaces;
+using BlazorState.Redux.Interfaces;
 using Ether.ViewModels;
 using Microsoft.AspNetCore.Components;
 
