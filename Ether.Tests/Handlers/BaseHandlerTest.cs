@@ -8,11 +8,13 @@ using Ether.Contracts.Dto;
 using Ether.Contracts.Interfaces;
 using Ether.Core.Config;
 using Ether.Vsts.Config;
+using Ether.Vsts.Interfaces;
 using ExpectedObjects;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Moq.Language.Flow;
 using NUnit.Framework;
+using VSTS.Net.Interfaces;
 
 namespace Ether.Tests.Handlers
 {
@@ -21,6 +23,10 @@ namespace Ether.Tests.Handlers
         protected IMapper Mapper { get; private set; }
 
         protected Mock<IRepository> RepositoryMock { get; private set; }
+
+        protected Mock<IVstsClientFactory> VstsClientFactory { get; private set; }
+
+        protected Mock<IVstsPullRequestsClient> PullRequestsClient { get; private set; }
 
         [SetUp]
         public void SetUp()
@@ -33,7 +39,10 @@ namespace Ether.Tests.Handlers
             });
             Mapper = mappingConfig.CreateMapper();
             RepositoryMock = new Mock<IRepository>(MockBehavior.Strict);
+            VstsClientFactory = new Mock<IVstsClientFactory>(MockBehavior.Strict);
+            PullRequestsClient = new Mock<IVstsPullRequestsClient>(MockBehavior.Strict);
 
+            SetupVstsClientFactory();
             Initialize();
         }
 
@@ -150,6 +159,13 @@ namespace Ether.Tests.Handlers
         protected ILogger<T> GetLoggerMock<T>()
         {
             return Mock.Of<ILogger<T>>();
+        }
+
+        private void SetupVstsClientFactory()
+        {
+            VstsClientFactory.Setup(c => c.GetPullRequestsClient(It.IsAny<string>()))
+                .ReturnsAsync(PullRequestsClient.Object)
+                .Verifiable();
         }
     }
 }

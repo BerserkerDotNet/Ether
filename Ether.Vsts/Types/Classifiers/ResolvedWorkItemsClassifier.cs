@@ -24,7 +24,7 @@ namespace Ether.Vsts.Types.Classifiers
                 assignedToMember = request.Team.SingleOrDefault(t => (!string.IsNullOrEmpty(request.WorkItem[WorkItemAssignedToField]) && request.WorkItem[WorkItemAssignedToField].Contains(t.Email)));
             }
 
-            var resolvedByMemeber = request.Team.SingleOrDefault(member => resolutionUpdate[WorkItemResolvedByField].NewValue.Contains(member.Email));
+            var resolvedByMemeber = request.Team.SingleOrDefault(member => resolutionUpdate.Fields.ContainsKey(WorkItemResolvedByField) && resolutionUpdate[WorkItemResolvedByField].NewValue.Contains(member.Email));
             if (assignedToMember != null)
             {
                 resolvedByMemeber = assignedToMember;

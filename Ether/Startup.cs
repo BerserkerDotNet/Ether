@@ -29,7 +29,6 @@ namespace Ether
             services.AddReduxStore<RootState>(cfg =>
             {
                 cfg.UseReduxDevTools();
-                cfg.UseLocalStorage();
                 cfg.TrackUserNavigation(s => s.Location);
 
                 cfg.Map<JobLogsReducer, JobLogsState>(s => s.JobLogs);

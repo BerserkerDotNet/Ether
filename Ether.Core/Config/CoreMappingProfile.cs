@@ -10,8 +10,7 @@ namespace Ether.Core.Config
         public CoreMappingProfile()
         {
             CreateMap<IdentityViewModel, Identity>();
-            CreateMap<Identity, IdentityViewModel>()
-                .ForMember(m => m.Token, a => a.Ignore());
+            CreateMap<Identity, IdentityViewModel>();
             CreateMap<PullRequestsReport, PullRequestReportViewModel>();
             CreateMap<AggregatedWorkitemsETAReport, AggregatedWorkitemsETAReportViewModel>();
             CreateMap<WorkItemsReport, WorkItemsReportViewModel>();
