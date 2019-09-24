@@ -66,7 +66,7 @@ namespace Ether.Components.Settings
 
         private IEnumerable<VstsRepositoryViewModel> GetRepositories(RootState state)
         {
-            return state?.Repositories?.Repositories ?? Enumerable.Empty<VstsRepositoryViewModel>();
+            return state?.Repositories?.Repositories ?? null;
         }
 
         private bool IsProjectsInitialized(RootState state)

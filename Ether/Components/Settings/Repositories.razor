@@ -25,18 +25,16 @@
         </DataTable>
     </ListModeContent>
     <FormModeContent Context="ctx">
-        <ModelValidation Handler="ctx">
-            <div class="form-group">
-                <label>Name</label>
-                <InputText Class="form-control" @bind-Value="ctx.EditingItem.Name" />
-                <ValidationMessage For="@(() => ctx.EditingItem.Name)" />
-            </div>
-            <div class="form-group">
-                <label>Project</label>
-                <SelectInput Class="form-control" @bind-Value="ctx.EditingItem.Project" Options="Props.ProjectsOptions" />
-                <ValidationMessage For="@(() => ctx.EditingItem.Project)" />
-            </div>
-        </ModelValidation>
+        <div class="form-group">
+            <label>Name</label>
+            <InputText Class="form-control" @bind-Value="ctx.EditingItem.Name" />
+            <ValidationMessage For="@(() => ctx.EditingItem.Name)" />
+        </div>
+        <div class="form-group">
+            <label>Project</label>
+            <SelectInput Class="form-control" @bind-Value="ctx.EditingItem.Project" Options="Props.ProjectsOptions" />
+            <ValidationMessage For="@(() => ctx.EditingItem.Project)" />
+        </div>
     </FormModeContent>
 </EditableGrid>
 

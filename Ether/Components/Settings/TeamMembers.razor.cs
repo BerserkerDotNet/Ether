@@ -72,7 +72,7 @@ namespace Ether.Components.Settings
 
         private IEnumerable<TeamMemberViewModel> GetMembers(RootState state)
         {
-            return state?.TeamMembers?.Members ?? Enumerable.Empty<TeamMemberViewModel>();
+            return state?.TeamMembers?.Members ?? null;
         }
 
         private IEnumerable<ProfileViewModel> GetProfiles(RootState state)

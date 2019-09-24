@@ -80,7 +80,7 @@ namespace Ether.Components.Settings
 
         private IEnumerable<ProfileViewModel> GetProfiles(RootState state)
         {
-            return state?.Profiles?.Profiles ?? Enumerable.Empty<ProfileViewModel>();
+            return state?.Profiles?.Profiles ?? null;
         }
 
         private Dictionary<Guid, string> GetMemberOptions(RootState state)

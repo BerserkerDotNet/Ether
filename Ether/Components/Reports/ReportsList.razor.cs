@@ -52,7 +52,7 @@ namespace Ether.Components.Reports
 
         private IEnumerable<ReportViewModel> GetReports(RootState state)
         {
-            return state?.Reports?.Reports ?? Enumerable.Empty<ReportViewModel>();
+            return state?.Reports?.Reports ?? null;
         }
 
         private bool IsReportsSstateInitialized(RootState state)

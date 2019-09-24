@@ -66,7 +66,7 @@ namespace Ether.Components.Settings
 
         private IEnumerable<IdentityViewModel> GetIdentities(RootState state)
         {
-            return state?.Settings?.Identities ?? Enumerable.Empty<IdentityViewModel>();
+            return state?.Settings?.Identities ?? null;
         }
     }
 }

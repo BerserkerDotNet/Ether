@@ -70,7 +70,7 @@ namespace Ether.Components.Settings
 
         private IEnumerable<VstsProjectViewModel> GetProjects(RootState state)
         {
-            return state?.Projects?.Projects ?? Enumerable.Empty<VstsProjectViewModel>();
+            return state?.Projects?.Projects ?? null;
         }
 
         private Dictionary<Guid?, string> GetIdentityOptions(RootState state)
