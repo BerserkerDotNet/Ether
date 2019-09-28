@@ -53,15 +53,17 @@ namespace Ether.Vsts.Handlers.Commands
 
         private async Task UpdatePullRequest(PullRequest pullRequest)
         {
-            var vstsRepository = await _repository.GetSingleAsync<Repository>(pullRequest.Repository);
+            // TODO: Need to either get info about the repository or iterate over different identities on 401
+
+            /*var vstsRepository = await _repository.GetSingleAsync<Repository>(pullRequest.Repository);
             var vstsProject = await _repository.GetSingleAsync<Project>(vstsRepository.Project);
             var identity = vstsProject.Identity.HasValue ? (await _repository.GetSingleAsync<Identity>(vstsProject.Identity.Value)) : null;
-            var token = identity is null ? null : identity.Token;
-            var client = await _clientFactory.GetPullRequestsClient(token);
+            var token = identity is null ? null : identity.Token;*/
+            var client = await _clientFactory.GetPullRequestsClient();
 
             var prInfo = await client.GetPullRequestAsync(pullRequest.PullRequestId);
-            var iterations = await client.GetPullRequestIterationsAsync(vstsProject.Name, vstsRepository.Name, prInfo.PullRequestId);
-            var threads = await client.GetPullRequestThreadsAsync(vstsProject.Name, vstsRepository.Name, prInfo.PullRequestId);
+            var iterations = await client.GetPullRequestIterationsAsync(prInfo.Repository.Project.Name, prInfo.Repository.Name, prInfo.PullRequestId);
+            var threads = await client.GetPullRequestThreadsAsync(prInfo.Repository.Project.Name, prInfo.Repository.Name, prInfo.PullRequestId);
 
             var updatedPr = new PullRequest
             {
