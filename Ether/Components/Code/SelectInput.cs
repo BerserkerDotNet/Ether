@@ -2,23 +2,22 @@
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
-using Microsoft.AspNetCore.Components.RenderTree;
+using Microsoft.AspNetCore.Components.Rendering;
 
 namespace Ether.Components.Code
 {
     public class SelectInput<T> : InputSelect<T>
     {
-        [Parameter] public Dictionary<T, string> Options { get; private set; }
+        [Parameter] public Dictionary<T, string> Options { get; set; }
 
         protected override void BuildRenderTree(RenderTreeBuilder builder)
         {
             builder.OpenElement(0, "select");
             builder.AddMultipleAttributes(1, AdditionalAttributes);
-            builder.AddAttribute(2, "id", Id);
-            builder.AddAttribute(3, "class", CssClass);
-            builder.AddAttribute(4, "value", BindMethods.GetValue(CurrentValueAsString));
-            builder.AddAttribute(5, "onchange", BindMethods.SetValueHandler(val => CurrentValueAsString = val, CurrentValueAsString));
-            builder.AddContent(6, RenderOptions);
+            builder.AddAttribute(2, "class", CssClass);
+            builder.AddAttribute(3, "value", BindConverter.FormatValue(CurrentValueAsString));
+            builder.AddAttribute(4, "onchange", EventCallback.Factory.CreateBinder<string>(this, val => CurrentValueAsString = val, CurrentValueAsString));
+            builder.AddContent(5, RenderOptions);
             builder.CloseElement();
         }
 
@@ -42,9 +41,16 @@ namespace Ether.Components.Code
         {
             foreach (var option in Options)
             {
-                builder.OpenElement(0, "option");
-                builder.AddAttribute(1, "value", option.Key);
-                builder.AddContent(2, option.Value);
+                var seq = 0;
+                builder.OpenElement(seq++, "option");
+                builder.SetKey(option.Key);
+                builder.AddAttribute(seq++, "value", option.Key);
+                if (Equals(option.Key, CurrentValue))
+                {
+                    builder.AddAttribute(seq++, "selected", true);
+                }
+
+                builder.AddContent(seq++, option.Value);
                 builder.CloseElement();
             }
         }

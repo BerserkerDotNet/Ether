@@ -1,11 +1,17 @@
-﻿<EditableGrid Items="Items"
+﻿<EditableGrid Items="Props.Items"
               IsReadOnly="true"
               GridTitle="Job Logs"
               ExistingTitle="Job Details"
               CancelButtonText="Back"
-              OnRefresh="@(async () => await OnRefresh.InvokeAsync(null))">
+              OnRefresh="@(async () => await Props.OnRefresh.InvokeAsync(null))">
     <ListModeContent Context="ctx">
-        <DataTable Items="@ctx.Items" PageSize="8" OrderBy="orderByConfig">
+        <DataTable Items="@ctx.Items" 
+                   PageSize="10"
+                   TotalPages="Props.TotalPages"
+                   CurrentPage="Props.CurrentPage"
+                   IsServerPaging="true"
+                   OnNextPage="Props.OnNextPage"
+                   OnPreviousPage="Props.OnPreviousPage">
             <TableHeader>
                 <th>Type</th>
                 <th>Result</th>
@@ -15,7 +21,7 @@
             </TableHeader>
             <RowTemplate Context="log">
                 <td>
-                    <If Condition="log.Result == ViewModels.Types.JobExecutionResult.Successful">
+                    <If Condition="@(log.Result == ViewModels.Types.JobExecutionResult.Successful)">
                         <Then>
                             <button class="btn btn-link" @onclick="@(() => OnViewDetails(ctx, log))">@log.JobType</button>
                         </Then>
@@ -49,15 +55,11 @@
         .OrderByDescending(l => l.StartTime)
         .Build();
 
-    [Parameter] IEnumerable<JobLogViewModel> Items { get; set; }
-    [Parameter] EventCallback OnRefresh { get; set; }
-    [Parameter] Func<JobLogViewModel, Task<ViewModels.Types.JobDetails>> OnDetailsRequested { get; set; }
-
+    [Parameter] public JobLogsProps Props { get; set; }
 
     protected async Task OnViewDetails(EditableGridBase<JobLogViewModel> context, JobLogViewModel log)
     {
-        var details = await OnDetailsRequested(log);
-        log.Details = details;
+        await Props.OnDetailsRequested.InvokeAsync(log);
         context.Edit(log);
     }
 }

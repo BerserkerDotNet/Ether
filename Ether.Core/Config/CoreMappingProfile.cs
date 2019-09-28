@@ -9,8 +9,8 @@ namespace Ether.Core.Config
     {
         public CoreMappingProfile()
         {
-            CreateMap<Identity, IdentityViewModel>();
             CreateMap<IdentityViewModel, Identity>();
+            CreateMap<Identity, IdentityViewModel>();
             CreateMap<PullRequestsReport, PullRequestReportViewModel>();
             CreateMap<AggregatedWorkitemsETAReport, AggregatedWorkitemsETAReportViewModel>();
             CreateMap<WorkItemsReport, WorkItemsReportViewModel>();

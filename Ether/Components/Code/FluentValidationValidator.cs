@@ -9,7 +9,7 @@ namespace Ether.Components.Code
     {
         [CascadingParameter] EditContext CurrentEditContext { get; set; }
 
-        protected override void OnInit()
+        protected override void OnInitialized()
         {
             if (CurrentEditContext == null)
             {

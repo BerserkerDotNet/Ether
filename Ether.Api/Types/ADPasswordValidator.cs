@@ -43,20 +43,8 @@ namespace Ether.Api.Types
                 {
                     var userNameToSearch = type == ContextType.Machine ? Environment.UserName : context.UserName;
                     var user = UserPrincipal.FindByIdentity(principal, userNameToSearch);
-                    if (user == null)
-                    {
-                        using (var domainPrincipal = new PrincipalContext(ContextType.Domain, domainAndName[0]))
-                        {
-                            user = UserPrincipal.FindByIdentity(domainPrincipal, userNameToSearch);
-                            var claims = GetAdditionalClaims(user);
-                            context.Result = new GrantValidationResult(subject: user.Name, authenticationMethod: "ADS", claims: claims);
-                        }
-                    }
-                    else
-                    {
-                        var claims = GetAdditionalClaims(user);
-                        context.Result = new GrantValidationResult(subject: user.Name, authenticationMethod: "ADS", claims: claims);
-                    }
+                    var claims = GetAdditionalClaims(user);
+                    context.Result = new GrantValidationResult(subject: user.Name, authenticationMethod: "ADS", claims: claims);
                 }
                 else
                 {

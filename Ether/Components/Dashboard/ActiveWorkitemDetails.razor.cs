@@ -9,7 +9,7 @@ namespace Ether.Components.Dashboard
     public class ActiveWorkitemDetailsBase : ComponentBase
     {
         [Parameter]
-        protected WorkitemInformationViewModel Workitem { get; set; }
+        public WorkitemInformationViewModel Workitem { get; set; }
 
         protected string FormatActiveTime(TimeSpan activeTime)
         {

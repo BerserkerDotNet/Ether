@@ -32,9 +32,9 @@
 
 @code
 {
-    [Parameter] IEnumerable<TeamMemberViewModel> Team { get; set; }
+    [Parameter] public IEnumerable<TeamMemberViewModel> Team { get; set; }
 
-    [Parameter] IEnumerable<TeamAttendanceViewModel> Attendance { get; set; }
+    [Parameter] public IEnumerable<TeamAttendanceViewModel> Attendance { get; set; }
 
     private void FlipAttendance(Guid member, int day = -1)
     {

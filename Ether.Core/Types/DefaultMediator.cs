@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Autofac;
 using Ether.Contracts.Interfaces.CQS;
 using Ether.Contracts.Types;
+using Ether.ViewModels;
 using Microsoft.Extensions.Logging;
 
 namespace Ether.Core.Types
@@ -106,6 +107,12 @@ namespace Ether.Core.Types
             where TQuery : IQuery<IEnumerable<TResult>>
         {
             return Request<TQuery, IEnumerable<TResult>>(query);
+        }
+
+        public Task<PageViewModel<TResult>> RequestPagedCollection<TQuery, TResult>(IQuery<PageViewModel<TResult>> query)
+            where TQuery : IQuery<PageViewModel<TResult>>
+        {
+            return Request<TQuery, PageViewModel<TResult>>(query);
         }
 
         public Task<IEnumerable<TResult>> RequestCollection<TQuery, TResult>()

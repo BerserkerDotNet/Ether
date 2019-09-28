@@ -1,20 +1,20 @@
-﻿<If Condition="VstsDataSource == null">
+﻿<If Condition="@(Props.VstsDataSource == null)">
     <Then>
         <Spinner Text="Loading..." />
     </Then>
     <Else>
-        <EditForm Model="VstsDataSource" OnValidSubmit="@(async () => await OnUpdate.InvokeAsync(VstsDataSource))">
+        <EditForm Model="Props.VstsDataSource" OnValidSubmit="@(async () => await Props.OnSave.InvokeAsync(Props.VstsDataSource))">
             <Card Title="Vsts configuration" AdditionalClasses="card-600">
                 <Body>
                     <div class="form-group">
                         <label>Instance Name</label>
-                        <InputText Class="form-control" @bind-Value="VstsDataSource.InstanceName" />
-                        <ValidationMessage For="@(() => VstsDataSource.InstanceName)" />
+                        <InputText Class="form-control" @bind-Value="Props.VstsDataSource.InstanceName" />
+                        <ValidationMessage For="@(() => Props.VstsDataSource.InstanceName)" />
                     </div>
                     <div class="form-group">
                         <label>Default Token</label>
-                        <SelectInput Class="form-control" @bind-Value="VstsDataSource.DefaultToken" Options="IdentitiesOptions" />
-                        <ValidationMessage For="@(() => VstsDataSource.DefaultToken)" />
+                        <SelectInput Class="form-control" @bind-Value="Props.VstsDataSource.DefaultToken" Options="Props.IdentitiesOptions" />
+                        <ValidationMessage For="@(() => Props.VstsDataSource.DefaultToken)" />
                     </div>
                 </Body>
                 <Footer><button type="submit" class="btn btn-success btn-fill pull-right">Save</button></Footer>
@@ -25,7 +25,5 @@
 
 @code
 {
-    [Parameter] VstsDataSourceViewModel VstsDataSource { get; set; }
-    [Parameter] Dictionary<Guid?, string> IdentitiesOptions { get; set; }
-    [Parameter] EventCallback<VstsDataSourceViewModel> OnUpdate { get; set; }
+    [Parameter] public VstsConfigurationSettingsProps Props { get; set; }
 }

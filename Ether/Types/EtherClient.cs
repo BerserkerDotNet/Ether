@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -37,10 +38,10 @@ namespace Ether.Types
         };
 
         private readonly HttpClient _httpClient;
-        private readonly IUriHelper _navigation;
+        private readonly NavigationManager _navigation;
         private readonly ILogger<EtherClient> _logger;
 
-        public EtherClient(HttpClient httpClient, IUriHelper navigation, ILogger<EtherClient> logger)
+        public EtherClient(HttpClient httpClient, NavigationManager navigation, ILogger<EtherClient> logger)
         {
             WebAssemblyHttpMessageHandler.DefaultCredentials = FetchCredentialsOption.Include;
             _httpClient = httpClient;
@@ -85,6 +86,23 @@ namespace Ether.Types
         public Task<IEnumerable<T>> GetAll<T>()
         {
             return HttpGet<IEnumerable<T>>($"{GetPathFor<T>()}/GetAll");
+        }
+
+        public async Task<PageViewModel<T>> GetAllPaged<T>(int page = 1, int itemsPerPage = 10, Func<JObject, T> converter = null)
+        {
+            if (converter == null)
+            {
+                return await HttpGet<PageViewModel<T>>($"{GetPathFor<T>()}/GetAll?page={page}&itemsPerPage={itemsPerPage}");
+            }
+
+            var pageModel = await HttpGet<PageViewModel<JObject>>($"{GetPathFor<T>()}/GetAll?page={page}&itemsPerPage={itemsPerPage}");
+            var items = pageModel.Items.Select(i => converter(i)).ToArray();
+            return new PageViewModel<T>
+            {
+                Items = items,
+                CurrentPage = pageModel.CurrentPage,
+                TotalPages = pageModel.TotalPages
+            };
         }
 
         public Task<T> GetById<T>(Guid id)
@@ -221,7 +239,7 @@ namespace Ether.Types
 
         private Uri GetApiUrl()
         {
-            var baseUrl = _navigation.GetBaseUri();
+            var baseUrl = _navigation.BaseUri;
             var isDevelopment = baseUrl.StartsWith("https://localhost");
 
             return isDevelopment ? new Uri("https://localhost:44315/api/") : new Uri($"{baseUrl}api/");

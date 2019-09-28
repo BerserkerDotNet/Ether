@@ -39,6 +39,8 @@ namespace Ether.Vsts.Jobs
                 }
             }
 
+            await _mediator.Execute(new UpdateActivePullRequests());
+
             var membersAndRepositories = await _mediator.RequestCollection<GetMembersAndRepositoriesOfAllProfiles, RepositoryInfo>(new GetMembersAndRepositoriesOfAllProfiles(includeMembers));
             _logger.LogInformation("Found {Count} repositories to scan.", membersAndRepositories.Count());
 

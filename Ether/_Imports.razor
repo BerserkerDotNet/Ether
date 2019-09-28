@@ -1,7 +1,7 @@
 @using System
 @using System.Net.Http
 @using System.Linq.Expressions
-@using Microsoft.AspNetCore.Components.Layouts
+@using Microsoft.AspNetCore.Components.Web
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.JSInterop
 @using Microsoft.Extensions.Logging
@@ -25,6 +25,9 @@
 @using Ether.Components.Dashboard
 @using Microsoft.AspNetCore.Components
 @using Microsoft.AspNetCore.Components.Routing
-@using BlazorBootstrap.Modal.UI;
-@using BlazorBootstrap.Modal.Services;
+@using BlazorBootstrap.Modal.UI
+@using BlazorBootstrap.Modal.Services
+@using BlazorState.Redux.Interfaces
+@using BlazorState.Redux.Blazor
+@using static BlazorState.Redux.Blazor.ComponentConnector
 @using static Ether.Types.JsUtils

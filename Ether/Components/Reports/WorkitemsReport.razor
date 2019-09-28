@@ -97,11 +97,11 @@
 {
     private VstsDataSourceViewModel vstsConfiguration = new VstsDataSourceViewModel();
 
-    [Parameter] Guid Id { get; set; }
+    [Parameter] public Guid Id { get; set; }
 
-    [Parameter] WorkItemsReportViewModel Report { get; set; }
+    [Parameter] public WorkItemsReportViewModel Report { get; set; }
 
-    protected override async Task OnInitAsync()
+    protected override async Task OnInitializedAsync()
     {
         vstsConfiguration = await Client.GetVstsDataSourceConfig();
     }

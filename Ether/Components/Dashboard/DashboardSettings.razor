@@ -96,7 +96,7 @@ protected string WorkitemsQueryId
     }
 }
 
-[Parameter] Guid? DashboardId { get; set; }
+[Parameter] public Guid? DashboardId { get; set; }
 
 protected override async Task OnParametersSetAsync()
 {

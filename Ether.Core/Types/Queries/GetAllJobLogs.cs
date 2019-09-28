@@ -1,10 +1,13 @@
-﻿using System.Collections.Generic;
-using Ether.Contracts.Interfaces.CQS;
-using Ether.ViewModels;
+﻿using Ether.ViewModels;
 
 namespace Ether.Core.Types.Queries
 {
-    public class GetAllJobLogs : IQuery<IEnumerable<JobLogViewModel>>
+    public class GetAllJobLogs : GetAllPagedQuery<JobLogViewModel>
     {
+        public GetAllJobLogs(int page, int itemsPerPage = 10)
+        {
+            Page = page;
+            ItemsPerPage = itemsPerPage;
+        }
     }
 }

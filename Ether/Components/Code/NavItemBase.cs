@@ -11,28 +11,28 @@ namespace Ether.Components.Code
         private string[] _absoluteUrls;
 
         [Inject]
-        public IUriHelper UriHelper { get; set; }
+        public NavigationManager Navigation { get; set; }
 
         public void Dispose()
         {
-            UriHelper.OnLocationChanged -= OnLocationChanged;
+            Navigation.LocationChanged -= OnLocationChanged;
         }
 
         protected bool IsActive => _isActive;
 
-        protected override void OnInit()
+        protected override void OnInitialized()
         {
-            base.OnInit();
-            UriHelper.OnLocationChanged += OnLocationChanged;
+            base.OnInitialized();
+            Navigation.LocationChanged += OnLocationChanged;
         }
 
         protected override void OnParametersSet()
         {
             base.OnParametersSet();
             _absoluteUrls = GetRelativeUrlPrefixes()
-                .Select(u => UriHelper.ToAbsoluteUri(u).AbsoluteUri)
+                .Select(u => Navigation.ToAbsoluteUri(u).AbsoluteUri)
                 .ToArray();
-            OnLocationChanged(this, new LocationChangedEventArgs(UriHelper.GetAbsoluteUri(), false));
+            OnLocationChanged(this, new LocationChangedEventArgs(Navigation.Uri, false));
         }
 
         protected abstract string[] GetRelativeUrlPrefixes();

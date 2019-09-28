@@ -1,5 +1,10 @@
 //using Blazor.Extensions.Logging;
+using Blazor.Extensions.Storage;
 using BlazorBootstrap.Modal;
+using BlazorState.Redux.Extensions;
+using BlazorState.Redux.Storage;
+using Ether.Actions.Async;
+using Ether.Reducers;
 using Ether.Types;
 using Ether.Types.EditableTable;
 using Ether.Types.State;
@@ -21,16 +26,22 @@ namespace Ether
             services.AddSingleton<LocalStorage>();
 
             // State
-            services.AddSingleton<ReportDescriptorStateService>();
-            services.AddSingleton<ReportStateService>();
-            services.AddSingleton<JobLogsStateService>();
-            services.AddSingleton<VstsDataSourceStateService>();
-            services.AddSingleton<IdentitiesStateService>();
-            services.AddSingleton<ProjectsStateService>();
-            services.AddSingleton<RepositoriesStateService>();
-            services.AddSingleton<ProfilesStateService>();
-            services.AddSingleton<TeamMembersStateService>();
-            services.AddSingleton<AppState>();
+            services.AddReduxStore<RootState>(cfg =>
+            {
+                cfg.UseReduxDevTools();
+                cfg.TrackUserNavigation(s => s.Location);
+
+                cfg.Map<JobLogsReducer, JobLogsState>(s => s.JobLogs);
+                cfg.Map<ProfilesReducer, ProfilesState>(s => s.Profiles);
+                cfg.Map<GenerateReportFormReducer, GenerateReportFormState>(s => s.GenerateReportForm);
+                cfg.Map<SettingsReducer, SettingsState>(s => s.Settings);
+                cfg.Map<ReportsReducer, ReportsState>(s => s.Reports);
+                cfg.Map<MembersReducer, TeamMembersState>(s => s.TeamMembers);
+                cfg.Map<RepositoriesReducer, RepositoriesState>(s => s.Repositories);
+                cfg.Map<ProjectsReducer, ProjectsState>(s => s.Projects);
+
+                cfg.RegisterActionsFromAssemblyContaining<FetchProfiles>();
+            });
 
             services.AddSingleton<EtherClientEditableTableDataProvider>();
             services.AddSingleton<NoOpEditableTableDataProvider>();

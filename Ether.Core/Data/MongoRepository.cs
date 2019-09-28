@@ -57,6 +57,18 @@ namespace Ether.Core.Data
                 .ToListAsync();
         }
 
+        public async Task<IEnumerable<T>> GetAllPagedAsync<T>(int page = 1, int itemsPerPage = 10, Expression<Func<T, object>> orderBy = null)
+            where T : BaseDto
+        {
+            var skip = (page - 1) * itemsPerPage;
+            return await GetCollectionFor<T>()
+                .AsQueryable()
+                .OrderByDescending(orderBy)
+                .Skip(skip)
+                .Take(itemsPerPage)
+                .ToListAsync();
+        }
+
         public IEnumerable<T> GetAll<T>()
             where T : BaseDto
         {
@@ -263,6 +275,14 @@ namespace Ether.Core.Data
                 .DeleteMany(predicate);
 
             return result.DeletedCount;
+        }
+
+        public async Task<long> CountAsync<T>()
+            where T : BaseDto
+        {
+            return await GetCollectionFor<T>()
+                .AsQueryable()
+                .CountAsync();
         }
 
         private string GetCollectionNameFor(Type type)

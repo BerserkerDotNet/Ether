@@ -1,52 +1,8 @@
 ﻿@page "/reports"
-@page "/reports/{id:guid}"
-@inject ReportStateService ReportState
-@inject IUriHelper UriHelper
 
-<EditableGrid Items="ReportState.Reports"
-              GridTitle="Reports"
-              IsReadOnly="true"
-              OnRefresh="HandleRefresh">
-    <ListModeContent Context="ctx">
-        <Ether.Components.DataTable Items="ctx.Items" PageSize="8">
-            <TableHeader>
-                <th>Name</th>
-                <th>Taken</th>
-                <th>Profile</th>
-                <th>Start</th>
-                <th>End</th>
-            </TableHeader>
-            <RowTemplate Context="report">
-                <td>@report.ReportName</td>
-                <td>@report.DateTaken</td>
-                <td>@report.ProfileName</td>
-                <td>@report.StartDate</td>
-                <td>@report.EndDate</td>
-            </RowTemplate>
-            <ActionsTemplate Context="report">
-                <div>
-                    <button class="btn btn-success btn-fill" @onclick="@(() => View(report))">View</button>
-                    <button class="btn btn-danger btn-fill" @onclick="@(() => ctx.Delete(report))">Delete</button>
-                </div>
-            </ActionsTemplate>
-        </Ether.Components.DataTable>
-    </ListModeContent>
-</EditableGrid>
+@ReportsList
 
 @code
 {
-    protected override async Task OnInitAsync()
-    {
-        await ReportState.LoadAsync();
-    }
-
-    protected void View(ReportViewModel model)
-    {
-        UriHelper.NavigateTo($"/reports/view/{model.ReportType}/{model.Id}");
-    }
-
-    protected async Task HandleRefresh()
-    {
-        await ReportState.LoadAsync(hard: true);
-    }
+    RenderFragment ReportsList = ReportsListConnected.Get();
 }

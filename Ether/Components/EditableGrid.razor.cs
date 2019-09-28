@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Ether.Types;
 using Ether.ViewModels;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 
 namespace Ether.Components
 {
@@ -19,40 +20,40 @@ namespace Ether.Components
         public IEnumerable<TItem> Items { get; set; }
 
         [Parameter]
-        protected string GridTitle { get; set; }
+        public string GridTitle { get; set; }
 
         [Parameter]
-        protected string NewTitle { get; set; }
+        public string NewTitle { get; set; }
 
         [Parameter]
-        protected string ExistingTitle { get; set; }
+        public string ExistingTitle { get; set; }
 
         [Parameter]
-        protected string CancelButtonText { get; set; } = "Cancel";
+        public string CancelButtonText { get; set; } = "Cancel";
 
         [Parameter]
-        protected bool IsReadOnly { get; set; }
+        public bool IsReadOnly { get; set; }
 
         [Parameter]
-        protected Func<TItem, object> OrderBy { get; set; }
+        public Func<TItem, object> OrderBy { get; set; }
 
         [Parameter]
-        protected Func<TItem, object> OrderByDescending { get; set; }
+        public Func<TItem, object> OrderByDescending { get; set; }
 
         [Parameter]
-        protected EventCallback<TItem> OnSave { get; set; }
+        public EventCallback<TItem> OnSave { get; set; }
 
         [Parameter]
-        protected EventCallback<TItem> OnDelete { get; set; }
+        public EventCallback<TItem> OnDelete { get; set; }
 
         [Parameter]
-        protected EventCallback OnRefresh { get; set; }
+        public EventCallback OnRefresh { get; set; }
 
         [Parameter]
-        protected RenderFragment<EditableGridBase<TItem>> ListModeContent { get; set; }
+        public RenderFragment<EditableGridBase<TItem>> ListModeContent { get; set; }
 
         [Parameter]
-        protected RenderFragment<EditableGridBase<TItem>> FormModeContent { get; set; }
+        public RenderFragment<EditableGridBase<TItem>> FormModeContent { get; set; }
 
         public TItem EditingItem { get; set; }
 
@@ -103,7 +104,7 @@ namespace Ether.Components
             Editing(default);
         }
 
-        protected void OnNew(UIMouseEventArgs args)
+        protected void OnNew(MouseEventArgs args)
         {
             var item = TCreator();
             if (item is ViewModelWithId vm)

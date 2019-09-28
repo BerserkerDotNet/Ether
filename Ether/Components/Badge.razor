@@ -1,6 +1,6 @@
 ﻿<span class="badge badge-@(Type.ToString().ToLower())">@Text</span>
 
 @code{
-    [Parameter] BadgeType Type { get; set; }
-    [Parameter] string Text { get; set; }
+    [Parameter] public BadgeType Type { get; set; }
+    [Parameter] public string Text { get; set; }
 }

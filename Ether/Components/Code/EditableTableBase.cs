@@ -29,25 +29,25 @@ namespace Ether.Components.Code
         public T EditingItem { get; set; }
 
         [Parameter]
-        protected Func<T, object> OrderBy { get; set; }
+        public Func<T, object> OrderBy { get; set; }
 
         [Parameter]
-        protected Func<T, object> OrderByDescending { get; set; }
+        public Func<T, object> OrderByDescending { get; set; }
 
         [Parameter]
-        protected Action<EditableTableBase<T>> OnRecordsLoaded { get; set; }
+        public Action<EditableTableBase<T>> OnRecordsLoaded { get; set; }
 
         [Parameter]
-        protected IEditableTableDataProvider DataProvider { get; set; }
+        public IEditableTableDataProvider DataProvider { get; set; }
 
         [Inject]
-        protected ILogger<EditableTableBase<T>> Logger { get; set; }
+        public ILogger<EditableTableBase<T>> Logger { get; set; }
 
         [Inject]
-        protected EtherClientEditableTableDataProvider DefaultDataProvider { get; set; }
+        public EtherClientEditableTableDataProvider DefaultDataProvider { get; set; }
 
         [Inject]
-        protected JsUtils JsUtils { get; set; }
+        public JsUtils JsUtils { get; set; }
 
         protected bool IsEditing { get; set; }
 

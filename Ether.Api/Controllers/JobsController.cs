@@ -25,9 +25,9 @@ namespace Ether.Api.Controllers
 
         [HttpGet]
         [Route(nameof(Logs) + "/GetAll")]
-        public async Task<IActionResult> Logs()
+        public async Task<IActionResult> Logs(int page = 1, int itemsPerPage = 10)
         {
-            var logs = await _mediator.RequestCollection<GetAllJobLogs, JobLogViewModel>();
+            var logs = await _mediator.RequestPagedCollection<GetAllJobLogs, JobLogViewModel>(new GetAllJobLogs(page, itemsPerPage));
             return Ok(logs);
         }
 
