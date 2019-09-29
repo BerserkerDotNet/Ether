@@ -8,7 +8,7 @@ namespace Ether.Contracts.Types
 {
     public abstract class BaseWorkItemsClassifier : IWorkItemsClassifier
     {
-        public IEnumerable<WorkItemResolution> Classify(WorkItemResolutionRequest request)
+        public IEnumerable<IWorkItemEvent> Classify(WorkItemResolutionRequest request)
         {
             if (request == null)
             {
@@ -18,12 +18,12 @@ namespace Ether.Contracts.Types
             var workItem = request.WorkItem;
             if (workItem == null || workItem.Updates == null || !workItem.Updates.Any())
             {
-                return Enumerable.Empty<WorkItemResolution>();
+                return Enumerable.Empty<IWorkItemEvent>();
             }
 
             if (!IsSupported(workItem))
             {
-                return Enumerable.Empty<WorkItemResolution>();
+                return Enumerable.Empty<IWorkItemEvent>();
             }
 
             try
@@ -32,12 +32,15 @@ namespace Ether.Contracts.Types
             }
             catch (Exception ex)
             {
-                return new[] { WorkItemResolution.GetError(ex) };
+                return new[] { new ErrorClassifyingWorkItemEvent(GetWorkItemWrapper(workItem), this, ex) };
             }
         }
 
         protected abstract bool IsSupported(WorkItemViewModel item);
 
-        protected abstract IEnumerable<WorkItemResolution> ClassifyInternal(WorkItemResolutionRequest request);
+        // HACK: Replace WorkITemViewModel completely witrh IWorkItem
+        protected abstract IWorkItem GetWorkItemWrapper(WorkItemViewModel workItem);
+
+        protected abstract IEnumerable<IWorkItemEvent> ClassifyInternal(WorkItemResolutionRequest request);
     }
 }

@@ -48,7 +48,7 @@ namespace Ether.Core.Types.Handlers.Commands
             var team = await GetAllTeamMembers(dataSource, profile.Members);
             var scope = new ClassificationScope(team, command.Start, command.End);
             var resolutions = workItems.SelectMany(w => _workItemClassificationContext.Classify(w, scope))
-                .GroupBy(r => r.MemberEmail)
+                .GroupBy(r => r.AssociatedUser.Email)
                 .ToDictionary(k => k.Key, v => v.AsEnumerable());
 
             var report = new AggregatedWorkitemsETAReport(team.Count());
@@ -62,7 +62,7 @@ namespace Ether.Core.Types.Handlers.Commands
         }
 
         private AggregatedWorkitemsETAReport.IndividualETAReport GetIndividualReport(
-            Dictionary<string, IEnumerable<WorkItemResolution>> resolutions,
+            Dictionary<string, IEnumerable<IWorkItemEvent>> resolutions,
             IEnumerable<WorkItemViewModel> workItems,
             IDataSource dataSource,
             TeamMemberViewModel member,
@@ -85,7 +85,7 @@ namespace Ether.Core.Types.Handlers.Commands
         }
 
         private void PopulateMetrics(
-            Dictionary<string, IEnumerable<WorkItemResolution>> resolutions,
+            Dictionary<string, IEnumerable<IWorkItemEvent>> resolutions,
             IEnumerable<WorkItemViewModel> workItems,
             IDataSource dataSource,
             string email,
@@ -94,12 +94,12 @@ namespace Ether.Core.Types.Handlers.Commands
         {
             var resolvedByMember = resolutions[email];
             report.TotalResolved = resolvedByMember.Count();
-            report.TotalResolvedBugs = resolvedByMember.Count(w => string.Equals(w.WorkItemType, "Bug", StringComparison.OrdinalIgnoreCase));
-            report.TotalResolvedTasks = resolvedByMember.Count(w => string.Equals(w.WorkItemType, "Task", StringComparison.OrdinalIgnoreCase));
+            report.TotalResolvedBugs = resolvedByMember.Count(w => string.Equals(w.WorkItem.Type, "Bug", StringComparison.OrdinalIgnoreCase));
+            report.TotalResolvedTasks = resolvedByMember.Count(w => string.Equals(w.WorkItem.Type, "Task", StringComparison.OrdinalIgnoreCase));
             report.Details = new List<AggregatedWorkitemsETAReport.IndividualReportDetail>(report.TotalResolved);
             foreach (var item in resolvedByMember)
             {
-                var workitem = workItems.Single(w => w.WorkItemId == item.WorkItemId);
+                var workitem = workItems.Single(w => w.WorkItemId == item.WorkItem.Id);
                 var timeSpent = dataSource.GetActiveDuration(workitem, team);
                 var eta = dataSource.GetETAValues(workitem);
                 if (eta.IsEmpty)
@@ -128,9 +128,9 @@ namespace Ether.Core.Types.Handlers.Commands
 
                 report.Details.Add(new AggregatedWorkitemsETAReport.IndividualReportDetail
                 {
-                    WorkItemId = item.WorkItemId,
-                    WorkItemTitle = item.WorkItemTitle,
-                    WorkItemType = item.WorkItemType,
+                    WorkItemId = item.WorkItem.Id,
+                    WorkItemTitle = item.WorkItem.Title,
+                    WorkItemType = item.WorkItem.Type,
                     OriginalEstimate = eta.OriginalEstimate,
                     EstimatedToComplete = eta.RemainingWork + eta.CompletedWork,
                     TimeSpent = timeSpent,

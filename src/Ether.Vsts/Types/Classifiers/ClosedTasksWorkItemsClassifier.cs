@@ -1,21 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Ether.Contracts.Interfaces;
 using Ether.Contracts.Types;
 using Ether.ViewModels;
 using static Ether.Vsts.Constants;
 
 namespace Ether.Vsts.Types.Classifiers
 {
-    public class ClosedTasksWorkItemsClassifier : BaseWorkItemsClassifier
+    public class ClosedTasksWorkItemsClassifier : VstsBaseWorkItemsClassifier
     {
-        protected override IEnumerable<WorkItemResolution> ClassifyInternal(WorkItemResolutionRequest request)
+        protected override IEnumerable<IWorkItemEvent> ClassifyInternal(WorkItemResolutionRequest request)
         {
             var resolutionUpdate = request.WorkItem.Updates.LastOrDefault(u => WasClosedByTeamMember(u, request));
             var wasEverResolved = request.WorkItem.Updates.Any(u => u[WorkItemStateField].NewValue == WorkItemStateResolved);
             if (resolutionUpdate == null || wasEverResolved)
             {
-                return Enumerable.Empty<WorkItemResolution>();
+                return Enumerable.Empty<IWorkItemEvent>();
             }
 
             var reason = resolutionUpdate[WorkItemReasonField].NewValue;
@@ -33,17 +34,12 @@ namespace Ether.Vsts.Types.Classifiers
                 closedByMemeber = assignedToMember;
             }
 
+            var closedDate = DateTime.Parse(resolutionUpdate[WorkItemChangedDateField].NewValue);
+            var closedBy = new UserReference { Email = closedByMemeber.Email, Title = closedByMemeber.DisplayName };
+
             return new[]
             {
-                new WorkItemResolution(
-                    request.WorkItem.WorkItemId,
-                    request.WorkItem[WorkItemTitleField],
-                    request.WorkItem[WorkItemTypeField],
-                    WorkItemStateClosed,
-                    reason,
-                    DateTime.Parse(resolutionUpdate[WorkItemChangedDateField].NewValue),
-                    closedByMemeber.Email,
-                    closedByMemeber.DisplayName)
+                new WorkItemClosedEvent(new VstsWorkItem(request.WorkItem), closedDate, closedBy)
             };
         }
 

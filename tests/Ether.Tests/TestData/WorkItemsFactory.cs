@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Ether.Contracts.Interfaces;
 using Ether.Contracts.Types;
 using Ether.Tests.Extensions;
 using Ether.ViewModels;
 using Ether.Vsts;
+using Ether.Vsts.Types;
 
 namespace Ether.Tests.TestData
 {
@@ -24,11 +26,12 @@ namespace Ether.Tests.TestData
             var workItem = new WorkItemViewModel { Fields = new Dictionary<string, string>() };
             workItem.WorkItemId = id;
             workItem.Fields.Add(Constants.WorkItemTypeField, type);
+            workItem.Fields.Add(Constants.WorkItemTitleField, $"{id} - {type}");
 
             return new WorkItemTestData
             {
                 WorkItem = workItem,
-                Resolutions = new List<WorkItemResolution>(),
+                Resolutions = new List<IWorkItemEvent>(),
                 Type = type
             };
         }
@@ -64,14 +67,10 @@ namespace Ether.Tests.TestData
 
             data.WorkItem.Updates = updatesBuilder.Build();
 
-            var resolution = new WorkItemResolution(
-                data.WorkItem.WorkItemId,
-                $"Work item #{data.WorkItem.WorkItemId}",
-                data.Type,
-                Constants.WorkItemStateResolved, "Fixed",
+            var resolution = new WorkItemResolvedEvent(
+                new VstsWorkItem(data.WorkItem),
                 DateTime.UtcNow,
-                resolvedBy.Email,
-                resolvedBy.DisplayName);
+                new UserReference { Email = resolvedBy.Email, Title = resolvedBy.DisplayName });
 
             data.Resolutions.Add(resolution);
             data.ExpectedDuration = daysActive;
@@ -101,14 +100,10 @@ namespace Ether.Tests.TestData
 
             data.WorkItem.Updates = updatesBuilder.Build();
 
-            var resolution = new WorkItemResolution(
-                data.WorkItem.WorkItemId,
-                $"Work item #{data.WorkItem.WorkItemId}",
-                data.Type,
-                Constants.WorkItemStateResolved, "No Repro",
+            var resolution = new WorkItemClosedEvent(
+                new VstsWorkItem(data.WorkItem),
                 DateTime.UtcNow,
-                resolvedBy.Email,
-                resolvedBy.DisplayName);
+                new UserReference { Email = resolvedBy.Email, Title = resolvedBy.DisplayName });
 
             data.Resolutions.Add(resolution);
             data.ExpectedDuration = 1;

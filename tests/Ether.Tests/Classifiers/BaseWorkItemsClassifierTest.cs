@@ -34,8 +34,7 @@ namespace Ether.Tests.Classifiers
         {
             var result = _classifier.Classify(new WorkItemResolutionRequest());
 
-            result.Should().NotBeNull();
-            result.Should().OnlyContain(r => r.IsNone);
+            result.Should().BeEmpty();
         }
 
         [Test]
@@ -44,8 +43,7 @@ namespace Ether.Tests.Classifiers
             var workItem = Builder<WorkItemViewModel>.CreateNew().Build();
             var result = _classifier.Classify(new WorkItemResolutionRequest { WorkItem = workItem });
 
-            result.Should().NotBeNull();
-            result.Should().OnlyContain(r => r.IsNone);
+            result.Should().BeEmpty();
         }
 
         [Test]
@@ -60,9 +58,8 @@ namespace Ether.Tests.Classifiers
 
             var result = _classifier.Classify(new WorkItemResolutionRequest { WorkItem = workItem });
 
-            result.Should().NotBeNull();
-            result.Should().OnlyContain(r => !r.IsNone);
-            result.Should().OnlyContain(r => r.Resolution == DummyClassifier.ExpectedResolution);
+            result.Should().NotBeEmpty();
+            result.Should().OnlyContain(r => r is DummyWorkItemEvent);
         }
 
         [Test]
@@ -76,8 +73,7 @@ namespace Ether.Tests.Classifiers
 
             var result = _classifier.Classify(new WorkItemResolutionRequest { WorkItem = workItem });
 
-            result.Should().NotBeNull();
-            result.Should().OnlyContain(r => r.IsNone);
+            result.Should().BeEmpty();
         }
 
         [Test]
@@ -91,8 +87,7 @@ namespace Ether.Tests.Classifiers
 
             var result = _classifier.Classify(new WorkItemResolutionRequest { WorkItem = workItem });
 
-            result.Should().NotBeNull();
-            result.Should().OnlyContain(r => r.IsNone);
+            result.Should().BeEmpty();
         }
 
         [Test]
@@ -108,9 +103,9 @@ namespace Ether.Tests.Classifiers
             var classifier = new ExceptionWorkItemClassifier();
             var result = classifier.Classify(new WorkItemResolutionRequest { WorkItem = workItem });
 
-            result.Should().NotBeNull();
-            result.Should().OnlyContain(r => r.IsError);
-            result.Should().OnlyContain(r => r.Reason == ExceptionWorkItemClassifier.ExpectedReason);
+            result.Should().NotBeEmpty();
+            result.Should().OnlyContain(r => r is ErrorClassifyingWorkItemEvent);
+            result.Should().OnlyContain(r => ((ErrorClassifyingWorkItemEvent)r).Error.Message == ExceptionWorkItemClassifier.ExpectedReason);
         }
     }
 }

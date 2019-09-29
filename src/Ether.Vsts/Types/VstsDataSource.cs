@@ -188,9 +188,9 @@ namespace Ether.Vsts.Types
                 string.Equals(workItem[WorkItemStateField], WorkItemStateClosed, StringComparison.OrdinalIgnoreCase);
         }
 
-        public bool IsResolved(IEnumerable<WorkItemResolution> resolutions)
+        public bool IsResolved(IEnumerable<IWorkItemEvent> resolutions)
         {
-            return resolutions.Any(r => r.Resolution == WorkItemStateResolved || (r.WorkItemType == WorkItemTypeTask && r.Resolution == WorkItemStateClosed));
+            return resolutions.Any(r => r is WorkItemResolvedEvent || (r.WorkItem.Type == WorkItemTypeTask && r is WorkItemClosedEvent));
         }
 
         public bool IsAssignedToTeamMember(WorkItemViewModel workItem, IEnumerable<TeamMemberViewModel> team)

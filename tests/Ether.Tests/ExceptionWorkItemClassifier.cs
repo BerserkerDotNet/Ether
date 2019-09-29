@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using Ether.Contracts.Interfaces;
 using Ether.Contracts.Types;
 using Ether.ViewModels;
 using Ether.Vsts;
+using Ether.Vsts.Types;
 
 namespace Ether.Tests.Classifiers
 {
@@ -12,9 +14,14 @@ namespace Ether.Tests.Classifiers
 
         public const string SupportedType = "Exception";
 
-        protected override IEnumerable<WorkItemResolution> ClassifyInternal(WorkItemResolutionRequest request)
+        protected override IEnumerable<IWorkItemEvent> ClassifyInternal(WorkItemResolutionRequest request)
         {
             throw new Exception(ExpectedReason);
+        }
+
+        protected override IWorkItem GetWorkItemWrapper(WorkItemViewModel workItem)
+        {
+            return new VstsWorkItem(workItem);
         }
 
         protected override bool IsSupported(WorkItemViewModel item)

@@ -5,6 +5,6 @@ namespace Ether.Contracts.Interfaces
 {
     public interface IWorkItemsClassifier
     {
-        IEnumerable<WorkItemResolution> Classify(WorkItemResolutionRequest request);
+        IEnumerable<IWorkItemEvent> Classify(WorkItemResolutionRequest request);
     }
 }

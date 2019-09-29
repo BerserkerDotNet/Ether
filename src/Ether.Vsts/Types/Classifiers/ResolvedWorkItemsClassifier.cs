@@ -1,20 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Ether.Contracts.Interfaces;
 using Ether.Contracts.Types;
 using Ether.ViewModels;
 using static Ether.Vsts.Constants;
 
 namespace Ether.Vsts.Types.Classifiers
 {
-    public class ResolvedWorkItemsClassifier : BaseWorkItemsClassifier
+    public class ResolvedWorkItemsClassifier : VstsBaseWorkItemsClassifier
     {
-        protected override IEnumerable<WorkItemResolution> ClassifyInternal(WorkItemResolutionRequest request)
+        protected override IEnumerable<IWorkItemEvent> ClassifyInternal(WorkItemResolutionRequest request)
         {
             var resolutionUpdate = request.WorkItem.Updates.LastOrDefault(u => WasResolvedByTeamMember(u, request));
             if (resolutionUpdate == null)
             {
-                return Enumerable.Empty<WorkItemResolution>();
+                return Enumerable.Empty<IWorkItemEvent>();
             }
 
             var assignedToMember = request.Team.SingleOrDefault(member => !resolutionUpdate[WorkItemAssignedToField].IsEmpty() &&
@@ -31,17 +32,12 @@ namespace Ether.Vsts.Types.Classifiers
                 resolvedByMemeber = assignedToMember;
             }
 
+            var resolvedDate = DateTime.Parse(resolutionUpdate[WorkItemChangedDateField].NewValue);
+            var resolvedBy = new UserReference { Email = resolvedByMemeber.Email, Title = resolvedByMemeber.DisplayName };
+
             return new[]
             {
-                new WorkItemResolution(
-                    request.WorkItem.WorkItemId,
-                    request.WorkItem[WorkItemTitleField],
-                    request.WorkItem[WorkItemTypeField],
-                    WorkItemStateResolved,
-                    resolutionUpdate[WorkItemReasonField].NewValue,
-                    DateTime.Parse(resolutionUpdate[WorkItemChangedDateField].NewValue),
-                    resolvedByMemeber.Email,
-                    resolvedByMemeber.DisplayName)
+                new WorkItemResolvedEvent(GetWorkItemWrapper(request.WorkItem), resolvedDate, resolvedBy)
             };
         }
 

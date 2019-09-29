@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Ether.Contracts.Interfaces;
 using Ether.Contracts.Types;
 using Ether.ViewModels;
 
@@ -8,7 +9,7 @@ namespace Ether.Tests.TestData
     {
         public WorkItemViewModel WorkItem { get; set; }
 
-        public List<WorkItemResolution> Resolutions { get; set; }
+        public List<IWorkItemEvent> Resolutions { get; set; }
 
         public string Type { get; set; }
 

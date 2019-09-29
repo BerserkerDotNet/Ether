@@ -28,7 +28,7 @@ namespace Ether.Contracts.Interfaces
 
         bool IsAssignedToTeamMember(WorkItemViewModel workItem, IEnumerable<TeamMemberViewModel> team);
 
-        bool IsResolved(IEnumerable<WorkItemResolution> resolutions);
+        bool IsResolved(IEnumerable<IWorkItemEvent> events);
 
         WorkItemDetail CreateWorkItemDetail(WorkItemViewModel item, IEnumerable<TeamMemberViewModel> team);
 

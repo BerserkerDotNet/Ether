@@ -6,6 +6,6 @@ namespace Ether.Contracts.Interfaces
 {
     public interface IWorkItemClassificationContext
     {
-        IEnumerable<WorkItemResolution> Classify(WorkItemViewModel item, ClassificationScope scope);
+        IEnumerable<IWorkItemEvent> Classify(WorkItemViewModel item, ClassificationScope scope);
     }
 }
