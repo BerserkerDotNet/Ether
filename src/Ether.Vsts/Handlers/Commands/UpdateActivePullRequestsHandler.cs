@@ -76,7 +76,7 @@ namespace Ether.Vsts.Handlers.Commands
                 Title = prInfo.Title,
                 State = (Types.PullRequestState)Enum.Parse(typeof(Types.PullRequestState), prInfo.Status, true),
                 Completed = prInfo.ClosedDate.HasValue ? prInfo.ClosedDate.Value : DateTime.MinValue,
-                Repository = prInfo.Repository.Id,
+                Repository = pullRequest.Repository,
                 Iterations = iterations.Count(),
                 Comments = threads.Sum(t => t.Comments.Count(c => !c.IsDeleted && string.Equals(c.CommentType, UserCommentType, StringComparison.OrdinalIgnoreCase)))
             };

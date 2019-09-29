@@ -66,13 +66,16 @@ namespace Ether.Tests.Handlers.Commands
                 Comments = 8,
                 PullRequestId = 1246587,
                 Title = "Test PR",
-                Repository = Guid.NewGuid()
+                Repository = Guid.NewGuid(),
+                LastSync = DateTime.UtcNow
             };
 
             var activePullRequest = Builder<PullRequest>
                 .CreateNew()
                 .With(p => p.Id, expecetedPullRequest.Id)
                 .With(p => p.PullRequestId, expecetedPullRequest.PullRequestId)
+                .With(p => p.LastSync, expecetedPullRequest.LastSync)
+                .With(p => p.Repository, expecetedPullRequest.Repository)
                 .With(p => p.State, Vsts.Types.PullRequestState.Active)
                 .Build();
 
@@ -90,7 +93,7 @@ namespace Ether.Tests.Handlers.Commands
                     CreatedBy = new VSTS.Net.Models.Identity.IdentityReference { Id = expecetedPullRequest.AuthorId, UniqueName = expecetedPullRequest.Author },
                     Title = expecetedPullRequest.Title,
                     Status = "Completed",
-                    Repository = new VSTS.Net.Models.Common.Repository { Id = expecetedPullRequest.Repository, Project = new VSTS.Net.Models.Common.Project { } },
+                    Repository = new VSTS.Net.Models.Common.Repository { Id = Guid.NewGuid(), Project = new VSTS.Net.Models.Common.Project { } },
                 });
 
             await _handler.Handle(new Vsts.Commands.UpdateActivePullRequests());
@@ -109,7 +112,18 @@ namespace Ether.Tests.Handlers.Commands
 
         private bool VerifyPullRequest(PullRequest actual, PullRequest expected)
         {
-            actual.Should().BeEquivalentTo(expected);
+            actual.Author.Should().Be(expected.Author);
+            actual.AuthorId.Should().Be(expected.AuthorId);
+            actual.Comments.Should().Be(expected.Comments);
+            actual.Completed.Should().Be(expected.Completed);
+            actual.Created.Should().Be(expected.Created);
+            actual.Id.Should().Be(expected.Id);
+            actual.Iterations.Should().Be(expected.Iterations);
+            actual.LastSync.Should().Be(expected.LastSync);
+            actual.PullRequestId.Should().Be(expected.PullRequestId);
+            actual.Repository.Should().Be(expected.Repository);
+            actual.State.Should().Be(expected.State);
+            actual.Title.Should().Be(expected.Title);
             return true;
         }
 
