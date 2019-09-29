@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Ether.Contracts.Dto;
 using Ether.Vsts.Dto;
 using Ether.Vsts.Handlers.Commands;
+using Ether.Vsts.Types;
 using FizzWare.NBuilder;
 using FluentAssertions;
 using Moq;
@@ -45,7 +46,7 @@ namespace Ether.Tests.Handlers.Commands
 
             await _handler.Handle(new Vsts.Commands.UpdateActivePullRequests());
 
-            RepositoryMock.Verify();
+            RepositoryMock.Verify(r => r.GetAsync<PullRequest>(p => p.State == PullRequestState.Active), Times.Once());
             VstsClientFactory.Verify();
             PullRequestsClient.Verify();
         }
@@ -89,7 +90,7 @@ namespace Ether.Tests.Handlers.Commands
                     CreatedBy = new VSTS.Net.Models.Identity.IdentityReference { Id = expecetedPullRequest.AuthorId, UniqueName = expecetedPullRequest.Author },
                     Title = expecetedPullRequest.Title,
                     Status = "Completed",
-                    Repository = new VSTS.Net.Models.Common.Repository { Id = expecetedPullRequest.Repository },
+                    Repository = new VSTS.Net.Models.Common.Repository { Id = expecetedPullRequest.Repository, Project = new VSTS.Net.Models.Common.Project { } },
                 });
 
             await _handler.Handle(new Vsts.Commands.UpdateActivePullRequests());
@@ -135,7 +136,7 @@ namespace Ether.Tests.Handlers.Commands
                         CreatedBy = new VSTS.Net.Models.Identity.IdentityReference { Id = Guid.NewGuid(), UniqueName = "Fooo" },
                         Title = "Test PR",
                         Status = "Completed",
-                        Repository = new VSTS.Net.Models.Common.Repository { Id = Guid.NewGuid() },
+                        Repository = new VSTS.Net.Models.Common.Repository { Id = Guid.NewGuid(), Project = new VSTS.Net.Models.Common.Project { } },
                     });
                 })
                 .Verifiable();
