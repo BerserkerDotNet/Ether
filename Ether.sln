@@ -3,30 +3,34 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.28917.182
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ether", "Ether\Ether.csproj", "{4BA11030-02C1-48D9-A6E7-D9014CBEE19C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ether", "src\Ether\Ether.csproj", "{4BA11030-02C1-48D9-A6E7-D9014CBEE19C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ether.Api", "Ether.Api\Ether.Api.csproj", "{BD06D355-6F08-45AC-ADC8-2C4B6BC54C23}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ether.Api", "src\Ether.Api\Ether.Api.csproj", "{BD06D355-6F08-45AC-ADC8-2C4B6BC54C23}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ether.Contracts", "Ether.Contracts\Ether.Contracts.csproj", "{AD08C2E0-50DA-4597-A671-7FC75C65B2C1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ether.Contracts", "src\Ether.Contracts\Ether.Contracts.csproj", "{AD08C2E0-50DA-4597-A671-7FC75C65B2C1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ether.Vsts", "Ether.Vsts\Ether.Vsts.csproj", "{ADFA09E4-970F-41E1-A399-D546B0F125A0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ether.Vsts", "src\Ether.Vsts\Ether.Vsts.csproj", "{ADFA09E4-970F-41E1-A399-D546B0F125A0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ether.Tests", "Ether.Tests\Ether.Tests.csproj", "{CD0EC4BA-EC1A-4AF8-925B-7F82BF930E59}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ether.Tests", "tests\Ether.Tests\Ether.Tests.csproj", "{CD0EC4BA-EC1A-4AF8-925B-7F82BF930E59}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{0FC6D5B9-FF3D-43E7-9B4D-31B071286D15}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{F921274A-98FC-4B8E-A143-48928AAD3326}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ether.Core", "Ether.Core\Ether.Core.csproj", "{A098D6D2-6CC9-4B64-9CA6-2CBB541CA619}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ether.Core", "src\Ether.Core\Ether.Core.csproj", "{A098D6D2-6CC9-4B64-9CA6-2CBB541CA619}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ether.ViewModels", "Ether.ViewModels\Ether.ViewModels.csproj", "{16B24C64-9C2C-4676-8F52-48DD7DBBF392}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ether.ViewModels", "src\Ether.ViewModels\Ether.ViewModels.csproj", "{16B24C64-9C2C-4676-8F52-48DD7DBBF392}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ether.EmailGenerator", "Ether.EmailGenerator\Ether.EmailGenerator.csproj", "{568E5103-8884-4AE2-8ADB-E93CED473510}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ether.EmailGenerator", "src\Ether.EmailGenerator\Ether.EmailGenerator.csproj", "{568E5103-8884-4AE2-8ADB-E93CED473510}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "protos", "protos", "{AC1B8896-3C45-47B9-828C-B5966C475699}"
 	ProjectSection(SolutionItems) = preProject
 		protos\emailgenerator.proto = protos\emailgenerator.proto
 	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "_build", "build\_build.csproj", "{77E83945-2095-4198-8FBC-886F11FEF777}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{A0E61D44-CD96-4749-A6AB-D4C214E25D74}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -66,6 +70,8 @@ Global
 		{568E5103-8884-4AE2-8ADB-E93CED473510}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{568E5103-8884-4AE2-8ADB-E93CED473510}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{568E5103-8884-4AE2-8ADB-E93CED473510}.Release|Any CPU.Build.0 = Release|Any CPU
+		{77E83945-2095-4198-8FBC-886F11FEF777}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{77E83945-2095-4198-8FBC-886F11FEF777}.Release|Any CPU.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -79,6 +85,7 @@ Global
 		{A098D6D2-6CC9-4B64-9CA6-2CBB541CA619} = {0FC6D5B9-FF3D-43E7-9B4D-31B071286D15}
 		{16B24C64-9C2C-4676-8F52-48DD7DBBF392} = {0FC6D5B9-FF3D-43E7-9B4D-31B071286D15}
 		{568E5103-8884-4AE2-8ADB-E93CED473510} = {0FC6D5B9-FF3D-43E7-9B4D-31B071286D15}
+		{77E83945-2095-4198-8FBC-886F11FEF777} = {A0E61D44-CD96-4749-A6AB-D4C214E25D74}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B333D861-D4DA-41A7-8910-EDD627F8C7F4}

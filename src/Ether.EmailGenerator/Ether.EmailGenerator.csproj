@@ -9,25 +9,25 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <WarningsAsErrors />
-    <CodeAnalysisRuleSet>..\StyleCop.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>..\..\StyleCop.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <WarningsAsErrors />
-    <CodeAnalysisRuleSet>..\StyleCop.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>..\..\StyleCop.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
 
   <ItemGroup>
-    <AdditionalFiles Include="..\stylecop.json" Link="stylecop.json" />
+    <AdditionalFiles Include="..\..\stylecop.json" Link="stylecop.json" />
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="..\GlobalSuppressions.cs" Link="GlobalSuppressions.cs" />
+    <Compile Include="..\..\GlobalSuppressions.cs" Link="GlobalSuppressions.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\StyleCop.ruleset" Link="StyleCop.ruleset" />
+    <None Include="..\..\StyleCop.ruleset" Link="StyleCop.ruleset" />
   </ItemGroup>
 
   <ItemGroup>
@@ -48,7 +48,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Protobuf Include="..\protos\emailgenerator.proto" GrpcServices="Server">
+    <Protobuf Include="..\..\protos\emailgenerator.proto" GrpcServices="Server">
       <Link>emailgenerator.proto</Link>
     </Protobuf>
   </ItemGroup>

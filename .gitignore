@@ -13,7 +13,6 @@
 [Dd]ebug/
 [Rr]elease/
 x64/
-build/
 [Bb]in/
 [Oo]bj/
 
@@ -209,3 +208,5 @@ tempkey.rsa
 #####
 # End of core ignore list, below put you custom 'per project' settings (patterns or path)
 #####
+
+artifacts/
