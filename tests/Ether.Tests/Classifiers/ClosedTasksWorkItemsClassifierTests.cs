@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Ether.Contracts.Types;
 using Ether.Tests.TestData;
 using Ether.ViewModels;
@@ -43,7 +44,7 @@ namespace Ether.Tests.Classifiers
             var result = _classifier.Classify(new WorkItemResolutionRequest { WorkItem = workItem });
 
             result.Should().NotBeNull();
-            result.IsNone.Should().BeTrue();
+            result.Should().OnlyContain(r => r.IsNone);
         }
 
         [Test]
@@ -52,7 +53,7 @@ namespace Ether.Tests.Classifiers
         {
             var result = _classifier.Classify(request);
             result.Should().NotBeNull();
-            result.IsNone.Should().BeTrue();
+            result.Should().OnlyContain(r => r.IsNone);
         }
 
         [Test]

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Ether.Contracts.Types;
 using Ether.ViewModels;
@@ -8,12 +9,12 @@ namespace Ether.Vsts.Types.Classifiers
 {
     public class ResolvedWorkItemsClassifier : BaseWorkItemsClassifier
     {
-        protected override WorkItemResolution ClassifyInternal(WorkItemResolutionRequest request)
+        protected override IEnumerable<WorkItemResolution> ClassifyInternal(WorkItemResolutionRequest request)
         {
             var resolutionUpdate = request.WorkItem.Updates.LastOrDefault(u => WasResolvedByTeamMember(u, request));
             if (resolutionUpdate == null)
             {
-                return WorkItemResolution.None;
+                return Enumerable.Empty<WorkItemResolution>();
             }
 
             var assignedToMember = request.Team.SingleOrDefault(member => !resolutionUpdate[WorkItemAssignedToField].IsEmpty() &&
@@ -30,15 +31,18 @@ namespace Ether.Vsts.Types.Classifiers
                 resolvedByMemeber = assignedToMember;
             }
 
-            return new WorkItemResolution(
-                request.WorkItem.WorkItemId,
-                request.WorkItem[WorkItemTitleField],
-                request.WorkItem[WorkItemTypeField],
-                WorkItemStateResolved,
-                resolutionUpdate[WorkItemReasonField].NewValue,
-                DateTime.Parse(resolutionUpdate[WorkItemChangedDateField].NewValue),
-                resolvedByMemeber.Email,
-                resolvedByMemeber.DisplayName);
+            return new[]
+            {
+                new WorkItemResolution(
+                    request.WorkItem.WorkItemId,
+                    request.WorkItem[WorkItemTitleField],
+                    request.WorkItem[WorkItemTypeField],
+                    WorkItemStateResolved,
+                    resolutionUpdate[WorkItemReasonField].NewValue,
+                    DateTime.Parse(resolutionUpdate[WorkItemChangedDateField].NewValue),
+                    resolvedByMemeber.Email,
+                    resolvedByMemeber.DisplayName)
+            };
         }
 
         protected override bool IsSupported(WorkItemViewModel item)

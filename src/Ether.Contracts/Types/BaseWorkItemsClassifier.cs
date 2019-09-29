@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Ether.Contracts.Interfaces;
 using Ether.ViewModels;
@@ -7,7 +8,7 @@ namespace Ether.Contracts.Types
 {
     public abstract class BaseWorkItemsClassifier : IWorkItemsClassifier
     {
-        public WorkItemResolution Classify(WorkItemResolutionRequest request)
+        public IEnumerable<WorkItemResolution> Classify(WorkItemResolutionRequest request)
         {
             if (request == null)
             {
@@ -17,12 +18,12 @@ namespace Ether.Contracts.Types
             var workItem = request.WorkItem;
             if (workItem == null || workItem.Updates == null || !workItem.Updates.Any())
             {
-                return WorkItemResolution.None;
+                return Enumerable.Empty<WorkItemResolution>();
             }
 
             if (!IsSupported(workItem))
             {
-                return WorkItemResolution.None;
+                return Enumerable.Empty<WorkItemResolution>();
             }
 
             try
@@ -31,12 +32,12 @@ namespace Ether.Contracts.Types
             }
             catch (Exception ex)
             {
-                return WorkItemResolution.GetError(ex);
+                return new[] { WorkItemResolution.GetError(ex) };
             }
         }
 
         protected abstract bool IsSupported(WorkItemViewModel item);
 
-        protected abstract WorkItemResolution ClassifyInternal(WorkItemResolutionRequest request);
+        protected abstract IEnumerable<WorkItemResolution> ClassifyInternal(WorkItemResolutionRequest request);
     }
 }

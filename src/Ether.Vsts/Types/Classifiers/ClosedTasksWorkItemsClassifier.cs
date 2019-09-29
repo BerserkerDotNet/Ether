@@ -9,13 +9,13 @@ namespace Ether.Vsts.Types.Classifiers
 {
     public class ClosedTasksWorkItemsClassifier : BaseWorkItemsClassifier
     {
-        protected override WorkItemResolution ClassifyInternal(WorkItemResolutionRequest request)
+        protected override IEnumerable<WorkItemResolution> ClassifyInternal(WorkItemResolutionRequest request)
         {
             var resolutionUpdate = request.WorkItem.Updates.LastOrDefault(u => WasClosedByTeamMember(u, request));
             var wasEverResolved = request.WorkItem.Updates.Any(u => u[WorkItemStateField].NewValue == WorkItemStateResolved);
             if (resolutionUpdate == null || wasEverResolved)
             {
-                return WorkItemResolution.None;
+                return Enumerable.Empty<WorkItemResolution>();
             }
 
             var reason = resolutionUpdate[WorkItemReasonField].NewValue;
@@ -33,15 +33,18 @@ namespace Ether.Vsts.Types.Classifiers
                 closedByMemeber = assignedToMember;
             }
 
-            return new WorkItemResolution(
-                request.WorkItem.WorkItemId,
-                request.WorkItem[WorkItemTitleField],
-                request.WorkItem[WorkItemTypeField],
-                WorkItemStateClosed,
-                reason,
-                DateTime.Parse(resolutionUpdate[WorkItemChangedDateField].NewValue),
-                closedByMemeber.Email,
-                closedByMemeber.DisplayName);
+            return new[]
+            {
+                new WorkItemResolution(
+                    request.WorkItem.WorkItemId,
+                    request.WorkItem[WorkItemTitleField],
+                    request.WorkItem[WorkItemTypeField],
+                    WorkItemStateClosed,
+                    reason,
+                    DateTime.Parse(resolutionUpdate[WorkItemChangedDateField].NewValue),
+                    closedByMemeber.Email,
+                    closedByMemeber.DisplayName)
+            };
         }
 
         protected override bool IsSupported(WorkItemViewModel item)

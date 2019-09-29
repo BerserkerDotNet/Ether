@@ -1,9 +1,10 @@
-﻿using Ether.Contracts.Types;
+﻿using System.Collections.Generic;
+using Ether.Contracts.Types;
 
 namespace Ether.Contracts.Interfaces
 {
     public interface IWorkItemsClassifier
     {
-        WorkItemResolution Classify(WorkItemResolutionRequest request);
+        IEnumerable<WorkItemResolution> Classify(WorkItemResolutionRequest request);
     }
 }

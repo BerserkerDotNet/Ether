@@ -43,7 +43,7 @@ namespace Ether.Tests.Classifiers
             var result = _classifier.Classify(new WorkItemResolutionRequest { WorkItem = workItem });
 
             result.Should().NotBeNull();
-            result.IsNone.Should().BeTrue();
+            result.Should().OnlyContain(r => r.IsNone);
         }
 
         [Test]
@@ -60,7 +60,7 @@ namespace Ether.Tests.Classifiers
             var result = _classifier.Classify(new WorkItemResolutionRequest { WorkItem = workItem, Team = ResolvedWorkItemsDataProvider.GetFakeTeam() });
 
             result.Should().NotBeNull();
-            result.IsNone.Should().BeTrue();
+            result.Should().OnlyContain(r => r.IsNone);
         }
 
         [Test]
@@ -75,7 +75,7 @@ namespace Ether.Tests.Classifiers
             var result = _classifier.Classify(new WorkItemResolutionRequest { WorkItem = workItem, Team = ResolvedWorkItemsDataProvider.GetFakeTeam() });
 
             result.Should().NotBeNull();
-            result.IsNone.Should().BeTrue();
+            result.Should().OnlyContain(r => r.IsNone);
         }
 
         [Test]
@@ -88,7 +88,7 @@ namespace Ether.Tests.Classifiers
             var result = _classifier.Classify(new WorkItemResolutionRequest { WorkItem = workItem, Team = ResolvedWorkItemsDataProvider.GetFakeTeam() });
 
             result.Should().NotBeNull();
-            result.IsNone.Should().BeTrue();
+            result.Should().OnlyContain(r => r.IsNone);
         }
 
         [Test]
@@ -103,7 +103,7 @@ namespace Ether.Tests.Classifiers
             var result = _classifier.Classify(new WorkItemResolutionRequest { WorkItem = workItem, Team = ResolvedWorkItemsDataProvider.GetFakeTeam() });
 
             result.Should().NotBeNull();
-            result.IsNone.Should().BeTrue();
+            result.Should().OnlyContain(r => r.IsNone);
         }
 
         [Test]

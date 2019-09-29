@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Ether.Contracts.Types;
 using Ether.ViewModels;
 using Ether.Vsts;
@@ -11,7 +12,7 @@ namespace Ether.Tests.Classifiers
 
         public const string SupportedType = "Exception";
 
-        protected override WorkItemResolution ClassifyInternal(WorkItemResolutionRequest request)
+        protected override IEnumerable<WorkItemResolution> ClassifyInternal(WorkItemResolutionRequest request)
         {
             throw new Exception(ExpectedReason);
         }

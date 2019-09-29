@@ -35,7 +35,7 @@ namespace Ether.Tests.Classifiers
             var result = _classifier.Classify(new WorkItemResolutionRequest());
 
             result.Should().NotBeNull();
-            result.IsNone.Should().BeTrue();
+            result.Should().OnlyContain(r => r.IsNone);
         }
 
         [Test]
@@ -45,7 +45,7 @@ namespace Ether.Tests.Classifiers
             var result = _classifier.Classify(new WorkItemResolutionRequest { WorkItem = workItem });
 
             result.Should().NotBeNull();
-            result.IsNone.Should().BeTrue();
+            result.Should().OnlyContain(r => r.IsNone);
         }
 
         [Test]
@@ -61,8 +61,8 @@ namespace Ether.Tests.Classifiers
             var result = _classifier.Classify(new WorkItemResolutionRequest { WorkItem = workItem });
 
             result.Should().NotBeNull();
-            result.IsNone.Should().BeFalse();
-            result.Resolution.Should().Be(DummyClassifier.ExpectedResolution);
+            result.Should().OnlyContain(r => !r.IsNone);
+            result.Should().OnlyContain(r => r.Resolution == DummyClassifier.ExpectedResolution);
         }
 
         [Test]
@@ -77,7 +77,7 @@ namespace Ether.Tests.Classifiers
             var result = _classifier.Classify(new WorkItemResolutionRequest { WorkItem = workItem });
 
             result.Should().NotBeNull();
-            result.IsNone.Should().BeTrue();
+            result.Should().OnlyContain(r => r.IsNone);
         }
 
         [Test]
@@ -92,7 +92,7 @@ namespace Ether.Tests.Classifiers
             var result = _classifier.Classify(new WorkItemResolutionRequest { WorkItem = workItem });
 
             result.Should().NotBeNull();
-            result.IsNone.Should().BeTrue();
+            result.Should().OnlyContain(r => r.IsNone);
         }
 
         [Test]
@@ -109,8 +109,8 @@ namespace Ether.Tests.Classifiers
             var result = classifier.Classify(new WorkItemResolutionRequest { WorkItem = workItem });
 
             result.Should().NotBeNull();
-            result.IsError.Should().BeTrue();
-            result.Reason.Should().Be(ExceptionWorkItemClassifier.ExpectedReason);
+            result.Should().OnlyContain(r => r.IsError);
+            result.Should().OnlyContain(r => r.Reason == ExceptionWorkItemClassifier.ExpectedReason);
         }
     }
 }

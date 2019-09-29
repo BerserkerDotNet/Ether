@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Ether.Contracts.Types;
 using Ether.ViewModels;
 using Ether.Vsts;
@@ -20,11 +21,11 @@ namespace Ether.Tests.Classifiers
             _requestProcessor = requestProcessor;
         }
 
-        protected override WorkItemResolution ClassifyInternal(WorkItemResolutionRequest request)
+        protected override IEnumerable<WorkItemResolution> ClassifyInternal(WorkItemResolutionRequest request)
         {
             _requestProcessor?.Invoke(request);
 
-            return new WorkItemResolution(request.WorkItem.WorkItemId, request.WorkItem["Title"], request.WorkItem[Constants.WorkItemTypeField], _resolution, "Because", DateTime.UtcNow.AddDays(-1), string.Empty, string.Empty);
+            return new[] { new WorkItemResolution(request.WorkItem.WorkItemId, request.WorkItem["Title"], request.WorkItem[Constants.WorkItemTypeField], _resolution, "Because", DateTime.UtcNow.AddDays(-1), string.Empty, string.Empty) };
         }
 
         protected override bool IsSupported(WorkItemViewModel item)

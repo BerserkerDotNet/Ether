@@ -21,7 +21,8 @@ namespace Ether.Core.Types
         public IEnumerable<WorkItemResolution> Classify(WorkItemViewModel item, ClassificationScope scope)
         {
             var rs = from c in _classifiers
-                     let r = c.Classify(new WorkItemResolutionRequest { WorkItem = item, Team = scope.Team, StartDate = scope.StartDate, EndDate = scope.EndDate })
+                     let resolutions = c.Classify(new WorkItemResolutionRequest { WorkItem = item, Team = scope.Team, StartDate = scope.StartDate, EndDate = scope.EndDate })
+                     from r in resolutions
                      where !r.IsNone && (IsInRange(r, scope) || r.IsError)
                      select r;
 
