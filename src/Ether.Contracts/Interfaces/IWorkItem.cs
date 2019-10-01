@@ -1,4 +1,6 @@
-﻿namespace Ether.Contracts.Interfaces
+﻿using System.Collections.Generic;
+
+namespace Ether.Contracts.Interfaces
 {
     public interface IWorkItem
     {
@@ -7,5 +9,7 @@
         string Title { get; set; }
 
         string Type { get; set; }
+
+        IEnumerable<IWorkItemUpdate> Updates { get; }
     }
 }

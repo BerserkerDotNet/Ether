@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
 using Ether.Contracts.Interfaces;
 using Ether.ViewModels;
 
@@ -11,6 +14,7 @@ namespace Ether.Vsts.Types
         public VstsWorkItem(WorkItemViewModel workItem)
         {
             _workItem = workItem;
+            Updates = workItem.Updates?.Select(u => new VstsWorkItemUpdate(u));
         }
 
         public int Id
@@ -52,6 +56,8 @@ namespace Ether.Vsts.Types
             }
         }
 
+        public IEnumerable<IWorkItemUpdate> Updates { get; }
+
         private string GetString(string key)
         {
             if (_workItem.Fields is object && _workItem.Fields.ContainsKey(key))
@@ -77,6 +83,68 @@ namespace Ether.Vsts.Types
             {
                 _workItem.Fields.Add(key, value);
             }
+        }
+    }
+
+    public class VstsWorkItemUpdate : IWorkItemUpdate
+    {
+        private readonly WorkItemUpdateViewModel _update;
+        private readonly Regex _userParser = new Regex("(?<Name>[^<]+)\\s+<(?<Email>[^<>]+)>");
+
+        public VstsWorkItemUpdate(WorkItemUpdateViewModel update)
+        {
+            _update = update;
+        }
+
+        public int Id => _update.Id;
+
+        public int WorkItemId => _update.WorkItemId;
+
+        public (string New, string Old) State => Get(Constants.WorkItemStateField);
+
+        public (DateTime New, DateTime? Old) ChangedDate
+        {
+            get
+            {
+                var (@new, old) = Get(Constants.WorkItemChangedDateField);
+                return (DateTime.Parse(@new), string.IsNullOrEmpty(old) ? (DateTime?)null : DateTime.Parse(old));
+            }
+        }
+
+        public (UserReference New, UserReference Old) ResolvedBy
+        {
+            get
+            {
+                var (@new, old) = Get(Constants.WorkItemResolvedByField);
+                return (ParseUser(@new), ParseUser(old));
+            }
+        }
+
+        private UserReference ParseUser(string userString)
+        {
+            if (string.IsNullOrEmpty(userString))
+            {
+                return null;
+            }
+
+            var newUserMatch = _userParser.Match(userString);
+            if (!newUserMatch.Success)
+            {
+                return null;
+            }
+
+            return new UserReference { Email = newUserMatch.Groups["Email"].Value, Title = newUserMatch.Groups["Name"].Value };
+        }
+
+        private (string New, string Old) Get(string key)
+        {
+            if (_update.Fields == null || !_update.Fields.ContainsKey(key))
+            {
+                return (string.Empty, string.Empty);
+            }
+
+            var field = _update.Fields[key];
+            return (field.NewValue, field.OldValue);
         }
     }
 }
