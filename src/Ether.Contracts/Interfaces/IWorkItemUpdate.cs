@@ -14,5 +14,9 @@ namespace Ether.Contracts.Interfaces
         (DateTime New, DateTime? Old) ChangedDate { get; }
 
         (UserReference New, UserReference Old) ResolvedBy { get; }
+
+        (UserReference New, UserReference Old) ClosedBy { get; }
+
+        (UserReference New, UserReference Old) AssignedTo { get; }
     }
 }

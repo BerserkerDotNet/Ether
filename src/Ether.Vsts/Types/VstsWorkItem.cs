@@ -14,7 +14,7 @@ namespace Ether.Vsts.Types
         public VstsWorkItem(WorkItemViewModel workItem)
         {
             _workItem = workItem;
-            Updates = workItem.Updates?.Select(u => new VstsWorkItemUpdate(u));
+            Updates = workItem.Updates?.Select(u => new VstsWorkItemUpdate(u)).ToList();
         }
 
         public int Id
@@ -116,6 +116,24 @@ namespace Ether.Vsts.Types
             get
             {
                 var (@new, old) = Get(Constants.WorkItemResolvedByField);
+                return (ParseUser(@new), ParseUser(old));
+            }
+        }
+
+        public (UserReference New, UserReference Old) AssignedTo
+        {
+            get
+            {
+                var (@new, old) = Get(Constants.WorkItemAssignedToField);
+                return (ParseUser(@new), ParseUser(old));
+            }
+        }
+
+        public (UserReference New, UserReference Old) ClosedBy
+        {
+            get
+            {
+                var (@new, old) = Get(Constants.WorkItemClosedByField);
                 return (ParseUser(@new), ParseUser(old));
             }
         }
