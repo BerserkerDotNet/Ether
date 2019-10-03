@@ -8,5 +8,7 @@
         public const string PullRequestsReportName = "Pull Requests report";
         public const string ETAReportType = "AggregatedWorkitemsETAReport";
         public const string ETAReportName = "Aggregated workitems ETA report";
+        public const string ReOpenedWorkitemsReportType = "ReOpenedWorkitemsReporter";
+        public const string ReOpenedWorkitemsReporterName = "Re-Opened work items report";
     }
 }

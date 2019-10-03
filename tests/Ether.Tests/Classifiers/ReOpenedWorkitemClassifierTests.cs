@@ -222,6 +222,18 @@ namespace Ether.Tests.Classifiers
         [Test]
         public void ShouldSkipIfNoCorrespondingResolveUpdate()
         {
+            var joe = SetupMembers("Joe", "Foo");
+            var bug = SetupBug(updatesConfig =>
+            {
+                updatesConfig.New()
+                    .Then().Activated()
+                    .Then().AssignedTo(joe)
+                    .Then().Activated(from: "Resolved");
+            });
+
+            var events = Run(bug, joe);
+
+            events.Should().HaveCount(0);
         }
 
         private IEnumerable<IWorkItemEvent> Run(WorkItemViewModel item, params TeamMemberViewModel[] team)
