@@ -12,5 +12,11 @@ namespace Ether.ViewModels
         }
 
         public IEnumerable<ReOpenedWorkItemDetail> Details { get; set; }
+
+        public int TotalReopened => Details.Count();
+
+        public IEnumerable<IGrouping<string, ReOpenedWorkItemDetail>> GroupedByMember => Details
+            .GroupBy(k => k.AssociatedUser.Email, v => v)
+            .OrderBy(k => k.First().AssociatedUser.Title);
     }
 }

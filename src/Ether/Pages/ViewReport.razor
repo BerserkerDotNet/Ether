@@ -3,7 +3,7 @@
 @inject NavigationManager UriHelper
 @inject JsUtils JsUtils
 
-@if (string.Equals(Type, "WorkitemsReporter"))
+@if (string.Equals(Type, "WorkitemsReporter") || string.Equals(Type, "ReOpenedWorkitemsReporter"))
 {
     <Ether.Components.Card Title="@reportDisplayName">
         <Header>
@@ -66,7 +66,7 @@ else
 
     protected override async Task OnParametersSetAsync()
     {
-        // TODO: that is not going to fly
+        // HACK: this is not going to fly
         if (string.Equals(Type, "PullRequestsReport", StringComparison.OrdinalIgnoreCase))
         {
             reportDisplayName = "Pull requests report";
@@ -88,8 +88,16 @@ else
             reportDisplayName = "Workitems report";
             report = await Client.GetById<WorkItemsReportViewModel>(Id.Value);
             supportsExcel = true;
-            supportsEmail = true;
+            supportsEmail = false;
             componentToRender = b => RenderComponent<Ether.Components.Reports.WorkitemsReport>(b);
+        }
+        else if (string.Equals(Type, "ReOpenedWorkitemsReporter", StringComparison.OrdinalIgnoreCase))
+        {
+            reportDisplayName = "Re-Opened work items report";
+            report = await Client.GetById<ReOpenedWorkItemsReportViewModel>(Id.Value);
+            supportsExcel = false;
+            supportsEmail = false;
+            componentToRender = b => RenderComponent<Ether.Components.Reports.ReopenedWorkitemsReport>(b);
         }
     }
 
