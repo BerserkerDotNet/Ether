@@ -14,7 +14,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Ether.Core.Types.Handlers.Commands
 {
-    public class GenerateWorkitemsReportHandler : GenerateReportHandlerBase<GenerateWorkItemsReport>
+    public class GenerateWorkitemsReportHandler : GenerateWorkItemsReportHandlerBase<GenerateWorkItemsReport>
     {
         private readonly IWorkItemClassificationContext _workItemClassificationContext;
 
@@ -80,34 +80,6 @@ namespace Ether.Core.Types.Handlers.Commands
             }
 
             return report;
-        }
-
-        private async Task<List<WorkItemViewModel>> GetAllWorkItems(IDataSource dataSource, IEnumerable<Guid> members)
-        {
-            var allWorkItems = new List<WorkItemViewModel>();
-
-            // TODO: Parallel
-            foreach (var member in members)
-            {
-                var workItems = await dataSource.GetWorkItemsFor(member);
-                allWorkItems.AddRange(workItems);
-            }
-
-            return allWorkItems.Distinct().ToList();
-        }
-
-        private async Task<List<TeamMemberViewModel>> GetAllTeamMembers(IDataSource dataSource, IEnumerable<Guid> members)
-        {
-            var allMembers = new List<TeamMemberViewModel>();
-
-            // TODO: Parallel
-            foreach (var member in members)
-            {
-                var teamMember = await dataSource.GetTeamMember(member);
-                allMembers.Add(teamMember);
-            }
-
-            return allMembers;
         }
     }
 }

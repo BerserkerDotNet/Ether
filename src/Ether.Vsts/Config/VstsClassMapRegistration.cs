@@ -17,6 +17,7 @@ namespace Ether.Vsts.Config
             SafeRegisterClassMap<PullRequestsReport>();
             SafeRegisterClassMap<AggregatedWorkitemsETAReport>();
             SafeRegisterClassMap<WorkItemsReport>();
+            SafeRegisterClassMap<ReOpenedWorkItemsReport>();
             BsonClassMap.RegisterClassMap<WorkItem>(cm =>
             {
                 cm.AutoMap();

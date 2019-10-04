@@ -30,6 +30,7 @@ namespace Ether.Types
             { typeof(PullRequestReportViewModel), "report" },
             { typeof(AggregatedWorkitemsETAReportViewModel), "report" },
             { typeof(WorkItemsReportViewModel), "report" },
+            { typeof(ReOpenedWorkItemsReportViewModel), "report" },
             { typeof(GenerateReportViewModel), "report" },
             { typeof(ReporterDescriptorViewModel), "report" },
             { typeof(JobLogViewModel), "jobs/logs" },

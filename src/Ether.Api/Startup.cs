@@ -95,6 +95,7 @@ namespace Ether.Api
             services.AddReporter<GeneratePullRequestsReport, PullRequestsReport, PullRequestReportViewModel>(Constants.PullRequestsReportType, Constants.PullRequestsReportName);
             services.AddReporter<GenerateAggregatedWorkitemsETAReport, AggregatedWorkitemsETAReport, AggregatedWorkitemsETAReportViewModel>(Constants.ETAReportType, Constants.ETAReportName);
             services.AddReporter<GenerateWorkItemsReport, WorkItemsReport, WorkItemsReportViewModel>(Constants.WorkitemsReportType, Constants.WorkitemsReporterName);
+            services.AddReporter<GenerateReOpenedWorkItemsReport, ReOpenedWorkItemsReport, ReOpenedWorkItemsReportViewModel>(Constants.ReOpenedWorkitemsReportType, Constants.ReOpenedWorkitemsReporterName);
 
             var jobsConfig = new JobsConfiguration();
             Configuration.GetSection("Jobs").Bind(jobsConfig);

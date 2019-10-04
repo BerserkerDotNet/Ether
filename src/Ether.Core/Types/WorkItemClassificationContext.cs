@@ -18,20 +18,26 @@ namespace Ether.Core.Types
             _classifiers = classifiers;
         }
 
-        public IEnumerable<WorkItemResolution> Classify(WorkItemViewModel item, ClassificationScope scope)
+        public IEnumerable<IWorkItemEvent> Classify(WorkItemViewModel item, ClassificationScope scope)
         {
             var rs = from c in _classifiers
-                     let r = c.Classify(new WorkItemResolutionRequest { WorkItem = item, Team = scope.Team, StartDate = scope.StartDate, EndDate = scope.EndDate })
-                     where !r.IsNone && (IsInRange(r, scope) || r.IsError)
+                     let resolutions = c.Classify(new WorkItemResolutionRequest { WorkItem = item, Team = scope.Team, StartDate = scope.StartDate, EndDate = scope.EndDate })
+                     from r in resolutions
+                     where IsInRange(r, scope) || IsError(r)
                      select r;
 
             return rs.ToList();
         }
 
-        private bool IsInRange(WorkItemResolution r, ClassificationScope scope)
+        private bool IsError(IWorkItemEvent @event)
         {
-            return (r.ResolutionDate >= scope.StartDate && r.ResolutionDate <= scope.EndDate)
-                || r.ResolutionDate == MaxDate;
+            return @event is ErrorClassifyingWorkItemEvent;
+        }
+
+        private bool IsInRange(IWorkItemEvent r, ClassificationScope scope)
+        {
+            return (r.Date >= scope.StartDate && r.Date <= scope.EndDate)
+                || r.Date == MaxDate;
         }
     }
 }

@@ -78,6 +78,13 @@ namespace Ether.Tests
             return this;
         }
 
+        public UpdateBuilder AssignedTo(TeamMemberViewModel user)
+        {
+            _fields.Add(Constants.WorkItemAssignedToField, new WorkItemFieldUpdate { NewValue = FormatTeamMemberRef(user), OldValue = string.Empty });
+            On(DateTime.UtcNow);
+            return this;
+        }
+
         public IEnumerable<WorkItemUpdateViewModel> GetNew(string from = "")
         {
             return New(from).Build();
@@ -117,6 +124,13 @@ namespace Ether.Tests
         public UpdateBuilder With(string fieldName, WorkItemFieldUpdate value)
         {
             _fields[fieldName] = value;
+            On(DateTime.UtcNow);
+            return this;
+        }
+
+        public UpdateBuilder WithAssignedTo(TeamMemberViewModel old, TeamMemberViewModel @new = null)
+        {
+            With(Constants.WorkItemAssignedToField, new WorkItemFieldUpdate { NewValue = FormatTeamMemberRef(@new), OldValue = FormatTeamMemberRef(old) });
             On(DateTime.UtcNow);
             return this;
         }
@@ -198,6 +212,16 @@ namespace Ether.Tests
 
             With(Constants.WorkItemTagsField, string.Join(';', tags), oldTags);
             return this;
+        }
+
+        private string FormatTeamMemberRef(TeamMemberViewModel member)
+        {
+            if (member is null)
+            {
+                return string.Empty;
+            }
+
+            return $"{member.DisplayName}<{member.Email}>";
         }
     }
 }

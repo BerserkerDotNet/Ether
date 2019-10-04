@@ -1,0 +1,56 @@
+﻿<section id="ReopenedTeamStats">
+    <Ether.Components.Card Title="By Member">
+        <Body>
+            <DataTable Items="Report.GroupedByMember" PageSize="int.MaxValue">
+                <TableHeader>
+                    <th>Member</th>
+                    <th># of reopened bugs</th>
+                </TableHeader>
+                <RowTemplate Context="detail">
+                    <td>@detail.First().AssociatedUser.Title</td>
+                    <td>@detail.Count()</td>
+                </RowTemplate>
+                <TableFooter>
+                    <tr>
+                        <th class="table-active">Total:</th>
+                        <td class="table-success">@Report.TotalReopened</td>
+                    </tr>
+                </TableFooter>
+            </DataTable>
+        </Body>
+    </Ether.Components.Card>
+</section>
+<section id="ReopenedWIList">
+    <Ether.Components.Card Title="Work items list">
+        <Body>
+            <DataTable Items="Report.Details.OrderBy(d => d.AssociatedUser.Title)" PageSize="int.MaxValue">
+                <TableHeader>
+                    <th>Workitem</th>
+                    <th>Title</th>
+                    <th>Type</th>
+                    <th>Date</th>
+                    <th>User</th>
+                </TableHeader>
+                <RowTemplate Context="detail">
+                    <td><a href="" target="_blank">@detail.WorkItemId</a></td>
+                    <td>@detail.WorkItemTitle</td>
+                    <td>@detail.WorkItemType</td>
+                    <td>@detail.ReOpenedDate</td>
+                    <td>@detail.AssociatedUser.Title</td>
+                </RowTemplate>
+                <TableFooter>
+                    <tr>
+                        <th class="table-active">Total:</th>
+                        <td class="table-success" colspan="4">@Report.TotalReopened</td>
+                    </tr>
+                </TableFooter>
+            </DataTable>
+        </Body>
+    </Ether.Components.Card>
+</section>
+
+@code {
+    [Parameter] public Guid Id { get; set; }
+
+    [Parameter] public ReOpenedWorkItemsReportViewModel Report { get; set; }
+}

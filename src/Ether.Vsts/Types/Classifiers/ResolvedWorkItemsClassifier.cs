@@ -1,19 +1,21 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using Ether.Contracts.Interfaces;
 using Ether.Contracts.Types;
 using Ether.ViewModels;
 using static Ether.Vsts.Constants;
 
 namespace Ether.Vsts.Types.Classifiers
 {
-    public class ResolvedWorkItemsClassifier : BaseWorkItemsClassifier
+    public class ResolvedWorkItemsClassifier : VstsBaseWorkItemsClassifier
     {
-        protected override WorkItemResolution ClassifyInternal(WorkItemResolutionRequest request)
+        protected override IEnumerable<IWorkItemEvent> ClassifyInternal(WorkItemResolutionRequest request)
         {
             var resolutionUpdate = request.WorkItem.Updates.LastOrDefault(u => WasResolvedByTeamMember(u, request));
             if (resolutionUpdate == null)
             {
-                return WorkItemResolution.None;
+                return Enumerable.Empty<IWorkItemEvent>();
             }
 
             var assignedToMember = request.Team.SingleOrDefault(member => !resolutionUpdate[WorkItemAssignedToField].IsEmpty() &&
@@ -30,15 +32,13 @@ namespace Ether.Vsts.Types.Classifiers
                 resolvedByMemeber = assignedToMember;
             }
 
-            return new WorkItemResolution(
-                request.WorkItem.WorkItemId,
-                request.WorkItem[WorkItemTitleField],
-                request.WorkItem[WorkItemTypeField],
-                WorkItemStateResolved,
-                resolutionUpdate[WorkItemReasonField].NewValue,
-                DateTime.Parse(resolutionUpdate[WorkItemChangedDateField].NewValue),
-                resolvedByMemeber.Email,
-                resolvedByMemeber.DisplayName);
+            var resolvedDate = DateTime.Parse(resolutionUpdate[WorkItemChangedDateField].NewValue);
+            var resolvedBy = new UserReference { Email = resolvedByMemeber.Email, Title = resolvedByMemeber.DisplayName };
+
+            return new[]
+            {
+                new WorkItemResolvedEvent(GetWorkItemWrapper(request.WorkItem), resolvedDate, resolvedBy)
+            };
         }
 
         protected override bool IsSupported(WorkItemViewModel item)

@@ -45,8 +45,7 @@ namespace Ether.Tests.Classifiers
             var result = Classify();
 
             result.Should().HaveCount(2);
-            result.Should().NotContain(r => r.IsNone);
-            result.Should().OnlyContain(r => r.Resolution == DummyResolution1 || r.Resolution == DummyResolution2);
+            result.Should().OnlyContain(r => r is DummyWorkItemEvent);
         }
 
         [Test]
@@ -74,8 +73,7 @@ namespace Ether.Tests.Classifiers
             var result = Classify(type: Vsts.Constants.WorkItemTypeBug);
 
             result.Should().HaveCount(1);
-            result.Should().NotContain(r => r.IsNone);
-            result.Should().OnlyContain(r => r.Resolution == DummyClassifier.ExpectedResolution);
+            result.Should().OnlyContain(r => r is DummyWorkItemEvent);
         }
 
         [Test]
@@ -83,7 +81,7 @@ namespace Ether.Tests.Classifiers
         {
             var result = Classify();
 
-            result.Should().BeOfType<List<WorkItemResolution>>();
+            result.Should().BeOfType<List<IWorkItemEvent>>();
         }
 
         [Test]
@@ -92,7 +90,7 @@ namespace Ether.Tests.Classifiers
             var result = Classify(type: ExceptionWorkItemClassifier.SupportedType);
 
             result.Should().HaveCount(1);
-            result.Should().OnlyContain(r => r.IsError);
+            result.Should().AllBeOfType<ErrorClassifyingWorkItemEvent>();
         }
 
         [Test]
@@ -106,7 +104,7 @@ namespace Ether.Tests.Classifiers
             result.Should().BeEmpty();
         }
 
-        private IEnumerable<WorkItemResolution> Classify(string type = DummyClassifier.SupportedType)
+        private IEnumerable<IWorkItemEvent> Classify(string type = DummyClassifier.SupportedType)
         {
             var workitem = GetWorkitem(type, resolvedOn: DateTime.UtcNow.AddDays(-2));
             var startDate = DateTime.UtcNow.AddDays(-3);

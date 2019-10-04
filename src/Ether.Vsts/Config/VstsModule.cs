@@ -26,6 +26,7 @@ namespace Ether.Vsts.Config
             builder.RegisterType<VstsDataSource>().Keyed<IDataSource>(Constants.VstsType);
             builder.RegisterType<ResolvedWorkItemsClassifier>().As<IWorkItemsClassifier>();
             builder.RegisterType<ClosedTasksWorkItemsClassifier>().As<IWorkItemsClassifier>();
+            builder.RegisterType<ReOpenedWorkitemClassifier>().As<IWorkItemsClassifier>();
 
             base.Load(builder);
         }

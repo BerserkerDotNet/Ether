@@ -42,8 +42,7 @@ namespace Ether.Tests.Classifiers
 
             var result = _classifier.Classify(new WorkItemResolutionRequest { WorkItem = workItem });
 
-            result.Should().NotBeNull();
-            result.IsNone.Should().BeTrue();
+            result.Should().BeEmpty();
         }
 
         [Test]
@@ -59,8 +58,7 @@ namespace Ether.Tests.Classifiers
 
             var result = _classifier.Classify(new WorkItemResolutionRequest { WorkItem = workItem, Team = ResolvedWorkItemsDataProvider.GetFakeTeam() });
 
-            result.Should().NotBeNull();
-            result.IsNone.Should().BeTrue();
+            result.Should().BeEmpty();
         }
 
         [Test]
@@ -74,8 +72,7 @@ namespace Ether.Tests.Classifiers
 
             var result = _classifier.Classify(new WorkItemResolutionRequest { WorkItem = workItem, Team = ResolvedWorkItemsDataProvider.GetFakeTeam() });
 
-            result.Should().NotBeNull();
-            result.IsNone.Should().BeTrue();
+            result.Should().BeEmpty();
         }
 
         [Test]
@@ -87,8 +84,7 @@ namespace Ether.Tests.Classifiers
 
             var result = _classifier.Classify(new WorkItemResolutionRequest { WorkItem = workItem, Team = ResolvedWorkItemsDataProvider.GetFakeTeam() });
 
-            result.Should().NotBeNull();
-            result.IsNone.Should().BeTrue();
+            result.Should().BeEmpty();
         }
 
         [Test]
@@ -102,8 +98,7 @@ namespace Ether.Tests.Classifiers
 
             var result = _classifier.Classify(new WorkItemResolutionRequest { WorkItem = workItem, Team = ResolvedWorkItemsDataProvider.GetFakeTeam() });
 
-            result.Should().NotBeNull();
-            result.IsNone.Should().BeTrue();
+            result.Should().BeEmpty();
         }
 
         [Test]
@@ -112,11 +107,11 @@ namespace Ether.Tests.Classifiers
         {
             var result = _classifier.Classify(request);
             result.Should().NotBeNull();
-            result.Resolution.Should().Be("Resolved");
-            result.Reason.Should().Be(expectedReason);
-            result.ResolutionDate.Should().BeCloseTo(expectedResolutionDate, precision: 1000);
-            result.MemberEmail.Should().Be(expectedTeamMember.Email);
-            result.MemberName.Should().Be(expectedTeamMember.DisplayName);
+            var resolution = result.Single();
+            resolution.Should().BeOfType<WorkItemResolvedEvent>();
+            resolution.Date.Should().BeCloseTo(expectedResolutionDate, precision: 1000);
+            resolution.AssociatedUser.Email.Should().Be(expectedTeamMember.Email);
+            resolution.AssociatedUser.Title.Should().Be(expectedTeamMember.DisplayName);
         }
     }
 }

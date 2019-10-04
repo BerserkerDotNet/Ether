@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Ether.Contracts.Types;
 using Ether.Tests.TestData;
 using Ether.ViewModels;
@@ -42,8 +43,7 @@ namespace Ether.Tests.Classifiers
 
             var result = _classifier.Classify(new WorkItemResolutionRequest { WorkItem = workItem });
 
-            result.Should().NotBeNull();
-            result.IsNone.Should().BeTrue();
+            result.Should().BeEmpty();
         }
 
         [Test]
@@ -51,8 +51,7 @@ namespace Ether.Tests.Classifiers
         public void ShouldReturnNoneResolution(WorkItemResolutionRequest request)
         {
             var result = _classifier.Classify(request);
-            result.Should().NotBeNull();
-            result.IsNone.Should().BeTrue();
+            result.Should().BeEmpty();
         }
 
         [Test]
@@ -61,11 +60,11 @@ namespace Ether.Tests.Classifiers
         {
             var result = _classifier.Classify(request);
             result.Should().NotBeNull();
-            result.Resolution.Should().Be("Closed");
-            result.Reason.Should().Be("Fixed");
-            result.ResolutionDate.Should().BeCloseTo(expectedResolutionDate, 1000);
-            result.MemberEmail.Should().Be(expectedTeamMember.Email);
-            result.MemberName.Should().Be(expectedTeamMember.DisplayName);
+            var resolution = result.Single();
+            resolution.Should().BeOfType<WorkItemClosedEvent>();
+            resolution.Date.Should().BeCloseTo(expectedResolutionDate, 1000);
+            resolution.AssociatedUser.Email.Should().Be(expectedTeamMember.Email);
+            resolution.AssociatedUser.Title.Should().Be(expectedTeamMember.DisplayName);
         }
     }
 }

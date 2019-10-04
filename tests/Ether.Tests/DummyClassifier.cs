@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
+using Ether.Contracts.Interfaces;
 using Ether.Contracts.Types;
 using Ether.ViewModels;
 using Ether.Vsts;
+using Ether.Vsts.Types;
 
 namespace Ether.Tests.Classifiers
 {
@@ -20,16 +23,37 @@ namespace Ether.Tests.Classifiers
             _requestProcessor = requestProcessor;
         }
 
-        protected override WorkItemResolution ClassifyInternal(WorkItemResolutionRequest request)
+        protected override IEnumerable<IWorkItemEvent> ClassifyInternal(WorkItemResolutionRequest request)
         {
             _requestProcessor?.Invoke(request);
 
-            return new WorkItemResolution(request.WorkItem.WorkItemId, request.WorkItem["Title"], request.WorkItem[Constants.WorkItemTypeField], _resolution, "Because", DateTime.UtcNow.AddDays(-1), string.Empty, string.Empty);
+            return new[] { new DummyWorkItemEvent(GetWorkItemWrapper(request.WorkItem), DateTime.UtcNow.AddDays(-1), new UserReference { Email = string.Empty, Title = string.Empty }) };
+        }
+
+        protected override IWorkItem GetWorkItemWrapper(WorkItemViewModel workItem)
+        {
+            return new VstsWorkItem(workItem);
         }
 
         protected override bool IsSupported(WorkItemViewModel item)
         {
             return item[Constants.WorkItemTypeField] == _type;
         }
+    }
+
+    public class DummyWorkItemEvent : IWorkItemEvent
+    {
+        public DummyWorkItemEvent(IWorkItem workItem, DateTime date, UserReference user)
+        {
+            WorkItem = workItem;
+            Date = date;
+            AssociatedUser = user;
+        }
+
+        public IWorkItem WorkItem { get; }
+
+        public DateTime Date { get; }
+
+        public UserReference AssociatedUser { get; }
     }
 }

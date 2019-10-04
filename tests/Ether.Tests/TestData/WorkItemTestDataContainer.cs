@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Ether.Contracts.Interfaces;
 using Ether.Contracts.Types;
 using Ether.ViewModels;
 
@@ -24,6 +25,6 @@ namespace Ether.Tests.TestData
 
         public WorkItemViewModel WorkItemById(int id) => _data.Single(w => w.WorkItem.WorkItemId == id).WorkItem;
 
-        public IEnumerable<WorkItemResolution> ResolutionsById(int id) => _data.Single(w => w.WorkItem.WorkItemId == id).Resolutions;
+        public IEnumerable<IWorkItemEvent> ResolutionsById(int id) => _data.Single(w => w.WorkItem.WorkItemId == id).Resolutions;
     }
 }
