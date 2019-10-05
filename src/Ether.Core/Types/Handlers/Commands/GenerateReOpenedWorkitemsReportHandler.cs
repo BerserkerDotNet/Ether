@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Autofac.Features.Indexed;
@@ -46,6 +47,7 @@ namespace Ether.Core.Types.Handlers.Commands
             var team = await GetAllTeamMembers(dataSource, profile.Members);
             var scope = new ClassificationScope(team, command.Start, command.End);
 
+            var resolvedList = new List<(string email, int id)>(workItems.Count);
             var report = new ReOpenedWorkItemsReport();
             foreach (var workItem in workItems)
             {
@@ -63,12 +65,23 @@ namespace Ether.Core.Types.Handlers.Commands
                             AssociatedUser = e.AssociatedUser
                         });
                     report.Details.AddRange(details);
+
+                    var resolvedByUser = resolutions.OfType<WorkItemResolvedEvent>().Select(e => (e.AssociatedUser.Email, e.WorkItem.Id));
+                    resolvedList.AddRange(resolvedByUser);
                 }
                 catch (Exception ex)
                 {
                     Logger.LogError(ex, "Error generating details for workitem {WorkItemId}", workItem.WorkItemId);
                 }
             }
+
+            var resolvedLookup = resolvedList
+                .Distinct()
+                .GroupBy(r => r.email)
+                .ToDictionary(k => k.Key, v => v.Count());
+
+            report.ResolvedWorkItemsLookup = resolvedLookup;
+            report.MembersLookup = team.OrderBy(t => t.DisplayName).ToDictionary(k => k.Email, v => v.DisplayName);
 
             return report;
         }

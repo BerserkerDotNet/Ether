@@ -54,7 +54,7 @@ namespace Ether.Vsts.Types.Classifiers
 
                 if (associatedUser is null)
                 {
-                    _logger.LogWarning("Could not determine associated user while classifying {WorkItem}.", wrapper.Id);
+                    _logger.LogInformation("Reopen detected for Work item '{WorkItem}' but it was resolved not by team member.", wrapper.Id);
                     continue;
                 }
 

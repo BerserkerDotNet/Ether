@@ -32,6 +32,7 @@ namespace Ether.Core.Config
                 .SingleInstance();
 
             builder.RegisterType<WorkItemClassificationContext>().As<IWorkItemClassificationContext>();
+            builder.RegisterType<CoreClassMapRegistration>().As<IClassMapRegistration>();
 
             base.Load(builder);
         }

@@ -13,5 +13,9 @@ namespace Ether.Contracts.Dto.Reports
         }
 
         public List<ReOpenedWorkItemDetail> Details { get; set; }
+
+        public Dictionary<string, int> ResolvedWorkItemsLookup { get; set; }
+
+        public Dictionary<string, string> MembersLookup { get; set; }
     }
 }

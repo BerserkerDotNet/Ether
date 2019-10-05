@@ -1,19 +1,25 @@
 ﻿<section id="ReopenedTeamStats">
     <Ether.Components.Card Title="By Member">
         <Body>
-            <DataTable Items="Report.GroupedByMember" PageSize="int.MaxValue">
+            <DataTable Items="Report.MembersLookup" PageSize="int.MaxValue">
                 <TableHeader>
                     <th>Member</th>
                     <th># of reopened bugs</th>
+                    <th># of resolved bugs</th>
+                    <th>% reopened</th>
                 </TableHeader>
-                <RowTemplate Context="detail">
-                    <td>@detail.First().AssociatedUser.Title</td>
-                    <td>@detail.Count()</td>
+                <RowTemplate Context="member">
+                    <td>@member.Value</td>
+                    <td>@Report.GetRepopenedCount(member.Key)</td>
+                    <td>@Report.GetResolvedCount(member.Key)</td>
+                    <td>@Report.GetPercentage(member.Key)</td>
                 </RowTemplate>
                 <TableFooter>
                     <tr>
                         <th class="table-active">Total:</th>
                         <td class="table-success">@Report.TotalReopened</td>
+                        <td class="table-success">@Report.TotalResolved</td>
+                        <td class="table-success">@Report.TotalPercentage</td>
                     </tr>
                 </TableFooter>
             </DataTable>
