@@ -12,7 +12,7 @@ class Build : NukeBuild
 {
     const string Ether = "Ether";
     const string Api = "Ether.Api";
-    const string EmailGenerator = "Ether.EmailGenerator";
+    const string EmailGenerator = "Ether.EmailGenerator.Service";
 
     public static int Main() => Execute<Build>(x => x.Publish);
 

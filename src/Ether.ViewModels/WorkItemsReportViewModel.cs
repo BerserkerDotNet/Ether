@@ -8,9 +8,6 @@ namespace Ether.ViewModels
     {
         public WorkItemsReportViewModel()
         {
-            ActiveWorkItems = Enumerable.Empty<WorkItemDetail>();
-            ResolvedWorkItems = Enumerable.Empty<WorkItemDetail>();
-            WorkItemsInReview = Enumerable.Empty<WorkItemDetail>();
         }
 
         public IEnumerable<WorkItemDetail> ActiveWorkItems { get; set; }
