@@ -1,6 +1,7 @@
 ﻿using Ether.ViewModels;
 using Ether.ViewModels.Types;
 using NetOffice.OutlookApi;
+using NetOffice.OutlookApi.Enums;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -28,9 +29,10 @@ namespace Ether.EmailGenerator
                 body = ApplyBodyPlaceholders(body, attendanceViewModel, report, points);
                 body = body.Replace("style=\"\"", string.Empty);
 
-                var msg = new MailItem();
+                var app = new Application();
+                var msg = app.CreateItem(OlItemType.olMailItem) as MailItem;
                 msg.Subject = subject;
-                msg.RTFBody = body;
+                msg.HTMLBody = body;
                 msg.Display();
             }
             catch (System.Exception ex)
