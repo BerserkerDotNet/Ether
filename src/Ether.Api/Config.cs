@@ -25,6 +25,15 @@ namespace Ether.Api
                     AllowedScopes = { "api", "openid" },
                     RequireClientSecret = false,
                     AccessTokenLifetime = (int)TimeSpan.FromDays(30).TotalSeconds
+                },
+                new Client
+                {
+                    ClientId = "EtherEmailGenerator",
+                    ClientSecrets = new[] { new Secret("EtherEmailGeneratorSecret".Sha256()) }, // TODO: uhh...DB
+                    AllowedGrantTypes = GrantTypes.ClientCredentials,
+                    AllowedScopes = { "api", "openid" },
+                    RequireClientSecret = true,
+                    AccessTokenLifetime = (int)TimeSpan.FromDays(1).TotalSeconds
                 }
             };
         }

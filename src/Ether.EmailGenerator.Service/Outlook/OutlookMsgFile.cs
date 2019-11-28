@@ -5,7 +5,6 @@ using System.IO.Packaging;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using Ether.EmailGenerator.Properties;
 using MarkupConverter;
 
 namespace Ether.EmailGenerator.Outlook
@@ -32,7 +31,8 @@ namespace Ether.EmailGenerator.Outlook
             }
 
             var filePath = Path.Combine(tempDir, $"{id}.msg");
-            File.WriteAllBytes(filePath, Resources.MsgTemplate);
+
+            // File.WriteAllBytes(filePath, Resources.MsgTemplate);
 
             return new OutlookMsgFile(filePath);
         }

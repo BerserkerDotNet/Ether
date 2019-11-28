@@ -1,76 +1,81 @@
-﻿using Ether.ViewModels;
-using Ether.ViewModels.Types;
-using NetOffice.OutlookApi;
-using NetOffice.OutlookApi.Enums;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
+using System.IO;
 using System.Linq;
 using System.Runtime.ExceptionServices;
 using System.Text;
+using System.Threading.Tasks;
+using Ether.EmailGenerator.Outlook;
+using Google.Protobuf;
+using Grpc.Core;
+using Microsoft.Extensions.Logging;
 
 namespace Ether.EmailGenerator
 {
-    public class EmailGeneratorService
+    public class EmailGeneratorService : EmailGenerator.EmailGeneratorBase
     {
-        private string _instanceName;
+        private readonly ILogger<EmailGeneratorService> _logger;
 
-        public EmailGeneratorService()
+        public EmailGeneratorService(ILogger<EmailGeneratorService> logger)
         {
-            _instanceName = ConfigurationManager.AppSettings.Get("InstanceName");
+            _logger = logger;
         }
 
-        public void Generate(IEnumerable<TeamAttendanceViewModel> attendanceViewModel, WorkItemsReportViewModel report, ProfileViewModel profile, string points)
+        // TODO: Async?
+        public override Task<EmailReply> Generate(EmailRequest request, ServerCallContext context)
         {
+            _logger.LogInformation("Generating report for {Id}", request.Id);
+
             try
             {
-                var subject = ApplyCommonPlaceholders(profile.EmailSubject, profile);
-                var body = ApplyCommonPlaceholders(profile.EmailBody, profile);
-                body = ApplyBodyPlaceholders(body, attendanceViewModel, report, points);
+                var subject = ApplyCommonPlaceholders(request.Template.Subject, request);
+                var body = ApplyCommonPlaceholders(request.Template.Body, request);
+                body = ApplyBodyPlaceholders(body, request);
                 body = body.Replace("style=\"\"", string.Empty);
 
-                var app = new Application();
-                var msg = app.CreateItem(OlItemType.olMailItem) as MailItem;
-                msg.Subject = subject;
-                msg.HTMLBody = body;
-                msg.Display();
+                var msg = OutlookMsgFile.New(request.Id);
+                msg.SetSubjectAndBody(subject, body);
+                var bytes = File.ReadAllBytes(msg.FilePath);
+
+                return Task.FromResult(new EmailReply { File = ByteString.CopyFrom(bytes) });
             }
             catch (System.Exception ex)
             {
+                _logger.LogError(ex, "Error while generating report.");
                 ExceptionDispatchInfo.Capture(ex).Throw();
                 throw;
             }
         }
 
-        private string ApplyCommonPlaceholders(string value, ProfileViewModel profile)
+        private string ApplyCommonPlaceholders(string value, EmailRequest request)
         {
             return value
-                .Replace("{Profile}", profile.Name)
+                .Replace("{Profile}", request.Name)
                 .Replace("{Date}", DateTime.Now.ToString("d"));
         }
 
-        private string ApplyBodyPlaceholders(string value, IEnumerable<TeamAttendanceViewModel> teamAttendance, WorkItemsReportViewModel report, string pointsString)
+        private string ApplyBodyPlaceholders(string value, EmailRequest request)
         {
-            var resolvedTable = CreateTable(report.ResolvedWorkItems, "#70AD47");
-            var codeReviewTable = CreateTable(report.WorkItemsInReview, "#FFC000");
-            var activeTable = CreateTable(report.ActiveWorkItems, "#5B9BD5");
-            var points = CreatePoints(pointsString);
-            var createTeam = CreateTeamTable(teamAttendance);
-            var teamCount = GetTeamCount(teamAttendance);
+            var resolvedTable = CreateTable(request.Report.Completed, "#70AD47");
+            var codeReviewTable = CreateTable(request.Report.Inreview, "#FFC000");
+            var activeTable = CreateTable(request.Report.Active, "#5B9BD5");
+            var points = CreatePoints(request.Points);
+            var createTeam = CreateTeamTable(request.Attendance);
+            var teamCount = GetTeamCount(request.Attendance);
 
             return value
                  .Replace("{ResolvedItems}", resolvedTable)
                  .Replace("{InReviewItems}", codeReviewTable)
                  .Replace("{ActiveItems}", activeTable)
-                 .Replace("{ResolvedCount}", report.ResolvedWorkItems.Count().ToString())
-                 .Replace("{InReviewCount}", report.WorkItemsInReview.Count().ToString())
-                 .Replace("{ActiveCount}", report.ActiveWorkItems.Count().ToString())
+                 .Replace("{ResolvedCount}", request.Report.Completed.Count.ToString())
+                 .Replace("{InReviewCount}", request.Report.Inreview.Count.ToString())
+                 .Replace("{ActiveCount}", request.Report.Active.Count.ToString())
                  .Replace("{TeamCount}", teamCount.ToString())
                  .Replace("{Points}", points)
                 .Replace("{Team}", createTeam);
         }
 
-        private string CreateTable(IEnumerable<WorkItemDetail> items, string color)
+        private string CreateTable(IEnumerable<WorkItem> items, string color)
         {
             var table = new StringBuilder();
             table.Append($"<table style=\"border: 1px solid {color};border-collapse: collapse;\">");
@@ -87,11 +92,11 @@ namespace Ether.EmailGenerator
             foreach (var item in items)
             {
                 table.Append($"<tr>");
-                table.Append($"<td style=\"border: solid {color} 1.0pt;border-right: none;margin-left:5pt;margin-right:5pt;\"><a href=\"{GetWorkItemUrl(item)}\">{item.WorkItemId}</a></td>");
-                table.Append($"<td style=\"border: solid {color} 1.0pt;border-right: none;margin-left:5pt;margin-right:5pt;\">{item.WorkItemTitle}</td>");
-                table.Append($"<td style=\"border: solid {color} 1.0pt;border-right: none;margin-left:5pt;margin-right:5pt;\">{item.WorkItemType}</td>");
-                table.Append($"<td style=\"border: solid {color} 1.0pt;border-right: none;margin-left:5pt;margin-right:5pt;\">{item.EstimatedToComplete}</td>");
-                table.Append($"<td style=\"border: solid {color} 1.0pt;margin-left:5pt;margin-right:5pt;\">{item.TimeSpent}</td>");
+                table.Append($"<td style=\"border: solid {color} 1.0pt;border-right: none;margin-left:5pt;margin-right:5pt;\"><a href=\"{item.Url}\">{item.Id}</a></td>");
+                table.Append($"<td style=\"border: solid {color} 1.0pt;border-right: none;margin-left:5pt;margin-right:5pt;\">{item.Title}</td>");
+                table.Append($"<td style=\"border: solid {color} 1.0pt;border-right: none;margin-left:5pt;margin-right:5pt;\">{item.Type}</td>");
+                table.Append($"<td style=\"border: solid {color} 1.0pt;border-right: none;margin-left:5pt;margin-right:5pt;\">{item.Estimated}</td>");
+                table.Append($"<td style=\"border: solid {color} 1.0pt;margin-left:5pt;margin-right:5pt;\">{item.Spent}</td>");
                 table.Append("</tr>");
             }
 
@@ -101,7 +106,7 @@ namespace Ether.EmailGenerator
             return table.ToString();
         }
 
-        private string CreateTeamTable(IEnumerable<TeamAttendanceViewModel> attendance)
+        private string CreateTeamTable(IEnumerable<TeamAttendance> attendance)
         {
             var table = new StringBuilder();
             table.Append("<table>");
@@ -121,7 +126,7 @@ namespace Ether.EmailGenerator
             foreach (var memberAttendance in attendance)
             {
                 table.Append("<tr>");
-                table.Append($"<td style=\"border: 1px solid black;\">{memberAttendance.MemberName}</td>");
+                table.Append($"<td style=\"border: 1px solid black;\">{memberAttendance.Name}</td>");
                 table.Append($"<td style=\"background:{GetColor(memberAttendance.Attendance[0])}; border: 1px solid black;width: 60pt;\">{(memberAttendance.Attendance[0] ? "V" : "OOF")}</td>");
                 table.Append($"<td style=\"background:{GetColor(memberAttendance.Attendance[1])}; border: 1px solid black;width: 60pt;\">{(memberAttendance.Attendance[1] ? "V" : "OOF")}</td>");
                 table.Append($"<td style=\"background:{GetColor(memberAttendance.Attendance[2])}; border: 1px solid black;width: 60pt;\">{(memberAttendance.Attendance[2] ? "V" : "OOF")}</td>");
@@ -139,7 +144,7 @@ namespace Ether.EmailGenerator
             return table.ToString();
         }
 
-        private int GetTeamCount(IEnumerable<TeamAttendanceViewModel> attendance)
+        private int GetTeamCount(IEnumerable<TeamAttendance> attendance)
         {
             return (int)Math.Round(attendance.Sum(t => t.Attendance.Count(a => a)) / 5.0d, MidpointRounding.AwayFromZero);
         }
@@ -161,12 +166,6 @@ namespace Ether.EmailGenerator
             sb.Append("</ul>");
 
             return sb.ToString();
-        }
-
-        // TODO: This should be returned by API
-        private string GetWorkItemUrl(WorkItemDetail item)
-        {
-            return $"https://{_instanceName}.visualstudio.com/{item.WorkItemProject}/_workitems/edit/{item.WorkItemId}";
         }
     }
 }

@@ -88,7 +88,7 @@ else
             reportDisplayName = "Workitems report";
             report = await Client.GetById<WorkItemsReportViewModel>(Id.Value);
             supportsExcel = true;
-            supportsEmail = false;
+            supportsEmail = true;
             componentToRender = b => RenderComponent<Ether.Components.Reports.WorkitemsReport>(b);
         }
         else if (string.Equals(Type, "ReOpenedWorkitemsReporter", StringComparison.OrdinalIgnoreCase))

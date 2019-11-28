@@ -13,6 +13,7 @@ using Ether.Vsts.Dto;
 using Ether.Vsts.Types;
 using FizzWare.NBuilder;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using static Ether.Vsts.Constants;
@@ -734,7 +735,7 @@ namespace Ether.Tests.DataSources
 
         protected override void Initialize()
         {
-            _dataSource = new VstsDataSource(RepositoryMock.Object, Mapper);
+            _dataSource = new VstsDataSource(RepositoryMock.Object, Mapper, Mock.Of<ILogger<VstsDataSource>>());
         }
 
         private void SetupGetFieldValue<TType, TProjection>(Guid id, TProjection value)

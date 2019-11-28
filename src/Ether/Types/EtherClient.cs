@@ -40,13 +40,15 @@ namespace Ether.Types
 
         private readonly HttpClient _httpClient;
         private readonly NavigationManager _navigation;
+        private readonly JsUtils _jsUtils;
         private readonly ILogger<EtherClient> _logger;
 
-        public EtherClient(HttpClient httpClient, NavigationManager navigation, ILogger<EtherClient> logger)
+        public EtherClient(HttpClient httpClient, NavigationManager navigation, JsUtils jsUtils, ILogger<EtherClient> logger)
         {
             WebAssemblyHttpMessageHandler.DefaultCredentials = FetchCredentialsOption.Include;
             _httpClient = httpClient;
             _navigation = navigation;
+            _jsUtils = jsUtils;
             _logger = logger;
             httpClient.BaseAddress = GetApiUrl();
         }
@@ -228,7 +230,9 @@ namespace Ether.Types
             }
             else if (!response.IsSuccessStatusCode)
             {
-                throw new Exception($"{response.StatusCode} {response.ReasonPhrase}");
+                var message = $"{response.StatusCode} {response.ReasonPhrase}";
+                _jsUtils.NotifyError("Server responded with error", message);
+                throw new Exception(message);
             }
         }
 

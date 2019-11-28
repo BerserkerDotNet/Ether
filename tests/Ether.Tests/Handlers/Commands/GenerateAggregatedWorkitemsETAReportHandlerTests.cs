@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Castle.Core.Logging;
 using Ether.Contracts.Dto;
 using Ether.Contracts.Dto.Reports;
 using Ether.Contracts.Interfaces;
@@ -15,6 +16,7 @@ using Ether.Vsts;
 using Ether.Vsts.Types;
 using FizzWare.NBuilder;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using static Ether.Tests.TestData.WorkItemsFactory;
@@ -274,7 +276,7 @@ namespace Ether.Tests.Handlers.Commands
 
         protected override GenerateAggregatedWorkitemsETAReportHandler InitializeHandler()
         {
-            var realDataSource = new VstsDataSource(RepositoryMock.Object, Mapper);
+            var realDataSource = new VstsDataSource(RepositoryMock.Object, Mapper, Mock.Of<ILogger<VstsDataSource>>());
 
             DataSourceMock.Setup(d => d.GetActiveDuration(It.IsAny<WorkItemViewModel>(), It.IsAny<IEnumerable<TeamMemberViewModel>>()))
                 .Returns<WorkItemViewModel, IEnumerable<TeamMemberViewModel>>((w, t) => realDataSource.GetActiveDuration(w, t));
