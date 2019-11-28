@@ -22,7 +22,7 @@ namespace Ether.Vsts.Types.Classifiers
             var wrapper = GetWorkItemWrapper(request.WorkItem);
             var updates = wrapper.Updates;
 
-            var reOpens = updates.Where(u => (IsResolved(u.State.Old) || IsClosed(u.State.Old)) && !IsClosed(u.State.New));
+            var reOpens = updates.Where(u => (IsResolved(u.State.Old) || IsClosed(u.State.Old)) && (IsActive(u.State.New) || IsNew(u.State.New)));
             foreach (var reOpen in reOpens)
             {
                 // TODO: Consider using update id instead of relying on reference equality
@@ -90,12 +90,12 @@ namespace Ether.Vsts.Types.Classifiers
 
         private bool IsActive(string state)
         {
-            return IsStateEqual(state, Constants.WorkItemStateResolved);
+            return IsStateEqual(state, Constants.WorkItemStateActive);
         }
 
         private bool IsNew(string state)
         {
-            return IsStateEqual(state, Constants.WorkItemStateResolved);
+            return IsStateEqual(state, Constants.WorkItemStateNew);
         }
 
         private bool IsStateEqual(string state, string expectedState)

@@ -160,6 +160,26 @@ namespace Ether.Tests.Classifiers
         }
 
         [Test]
+        public void ClosedToResolvedTest()
+        {
+            var joe = SetupMembers("Joe", "Foo");
+            var mary = SetupMembers("Mary", "Foo");
+            var bug = SetupBug(updatesConfig =>
+            {
+                updatesConfig.New()
+                    .Then().Activated()
+                    .Then().AssignedTo(mary)
+                    .Then().Resolved(mary)
+                    .Then().Closed(joe)
+                    .Then().Resolved(mary, from: "Closed")
+                    .Then().AssignedTo(joe);
+            });
+
+            var events = Run(bug, joe, mary);
+            events.Should().HaveCount(0);
+        }
+
+        [Test]
         public void AssignedToDidNotChangeOnResolve()
         {
             var expectedReopenDateJoe = DateTime.UtcNow.AddDays(5);

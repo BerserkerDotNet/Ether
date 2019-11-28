@@ -12,6 +12,7 @@ using Ether.ViewModels;
 using Ether.ViewModels.Types;
 using Ether.Vsts.Dto;
 using Ether.Vsts.Interfaces;
+using Microsoft.Extensions.Logging;
 using static Ether.Vsts.Constants;
 
 namespace Ether.Vsts.Types
@@ -27,12 +28,14 @@ namespace Ether.Vsts.Types
 
         private readonly IRepository _repository;
         private readonly IMapper _mapper;
+        private readonly ILogger<VstsDataSource> _logger;
         private Lazy<VstsDataSourceSettings> _vstsConfigCache;
 
-        public VstsDataSource(IRepository repository, IMapper mapper)
+        public VstsDataSource(IRepository repository, IMapper mapper, ILogger<VstsDataSource> logger)
         {
             _repository = repository;
             _mapper = mapper;
+            _logger = logger;
             _vstsConfigCache = new Lazy<VstsDataSourceSettings>(() => repository.GetSingle<VstsDataSourceSettings>(_ => true));
         }
 
@@ -307,11 +310,30 @@ namespace Ether.Vsts.Types
 
         private IEnumerable<int> GetPullRequestIds(WorkItemViewModel workItem)
         {
-            return workItem.Relations?
+            var ids = workItem.Relations?
                 .Where(r => string.Equals(r.RelationType, ArtifactLink, StringComparison.OrdinalIgnoreCase) && r.Url.LocalPath.Contains(PullRequestId))
                 .Select(r => r.Url.LocalPath.Substring(r.Url.LocalPath.LastIndexOf(ForwardSlash) + 1))
-                .Select(id => int.Parse(id))
                 .ToArray();
+
+            if (ids is null)
+            {
+                return Enumerable.Empty<int>();
+            }
+
+            var convertedIds = new List<int>(ids.Count());
+            foreach (var idString in ids)
+            {
+                if (int.TryParse(idString, out var id))
+                {
+                    convertedIds.Add(id);
+                }
+                else
+                {
+                    _logger.LogError("Error parsing pull request for work item {WorkItemId}; String to parse: {StringToParse}", workItem.WorkItemId, idString);
+                }
+            }
+
+            return convertedIds;
         }
 
         private (float eta, float spent) GetEtaMetric(WorkItemViewModel workItem, IEnumerable<TeamMemberViewModel> team, bool allowZeroEstimate = false)
