@@ -648,6 +648,22 @@ namespace Ether.Tests.DataSources
         }
 
         [Test]
+        public void ShouldSetReasonFeild()
+        {
+            const string expected = "testReason";
+
+            var vm = Builder<WorkItemViewModel>.CreateNew()
+                .With(v => v.Fields, new Dictionary<string, string>())
+                .With(v => v.Updates, Enumerable.Empty<WorkItemUpdateViewModel>())
+                .With(v => v.Fields[Constants.WorkItemReasonField] = expected)
+                .Build();
+
+            var result = _dataSource.CreateWorkItemDetail(vm, Enumerable.Empty<TeamMemberViewModel>());
+
+            result.Reason.Should().Be(expected);
+        }
+
+        [Test]
         public void ShouldNotOverrideRemainingWithOrginalIfRemainingNotNull()
         {
             const float expectedOriginal = 3.45F;
