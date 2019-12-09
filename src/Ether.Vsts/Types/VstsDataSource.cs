@@ -217,8 +217,7 @@ namespace Ether.Vsts.Types
                 Tags = item.Updates.LastOrDefault(u => !string.IsNullOrWhiteSpace(u[WorkItemTagsField].NewValue))?[WorkItemTagsField]?.NewValue,
                 OriginalEstimate = etaValues.OriginalEstimate,
                 EstimatedToComplete = estimatedToComplete,
-                TimeSpent = timeSpent,
-                Reason = item[WorkItemReasonField]
+                TimeSpent = timeSpent
             };
         }
 

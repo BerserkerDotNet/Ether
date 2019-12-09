@@ -17,7 +17,5 @@
         public float EstimatedToComplete { get; set; }
 
         public float TimeSpent { get; set; }
-
-        public string Reason { get; set; }
     }
 }
