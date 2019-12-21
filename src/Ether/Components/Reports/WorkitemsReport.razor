@@ -106,6 +106,7 @@
         vstsConfiguration = await Client.GetVstsDataSourceConfig();
     }
 
+    // HACK: Presentetional component should not query services
     protected string GetWorkItemUrl(string project, int workItemId)
     {
         return $"https://{vstsConfiguration.InstanceName}.visualstudio.com/{project}/_workitems/edit/{workItemId}";

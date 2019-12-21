@@ -1,4 +1,6 @@
-﻿<section id="ReopenedTeamStats">
+﻿@inject EtherClient Client
+
+<section id="ReopenedTeamStats">
     <Ether.Components.Card Title="By Member">
         <Body>
             <DataTable Items="Report.MembersLookup" PageSize="int.MaxValue">
@@ -6,20 +8,17 @@
                     <th>Member</th>
                     <th># of reopened bugs</th>
                     <th># of resolved bugs</th>
-                    <th>% reopened</th>
                 </TableHeader>
                 <RowTemplate Context="member">
                     <td>@member.Value</td>
                     <td>@Report.GetRepopenedCount(member.Key)</td>
                     <td>@Report.GetResolvedCount(member.Key)</td>
-                    <td>@Report.GetPercentage(member.Key)</td>
                 </RowTemplate>
                 <TableFooter>
                     <tr>
                         <th class="table-active">Total:</th>
                         <td class="table-success">@Report.TotalReopened</td>
                         <td class="table-success">@Report.TotalResolved</td>
-                        <td class="table-success">@Report.TotalPercentage</td>
                     </tr>
                 </TableFooter>
             </DataTable>
@@ -38,7 +37,7 @@
                     <th>User</th>
                 </TableHeader>
                 <RowTemplate Context="detail">
-                    <td><a href="" target="_blank">@detail.WorkItemId</a></td>
+                    <td><a href="@GetWorkItemUrl(detail.WorkItemProject, detail.WorkItemId)" target="_blank">@detail.WorkItemId</a></td>
                     <td>@detail.WorkItemTitle</td>
                     <td>@detail.WorkItemType</td>
                     <td>@detail.ReOpenedDate</td>
@@ -56,7 +55,21 @@
 </section>
 
 @code {
+
+    private VstsDataSourceViewModel vstsConfiguration = new VstsDataSourceViewModel();
+
     [Parameter] public Guid Id { get; set; }
 
     [Parameter] public ReOpenedWorkItemsReportViewModel Report { get; set; }
+
+    protected string GetWorkItemUrl(string project, int workItemId)
+    {
+        return $"https://{vstsConfiguration.InstanceName}.visualstudio.com/{project}/_workitems/edit/{workItemId}";
+    }
+    
+    // HACK: Presentetional component should not query services
+    protected override async Task OnInitializedAsync()
+    {
+        vstsConfiguration = await Client.GetVstsDataSourceConfig();
+    }
 }

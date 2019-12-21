@@ -73,6 +73,7 @@ window.BlazorComponents.DateRangePicker = {
     init: function (element, blazorComponent) {
         var start = moment().subtract(6, 'days').format('MM/DD/YYYY');
         var end = moment().format('MM/DD/YYYY');
+        console.log(moment());
         $(element).daterangepicker({
             "autoApply": true,
             ranges: {
@@ -86,7 +87,7 @@ window.BlazorComponents.DateRangePicker = {
             "startDate": start,
             "endDate": end,
             "minDate": moment().subtract(6, 'month'),
-            "maxDate": moment().add(10, 'days'),
+            "maxDate": moment(),
             "opens": "right"
         })
         .on('apply.daterangepicker', function (ev, picker) {
