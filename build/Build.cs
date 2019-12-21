@@ -12,7 +12,6 @@ class Build : NukeBuild
 {
     const string Ether = "Ether";
     const string Api = "Ether.Api";
-    const string EmailGenerator = "Ether.EmailGenerator.Service";
 
     public static int Main() => Execute<Build>(x => x.Publish);
 
@@ -62,7 +61,6 @@ class Build : NukeBuild
     Target Publish => _ => _
         .DependsOn(PublishClient)
         .DependsOn(PublishApi)
-        .DependsOn(PublishEmailGenerator)
         .Executes();
 
     Target PublishClient => _ => _
@@ -83,15 +81,5 @@ class Build : NukeBuild
                 .SetProject(Solution.GetProject(Api))
                 .SetConfiguration(Configuration)
                 .SetOutput(ArtifactsDirectory / Api));
-        });
-
-    Target PublishEmailGenerator => _ => _
-        .DependsOn(Test)
-        .Executes(() =>
-        {
-            DotNetPublish(s => s
-                .SetProject(Solution.GetProject(EmailGenerator))
-                .SetConfiguration(Configuration)
-                .SetOutput(ArtifactsDirectory / EmailGenerator));
         });
 }

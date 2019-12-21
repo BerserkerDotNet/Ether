@@ -21,8 +21,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ether.Core", "src\Ether.Cor
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ether.ViewModels", "src\Ether.ViewModels\Ether.ViewModels.csproj", "{16B24C64-9C2C-4676-8F52-48DD7DBBF392}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ether.EmailGenerator.Service", "src\Ether.EmailGenerator.Service\Ether.EmailGenerator.Service.csproj", "{568E5103-8884-4AE2-8ADB-E93CED473510}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "protos", "protos", "{AC1B8896-3C45-47B9-828C-B5966C475699}"
 	ProjectSection(SolutionItems) = preProject
 		protos\emailgenerator.proto = protos\emailgenerator.proto
@@ -32,7 +30,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "_build", "build\_build.cspr
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{A0E61D44-CD96-4749-A6AB-D4C214E25D74}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ether.EmailGenerator", "src\Ether.EmailGenerator\Ether.EmailGenerator.csproj", "{DA8917CA-0561-4329-B169-A2243DF252B9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ether.EmailGenerator", "src\Ether.EmailGenerator\Ether.EmailGenerator.csproj", "{DA8917CA-0561-4329-B169-A2243DF252B9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -68,10 +66,6 @@ Global
 		{16B24C64-9C2C-4676-8F52-48DD7DBBF392}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{16B24C64-9C2C-4676-8F52-48DD7DBBF392}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{16B24C64-9C2C-4676-8F52-48DD7DBBF392}.Release|Any CPU.Build.0 = Release|Any CPU
-		{568E5103-8884-4AE2-8ADB-E93CED473510}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{568E5103-8884-4AE2-8ADB-E93CED473510}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{568E5103-8884-4AE2-8ADB-E93CED473510}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{568E5103-8884-4AE2-8ADB-E93CED473510}.Release|Any CPU.Build.0 = Release|Any CPU
 		{77E83945-2095-4198-8FBC-886F11FEF777}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{77E83945-2095-4198-8FBC-886F11FEF777}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DA8917CA-0561-4329-B169-A2243DF252B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -90,7 +84,6 @@ Global
 		{CD0EC4BA-EC1A-4AF8-925B-7F82BF930E59} = {F921274A-98FC-4B8E-A143-48928AAD3326}
 		{A098D6D2-6CC9-4B64-9CA6-2CBB541CA619} = {0FC6D5B9-FF3D-43E7-9B4D-31B071286D15}
 		{16B24C64-9C2C-4676-8F52-48DD7DBBF392} = {0FC6D5B9-FF3D-43E7-9B4D-31B071286D15}
-		{568E5103-8884-4AE2-8ADB-E93CED473510} = {0FC6D5B9-FF3D-43E7-9B4D-31B071286D15}
 		{77E83945-2095-4198-8FBC-886F11FEF777} = {A0E61D44-CD96-4749-A6AB-D4C214E25D74}
 		{DA8917CA-0561-4329-B169-A2243DF252B9} = {0FC6D5B9-FF3D-43E7-9B4D-31B071286D15}
 	EndGlobalSection
