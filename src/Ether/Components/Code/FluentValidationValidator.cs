@@ -7,7 +7,8 @@ namespace Ether.Components.Code
 {
     public class FluentValidationValidator : ComponentBase
     {
-        [CascadingParameter] EditContext CurrentEditContext { get; set; }
+        [CascadingParameter]
+        private EditContext CurrentEditContext { get; set; }
 
         protected override void OnInitialized()
         {

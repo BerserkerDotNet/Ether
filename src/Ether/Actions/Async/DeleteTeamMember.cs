@@ -17,6 +17,7 @@ namespace Ether.Actions.Async
         public async Task Execute(IDispatcher dispatcher, TeamMemberViewModel member)
         {
             await _client.Delete<TeamMemberViewModel>(member.Id);
+
             // TODO: instead of refresh delete?
             await dispatcher.Dispatch<FetchMembers>();
         }

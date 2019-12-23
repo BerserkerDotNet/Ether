@@ -26,7 +26,6 @@ namespace Ether.Components.Reports
         public Dictionary<string, string> ReportTypes { get; set; }
 
         public EventCallback<GenerateReportViewModel> OnGenerate { get; set; }
-
     }
 
     public class GenerateReportFormConnected

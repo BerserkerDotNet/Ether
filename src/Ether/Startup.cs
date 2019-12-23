@@ -1,10 +1,9 @@
-//using Blazor.Extensions.Logging;
-using Blazor.Extensions.Storage;
+// using Blazor.Extensions.Logging;
 using BlazorBootstrap.Modal;
 using BlazorState.Redux.Extensions;
-using BlazorState.Redux.Storage;
 using Ether.Actions.Async;
 using Ether.Reducers;
+using Ether.Storage;
 using Ether.Types;
 using Ether.Types.EditableTable;
 using Ether.Types.State;
@@ -23,7 +22,7 @@ namespace Ether
             services.AddSingleton<ModelValidationService>();
             services.AddSingleton<TokenService>();
             services.AddSingleton<JsUtils>();
-            services.AddSingleton<LocalStorage>();
+            services.AddSingleton<ILocalStorage, LocalStorage>();
 
             // State
             services.AddReduxStore<RootState>(cfg =>
@@ -47,10 +46,10 @@ namespace Ether
             services.AddSingleton<NoOpEditableTableDataProvider>();
             services.AddBootstrapModal();
 
-            //services.AddLogging(builder => builder
-            //    .AddBrowserConsole()
-            //    .SetMinimumLevel(LogLevel.Trace)
-            //);
+            /*services.AddLogging(builder => builder
+                .AddBrowserConsole()
+                .SetMinimumLevel(LogLevel.Trace)
+            );*/
         }
 
         public void Configure(IComponentsApplicationBuilder app)

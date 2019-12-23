@@ -17,6 +17,7 @@ namespace Ether.Actions.Async
         public async Task Execute(IDispatcher dispatcher, ProfileViewModel profile)
         {
             await _client.Save(profile);
+
             // TODO: instead of refresh insert?
             await dispatcher.Dispatch<FetchProfiles>();
         }

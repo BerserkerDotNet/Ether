@@ -8,7 +8,8 @@ namespace Ether.Components.Code
 {
     public class SelectInput<T> : InputSelect<T>
     {
-        [Parameter] public Dictionary<T, string> Options { get; set; }
+        [Parameter]
+        public Dictionary<T, string> Options { get; set; }
 
         protected override void BuildRenderTree(RenderTreeBuilder builder)
         {

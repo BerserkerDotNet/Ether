@@ -1,5 +1,5 @@
-﻿using Ether.Actions;
-using BlazorState.Redux.Interfaces;
+﻿using BlazorState.Redux.Interfaces;
+using Ether.Actions;
 using Ether.Types.State;
 
 namespace Ether.Reducers

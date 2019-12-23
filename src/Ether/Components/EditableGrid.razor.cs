@@ -13,9 +13,6 @@ namespace Ether.Components
     {
         private static readonly Func<TItem> TCreator = Expression.Lambda<Func<TItem>>(Expression.New(typeof(TItem).GetConstructor(Type.EmptyTypes))).Compile();
 
-        [Inject]
-        protected JsUtils JsUtils { get; set; }
-
         [Parameter]
         public IEnumerable<TItem> Items { get; set; }
 
@@ -60,6 +57,9 @@ namespace Ether.Components
         protected bool IsEditing => EditingItem != null;
 
         protected bool IsLoading => Items == null;
+
+        [Inject]
+        protected JsUtils JsUtils { get; set; }
 
         protected bool IsSaving { get; set; }
 

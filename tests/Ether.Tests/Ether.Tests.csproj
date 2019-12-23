@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <IsTestProject>true</IsTestProject>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
@@ -33,12 +33,12 @@
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="8.0.0" />
     <PackageReference Include="ExpectedObjects" Version="2.3.4" />
-    <PackageReference Include="FluentAssertions" Version="5.6.0" />
-    <PackageReference Include="Moq" Version="4.13.0" />
-    <PackageReference Include="NBuilder" Version="6.0.1" />
+    <PackageReference Include="FluentAssertions" Version="5.9.0" />
+    <PackageReference Include="Moq" Version="4.13.1" />
+    <PackageReference Include="NBuilder" Version="6.1.0" />
     <PackageReference Include="nunit" Version="3.12.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.15.1" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.3.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.4.0" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>

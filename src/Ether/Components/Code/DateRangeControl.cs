@@ -21,25 +21,35 @@ namespace Ether.Components.Code
         [Inject]
         public JsUtils Js { get; set; }
 
-        [CascadingParameter] public EditContext EditContext { get; set; }
+        [CascadingParameter]
+        public EditContext EditContext { get; set; }
 
-        [Parameter(CaptureUnmatchedValues = true)] public IReadOnlyDictionary<string, object> AdditionalAttributes { get; set; }
+        [Parameter(CaptureUnmatchedValues = true)]
+        public IReadOnlyDictionary<string, object> AdditionalAttributes { get; set; }
 
-        [Parameter] public string Id { get; set; }
+        [Parameter]
+        public string Id { get; set; }
 
-        [Parameter] public string Class { get; set; }
+        [Parameter]
+        public string Class { get; set; }
 
-        [Parameter] public DateTime Start { get; set; }
+        [Parameter]
+        public DateTime Start { get; set; }
 
-        [Parameter] public EventCallback<DateTime> StartChanged { get; set; }
+        [Parameter]
+        public EventCallback<DateTime> StartChanged { get; set; }
 
-        [Parameter] public Expression<Func<DateTime>> StartExpression { get; set; }
+        [Parameter]
+        public Expression<Func<DateTime>> StartExpression { get; set; }
 
-        [Parameter] public DateTime End { get; set; }
+        [Parameter]
+        public DateTime End { get; set; }
 
-        [Parameter] public EventCallback<DateTime> EndChanged { get; set; }
+        [Parameter]
+        public EventCallback<DateTime> EndChanged { get; set; }
 
-        [Parameter] public Expression<Func<DateTime>> EndExpression { get; set; }
+        [Parameter]
+        public Expression<Func<DateTime>> EndExpression { get; set; }
 
         protected string FieldClass
         {

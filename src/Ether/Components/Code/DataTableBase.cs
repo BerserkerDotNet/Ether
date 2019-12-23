@@ -22,20 +22,47 @@ namespace Ether.Components.Code
         [Parameter]
         public int TotalPages { get; set; }
 
-        [Parameter] public RenderFragment TableHeader { get; set; }
-        [Parameter] public RenderFragment<TItem> RowTemplate { get; set; }
-        [Parameter] public RenderFragment<TItem> RowDetailTemplate { get; set; }
-        [Parameter] public RenderFragment<TItem> ActionsTemplate { get; set; }
-        [Parameter] public RenderFragment TableFooter { get; set; }
-        [Parameter] public RenderFragment<DataTableBase<TItem>> FilterTemplate { get; set; }
-        [Parameter] public IEnumerable<TItem> Items { get; set; }
-        [Parameter] public bool IsServerPaging { get; set; }
-        [Parameter] public int PageSize { get; set; } = 10;
-        [Parameter] public string NoItemsText { get; set; }
-        [Parameter] public Func<TItem, string> RowClass { get; set; }
-        [Parameter] public OrderByConfiguration<TItem>[] OrderBy { get; set; }
-        [Parameter] public EventCallback OnNextPage { get; set; }
-        [Parameter] public EventCallback OnPreviousPage { get; set; }
+        [Parameter]
+        public RenderFragment TableHeader { get; set; }
+
+        [Parameter]
+        public RenderFragment<TItem> RowTemplate { get; set; }
+
+        [Parameter]
+        public RenderFragment<TItem> RowDetailTemplate { get; set; }
+
+        [Parameter]
+        public RenderFragment<TItem> ActionsTemplate { get; set; }
+
+        [Parameter]
+        public RenderFragment TableFooter { get; set; }
+
+        [Parameter]
+        public RenderFragment<DataTableBase<TItem>> FilterTemplate { get; set; }
+
+        [Parameter]
+        public IEnumerable<TItem> Items { get; set; }
+
+        [Parameter]
+        public bool IsServerPaging { get; set; }
+
+        [Parameter]
+        public int PageSize { get; set; } = 10;
+
+        [Parameter]
+        public string NoItemsText { get; set; }
+
+        [Parameter]
+        public Func<TItem, string> RowClass { get; set; }
+
+        [Parameter]
+        public OrderByConfiguration<TItem>[] OrderBy { get; set; }
+
+        [Parameter]
+        public EventCallback OnNextPage { get; set; }
+
+        [Parameter]
+        public EventCallback OnPreviousPage { get; set; }
 
         public void Filter(Func<TItem, bool> predicate)
         {

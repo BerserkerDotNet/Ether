@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using BlazorState.Redux.Interfaces;
 using Ether.Actions;
 using Ether.Actions.Async;
-using BlazorState.Redux.Interfaces;
 using Ether.Types.State;
 using Ether.ViewModels;
 using Microsoft.AspNetCore.Components;

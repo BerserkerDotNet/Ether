@@ -17,6 +17,7 @@ namespace Ether.Actions.Async
         public async Task Execute(IDispatcher dispatcher, IdentityViewModel identity)
         {
             await _client.Delete<IdentityViewModel>(identity.Id);
+
             // TODO: instead of refresh delete?
             await dispatcher.Dispatch<FetchIdentities>();
         }

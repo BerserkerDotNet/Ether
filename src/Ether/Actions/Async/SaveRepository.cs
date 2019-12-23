@@ -17,6 +17,7 @@ namespace Ether.Actions.Async
         public async Task Execute(IDispatcher dispatcher, VstsRepositoryViewModel repository)
         {
             await _client.Save(repository);
+
             // TODO: instead of refresh insert?
             await dispatcher.Dispatch<FetchRepositories>();
         }

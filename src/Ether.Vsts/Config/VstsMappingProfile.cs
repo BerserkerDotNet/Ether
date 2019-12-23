@@ -41,6 +41,10 @@ namespace Ether.Vsts.Config
 
             CreateMap<Project, ProjectInfo>()
                 .ForMember(r => r.Identity, o => o.Ignore());
+
+            CreateMap<Repository, VstsRepositoryViewModel>();
+
+            CreateMap<PullRequest, PullRequestViewModel>();
         }
     }
 }

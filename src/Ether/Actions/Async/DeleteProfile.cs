@@ -19,6 +19,7 @@ namespace Ether.Actions.Async
         public async Task Execute(IDispatcher dispatcher, ProfileViewModel profile)
         {
             await _client.Delete<ProfileViewModel>(profile.Id);
+
             // TODO: instead of refresh delete?
             await dispatcher.Dispatch<FetchProfiles>();
             await _jsUtils.NotifySuccess("Delete", $"Profile {profile.Name} was deleted successfully.");

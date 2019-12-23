@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -45,7 +44,7 @@ namespace Ether.Types
 
         public EtherClient(HttpClient httpClient, NavigationManager navigation, JsUtils jsUtils, ILogger<EtherClient> logger)
         {
-            WebAssemblyHttpMessageHandler.DefaultCredentials = FetchCredentialsOption.Include;
+            // WebAssemblyHttpMessageHandler.DefaultCredentials = FetchCredentialsOption.Include;
             _httpClient = httpClient;
             _navigation = navigation;
             _jsUtils = jsUtils;

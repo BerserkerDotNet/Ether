@@ -23,5 +23,4 @@ namespace Ether.Types.State
 
         public IEnumerable<ReporterDescriptorViewModel> ReportTypes { get; set; }
     }
-
 }

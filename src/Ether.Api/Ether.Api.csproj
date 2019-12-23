@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <UserSecretsId>c814985e-1569-471b-ab96-6cac82c725c9</UserSecretsId>
   </PropertyGroup>
 
@@ -34,23 +34,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="5.0.0" />
+    <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="5.0.1" />
     <PackageReference Include="AutoMapper" Version="8.0.0" />
-    <PackageReference Include="FluentValidation.AspNetCore" Version="8.5.0-preview4" />
-    <PackageReference Include="Google.Protobuf" Version="3.9.2" />
-    <PackageReference Include="Grpc.AspNetCore.Server" Version="2.23.2" />
-    <PackageReference Include="Grpc.Core" Version="2.23.0" />
-    <PackageReference Include="Grpc.Tools" Version="2.23.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="IdentityServer4" Version="3.0.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.0.0" />
-    <PackageReference Include="IdentityServer4.AccessTokenValidation" Version="3.0.0" />
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.0.0" />
-    <PackageReference Include="Microsoft.Windows.Compatibility" Version="3.0.0" />
+    <PackageReference Include="FluentValidation.AspNetCore" Version="8.6.0" />
+    <PackageReference Include="IdentityServer4" Version="3.1.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.0" />
+    <PackageReference Include="IdentityServer4.AccessTokenValidation" Version="3.0.1" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.0" />
+    <PackageReference Include="Microsoft.Windows.Compatibility" Version="3.1.0" />
     <PackageReference Include="NPOI" Version="2.4.1" />
-    <PackageReference Include="Seq.Extensions.Logging" Version="4.0.1" />
+    <PackageReference Include="Seq.Extensions.Logging" Version="4.0.2" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
@@ -63,12 +56,6 @@
     <ProjectReference Include="..\Ether.Core\Ether.Core.csproj" />
     <ProjectReference Include="..\Ether.ViewModels\Ether.ViewModels.csproj" />
     <ProjectReference Include="..\Ether.Vsts\Ether.Vsts.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Protobuf Include="..\..\protos\emailgenerator.proto" GrpcServices="Client">
-      <Link>Protos\emailgenerator.proto</Link>
-    </Protobuf>
   </ItemGroup>
 
 </Project>

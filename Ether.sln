@@ -21,11 +21,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ether.Core", "src\Ether.Cor
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ether.ViewModels", "src\Ether.ViewModels\Ether.ViewModels.csproj", "{16B24C64-9C2C-4676-8F52-48DD7DBBF392}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "protos", "protos", "{AC1B8896-3C45-47B9-828C-B5966C475699}"
-	ProjectSection(SolutionItems) = preProject
-		protos\emailgenerator.proto = protos\emailgenerator.proto
-	EndProjectSection
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "_build", "build\_build.csproj", "{77E83945-2095-4198-8FBC-886F11FEF777}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{A0E61D44-CD96-4749-A6AB-D4C214E25D74}"

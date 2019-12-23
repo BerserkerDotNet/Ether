@@ -18,7 +18,6 @@ namespace Ether.Actions.Async
         {
             await _client.SaveVstsDataSourceConfig(dataSource);
             await dispatcher.Dispatch<FetchDataSourceSettings>();
-
         }
     }
 }

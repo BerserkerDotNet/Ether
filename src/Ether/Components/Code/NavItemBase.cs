@@ -13,12 +13,12 @@ namespace Ether.Components.Code
         [Inject]
         public NavigationManager Navigation { get; set; }
 
+        protected bool IsActive => _isActive;
+
         public void Dispose()
         {
             Navigation.LocationChanged -= OnLocationChanged;
         }
-
-        protected bool IsActive => _isActive;
 
         protected override void OnInitialized()
         {

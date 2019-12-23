@@ -1,14 +1,14 @@
-﻿using Blazor.Extensions.Storage;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Ether.Storage;
 
 namespace Ether.Types
 {
     public class TokenService
     {
         private const string TokenKey = "___EtherToken___";
-        private readonly LocalStorage _storage;
+        private readonly ILocalStorage _storage;
 
-        public TokenService(LocalStorage storage)
+        public TokenService(ILocalStorage storage)
         {
             _storage = storage;
         }
