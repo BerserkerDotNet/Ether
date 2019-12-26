@@ -1,9 +1,9 @@
 // using Blazor.Extensions.Logging;
 using BlazorBootstrap.Modal;
 using BlazorState.Redux.Extensions;
+using BlazorStorage.Extensions;
 using Ether.Actions.Async;
 using Ether.Reducers;
-using Ether.Storage;
 using Ether.Types;
 using Ether.Types.EditableTable;
 using Ether.Types.State;
@@ -22,7 +22,8 @@ namespace Ether
             services.AddSingleton<ModelValidationService>();
             services.AddSingleton<TokenService>();
             services.AddSingleton<JsUtils>();
-            services.AddSingleton<ILocalStorage, LocalStorage>();
+
+            services.AddStorage();
 
             // State
             services.AddReduxStore<RootState>(cfg =>

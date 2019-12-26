@@ -42,6 +42,7 @@
     <PackageReference Include="BlazorBootstrap.Modal" Version="1.0.3" />
     <PackageReference Include="BlazorState.Redux" Version="1.0.3" />
     <PackageReference Include="BlazorState.Redux.Storage" Version="1.0.3" />
+    <PackageReference Include="BlazorStorage" Version="1.0.0" />
     <PackageReference Include="IdentityModel" Version="4.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="3.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.Blazor" Version="3.1.0-preview4.19579.2" />
