@@ -6,6 +6,7 @@ using Ether.Actions.Async;
 using Ether.Reducers;
 using Ether.Types;
 using Ether.Types.EditableTable;
+using Ether.Types.Extensions;
 using Ether.Types.State;
 using Microsoft.AspNetCore.Components.Builder;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,6 +23,15 @@ namespace Ether
             services.AddSingleton<ModelValidationService>();
             services.AddSingleton<TokenService>();
             services.AddSingleton<JsUtils>();
+
+            services.AddMatToaster(config =>
+            {
+                config.Position = MatBlazor.MatToastPosition.TopRight;
+                config.NewestOnTop = true;
+                config.ShowCloseButton = true;
+                config.ShowProgressBar = true;
+                config.MaximumOpacity = 100;
+            });
 
             services.AddStorage();
 

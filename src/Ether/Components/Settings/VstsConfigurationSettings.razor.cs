@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using BlazorState.Redux.Interfaces;
 using Ether.Actions.Async;
+using Ether.Types;
 using Ether.Types.State;
 using Ether.ViewModels;
 using Microsoft.AspNetCore.Components;
@@ -16,7 +17,7 @@ namespace Ether.Components.Settings
     {
         public VstsDataSourceViewModel VstsDataSource { get; set; }
 
-        public Dictionary<Guid?, string> IdentitiesOptions { get; set; }
+        public IEnumerable<SelectOption<Guid?>> IdentitiesOptions { get; set; }
 
         public EventCallback<VstsDataSourceViewModel> OnSave { get; set; }
     }
@@ -31,15 +32,8 @@ namespace Ether.Components.Settings
 
         private async Task Init(IStore<RootState> store)
         {
-            if (store.State?.Settings?.DataSource == null)
-            {
-                await store.Dispatch<FetchDataSourceSettings>();
-            }
-
-            if (!IsIdentityOptionsInitialized(store.State))
-            {
-                await store.Dispatch<FetchIdentities>();
-            }
+            await store.Dispatch<FetchIdentities>();
+            await store.Dispatch<FetchDataSourceSettings>();
         }
 
         private void MapStateToProp(RootState state, VstsConfigurationSettingsProps props)
@@ -58,17 +52,17 @@ namespace Ether.Components.Settings
             await store.Dispatch<SaveDataSource, VstsDataSourceViewModel>(s);
         }
 
-        private Dictionary<Guid?, string> GetIdentityOptions(RootState state)
+        private IEnumerable<SelectOption<Guid?>> GetIdentityOptions(RootState state)
         {
             var identities = state?.Settings?.Identities ?? Enumerable.Empty<IdentityViewModel>();
-            var options = new Dictionary<Guid?, string>(identities.Count() + 1);
-            options.Add(Guid.Empty, Constants.NoneLabel);
+            var identitiesOptions = new List<SelectOption<Guid?>>(identities.Count() + 1);
+            identitiesOptions.Add(new SelectOption<Guid?>(Guid.Empty, Constants.NoneLabel));
             foreach (var identity in identities)
             {
-                options.Add(identity.Id, identity.Name);
+                identitiesOptions.Add(new SelectOption<Guid?>(identity.Id, identity.Name));
             }
 
-            return options;
+            return identitiesOptions;
         }
 
         private bool IsIdentityOptionsInitialized(RootState state)

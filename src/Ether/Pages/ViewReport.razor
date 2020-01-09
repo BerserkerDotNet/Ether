@@ -3,52 +3,23 @@
 @inject NavigationManager UriHelper
 @inject JsUtils JsUtils
 
-@if (string.Equals(Type, "WorkitemsReporter") || string.Equals(Type, "ReOpenedWorkitemsReporter"))
-{
-    <Ether.Components.Card Title="@reportDisplayName">
-        <Header>
-            <div class="d-print-none pull-right d-print-none">
-                @if (supportsExcel != null)
-                {
-                    <button class="btn btn-fill btn-primary" @onclick="ExportToExcel">Export to Excel</button>
-                }
-                <If Condition="supportsEmail">
-                    <Then>
-                        <button class="btn btn-fill btn-primary" @onclick="GenerateEmail">Generate Email</button>
-                    </Then>
-                </If>
-                <button class="btn btn-fill btn-secondary" @onclick="Print">Print</button>
-                <button class="btn btn-fill btn-info" @onclick="NewReport">New report</button>
-                <button class="btn btn-fill btn-success" @onclick="BackToList">Back to list</button>
-            </div>
-        </Header>
-    </Ether.Components.Card>
-    @componentToRender
-}
-else
-{
-    <Ether.Components.Card Title="@reportDisplayName">
-        <Header>
+<div class="mat-layout-grid">
+    <div class="mat-layout-grid-inner">
+        <div class="mat-layout-grid-cell mat-layout-grid-cell-span-12">
+            <MatHeadline4>@reportDisplayName</MatHeadline4>
             <div class="d-print-none pull-right d-print-none">
                 @if (supportsExcel)
                 {
-                    <button class="btn btn-fill btn-primary" @onclick="ExportToExcel">Export to Excel</button>
+                    <MatButton Icon="@MatIconNames.Grid_on" Label="Export to Excel" OnClick="ExportToExcel" />
                 }
-                <If Condition="supportsEmail">
-                    <Then>
-                        <button class="btn btn-fill btn-primary" @onclick="GenerateEmail">Generate Email</button>
-                    </Then>
-                </If>
-                <button class="btn btn-fill btn-secondary" @onclick="Print">Print</button>
-                <button class="btn btn-fill btn-info" @onclick="NewReport">New report</button>
-                <button class="btn btn-fill btn-success" @onclick="BackToList">Back to list</button>
+                <MatButton Icon="@MatIconNames.Print" Label="Print" OnClick="Print" />
+                <MatButton Icon="@MatIconNames.Fiber_new" Label="New report" OnClick="NewReport" />
+                <MatButton Icon="@MatIconNames.Replay" Label="Back to list" OnClick="BackToList" />
             </div>
-        </Header>
-        <Body>
             @componentToRender
-        </Body>
-    </Ether.Components.Card>
-}
+        </div>
+    </div>
+</div>
 
 @code
 {
@@ -130,10 +101,5 @@ else
         var excelReport = await Client.GenerateExcel(report.Id);
         var base64EncodedReport = Convert.ToBase64String(excelReport);
         await JsUtils.SaveAsFile("report.xlsx", base64EncodedReport);
-    }
-
-    protected void GenerateEmail()
-    {
-         UriHelper.NavigateTo($"/reports/email/{Id.Value}");
     }
 }

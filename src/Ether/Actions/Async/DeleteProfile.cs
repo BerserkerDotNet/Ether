@@ -2,18 +2,19 @@
 using BlazorState.Redux.Interfaces;
 using Ether.Types;
 using Ether.ViewModels;
+using MatBlazor;
 
 namespace Ether.Actions.Async
 {
     public class DeleteProfile : IAsyncAction<ProfileViewModel>
     {
         private readonly EtherClient _client;
-        private readonly JsUtils _jsUtils;
+        private readonly IMatToaster _toaster;
 
-        public DeleteProfile(EtherClient client, JsUtils jsUtils)
+        public DeleteProfile(EtherClient client, IMatToaster toaster)
         {
             _client = client;
-            _jsUtils = jsUtils;
+            _toaster = toaster;
         }
 
         public async Task Execute(IDispatcher dispatcher, ProfileViewModel profile)
@@ -22,7 +23,7 @@ namespace Ether.Actions.Async
 
             // TODO: instead of refresh delete?
             await dispatcher.Dispatch<FetchProfiles>();
-            await _jsUtils.NotifySuccess("Delete", $"Profile {profile.Name} was deleted successfully.");
+            _toaster.Add($"Profile {profile.Name} was deleted successfully.", MatToastType.Success, "Delete", MatIconNames.Delete);
         }
     }
 }

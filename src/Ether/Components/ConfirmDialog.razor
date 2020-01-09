@@ -1,0 +1,37 @@
+﻿<MatDialog @bind-IsOpen="@IsOpen" CanBeClosed="false">
+    <MatDialogTitle>@Title</MatDialogTitle>
+    <MatDialogContent>
+        <p>@Message</p>
+    </MatDialogContent>
+    <MatDialogActions>
+        <MatButton OnClick="Confirm">@ConfirmText</MatButton>
+        <MatButton OnClick="Cancel">@CancelText</MatButton>
+    </MatDialogActions>
+</MatDialog>
+
+@code {
+
+    [Parameter] public bool IsOpen { get; set; }
+
+    [Parameter] public string Title { get; set; }
+
+    [Parameter] public string Message { get; set; }
+
+    [Parameter] public string ConfirmText { get; set; } = "Confirm";
+
+    [Parameter] public string CancelText { get; set; } = "Cancel";
+
+    [Parameter] public EventCallback OnConfirm { get; set; }
+
+    [Parameter] public EventCallback OnCancel { get; set; }
+
+    private async Task Confirm()
+    {
+        await OnConfirm.InvokeAsync(null);
+    }
+
+    private async Task Cancel()
+    {
+        await OnCancel.InvokeAsync(null);
+    }
+}

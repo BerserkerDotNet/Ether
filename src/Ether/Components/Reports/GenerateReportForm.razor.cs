@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using BlazorState.Redux.Interfaces;
 using Ether.Actions.Async;
+using Ether.Types;
 using Ether.Types.State;
 using Ether.ViewModels;
 using Microsoft.AspNetCore.Components;
@@ -21,9 +22,9 @@ namespace Ether.Components.Reports
 
         public DateTime EndDate { get; set; }
 
-        public Dictionary<Guid, string> Profiles { get; set; }
+        public IEnumerable<SelectOption<Guid>> Profiles { get; set; }
 
-        public Dictionary<string, string> ReportTypes { get; set; }
+        public IEnumerable<SelectOption<string>> ReportTypes { get; set; }
 
         public EventCallback<GenerateReportViewModel> OnGenerate { get; set; }
     }
@@ -38,15 +39,8 @@ namespace Ether.Components.Reports
 
         private async Task Init(IStore<RootState> store)
         {
-            if (!IsReportTypesStateFetched(store.State))
-            {
-                await store.Dispatch<FetchReportDescriptors>();
-            }
-
-            if (!IsProfilesStateFetched(store.State))
-            {
-                await store.Dispatch<FetchProfiles>();
-            }
+            await store.Dispatch<FetchProfiles>();
+            await store.Dispatch<FetchReportDescriptors>();
         }
 
         private void MapStateToProps(RootState state, GenerateReportFormProps props)
@@ -60,33 +54,23 @@ namespace Ether.Components.Reports
                 props.EndDate = formState.End;
             }
 
-            props.ReportTypes = GetReportTypes(state).ToDictionary(k => k.UniqueName, v => v.DisplayName);
-            props.Profiles = GetProfiles(state).ToDictionary(k => k.Id, v => v.Name);
+            props.ReportTypes = GetReportTypes(state).Select(k => new SelectOption<string>(k.UniqueName, k.DisplayName)).ToArray();
+            props.Profiles = GetProfiles(state).Select(k => new SelectOption<Guid>(k.Id, k.Name)).ToArray();
 
             if (props.Profile == default && props.Profiles.Any())
             {
-                props.Profile = props.Profiles.First().Key;
+                props.Profile = props.Profiles.First().Value;
             }
 
             if (props.ReportType == default && props.ReportTypes.Any())
             {
-                props.ReportType = props.ReportTypes.First().Key;
+                props.ReportType = props.ReportTypes.First().Value;
             }
         }
 
         private IEnumerable<ProfileViewModel> GetProfiles(RootState state)
         {
-            return state?.Profiles?.Profiles ?? Enumerable.Empty<ProfileViewModel>();
-        }
-
-        private bool IsProfilesStateFetched(RootState state)
-        {
-            return state?.Profiles != null;
-        }
-
-        private bool IsReportTypesStateFetched(RootState state)
-        {
-            return state?.GenerateReportForm?.ReportTypes != null;
+            return state?.Profiles?.Profiles ?? new[] { new ProfileViewModel { Id = Guid.Empty, Name = "None" } };
         }
 
         private IEnumerable<ReporterDescriptorViewModel> GetReportTypes(RootState state)

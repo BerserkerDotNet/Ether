@@ -2,18 +2,19 @@
 using BlazorState.Redux.Interfaces;
 using Ether.Types;
 using Ether.ViewModels;
+using MatBlazor;
 
 namespace Ether.Actions.Async
 {
     public class DeleteReport : IAsyncAction<ReportViewModel>
     {
         private readonly EtherClient _client;
-        private readonly JsUtils _jsUtils;
+        private readonly IMatToaster _toaster;
 
-        public DeleteReport(EtherClient client, JsUtils jsUtils)
+        public DeleteReport(EtherClient client, IMatToaster toaster)
         {
             _client = client;
-            _jsUtils = jsUtils;
+            _toaster = toaster;
         }
 
         public async Task Execute(IDispatcher dispatcher, ReportViewModel report)
@@ -22,11 +23,11 @@ namespace Ether.Actions.Async
             {
                 await _client.Delete<ReportViewModel>(report.Id);
                 await dispatcher.Dispatch<FetchReports>();
-                await _jsUtils.NotifySuccess("Report deleted", $"{report.ReportType} was deleted successfully.");
+                _toaster.Add($"{report.ReportType} was deleted successfully.", MatToastType.Success, "Report deleted", MatIconNames.Delete);
             }
             catch (System.Exception ex)
             {
-                await _jsUtils.NotifyError("Error deleting report", $"{ex.Message}");
+                _toaster.Add(ex.Message, MatToastType.Danger, "Error deleting report", MatIconNames.Error);
             }
         }
     }

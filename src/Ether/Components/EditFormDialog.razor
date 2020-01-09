@@ -1,0 +1,34 @@
+﻿@typeparam T
+
+<MatDialog @bind-IsOpen="@IsShown" CanBeClosed="false" Class="edit-form">
+    <EditForm Model="Item" OnValidSubmit="async () => await OnSave.InvokeAsync(null)">
+        <MatDialogTitle>@Title</MatDialogTitle>
+        <MatDialogContent>
+            @if (Item is object)
+            {
+
+                <FluentValidationValidator />
+                @ChildContent(Item)
+
+            }
+        </MatDialogContent>
+        <MatDialogActions>
+            <MatButton Type="Submit">Save</MatButton>
+            <MatButton OnClick="async () => await OnCancel.InvokeAsync(null)">Cancel</MatButton>
+        </MatDialogActions>
+    </EditForm>
+</MatDialog>
+
+@code {
+    [Parameter] public bool IsShown { get; set; }
+
+    [Parameter] public string Title { get; set; }
+
+    [Parameter] public T Item { get; set; }
+
+    [Parameter] public RenderFragment<T> ChildContent { get; set; }
+
+    [Parameter] public EventCallback OnSave { get; set; }
+
+    [Parameter] public EventCallback OnCancel { get; set; }
+}

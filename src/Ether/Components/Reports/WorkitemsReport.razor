@@ -1,96 +1,105 @@
 ﻿@inject EtherClient Client
 
 <section id="resolved">
-    <Ether.Components.Card Title="Resolved work items">
-        <Body>
-            <DataTable Items="Report.ResolvedWorkItems" PageSize="int.MaxValue">
-                <TableHeader>
-                    <th>Workitem</th>
-                    <th>Title</th>
-                    <th>Type</th>
-                    <th>Estimated (Days)</th>
-                    <th>Time Spent (Days)</th>
-                </TableHeader>
-                <RowTemplate Context="detail">
-                    <td><a href="@GetWorkItemUrl(detail.WorkItemProject, detail.WorkItemId)" target="_blank">@detail.WorkItemId</a></td>
-                    <td>@detail.WorkItemTitle</td>
-                    <td>@detail.WorkItemType</td>
-                    <td>@detail.EstimatedToComplete</td>
-                    <td>@detail.TimeSpent</td>
-                </RowTemplate>
-                <TableFooter>
-                    <tr class="table-active">
-                        <th>Total:</th>
-                        <td class="table-success" colspan="2">@Report.GetTotalBugs(Report.ResolvedWorkItems) bugs / @Report.GetTotalTasks(Report.ResolvedWorkItems) tasks</td>
-                        <td class="table-success">@Report.GetTotalEstimated(Report.ResolvedWorkItems)</td>
-                        <td class="table-success">@Report.GetTotalTimeSpent(Report.ResolvedWorkItems)</td>
-                    </tr>
-                </TableFooter>
-            </DataTable>
-        </Body>
-    </Ether.Components.Card>
+    <MatHeadline6>Resolved work items</MatHeadline6>
+    <MatOverried.MatTable Items="Report.ResolvedWorkItems"
+                          Class="mat-elevation-z5"
+                          ShowPaging="false"
+                          PageSize="int.MaxValue"
+                          Striped="true"
+                          ShowFooter="true"
+                          Style="table-layout:auto">
+        <MatTableHeader>
+            <th>Workitem</th>
+            <th>Title</th>
+            <th>Type</th>
+            <th>Estimated (Days)</th>
+            <th>Time Spent (Days)</th>
+        </MatTableHeader>
+        <MatTableRow Context="detail">
+            <td><a href="@GetWorkItemUrl(detail.WorkItemProject, detail.WorkItemId)" target="_blank">@detail.WorkItemId</a></td>
+            <td>@detail.WorkItemTitle</td>
+            <td>@detail.WorkItemType</td>
+            <td>@detail.EstimatedToComplete</td>
+            <td>@detail.TimeSpent</td>
+        </MatTableRow>
+        <MatTableFooter>
+            <tr>
+                <th>Total:</th>
+                <td colspan="2">@Report.GetTotalBugs(Report.ResolvedWorkItems) bugs / @Report.GetTotalTasks(Report.ResolvedWorkItems) tasks</td>
+                <td>@Report.GetTotalEstimated(Report.ResolvedWorkItems)</td>
+                <td>@Report.GetTotalTimeSpent(Report.ResolvedWorkItems)</td>
+            </tr>
+        </MatTableFooter>
+    </MatOverried.MatTable>
 </section>
 
 <section id="pullrequest">
-    <Ether.Components.Card Title="Work items in pull request">
-        <Body>
-            <DataTable Items="Report.WorkItemsInReview" PageSize="int.MaxValue">
-                <TableHeader>
-                    <th>Workitem</th>
-                    <th>Title</th>
-                    <th>Type</th>
-                    <th>Estimated (Days)</th>
-                    <th>Time Spent (Days)</th>
-                </TableHeader>
-                <RowTemplate Context="detail">
-                    <td><a href="@GetWorkItemUrl(detail.WorkItemProject, detail.WorkItemId)" target="_blank">@detail.WorkItemId</a></td>
-                    <td>@detail.WorkItemTitle</td>
-                    <td>@detail.WorkItemType</td>
-                    <td>@detail.EstimatedToComplete</td>
-                    <td>@detail.TimeSpent</td>
-                </RowTemplate>
-                <TableFooter>
-                    <tr class="table-active">
-                        <th>Total:</th>
-                        <td class="table-success" colspan="2">@Report.GetTotalBugs(Report.WorkItemsInReview) bugs / @Report.GetTotalTasks(Report.WorkItemsInReview) tasks</td>
-                        <td class="table-success">@Report.GetTotalEstimated(Report.WorkItemsInReview)</td>
-                        <td class="table-success">@Report.GetTotalTimeSpent(Report.WorkItemsInReview)</td>
-                    </tr>
-                </TableFooter>
-            </DataTable>
-        </Body>
-    </Ether.Components.Card>
+    <MatHeadline6>Work items in pull request</MatHeadline6>
+    <MatOverried.MatTable Items="Report.ResolvedWorkItems"
+                          Class="mat-elevation-z5"
+                          ShowPaging="false"
+                          PageSize="int.MaxValue"
+                          Striped="true"
+                          ShowFooter="true"
+                          Style="table-layout:auto">
+        <MatTableHeader>
+            <th>Workitem</th>
+            <th>Title</th>
+            <th>Type</th>
+            <th>Estimated (Days)</th>
+            <th>Time Spent (Days)</th>
+        </MatTableHeader>
+        <MatTableRow Context="detail">
+            <td><a href="@GetWorkItemUrl(detail.WorkItemProject, detail.WorkItemId)" target="_blank">@detail.WorkItemId</a></td>
+            <td>@detail.WorkItemTitle</td>
+            <td>@detail.WorkItemType</td>
+            <td>@detail.EstimatedToComplete</td>
+            <td>@detail.TimeSpent</td>
+        </MatTableRow>
+        <MatTableFooter>
+            <tr>
+                <th>Total:</th>
+                <td colspan="2">@Report.GetTotalBugs(Report.WorkItemsInReview) bugs / @Report.GetTotalTasks(Report.WorkItemsInReview) tasks</td>
+                <td>@Report.GetTotalEstimated(Report.WorkItemsInReview)</td>
+                <td>@Report.GetTotalTimeSpent(Report.WorkItemsInReview)</td>
+            </tr>
+        </MatTableFooter>
+    </MatOverried.MatTable>
 </section>
 
 <section id="active">
-    <Ether.Components.Card Title="Active work items">
-        <Body>
-            <DataTable Items="Report.ActiveWorkItems" PageSize="int.MaxValue">
-                <TableHeader>
-                    <th>Workitem</th>
-                    <th>Title</th>
-                    <th>Type</th>
-                    <th>Estimated (Days)</th>
-                    <th>Time Spent (Days)</th>
-                </TableHeader>
-                <RowTemplate Context="detail">
-                    <td><a href="@GetWorkItemUrl(detail.WorkItemProject, detail.WorkItemId)" target="_blank">@detail.WorkItemId</a></td>
-                    <td>@detail.WorkItemTitle</td>
-                    <td>@detail.WorkItemType</td>
-                    <td>@detail.EstimatedToComplete</td>
-                    <td>@detail.TimeSpent</td>
-                </RowTemplate>
-                <TableFooter>
-                    <tr class="table-active">
-                        <th>Total:</th>
-                        <td class="table-success" colspan="2">@Report.GetTotalBugs(Report.ActiveWorkItems) bugs / @Report.GetTotalTasks(Report.ActiveWorkItems) tasks</td>
-                        <td class="table-success">@Report.GetTotalEstimated(Report.ActiveWorkItems)</td>
-                        <td class="table-success">@Report.GetTotalTimeSpent(Report.ActiveWorkItems)</td>
-                    </tr>
-                </TableFooter>
-            </DataTable>
-        </Body>
-    </Ether.Components.Card>
+    <MatHeadline6>Active work items</MatHeadline6>
+    <MatOverried.MatTable Items="Report.ResolvedWorkItems"
+                          Class="mat-elevation-z5"
+                          ShowPaging="false"
+                          PageSize="int.MaxValue"
+                          Striped="true"
+                          ShowFooter="true"
+                          Style="table-layout:auto">
+        <MatTableHeader>
+            <th>Workitem</th>
+            <th>Title</th>
+            <th>Type</th>
+            <th>Estimated (Days)</th>
+            <th>Time Spent (Days)</th>
+        </MatTableHeader>
+        <MatTableRow Context="detail">
+            <td><a href="@GetWorkItemUrl(detail.WorkItemProject, detail.WorkItemId)" target="_blank">@detail.WorkItemId</a></td>
+            <td>@detail.WorkItemTitle</td>
+            <td>@detail.WorkItemType</td>
+            <td>@detail.EstimatedToComplete</td>
+            <td>@detail.TimeSpent</td>
+        </MatTableRow>
+        <MatTableFooter>
+            <tr>
+                <th>Total:</th>
+                <td colspan="2">@Report.GetTotalBugs(Report.ActiveWorkItems) bugs / @Report.GetTotalTasks(Report.ActiveWorkItems) tasks</td>
+                <td>@Report.GetTotalEstimated(Report.ActiveWorkItems)</td>
+                <td>@Report.GetTotalTimeSpent(Report.ActiveWorkItems)</td>
+            </tr>
+        </MatTableFooter>
+    </MatOverried.MatTable>
 </section>
 
 @code

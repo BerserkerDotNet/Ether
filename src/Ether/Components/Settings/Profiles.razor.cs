@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using BlazorState.Redux.Blazor;
 using BlazorState.Redux.Interfaces;
 using Ether.Actions.Async;
+using Ether.Types;
 using Ether.Types.State;
 using Ether.ViewModels;
 using Microsoft.AspNetCore.Components;
@@ -15,9 +16,9 @@ namespace Ether.Components.Settings
     {
         public IEnumerable<ProfileViewModel> Items { get; set; }
 
-        public Dictionary<Guid, string> MembersOptions { get; set; }
+        public IEnumerable<SelectOption<Guid>> MembersOptions { get; set; }
 
-        public Dictionary<Guid, string> RepositoriesOptions { get; set; }
+        public IEnumerable<SelectOption<Guid>> RepositoriesOptions { get; set; }
 
         public EventCallback<ProfileViewModel> OnChange { get; set; }
 
@@ -44,20 +45,10 @@ namespace Ether.Components.Settings
 
         private async Task Init(IStore<RootState> store)
         {
-            if (IsRepositoriesInitialized(store.State))
-            {
-                await store.Dispatch<FetchRepositories>();
-            }
-
-            if (IsMembersInitialized(store.State))
-            {
-                await store.Dispatch<FetchMembers>();
-            }
-
-            if (!IsProfilesInitialized(store.State))
-            {
-                await store.Dispatch<FetchProfiles>();
-            }
+            // TODO: Check if something is already populated. Maybe flag in the state
+            await store.Dispatch<FetchRepositories>();
+            await store.Dispatch<FetchMembers>();
+            await store.Dispatch<FetchProfiles>();
         }
 
         private void MapStateToProps(RootState state, ProfilesProps props)
@@ -80,34 +71,19 @@ namespace Ether.Components.Settings
 
         private IEnumerable<ProfileViewModel> GetProfiles(RootState state)
         {
-            return state?.Profiles?.Profiles ?? null;
+            return state?.Profiles?.Profiles ?? Enumerable.Empty<ProfileViewModel>();
         }
 
-        private Dictionary<Guid, string> GetMemberOptions(RootState state)
+        private IEnumerable<SelectOption<Guid>> GetMemberOptions(RootState state)
         {
             var members = state?.TeamMembers?.Members ?? Enumerable.Empty<TeamMemberViewModel>();
-            return members.ToDictionary(k => k.Id, v => v.DisplayName);
+            return members.Select(k => new SelectOption<Guid>(k.Id, k.DisplayName));
         }
 
-        private Dictionary<Guid, string> GetRepositoriesOptions(RootState state)
+        private IEnumerable<SelectOption<Guid>> GetRepositoriesOptions(RootState state)
         {
             var repositories = state?.Repositories?.Repositories ?? Enumerable.Empty<VstsRepositoryViewModel>();
-            return repositories.ToDictionary(k => k.Id, v => v.Name);
-        }
-
-        private bool IsProfilesInitialized(RootState state)
-        {
-            return state?.Profiles?.Profiles == null;
-        }
-
-        private bool IsMembersInitialized(RootState state)
-        {
-            return state?.TeamMembers?.Members == null;
-        }
-
-        private bool IsRepositoriesInitialized(RootState state)
-        {
-            return state?.Repositories?.Repositories == null;
+            return repositories.Select(k => new SelectOption<Guid>(k.Id, k.Name));
         }
 
         private async Task HandleResetWorkItems(IStore<RootState> store, IEnumerable<Guid> members)

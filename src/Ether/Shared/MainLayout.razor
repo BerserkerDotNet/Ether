@@ -5,35 +5,28 @@
 @inject NavigationManager UriHelper
 @if (isAuthenticated)
 {
-    <div id="wrapper">
-        <BootstrapModal />
-        <NavMenu />
-        <div id="content-wrapper" class="d-flex flex-column">
-            <div id="content">
-                <nav class="d-print-none navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
-                    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
-                        <i class="fas fa-bars"></i>
-                    </button>
-                    <ul class="navbar-nav ml-auto">
-
-                        <div class="topbar-divider d-none d-sm-block"></div>
-
-                        <!-- Nav Item - User Information -->
-                        <li class="nav-item dropdown no-arrow">
-                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">Welcome, @currentUser.DisplayName</span>
-                                <img class="img-profile rounded-circle" src="/images/user.png">
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
-                <div class="container-fluid">
-                    @Body
-                </div>
-            </div>
+    <MatAppBar Style="z-index: 100;" Class="mat">
+        <MatAppBarRow>
+            <MatAppBarSection>
+                <MatIconButton Icon="@MatIconNames.Menu" OnClick="() => IsMenuOpened = !IsMenuOpened"></MatIconButton>
+                <MatAppBarTitle>Ether - KPI reporting tool</MatAppBarTitle>
+            </MatAppBarSection>
+            <MatAppBarSection Align="MatAppBarSectionAlign.End">
+                <MatIcon Icon="@MatIconNames.Account_circle" />&nbsp; Welcome, @currentUser.DisplayName
+            </MatAppBarSection>
+        </MatAppBarRow>
+    </MatAppBar>
+    <MatDrawerContainer Style="width: 100vw; height: 100vh;" Class="mat">
+        <MatDrawer Opened="IsMenuOpened" Class="mat-elevation-z5">
+            <MatAppBarAdjust></MatAppBarAdjust>
+            <NavMenu />
+        </MatDrawer>
+        <MatDrawerContent Style="padding-left: 25px; padding-right: 25px;">
+            <MatAppBarAdjust></MatAppBarAdjust>
+            @Body
             <FooterBlock />
-        </div>
-    </div>
+        </MatDrawerContent>
+    </MatDrawerContainer>
 }
 else
 {
@@ -48,6 +41,8 @@ else
 @code{
     protected bool isAuthenticated = false;
     protected UserViewModel currentUser = UserViewModel.Anonymous;
+
+    public bool IsMenuOpened { get; set; } = true;
 
     protected override async Task OnInitializedAsync()
     {

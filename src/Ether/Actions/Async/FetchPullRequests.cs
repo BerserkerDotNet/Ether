@@ -2,25 +2,26 @@
 using System.Threading.Tasks;
 using BlazorState.Redux.Interfaces;
 using Ether.Types;
+using MatBlazor;
 
 namespace Ether.Actions.Async
 {
     public class FetchPullRequests : IAsyncAction<FetchDataJobParameters>
     {
         private readonly EtherClient _client;
-        private readonly JsUtils _jsUtils;
+        private readonly IMatToaster _toaster;
 
-        public FetchPullRequests(EtherClient client, JsUtils jsUtils)
+        public FetchPullRequests(EtherClient client, IMatToaster toaster)
         {
             _client = client;
-            _jsUtils = jsUtils;
+            _toaster = toaster;
         }
 
         public async Task Execute(IDispatcher dispatcher, FetchDataJobParameters parameters)
         {
             await _client.RunPullRequestsJob(parameters.Members, parameters.Reset);
             await dispatcher.Dispatch<FetchProfiles>();
-            await _jsUtils.NotifySuccess("Fetch Workitems", $"Started to fetch workitems for {parameters.Members.Count()} members.");
+            _toaster.Add($"Started to fetch pull requests for {parameters.Members.Count()} members.", MatToastType.Info, "Fetch Pull Requests", MatIconNames.Info);
         }
     }
 }

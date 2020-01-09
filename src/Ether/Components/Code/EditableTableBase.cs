@@ -101,7 +101,6 @@ namespace Ether.Components.Code
             catch (Exception ex)
             {
                 Logger.LogError(ex, "Refresh failed");
-                await JsUtils.NotifyError("Error loading records", ex.Message);
             }
             finally
             {
@@ -150,12 +149,10 @@ namespace Ether.Components.Code
             try
             {
                 await _dataProvider.Save(EditingItem);
-                await JsUtils.NotifySuccess("Success", $"{EditingItem.GetType().Name.Replace("ViewModel", string.Empty)} was saved successfully");
             }
             catch (Exception ex)
             {
                 Logger.LogError(ex, "Error saving record");
-                await JsUtils.NotifyError("Error saving record", ex.Message);
                 return;
             }
 

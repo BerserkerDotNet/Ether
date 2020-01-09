@@ -1,57 +1,63 @@
 ﻿@inject EtherClient Client
 
 <section id="ReopenedTeamStats">
-    <Ether.Components.Card Title="By Member">
-        <Body>
-            <DataTable Items="Report.MembersLookup" PageSize="int.MaxValue">
-                <TableHeader>
-                    <th>Member</th>
-                    <th># of reopened bugs</th>
-                    <th># of resolved bugs</th>
-                </TableHeader>
-                <RowTemplate Context="member">
-                    <td>@member.Value</td>
-                    <td>@Report.GetRepopenedCount(member.Key)</td>
-                    <td>@Report.GetResolvedCount(member.Key)</td>
-                </RowTemplate>
-                <TableFooter>
-                    <tr>
-                        <th class="table-active">Total:</th>
-                        <td class="table-success">@Report.TotalReopened</td>
-                        <td class="table-success">@Report.TotalResolved</td>
-                    </tr>
-                </TableFooter>
-            </DataTable>
-        </Body>
-    </Ether.Components.Card>
+    <MatHeadline6>By Member</MatHeadline6>
+    <MatOverried.MatTable Items="Report.MembersLookup"
+              Class="mat-elevation-z5"
+              ShowPaging="false"
+              PageSize="int.MaxValue"
+              Striped="true"
+              ShowFooter="true"
+              Style="table-layout:auto">
+        <MatTableHeader>
+            <th>Member</th>
+            <th># of reopened bugs</th>
+            <th># of resolved bugs</th>
+        </MatTableHeader>
+        <MatTableRow Context="member">
+            <td>@member.Value</td>
+            <td>@Report.GetRepopenedCount(member.Key)</td>
+            <td>@Report.GetResolvedCount(member.Key)</td>
+        </MatTableRow>
+        <MatTableFooter>
+            <tr>
+                <th>Total:</th>
+                <td>@Report.TotalReopened</td>
+                <td>@Report.TotalResolved</td>
+            </tr>
+        </MatTableFooter>
+    </MatOverried.MatTable>
 </section>
 <section id="ReopenedWIList">
-    <Ether.Components.Card Title="Work items list">
-        <Body>
-            <DataTable Items="Report.Details.OrderBy(d => d.AssociatedUser.Title)" PageSize="int.MaxValue">
-                <TableHeader>
-                    <th>Workitem</th>
-                    <th>Title</th>
-                    <th>Type</th>
-                    <th>Date</th>
-                    <th>User</th>
-                </TableHeader>
-                <RowTemplate Context="detail">
-                    <td><a href="@GetWorkItemUrl(detail.WorkItemProject, detail.WorkItemId)" target="_blank">@detail.WorkItemId</a></td>
-                    <td>@detail.WorkItemTitle</td>
-                    <td>@detail.WorkItemType</td>
-                    <td>@detail.ReOpenedDate</td>
-                    <td>@detail.AssociatedUser.Title</td>
-                </RowTemplate>
-                <TableFooter>
-                    <tr>
-                        <th class="table-active">Total:</th>
-                        <td class="table-success" colspan="4">@Report.TotalReopened</td>
-                    </tr>
-                </TableFooter>
-            </DataTable>
-        </Body>
-    </Ether.Components.Card>
+    <MatHeadline6>Work items list</MatHeadline6>
+    <MatOverried.MatTable Items="Report.Details"
+              Class="mat-elevation-z5"
+              ShowPaging="false"
+              PageSize="int.MaxValue"
+              Striped="true"
+              ShowFooter="true"
+              Style="table-layout:auto">
+        <MatTableHeader>
+            <th>Workitem</th>
+            <th>Title</th>
+            <th>Type</th>
+            <th>Date</th>
+            <th>User</th>
+        </MatTableHeader>
+        <MatTableRow Context="detail">
+            <td><a href="@GetWorkItemUrl(detail.WorkItemProject, detail.WorkItemId)" target="_blank">@detail.WorkItemId</a></td>
+            <td>@detail.WorkItemTitle</td>
+            <td>@detail.WorkItemType</td>
+            <td>@detail.ReOpenedDate</td>
+            <td>@detail.AssociatedUser.Title</td>
+        </MatTableRow>
+        <MatTableFooter>
+            <tr>
+                <th>Total:</th>
+                <td colspan="4">@Report.TotalReopened</td>
+            </tr>
+        </MatTableFooter>
+    </MatOverried.MatTable>
 </section>
 
 @code {
@@ -66,7 +72,7 @@
     {
         return $"https://{vstsConfiguration.InstanceName}.visualstudio.com/{project}/_workitems/edit/{workItemId}";
     }
-    
+
     // HACK: Presentetional component should not query services
     protected override async Task OnInitializedAsync()
     {

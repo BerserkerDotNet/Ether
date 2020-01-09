@@ -4,21 +4,21 @@
     </Then>
     <Else>
         <EditForm Model="Props.VstsDataSource" OnValidSubmit="@(async () => await Props.OnSave.InvokeAsync(Props.VstsDataSource))">
-            <Card Title="Vsts configuration" AdditionalClasses="card-600">
-                <Body>
-                    <div class="form-group">
-                        <label>Instance Name</label>
-                        <InputText Class="form-control" @bind-Value="Props.VstsDataSource.InstanceName" />
-                        <ValidationMessage For="@(() => Props.VstsDataSource.InstanceName)" />
-                    </div>
-                    <div class="form-group">
-                        <label>Default Token</label>
-                        <SelectInput Class="form-control" @bind-Value="Props.VstsDataSource.DefaultToken" Options="Props.IdentitiesOptions" />
-                        <ValidationMessage For="@(() => Props.VstsDataSource.DefaultToken)" />
-                    </div>
-                </Body>
-                <Footer><button type="submit" class="btn btn-success btn-fill pull-right">Save</button></Footer>
-            </Card>
+            <MatHeadline4>Azure DevOps configuration</MatHeadline4>
+            <p>
+                <MatTextField @bind-Value="Props.VstsDataSource.InstanceName" Label="Name" Class="full-width" />
+                <ValidationMessage For="@(() => Props.VstsDataSource.InstanceName)" />
+            </p>
+            <p>
+                <SelectControl @bind-Value="Props.VstsDataSource.DefaultToken"
+                               Options="Props.IdentitiesOptions"
+                               KeyToString="k => k is null ? Guid.Empty.ToString() : k.ToString()"
+                               StringToKey="s => Guid.Parse(s) == Guid.Empty ? (Guid?)null : (Guid?)Guid.Parse(s)"
+                               Label="Identity" />
+                <ValidationMessage For="@(() => Props.VstsDataSource.DefaultToken)" />
+            </p>
+
+            <MatButton Raised="true" Type="Submit">Save</MatButton>
         </EditForm>
     </Else>
 </If>

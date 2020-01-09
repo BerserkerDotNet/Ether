@@ -1,11 +1,13 @@
 ﻿@page "/settings"
 
-<div class="row">
-    <div class="col-xl-6 col-md-12">
-        @Identities
-    </div>
-    <div class="col-xl-6 col-md-12">
-        @VstsDataSourceSettings
+<div class="mat-layout-grid">
+    <div class="mat-layout-grid-inner">
+        <div class="mat-layout-grid-cell mat-layout-grid-cell-span-12">
+            @Identities
+        </div>
+        <div class="mat-layout-grid-cell mat-layout-grid-cell-span-12">
+            @VstsDataSourceSettings
+        </div>
     </div>
 </div>
 

@@ -1,46 +1,39 @@
-﻿<EditableGrid Items="Props.Items"
-              GridTitle="Identities"
-              NewTitle="New identity"
-              ExistingTitle="Editing identity"
-              OnSave="@(async (IdentityViewModel i) => await Props.OnSave.InvokeAsync(i))"
-              OnDelete="@(async (IdentityViewModel i) => await Props.OnDelete.InvokeAsync(i))"
-              OnRefresh="@(async () => await Props.OnRefresh.InvokeAsync(null))">
-    <ListModeContent Context="ctx">
-        <DataTable Items="@ctx.Items">
-            <TableHeader>
-                <th>Name</th>
-                <th>Expiration Date</th>
-            </TableHeader>
-            <RowTemplate Context="identity">
-                <td>@identity.Name</td>
-                <td>@identity.ExpirationDate</td>
-            </RowTemplate>
-            <ActionsTemplate Context="identity">
-                <div>
-                    <button class="btn btn-warning btn-fill" @onclick="@(() => ctx.Edit(identity))">Edit</button>
-                    <button class="btn btn-danger btn-fill" @onclick="@(() => ctx.Delete(identity))">Delete</button>
-                </div>
-            </ActionsTemplate>
-        </DataTable>
-    </ListModeContent>
-    <FormModeContent Context="ctx">
-        <div class="form-group">
-            <label>Name</label>
-            <InputText Class="form-control" @bind-Value="ctx.EditingItem.Name" />
-            <ValidationMessage For="@(() => ctx.EditingItem.Name)" />
-        </div>
-        <div class="form-group">
-            <label>Token</label>
-            <InputText type="password" Class="form-control" @bind-Value="ctx.EditingItem.Token" />
-            <ValidationMessage For="@(() => ctx.EditingItem.Token)" />
-        </div>
-        <div class="form-group">
-            <label>Expiration Date</label>
-            <InputDate Class="form-control" @bind-Value="ctx.EditingItem.ExpirationDate" />
-            <ValidationMessage For="@(() => ctx.EditingItem.ExpirationDate)" />
-        </div>
-    </FormModeContent>
-</EditableGrid>
+﻿<RichTable Items="Props.Items"
+           GridTitle="Identities"
+           FormTitle="Edit identity"
+           OnSaveEdit="Props.OnSave"
+           OnCancelEdit="Props.OnRefresh"
+           OnRefresh="Props.OnRefresh">
+    <TableHeader>
+        <th>Name</th>
+        <th>Expiration Date</th>
+        <th></th>
+    </TableHeader>
+    <TableBody Context="ctx">
+        <td>@ctx.CurrentItem.Name</td>
+        <td>@ctx.CurrentItem.ExpirationDate</td>
+        <td>
+            <div>
+                <MatButton Label="Edit" Icon="@MatIconNames.Edit" Dense="true" OnClick="() => ctx.Edit()" />
+                <DeleteButton OnDelete="async () => await Props.OnDelete.InvokeAsync(ctx.CurrentItem)" />
+            </div>
+        </td>
+    </TableBody>
+    <FormBody Context="ctx">
+        <p>
+            <MatTextField @bind-Value="ctx.CurrentItem.Name" Label="Name" FullWidth="true" />
+            <ValidationMessage For="@(() => ctx.CurrentItem.Name)" />
+        </p>
+        <p>
+            <MatTextField @bind-Value="ctx.CurrentItem.Token" Type="passowrd" Label="Token" FullWidth="true" />
+            <ValidationMessage For="@(() => ctx.CurrentItem.Token)" />
+        </p>
+        <p>
+            <MatDatePicker @bind-Value="ctx.CurrentItem.ExpirationDate"></MatDatePicker>
+            <ValidationMessage For="@(() => ctx.CurrentItem.ExpirationDate)" />
+        </p>
+    </FormBody>
+</RichTable>
 
 @code
 {

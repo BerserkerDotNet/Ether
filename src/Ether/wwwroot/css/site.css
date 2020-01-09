@@ -1,4 +1,36 @@
-﻿select.form-control {
+﻿.mdc-table {
+    display: table !important;
+}
+
+.mdc-table td:last-child {
+    width: auto !important;
+}
+
+.pull-right {
+    float: right;
+}
+
+.btn-right {
+    right: 0 !important;
+    position: absolute !important;
+}
+
+.edit-form .mdc-dialog__surface {
+    max-width: 100% !important;
+    max-height: 500px !important;
+    height: 500px !important;
+}
+
+.full-width {
+    width: 100%;
+}
+
+.mdc-nav-menu {
+    padding: 16px !important;
+}
+
+/*
+    select.form-control {
     height: auto;
 }
 
@@ -25,9 +57,7 @@ a.nav-link {
     cursor: pointer;
 }
 
-.pull-right {
-    float: right;
-}
+
 
 .buttons-list {
     display: block;
@@ -73,4 +103,4 @@ li.dropdown-item {
 
 .table-centered {
     text-align: center;
-}
+}*/

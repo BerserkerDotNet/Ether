@@ -1,33 +1,28 @@
-﻿<EditableGrid Items="Props.Reports"
-              GridTitle="Reports"
-              IsReadOnly="true"
-              OnRefresh="Props.OnRefresh"
-              OnDelete="Props.OnDelete" >
-    <ListModeContent Context="ctx">
-        <Ether.Components.DataTable Items="ctx.Items" PageSize="8">
-            <TableHeader>
-                <th>Name</th>
-                <th>Taken</th>
-                <th>Profile</th>
-                <th>Start</th>
-                <th>End</th>
-            </TableHeader>
-            <RowTemplate Context="report">
-                <td>@report.ReportName</td>
-                <td>@report.DateTaken</td>
-                <td>@report.ProfileName</td>
-                <td>@report.StartDate</td>
-                <td>@report.EndDate</td>
-            </RowTemplate>
-            <ActionsTemplate Context="report">
-                <div>
-                    <button class="btn btn-success btn-fill" @onclick="@(() => Props.OnView.InvokeAsync(report))">View</button>
-                    <button class="btn btn-danger btn-fill" @onclick="@(() => ctx.Delete(report))">Delete</button>
-                </div>
-            </ActionsTemplate>
-        </Ether.Components.DataTable>
-    </ListModeContent>
-</EditableGrid>
+﻿<MatHeadline4>Reports</MatHeadline4>
+<MatButton Icon="@MatIconNames.Refresh" Dense="true">Refresh</MatButton>
+<MatTable Items="Props.Reports" Class="mat-elevation-z5" AllowSelection="true" PageSize="10" Striped="true" Style="table-layout:auto">
+    <MatTableHeader>
+        <th>Name</th>
+        <th>Taken</th>
+        <th>Profile</th>
+        <th>Start</th>
+        <th>End</th>
+        <th>Actions</th>
+    </MatTableHeader>
+    <MatTableRow Context="report">
+        <td>@report.ReportName</td>
+        <td>@report.DateTaken</td>
+        <td>@report.ProfileName</td>
+        <td>@report.StartDate</td>
+        <td>@report.EndDate</td>
+        <td>
+            <div>
+                <MatIconButton Icon="@MatIconNames.Folder_open" OnClick="() => Props.OnView.InvokeAsync(report)" />
+                <MatIconButton Icon="@MatIconNames.Delete" OnClick="() => Props.OnDelete.InvokeAsync(report)" />
+            </div>
+        </td>
+    </MatTableRow>
+</MatTable>
 
 @code {
     [Parameter] public ReportsListProps Props { get; set; }

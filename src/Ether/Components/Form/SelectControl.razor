@@ -1,0 +1,57 @@
+﻿@typeparam T
+
+<MatSelect @bind-Value="ValueInternal" Label="@Label" Class="full-width">
+    @foreach (var option in OptionsInternal)
+    {
+        <MatOption Value="option.Value">@option.Name</MatOption>
+    }
+</MatSelect>
+
+@code {
+
+    [Parameter]
+    public string Label { get; set; }
+
+    [Parameter]
+    public IEnumerable<SelectOption<T>> Options { get; set; }
+
+    [Parameter]
+    public T Value{ get; set; }
+
+    [Parameter]
+    public EventCallback<T> ValueChanged { get; set; }
+
+    [Parameter]
+    public Expression<Func<T>> ValueExpression { get; set; }
+
+    [Parameter]
+    public Func<string, T> StringToKey { get; set; }
+
+    [Parameter]
+    public Func<T, string> KeyToString { get; set; }
+
+    private IEnumerable<SelectOption<string>> OptionsInternal { set; get; }
+
+    private string ValueInternal
+    {
+        get
+        {
+            return KeyToString(Value);
+        }
+        set
+        {
+            Value = StringToKey(value);
+            ValueChanged.InvokeAsync(Value);
+        }
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (Options is null)
+        {
+            OptionsInternal = Enumerable.Empty<SelectOption<string>>();
+        }
+
+        OptionsInternal = Options.Select(s => new SelectOption<string>(s.Value.ToString(), s.Name)).ToArray();
+    }
+}

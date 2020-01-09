@@ -1,11 +1,12 @@
 ﻿@page "/job-logs"
 
-<div class="row">
-    <div class="col-md-12">
-        @JobLogsComponent
+<div class="mat-layout-grid">
+    <div class="mat-layout-grid-inner">
+        <div class="mat-layout-grid-cell mat-layout-grid-cell-span-12">
+            @JobLogsComponent
+        </div>
     </div>
 </div>
-
 
 @code{
     RenderFragment JobLogsComponent = JobLogsConnected.Get();
