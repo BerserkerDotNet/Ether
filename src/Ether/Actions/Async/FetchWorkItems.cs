@@ -20,9 +20,7 @@ namespace Ether.Actions.Async
 
         public async Task Execute(IDispatcher dispatcher, FetchDataJobParameters parameters)
         {
-            Console.WriteLine("Sending toast");
             _toaster.Add($"Started to fetch workitems for {parameters.Members.Count()} members.", MatToastType.Info, "Fetch Workitems", MatIconNames.Info);
-            Console.WriteLine($"Toasts: {_toaster.Toasts.Count}");
             await _client.RunWorkitemsJob(parameters.Members, parameters.Reset);
             await dispatcher.Dispatch<FetchProfiles>();
         }

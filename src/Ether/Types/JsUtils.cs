@@ -20,11 +20,6 @@ namespace Ether.Types
             return _jsRuntime.InvokeAsync<bool>("confirm", message);
         }
 
-        public ValueTask ButtonState(ElementReference btn, string state)
-        {
-            return _jsRuntime.InvokeVoidAsync("window.BlazorComponents.Utils.buttonState", btn, state);
-        }
-
         public ValueTask Print()
         {
             return _jsRuntime.InvokeVoidAsync("window.BlazorComponents.Utils.print");

@@ -26,6 +26,8 @@
     <MatButton Raised="true" Type="Submit">Create a report</MatButton>
 </EditForm>
 
+<SpinnerDialog IsShown="isGeneratingReport" Label="Analyzing data, please wait..." />
+
 @code{
 
     private bool isGeneratingReport;
@@ -53,7 +55,14 @@
     private async Task Generate()
     {
         isGeneratingReport = true;
-        await Props.OnGenerate.InvokeAsync(reportRequest);
-        isGeneratingReport = false;
+        try
+        {
+            await Props.OnGenerate.InvokeAsync(reportRequest);
+        }
+        finally
+        {
+            isGeneratingReport = false;
+        }
+
     }
 }

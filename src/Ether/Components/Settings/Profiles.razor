@@ -22,7 +22,7 @@
                 <MatButton Label="Edit" Icon="@MatIconNames.Edit" Dense="true" OnClick="() => ctx.Edit()" />
                 <DeleteButton OnDelete="async () => await Props.OnDelete.InvokeAsync(ctx.CurrentItem)" />
                 <DropDownMenu Label="More">
-                    <MatListItem OnClick="async () => { await Props.OnFetchWorkItems.InvokeAsync(ctx.CurrentItem.Members); this.StateHasChanged(); }"><MatIcon Icon="@MatIconNames.Refresh" />&nbsp; Fetch work items</MatListItem>
+                    <MatListItem OnClick="async () => await Props.OnFetchWorkItems.InvokeAsync(ctx.CurrentItem.Members)"><MatIcon Icon="@MatIconNames.Refresh" />&nbsp; Fetch work items</MatListItem>
                     <MatListItem OnClick="async () => await Props.OnResetWorkItems.InvokeAsync(ctx.CurrentItem.Members)"><MatIcon Icon="@MatIconNames.Repeat" />&nbsp; Reset work items</MatListItem>
                     <MatListDivider />
                     <MatListItem OnClick="async () => await Props.OnFetchPullRequests.InvokeAsync(ctx.CurrentItem.Members)"><MatIcon Icon="@MatIconNames.Refresh" />&nbsp; Fetch pull requests</MatListItem>

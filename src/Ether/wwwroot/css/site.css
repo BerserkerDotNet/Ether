@@ -26,7 +26,11 @@
 }
 
 .mdc-nav-menu {
-    padding: 16px !important;
+    padding: 8px !important;
+}
+
+.mdc-sub-menu-icon {
+    top: 15% !important;
 }
 
 /*

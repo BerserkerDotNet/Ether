@@ -1,0 +1,15 @@
+﻿<MatDialog @bind-IsOpen="@IsShown" CanBeClosed="false">
+    <MatDialogContent>
+        <p>@Label</p>
+        <MatProgressBar Indeterminate="true"></MatProgressBar>
+    </MatDialogContent>
+</MatDialog>
+
+@code {
+
+    [Parameter]
+    public string Label { get; set; }
+
+    [Parameter]
+    public bool IsShown { get; set; }
+}
