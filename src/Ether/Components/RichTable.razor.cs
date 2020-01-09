@@ -64,7 +64,7 @@ namespace Ether.Components
 
         public RenderFragment TableBodyInternal(TItem item) => TableBody(CreateContext(item));
 
-        public RenderFragment FormBodyInternal(TItem item) => FormBody(CreateContext(item));
+        public RenderFragment FormBodyInternal(TItem item) => FormBody != null ? FormBody(CreateContext(item)) : null;
 
         public void Edit(TItem item)
         {

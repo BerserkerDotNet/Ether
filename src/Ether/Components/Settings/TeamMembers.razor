@@ -46,46 +46,4 @@
 
 @code{
     [Parameter] public TeamMembersProps Props { get; set; }
-
-    private string searchText = string.Empty;
-    private string selectedProfile = string.Empty;
-
-    private void ApplyFilter(ChangeEventArgs args, DataTableBase<TeamMemberViewModel> dataTable, bool isProfile)
-    {
-        if (isProfile)
-        {
-            selectedProfile = args.Value.ToString();
-        }
-        else
-        {
-            searchText = args.Value.ToString();
-        }
-
-        dataTable.Filter(t => ProfileFilter(t) && SearchBoxFilter(t));
-    }
-
-    private Func<TeamMemberViewModel, bool> ProfileFilter
-    {
-        get
-        {
-            var isGuid = Guid.TryParse(selectedProfile, out var profileId);
-            if (isGuid)
-            {
-                var profile = Props.Profiles.Single(p => p.Id == profileId);
-                return t => profile.Members.Contains(t.Id);
-            }
-            else
-            {
-                return _ => true;
-            }
-        }
-    }
-
-    private Func<TeamMemberViewModel, bool> SearchBoxFilter
-    {
-        get
-        {
-            return i => i.DisplayName.ToLower().Contains(searchText.ToLower()) || i.Email.Contains(searchText);
-        }
-    }
 }

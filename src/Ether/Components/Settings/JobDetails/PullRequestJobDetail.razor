@@ -1,14 +1,28 @@
 ﻿<div>
-    <DataTable Items="Repositories">
+    <RichTable Items="Repositories" GridTitle="Errors" ShowPaging="false" PageSize="int.MaxValue" ShowAdd="false">
         <TableHeader>
             <th>Name</th>
             <th> # of Members</th>
         </TableHeader>
-        <RowTemplate Context="item">
-            <td>@item.Name</td>
-            <td>@item.Items.Count()</td>
-        </RowTemplate>
-        <RowDetailTemplate Context="item">
+        <TableBody Context="item">
+            <td>@item.CurrentItem.Name</td>
+            <td>@item.CurrentItem.Items.Count()</td>
+        </TableBody>
+    </RichTable>
+
+    <RichTable Items="Details.Errors" GridTitle="Errors" ShowPaging="false" PageSize="int.MaxValue" ShowAdd="false">
+        <TableHeader>
+            <th>Repository</th>
+            <th>Member</th>
+            <th>Message</th>
+        </TableHeader>
+        <TableBody Context="item">
+            <td>@item.CurrentItem.Repository</td>
+            <td>@item.CurrentItem.Member</td>
+            <td class="table-danger">@item.CurrentItem.Error</td>
+        </TableBody>
+    </RichTable>
+    @*        <RowDetailTemplate Context="item">
             <DataTable Items="item.Items">
                 <TableHeader>
                     <th>Member</th>
@@ -35,22 +49,7 @@
                 <ActionsTemplate>
                 </ActionsTemplate>
             </DataTable>
-        </RowDetailTemplate>
-        <ActionsTemplate>
-        </ActionsTemplate>
-    </DataTable>
-    <DataTable Items="Details.Errors" NoItemsText="No errors">
-        <TableHeader>
-            <th>Repository</th>
-            <th>Member</th>
-            <th>Message</th>
-        </TableHeader>
-        <RowTemplate Context="item">
-            <td>@item.Repository</td>
-            <td>@item.Member</td>
-            <td class="table-danger">@item.Error</td>
-        </RowTemplate>
-    </DataTable>
+        </RowDetailTemplate>*@
 </div>
 
 @code{
