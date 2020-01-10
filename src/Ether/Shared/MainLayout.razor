@@ -23,7 +23,9 @@
         </MatDrawer>
         <MatDrawerContent Style="padding-left: 25px; padding-right: 25px;">
             <MatAppBarAdjust></MatAppBarAdjust>
-            @Body
+            <div class="full-height">
+                @Body
+            </div>
             <FooterBlock />
         </MatDrawerContent>
     </MatDrawerContainer>
@@ -31,14 +33,6 @@
 else
 {
     <SpinnerDialog IsShown="true" Label="Loading, please wait..." />
-
-    @*<div class="text-center" style="padding-top:20%">
-        <div class="spinner-border text-primary" role="status" style="width: 5rem; height: 5rem;">
-            <span class="sr-only">Loading...</span>
-        </div>
-        <div>Signing you in...</div>
-    </div>*@
-
 }
 @code{
     protected bool isAuthenticated = false;

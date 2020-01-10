@@ -19,6 +19,7 @@
     max-width: 100% !important;
     max-height: 500px !important;
     height: 500px !important;
+    width: 610px !important;
 }
 
 .full-width {
@@ -33,78 +34,29 @@
     top: 15% !important;
 }
 
-/*
-    select.form-control {
-    height: auto;
+.full-height {
+    min-height: calc(100% - 100px);
 }
 
-.btn-link {
-    padding: 0px;
-    vertical-align: super;
+.dialog-full-screen .mdc-dialog__surface {
+    height: 100% !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
 }
 
-.card.card-600 {
-    min-height: 600px;
+.dialog-full-screen .mdc-dialog__container {
+    width: 100% !important;
 }
 
-.card-title {
-    display: inline-block;
-    vertical-align: middle;
+.dialog-full-screen.mdc-dialog {
+    z-index: 99999;
 }
 
-.form-600 {
-    max-height: 600px;
-    overflow-y: scroll;
+form.mdc-footer-bottom {
+    height: calc(100% - 100px);
 }
 
-a.nav-link {
-    cursor: pointer;
+.mdc-footer-bottom .mdc-dialog__content {
+    height: calc(100% - 25px);
 }
-
-
-
-.buttons-list {
-    display: block;
-    border-color: lightgray;
-    border-style: solid;
-    border-width: 1px;
-    border-radius: 5.6px;
-    padding: 10px;
-    margin-top: 10px;
-}
-
-    .buttons-list .dropdown-item {
-        padding: 0px;
-    }
-
-li.dropdown-item {
-    cursor: pointer;
-}
-
-.form-control.invalid {
-    border-color: #e74a3b;
-}
-
-.validation-message {
-    color: #e74a3b;
-}
-
-.font-size-1 {
-    font-size: 1.18em;
-}
-
-.legend-block {
-    width: 35px;
-    height: 35px;
-    display: inline-block;
-}
-
-.legend-text {
-    vertical-align: top;
-    display: inline-block;
-    padding-top: 7px;
-}
-
-.table-centered {
-    text-align: center;
-}*/

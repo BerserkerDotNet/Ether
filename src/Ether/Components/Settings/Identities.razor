@@ -29,7 +29,7 @@
             <ValidationMessage For="@(() => ctx.CurrentItem.Token)" />
         </p>
         <p>
-            <MatDatePicker @bind-Value="ctx.CurrentItem.ExpirationDate"></MatDatePicker>
+            <MatDatePicker @bind-Value="ctx.CurrentItem.ExpirationDate" FullWidth="true" />
             <ValidationMessage For="@(() => ctx.CurrentItem.ExpirationDate)" />
         </p>
     </FormBody>

@@ -1,15 +1,16 @@
 ﻿@typeparam T
 
-<MatDialog @bind-IsOpen="@IsShown" CanBeClosed="false" Class="edit-form">
-    <EditForm Model="Item" OnValidSubmit="async () => await OnSave.InvokeAsync(null)">
-        <MatDialogTitle>@Title</MatDialogTitle>
+<MatDialog @bind-IsOpen="@IsShown" CanBeClosed="false" Class="@additionalClasses">
+    <MatDialogTitle>
+        @Title
+        <MatIconButton Icon="@MatIconNames.Fullscreen" ToggleIcon="@MatIconNames.Fullscreen_exit" Class="pull-right" OnClick="ToggleFullScreen" />
+    </MatDialogTitle>
+    <EditForm class="mdc-footer-bottom" Model="Item" OnValidSubmit="async () => await OnSave.InvokeAsync(null)">
         <MatDialogContent>
             @if (Item is object)
             {
-
                 <FluentValidationValidator />
                 @ChildContent(Item)
-
             }
         </MatDialogContent>
         <MatDialogActions>
@@ -20,6 +21,12 @@
 </MatDialog>
 
 @code {
+    const string DialogOpen = "mdc-dialog--open";
+    const string NormalFormClass = "edit-form";
+    const string FullScreenFormClass = "dialog-full-screen";
+
+    private string additionalClasses = NormalFormClass;
+
     [Parameter] public bool IsShown { get; set; }
 
     [Parameter] public string Title { get; set; }
@@ -31,4 +38,20 @@
     [Parameter] public EventCallback OnSave { get; set; }
 
     [Parameter] public EventCallback OnCancel { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        additionalClasses = NormalFormClass;
+    }
+
+    private void ToggleFullScreen()
+    {
+        additionalClasses = additionalClasses.Contains(NormalFormClass) ? FullScreenFormClass : NormalFormClass;
+
+        if (IsShown)
+        {
+            // HACK: Stupid dialog forgets that it was open if you change class. Submit a bug to MatBlazor
+            additionalClasses = $"{additionalClasses} {DialogOpen}";
+        }
+    }
 }
