@@ -16,10 +16,13 @@ namespace Ether.Actions.Async
 
         public async Task Execute(IDispatcher dispatcher, IdentityViewModel identity)
         {
-            await _client.Save(identity);
+            await Utils.ExecuteWithLoading(dispatcher, async () =>
+            {
+                await _client.Save(identity);
 
-            // TODO: instead of refresh insert?
-            await dispatcher.Dispatch<FetchIdentities>();
+                // TODO: instead of refresh insert?
+                await dispatcher.Dispatch<FetchIdentities>();
+            });
         }
     }
 }

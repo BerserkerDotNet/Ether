@@ -21,7 +21,10 @@ namespace Ether.Actions.Async
         {
             try
             {
-                await _client.Delete<ReportViewModel>(report.Id);
+                await Utils.ExecuteWithLoading(dispatcher, async () =>
+                {
+                    await _client.Delete<ReportViewModel>(report.Id);
+                });
                 await dispatcher.Dispatch<FetchReports>();
                 _toaster.Add($"{report.ReportType} was deleted successfully.", MatToastType.Success, "Report deleted", MatIconNames.Delete);
             }

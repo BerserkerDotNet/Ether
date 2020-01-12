@@ -16,10 +16,13 @@ namespace Ether.Actions.Async
 
         public async Task Execute(IDispatcher dispatcher)
         {
-            var members = await _client.GetAll<TeamMemberViewModel>();
-            dispatcher.Dispatch(new ReceiveMembersAction
+            await Utils.ExecuteWithLoading(dispatcher, async () =>
             {
-                Members = members
+                var members = await _client.GetAll<TeamMemberViewModel>();
+                dispatcher.Dispatch(new ReceiveMembersAction
+                {
+                    Members = members
+                });
             });
         }
     }

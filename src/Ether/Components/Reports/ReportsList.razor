@@ -1,28 +1,29 @@
-﻿<MatHeadline4>Reports</MatHeadline4>
-<MatButton Icon="@MatIconNames.Refresh" Dense="true">Refresh</MatButton>
-<MatTable Items="Props.Reports" Class="mat-elevation-z5" AllowSelection="true" PageSize="10" Striped="true" Style="table-layout:auto">
-    <MatTableHeader>
+﻿<RichTable Items="Props.Reports"
+           GridTitle="Reports"
+           ShowAdd="false"
+           OnRefresh="Props.OnRefresh">
+    <TableHeader>
         <th>Name</th>
         <th>Taken</th>
         <th>Profile</th>
         <th>Start</th>
         <th>End</th>
-        <th>Actions</th>
-    </MatTableHeader>
-    <MatTableRow Context="report">
-        <td>@report.ReportName</td>
-        <td>@report.DateTaken</td>
-        <td>@report.ProfileName</td>
-        <td>@report.StartDate</td>
-        <td>@report.EndDate</td>
+        <th></th>
+    </TableHeader>
+    <TableBody Context="ctx">
+        <td>@ctx.CurrentItem.ReportName</td>
+        <td>@ctx.CurrentItem.DateTaken</td>
+        <td>@ctx.CurrentItem.ProfileName</td>
+        <td>@ctx.CurrentItem.StartDate</td>
+        <td>@ctx.CurrentItem.EndDate</td>
         <td>
             <div>
-                <MatIconButton Icon="@MatIconNames.Folder_open" OnClick="() => Props.OnView.InvokeAsync(report)" />
-                <MatIconButton Icon="@MatIconNames.Delete" OnClick="() => Props.OnDelete.InvokeAsync(report)" />
+                <MatIconButton Icon="@MatIconNames.Folder_open" OnClick="() => Props.OnView.InvokeAsync(ctx.CurrentItem)" />
+                <MatIconButton Icon="@MatIconNames.Delete" OnClick="() => Props.OnDelete.InvokeAsync(ctx.CurrentItem)" />
             </div>
         </td>
-    </MatTableRow>
-</MatTable>
+    </TableBody>
+</RichTable>
 
 @code {
     [Parameter] public ReportsListProps Props { get; set; }

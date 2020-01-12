@@ -21,5 +21,7 @@ namespace Ether.Types.State
         public ProjectsState Projects { get; set; }
 
         public string Location { get; set; }
+
+        public int ComponentsInLoadingState { get; set; }
     }
 }

@@ -19,7 +19,10 @@ namespace Ether.Actions.Async
 
         public async Task Execute(IDispatcher dispatcher, VstsRepositoryViewModel repository)
         {
-            await _client.Delete<VstsRepositoryViewModel>(repository.Id);
+            await Utils.ExecuteWithLoading(dispatcher, async () =>
+            {
+                await _client.Delete<VstsRepositoryViewModel>(repository.Id);
+            });
 
             // TODO: instead of refresh delete?
             await dispatcher.Dispatch<FetchRepositories>();

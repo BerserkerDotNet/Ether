@@ -2,11 +2,13 @@
 @inherits RichTableBase<TItem>
 
 <MatHeadline4>@GridTitle</MatHeadline4>
-@if (ShowAdd)
-{
-    <MatButton Icon="@MatIconNames.Add" Dense="true" OnClick="New">New</MatButton>
-}
-<MatButton Icon="@MatIconNames.Refresh" Dense="true" OnClick="async () => await OnRefresh.InvokeAsync(null)">Refresh</MatButton>
+<div class="pull-right">
+    @if (ShowAdd)
+    {
+        <MatButton Icon="@MatIconNames.Add" Dense="true" OnClick="New">New</MatButton>
+    }
+    <MatButton Icon="@MatIconNames.Refresh" Dense="true" OnClick="async () => await OnRefresh.InvokeAsync(null)">Refresh</MatButton>
+</div>
 <MatTable Items="Items" Class="mat-elevation-z5" PageSize="PageSize" ShowPaging="ShowPaging" Striped="true" Style="table-layout:auto">
     <MatTableHeader>
         @TableHeader

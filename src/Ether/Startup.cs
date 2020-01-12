@@ -49,6 +49,7 @@ namespace Ether
                 cfg.Map<MembersReducer, TeamMembersState>(s => s.TeamMembers);
                 cfg.Map<RepositoriesReducer, RepositoriesState>(s => s.Repositories);
                 cfg.Map<ProjectsReducer, ProjectsState>(s => s.Projects);
+                cfg.Map<LoadingReducer, int>(s => s.ComponentsInLoadingState);
 
                 cfg.RegisterActionsFromAssemblyContaining<FetchProfiles>();
             });

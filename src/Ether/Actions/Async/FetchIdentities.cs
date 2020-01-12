@@ -16,10 +16,13 @@ namespace Ether.Actions.Async
 
         public async Task Execute(IDispatcher dispatcher)
         {
-            var identities = await _client.GetAll<IdentityViewModel>();
-            dispatcher.Dispatch(new ReceiveIdentitiesAction
+            await Utils.ExecuteWithLoading(dispatcher, async () =>
             {
-                Identities = identities
+                var identities = await _client.GetAll<IdentityViewModel>();
+                dispatcher.Dispatch(new ReceiveIdentitiesAction
+                {
+                    Identities = identities
+                });
             });
         }
     }

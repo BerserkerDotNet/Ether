@@ -1,6 +1,6 @@
 ﻿<BlazorRedux />
-
 <MatThemeProvider Theme="@theme">
+    @LoadingDialogConnected.Get()
     <MatToastContainer />
     <Router AppAssembly="typeof(Program).Assembly">
         <Found Context="routeData">

@@ -17,11 +17,14 @@ namespace Ether.Actions.Async
 
         public async Task Execute(IDispatcher dispatcher, JobLogViewModel log)
         {
-            var details = await _client.GetJobDetailsById<PullRequestJobDetails>(log.Id);
-            dispatcher.Dispatch(new UpdateJobLogDetail
+            await Utils.ExecuteWithLoading(dispatcher, async () =>
             {
-                Details = details,
-                JobLogId = log.Id
+                var details = await _client.GetJobDetailsById<PullRequestJobDetails>(log.Id);
+                dispatcher.Dispatch(new UpdateJobLogDetail
+                {
+                    Details = details,
+                    JobLogId = log.Id
+                });
             });
         }
     }

@@ -16,10 +16,13 @@ namespace Ether.Actions.Async
 
         public async Task Execute(IDispatcher dispatcher, VstsRepositoryViewModel repository)
         {
-            await _client.Save(repository);
+            await Utils.ExecuteWithLoading(dispatcher, async () =>
+            {
+                await _client.Save(repository);
 
-            // TODO: instead of refresh insert?
-            await dispatcher.Dispatch<FetchRepositories>();
+                // TODO: instead of refresh insert?
+                await dispatcher.Dispatch<FetchRepositories>();
+            });
         }
     }
 }
