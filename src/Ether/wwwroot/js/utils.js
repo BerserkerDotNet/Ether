@@ -1,38 +1,5 @@
 ﻿window.BlazorComponents = window.BlazorComponents || {};
-window.BlazorComponents.DataTableInterop = {
-    initializeDataTable: function (table) {
-        $(table).DataTable({
-            'paging': true,
-            'lengthChange': true,
-            'searching': true,
-            'ordering': false,
-            'info': true,
-            'autoWidth': true
-        });
-    }
-};
 window.BlazorComponents.Utils = {
-    getAllSelectedOptions: function (select) {
-        return $(select).val();
-    },
-    failValidation: function (id) {
-        $('#' + id).find(':input').addClass('is-invalid', 'was-validated');
-    },
-    succeedValidation: function (id) {
-        $('#' + id).find(':input').removeClass('is-invalid', 'was-validated');
-    },
-    buttonState: function (btn, state) {
-        var button = $(btn);
-        if (state === 'loading') {
-            var loadingText = button.data('loading-text');
-            button.html(loadingText);
-            button.attr('disabled', true);
-        } else {
-            var loadingText = button.data('normal-text');
-            button.html(loadingText);
-            button.removeAttr('disabled');
-        }
-    },
     print: function () {
         window.print();
     },
@@ -43,31 +10,8 @@ window.BlazorComponents.Utils = {
         document.body.appendChild(link); // Needed for Firefox
         link.click();
         document.body.removeChild(link);
-    },
-    getValue: function (element) {
-        return $(element).val();
-    },
-    setValue: function (element, value) {
-        return $(element).val(value);
     }
 };
-
-window.BlazorComponents.Notify = {
-    notify: function (type, title, message, timer) {
-        $.notify({
-            title: title,
-            message: message
-        },
-            {
-                type: type,
-                timer: timer,
-                placement: {
-                    from: "top",
-                    align: "right"
-                }
-            });
-    }
-}
 
 window.BlazorComponents.DateRangePicker = {
     init: function (element, blazorComponent) {

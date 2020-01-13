@@ -1,8 +1,5 @@
-﻿<If Condition="@(Props.VstsDataSource == null)">
+﻿<If Condition="@(Props.VstsDataSource != null)">
     <Then>
-        <Spinner Text="Loading..." />
-    </Then>
-    <Else>
         <EditForm Model="Props.VstsDataSource" OnValidSubmit="@(async () => await Props.OnSave.InvokeAsync(Props.VstsDataSource))">
             <MatHeadline4>Azure DevOps configuration</MatHeadline4>
             <p>
@@ -20,7 +17,7 @@
 
             <MatButton Raised="true" Type="Submit">Save</MatButton>
         </EditForm>
-    </Else>
+    </Then>
 </If>
 
 @code

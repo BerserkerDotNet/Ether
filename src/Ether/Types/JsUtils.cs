@@ -15,11 +15,6 @@ namespace Ether.Types
             _jsRuntime = jsRuntime;
         }
 
-        public ValueTask<bool> Confirm(string message)
-        {
-            return _jsRuntime.InvokeAsync<bool>("confirm", message);
-        }
-
         public ValueTask Print()
         {
             return _jsRuntime.InvokeVoidAsync("window.BlazorComponents.Utils.print");

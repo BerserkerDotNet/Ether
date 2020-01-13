@@ -50,14 +50,6 @@ namespace Ether.Components
         [Parameter]
         public EventCallback<TItem> OnSaveEdit { get; set; }
 
-        protected override void OnParametersSet()
-        {
-            if (Items == null)
-            {
-                Items = Enumerable.Empty<TItem>();
-            }
-        }
-
         protected bool IsEditing { get; set; }
 
         protected TItem EditingItem { get; set; } = TCreator();
@@ -66,10 +58,17 @@ namespace Ether.Components
 
         public RenderFragment FormBodyInternal(TItem item) => FormBody != null ? FormBody(CreateContext(item)) : null;
 
+        protected override void OnParametersSet()
+        {
+            if (Items == null)
+            {
+                Items = Enumerable.Empty<TItem>();
+            }
+        }
+
         public void Edit(TItem item)
         {
-            IsEditing = true;
-            EditingItem = item;
+            EditInternal(item, clone: true);
         }
 
         protected void New()
@@ -80,7 +79,7 @@ namespace Ether.Components
                 vm.Id = Guid.NewGuid();
             }
 
-            Edit(item);
+            EditInternal(item, clone: false);
         }
 
         protected Task SaveEdit()
@@ -98,6 +97,12 @@ namespace Ether.Components
         {
             IsEditing = false;
             return OnCancelEdit.InvokeAsync(null);
+        }
+
+        private void EditInternal(TItem item, bool clone)
+        {
+            IsEditing = true;
+            EditingItem = clone ? item.PoorMansClone() : item;
         }
     }
 }

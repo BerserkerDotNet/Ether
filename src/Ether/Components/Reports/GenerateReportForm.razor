@@ -17,8 +17,7 @@
         <ValidationMessage For="@(() => reportRequest.ReportType)" />
     </p>
     <p>
-        <label>Date range:</label>
-        <DateRangeControl Class="form-control" @bind-Start="reportRequest.Start" @bind-End="reportRequest.End" />
+        <DateRangeControl @bind-Start="reportRequest.Start" @bind-End="reportRequest.End" />
         <ValidationMessage For="@(() => reportRequest.Start)" />
         <ValidationMessage For="@(() => reportRequest.End)" />
     </p>
