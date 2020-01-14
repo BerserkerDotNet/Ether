@@ -16,10 +16,13 @@ namespace Ether.Actions.Async
 
         public async Task Execute(IDispatcher dispatcher)
         {
-            var config = await _client.GetVstsDataSourceConfig();
-            dispatcher.Dispatch(new ReceiveDataSourceConfig
+            await Utils.ExecuteWithLoading(dispatcher, async () =>
             {
-                Config = config
+                var config = await _client.GetVstsDataSourceConfig();
+                dispatcher.Dispatch(new ReceiveDataSourceConfig
+                {
+                    Config = config
+                });
             });
         }
     }

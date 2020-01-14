@@ -1,0 +1,32 @@
+﻿@typeparam TItem
+@inherits BaseMatAutocompleteList<TItem>
+@*NOTE: Copy from https://github.com/SamProf/MatBlazor/blob/master/src/MatBlazor/Components/MatAutocompleteList/MatAutocompleteList.razor to fix issue with dialog by using bind-Value*@
+<div class="@WrapperClassMapper.AsString()">
+    <MatTextField Icon="@Icon" OnFocus="@OpenPopup" HideClearButton="true" FullWidth="@FullWidth" OnFocusOut="@ClosePopup" Label="@Label" @bind-Value="@StringValue" OnInput="@OnValueChanged" OnKeyDown="@OnKeyDown" Outlined="@Outlined" Attributes="@Attributes" Id="@Id"></MatTextField>
+    @if (IsShowingClearButton)
+    {
+        <div class="mat-autocomplete-list-clearbutton">
+            <MatIconButton Icon="clear" OnMouseDown="@ClearText"></MatIconButton>
+        </div>
+    }
+    @if (Items != null && IsOpened)
+    {
+        <div class="mat-autocomplete-list-popup">
+            <MatList @ref="ListRef" SingleSelection="true">
+                @foreach (var elementWrapper in GetFilteredCollection(StringValue))
+                {
+                    <MatListItem OnMouseDown="@((e) => ItemClicked(elementWrapper.Item))">
+                        @if (ItemTemplate != null)
+                        {
+                            @ItemTemplate(elementWrapper.Item)
+                        }
+                        else
+                        {
+                            <MatListItemText>@(elementWrapper.StringValue)</MatListItemText>
+                        }
+                    </MatListItem>
+                }
+            </MatList>
+        </div>
+    }
+</div>

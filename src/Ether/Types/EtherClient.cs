@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Ether.ViewModels;
 using Ether.ViewModels.Types;
 using IdentityModel.Client;
+using MatBlazor;
 using Microsoft.AspNetCore.Blazor.Http;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Logging;
@@ -39,15 +40,15 @@ namespace Ether.Types
 
         private readonly HttpClient _httpClient;
         private readonly NavigationManager _navigation;
-        private readonly JsUtils _jsUtils;
+        private readonly IMatToaster _toaster;
         private readonly ILogger<EtherClient> _logger;
 
-        public EtherClient(HttpClient httpClient, NavigationManager navigation, JsUtils jsUtils, ILogger<EtherClient> logger)
+        public EtherClient(HttpClient httpClient, NavigationManager navigation, IMatToaster toaster, ILogger<EtherClient> logger)
         {
             // WebAssemblyHttpMessageHandler.DefaultCredentials = FetchCredentialsOption.Include;
             _httpClient = httpClient;
             _navigation = navigation;
-            _jsUtils = jsUtils;
+            _toaster = toaster;
             _logger = logger;
             httpClient.BaseAddress = GetApiUrl();
         }
@@ -230,7 +231,7 @@ namespace Ether.Types
             else if (!response.IsSuccessStatusCode)
             {
                 var message = $"{response.StatusCode} {response.ReasonPhrase}";
-                _jsUtils.NotifyError("Server responded with error", message);
+                _toaster.Add(message, MatToastType.Danger, "Server responded with error", MatIconNames.Error);
                 throw new Exception(message);
             }
         }

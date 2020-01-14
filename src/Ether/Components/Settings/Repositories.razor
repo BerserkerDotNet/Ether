@@ -1,42 +1,38 @@
-﻿@inject EtherClient Client
-<EditableGrid Items="Props.Items"
-              GridTitle="Repositories"
-              NewTitle="New Repository"
-              ExistingTitle="Edit Repository"
-              OnSave="@(async (VstsRepositoryViewModel r) => await Props.OnSave.InvokeAsync(r))"
-              OnDelete="@(async (VstsRepositoryViewModel r) => await Props.OnDelete.InvokeAsync(r))"
-              OnRefresh="@(async () => await Props.OnRefresh.InvokeAsync(null))">
-    <ListModeContent Context="ctx">
-        <DataTable Items="@ctx.Items">
-            <TableHeader>
-                <th>Name</th>
-                <th>Project</th>
-            </TableHeader>
-            <RowTemplate Context="repository">
-                <td>@repository.Name</td>
-                <td>@GetProjectName(repository.Project)</td>
-            </RowTemplate>
-            <ActionsTemplate Context="repository">
-                <div>
-                    <button class="btn btn-warning btn-fill" @onclick="@(() => ctx.Edit(repository))">Edit</button>
-                    <button class="btn btn-danger btn-fill" @onclick="@(() => ctx.Delete(repository))">Delete</button>
-                </div>
-            </ActionsTemplate>
-        </DataTable>
-    </ListModeContent>
-    <FormModeContent Context="ctx">
-        <div class="form-group">
-            <label>Name</label>
-            <InputText Class="form-control" @bind-Value="ctx.EditingItem.Name" />
-            <ValidationMessage For="@(() => ctx.EditingItem.Name)" />
-        </div>
-        <div class="form-group">
-            <label>Project</label>
-            <SelectInput Class="form-control" @bind-Value="ctx.EditingItem.Project" Options="Props.ProjectsOptions" />
-            <ValidationMessage For="@(() => ctx.EditingItem.Project)" />
-        </div>
-    </FormModeContent>
-</EditableGrid>
+﻿<RichTable Items="Props.Items"
+           GridTitle="Repositories"
+           FormTitle="Edit repository"
+           OnSaveEdit="Props.OnSave"
+           OnRefresh="Props.OnRefresh">
+    <TableHeader>
+        <th>Name</th>
+        <th>Project</th>
+        <th></th>
+    </TableHeader>
+    <TableBody Context="ctx">
+        <td>@ctx.CurrentItem.Name</td>
+        <td>@GetProjectName(ctx.CurrentItem.Project)</td>
+        <td>
+            <div>
+                <MatButton Label="Edit" Icon="@MatIconNames.Edit" Dense="true" OnClick="() => ctx.Edit()" />
+                <DeleteButton OnDelete="async () => await Props.OnDelete.InvokeAsync(ctx.CurrentItem)" />
+            </div>
+        </td>
+    </TableBody>
+    <FormBody Context="ctx">
+        <p>
+            <MatTextField @bind-Value="ctx.CurrentItem.Name" Label="Name" FullWidth="true" />
+            <ValidationMessage For="@(() => ctx.CurrentItem.Name)" />
+        </p>
+        <p>
+            <SelectControl @bind-Value="ctx.CurrentItem.Project"
+                           Options="Props.ProjectsOptions"
+                           KeyToString="k => k.ToString()"
+                           StringToKey="s => Guid.Parse(s)"
+                           Label="Project" />
+            <ValidationMessage For="@(() => ctx.CurrentItem.Project)" />
+        </p>
+    </FormBody>
+</RichTable>
 
 @code
 {
@@ -44,11 +40,12 @@
 
     private string GetProjectName(Guid projectId)
     {
-        if (!Props.ProjectsOptions.ContainsKey(projectId))
+        var project = Props.ProjectsOptions.FirstOrDefault(i => i.Value == projectId);
+        if (project is null)
         {
             return "N/A";
         }
 
-        return Props.ProjectsOptions[projectId];
+        return project.Name;
     }
 }

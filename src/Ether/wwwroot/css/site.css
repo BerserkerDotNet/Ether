@@ -1,76 +1,62 @@
-﻿select.form-control {
-    height: auto;
+﻿.mdc-table {
+    display: table !important;
 }
 
-.btn-link {
-    padding: 0px;
-    vertical-align: super;
-}
-
-.card.card-600 {
-    min-height: 600px;
-}
-
-.card-title {
-    display: inline-block;
-    vertical-align: middle;
-}
-
-.form-600 {
-    max-height: 600px;
-    overflow-y: scroll;
-}
-
-a.nav-link {
-    cursor: pointer;
+.mdc-table td:last-child {
+    width: auto !important;
 }
 
 .pull-right {
     float: right;
 }
 
-.buttons-list {
-    display: block;
-    border-color: lightgray;
-    border-style: solid;
-    border-width: 1px;
-    border-radius: 5.6px;
-    padding: 10px;
-    margin-top: 10px;
+.btn-right {
+    right: 0 !important;
+    position: absolute !important;
 }
 
-    .buttons-list .dropdown-item {
-        padding: 0px;
-    }
-
-li.dropdown-item {
-    cursor: pointer;
+.edit-form .mdc-dialog__surface {
+    max-width: 100% !important;
+    max-height: 500px !important;
+    height: 500px !important;
+    width: 610px !important;
 }
 
-.form-control.invalid {
-    border-color: #e74a3b;
+.full-width {
+    width: 100%;
 }
 
-.validation-message {
-    color: #e74a3b;
+.mdc-nav-menu {
+    padding: 8px !important;
 }
 
-.font-size-1 {
-    font-size: 1.18em;
+.mdc-sub-menu-icon {
+    top: 15% !important;
 }
 
-.legend-block {
-    width: 35px;
-    height: 35px;
-    display: inline-block;
+.full-height {
+    min-height: calc(100% - 100px);
 }
 
-.legend-text {
-    vertical-align: top;
-    display: inline-block;
-    padding-top: 7px;
+.dialog-full-screen .mdc-dialog__surface {
+    height: 100% !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
 }
 
-.table-centered {
-    text-align: center;
+.dialog-full-screen .mdc-dialog__container {
+    width: 100% !important;
+}
+
+.dialog-full-screen.mdc-dialog {
+    z-index: 99999;
+}
+
+form.mdc-footer-bottom {
+    height: calc(100% - 100px);
+}
+
+.mdc-footer-bottom .mdc-dialog__content {
+    height: calc(100% - 25px);
 }

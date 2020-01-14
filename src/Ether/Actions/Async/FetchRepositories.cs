@@ -16,10 +16,13 @@ namespace Ether.Actions.Async
 
         public async Task Execute(IDispatcher dispatcher)
         {
-            var repositories = await _client.GetAll<VstsRepositoryViewModel>();
-            dispatcher.Dispatch(new ReceiveRepositoriesAction
+            await Utils.ExecuteWithLoading(dispatcher, async () =>
             {
-                Repositories = repositories
+                var repositories = await _client.GetAll<VstsRepositoryViewModel>();
+                dispatcher.Dispatch(new ReceiveRepositoriesAction
+                {
+                    Repositories = repositories
+                });
             });
         }
     }

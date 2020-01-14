@@ -2,27 +2,31 @@
 using BlazorState.Redux.Interfaces;
 using Ether.Types;
 using Ether.ViewModels;
+using MatBlazor;
 
 namespace Ether.Actions.Async
 {
     public class DeleteProject : IAsyncAction<VstsProjectViewModel>
     {
         private readonly EtherClient _client;
-        private readonly JsUtils _jsUtils;
+        private readonly IMatToaster _toaster;
 
-        public DeleteProject(EtherClient client, JsUtils jsUtils)
+        public DeleteProject(EtherClient client, IMatToaster toaster)
         {
             _client = client;
-            _jsUtils = jsUtils;
+            _toaster = toaster;
         }
 
         public async Task Execute(IDispatcher dispatcher, VstsProjectViewModel project)
         {
-            await _client.Delete<VstsProjectViewModel>(project.Id);
+            await Utils.ExecuteWithLoading(dispatcher, async () =>
+            {
+                await _client.Delete<VstsProjectViewModel>(project.Id);
+            });
 
             // TODO: instead of refresh delete?
             await dispatcher.Dispatch<FetchProjects>();
-            await _jsUtils.NotifySuccess("Delete", $"Project {project.Name} was deleted successfully.");
+            _toaster.Add($"Project {project.Name} was deleted successfully.", MatToastType.Success, "Delete", MatIconNames.Delete);
         }
     }
 }

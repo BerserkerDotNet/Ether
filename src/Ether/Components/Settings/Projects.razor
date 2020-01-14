@@ -1,48 +1,44 @@
-﻿<EditableGrid Items="Props.Items"
-              GridTitle="Projects"
-              NewTitle="New Project"
-              ExistingTitle="Editing Project"
-              OnSave="@(async (VstsProjectViewModel p) => await Props.OnSave.InvokeAsync(p))"
-              OnDelete="@(async (VstsProjectViewModel p) => await Props.OnDelete.InvokeAsync(p))"
-              OnRefresh="@(async () => await Props. OnRefresh.InvokeAsync(null))">
-    <ListModeContent Context="ctx">
-        <DataTable Items="@ctx.Items">
-            <TableHeader>
-                <th>Name</th>
-                <th>Is workitems enabled</th>
-                <th>Identity</th>
-            </TableHeader>
-            <RowTemplate Context="project">
-                <td>@project.Name</td>
-                <td>@project.IsWorkItemsEnabled</td>
-                <td>@GetIdentityName(project.Identity)</td>
-            </RowTemplate>
-            <ActionsTemplate Context="project">
-                <div>
-                    <button class="btn btn-warning btn-fill" @onclick="@(() => ctx.Edit(project))">Edit</button>
-                    <button class="btn btn-danger btn-fill" @onclick="@(() => ctx.Delete(project))">Delete</button>
-                </div>
-            </ActionsTemplate>
-        </DataTable>
-    </ListModeContent>
-    <FormModeContent Context="ctx">
-        <div class="form-group">
-            <label>Name</label>
-            <InputText Class="form-control" @bind-Value="ctx.EditingItem.Name" />
-            <ValidationMessage For="@(() => ctx.EditingItem.Name)" />
-        </div>
-        <div class="form-group">
-            <label>Is Work Items Enabled</label>
-            <InputCheckbox Class="form-control" @bind-Value="ctx.EditingItem.IsWorkItemsEnabled" />
-            <ValidationMessage For="@(() => ctx.EditingItem.IsWorkItemsEnabled)" />
-        </div>
-        <div class="form-group">
-            <label>Identity</label>
-            <SelectInput Class="form-control" @bind-Value="ctx.EditingItem.Identity" Options="Props.IdentitiesOptions" />
-            <ValidationMessage For="@(() => ctx.EditingItem.Identity)" />
-        </div>
-    </FormModeContent>
-</EditableGrid>
+﻿<RichTable Items="Props.Items"
+           GridTitle="Projects"
+           FormTitle="Edit project"
+           OnSaveEdit="Props.OnSave"
+           OnRefresh="Props.OnRefresh">
+    <TableHeader>
+        <th>Name</th>
+        <th>Is workitems enabled</th>
+        <th>Identity</th>
+        <th></th>
+    </TableHeader>
+    <TableBody Context="ctx">
+        <td>@ctx.CurrentItem.Name</td>
+        <td>@ctx.CurrentItem.IsWorkItemsEnabled</td>
+        <td>@GetIdentityName(ctx.CurrentItem.Identity)</td>
+        <td>
+            <div>
+                <MatButton Label="Edit" Icon="@MatIconNames.Edit" Dense="true" OnClick="() => ctx.Edit()" />
+                <DeleteButton OnDelete="async () => await Props.OnDelete.InvokeAsync(ctx.CurrentItem)" />
+            </div>
+        </td>
+    </TableBody>
+    <FormBody Context="ctx">
+        <p>
+            <MatTextField @bind-Value="ctx.CurrentItem.Name" Label="Name" FullWidth="true" />
+            <ValidationMessage For="@(() => ctx.CurrentItem.Name)" />
+        </p>
+        <p>
+            <MatCheckbox @bind-Value="@ctx.CurrentItem.IsWorkItemsEnabled" Label="Is Work Items Enabled" />
+            <ValidationMessage For="@(() => ctx.CurrentItem.IsWorkItemsEnabled)" />
+        </p>
+        <p>
+            <SelectControl @bind-Value="ctx.CurrentItem.Identity"
+                           Options="Props.IdentitiesOptions"
+                           KeyToString="k => k is null ? Guid.Empty.ToString() : k.ToString()"
+                           StringToKey="s => Guid.Parse(s) == Guid.Empty ? (Guid?)null : (Guid?)Guid.Parse(s)"
+                           Label="Identity" />
+            <ValidationMessage For="@(() => ctx.CurrentItem.Identity)" />
+        </p>
+    </FormBody>
+</RichTable>
 
 @code
 {
@@ -55,12 +51,12 @@
             return Constants.NoneLabel;
         }
 
-        if (!Props.IdentitiesOptions.ContainsKey(identityId.Value))
+        var identity = Props.IdentitiesOptions.FirstOrDefault(i => i.Value == identityId.Value);
+        if (identity is null)
         {
             return "N/A";
         }
 
-        return Props.IdentitiesOptions[identityId.Value];
+        return identity.Name;
     }
-
 }

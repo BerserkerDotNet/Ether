@@ -1,0 +1,17 @@
+﻿<MatButton Icon="@MatIconNames.Call_to_action" Label="@Label" Dense="true" OnClick="async () => await menu.OpenAsync(button.Ref)" @ref="button" />
+<MatMenu @ref="menu">
+    <MatList>
+        @ChildContent
+    </MatList>
+</MatMenu>
+
+@code {
+    BaseMatButton button;
+    BaseMatMenu menu;
+
+    [Parameter] 
+    public string Label { get; set; }
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+}

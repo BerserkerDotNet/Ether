@@ -8,12 +8,13 @@ using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Rendering;
 using Microsoft.AspNetCore.Components.RenderTree;
 using Microsoft.JSInterop;
+using MatBlazor;
 
 namespace Ether.Components.Code
 {
-    public class DateRangeControl : ComponentBase
+    public class DateRangeControlBase : ComponentBase
     {
-        private ElementReference _dateRange;
+        protected MatTextField<string> _dateRange;
         private FieldIdentifier _startIdentifier;
         private FieldIdentifier _endIdentifier;
         private bool _isInitialized = false;
@@ -51,6 +52,8 @@ namespace Ether.Components.Code
         [Parameter]
         public Expression<Func<DateTime>> EndExpression { get; set; }
 
+        public string Value { get; set; }
+
         protected string FieldClass
         {
             get
@@ -78,6 +81,8 @@ namespace Ether.Components.Code
             EditContext.NotifyFieldChanged(_startIdentifier);
             EditContext.NotifyFieldChanged(_endIdentifier);
 
+            // Value = $"{Start} - {End}";
+
             this.StateHasChanged();
         }
 
@@ -89,22 +94,12 @@ namespace Ether.Components.Code
             _endIdentifier = FieldIdentifier.Create(EndExpression);
         }
 
-        protected override void BuildRenderTree(RenderTreeBuilder builder)
-        {
-            builder.OpenElement(0, "input");
-            builder.AddMultipleAttributes(1, AdditionalAttributes);
-            builder.AddAttribute(2, "id", Id);
-            builder.AddAttribute(3, "class", CssClass);
-            builder.AddElementReferenceCapture(4, r => _dateRange = r);
-            builder.CloseElement();
-        }
-
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (!_isInitialized)
             {
                 _isInitialized = true;
-                await Js.DateRangePicker(_dateRange, DotNetObjectReference.Create<object>(this));
+                await Js.DateRangePicker(_dateRange.InputRef, DotNetObjectReference.Create<object>(this));
             }
         }
     }

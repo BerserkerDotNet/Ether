@@ -1,0 +1,29 @@
+﻿<MatButton Label="Delete" Icon="@MatIconNames.Delete" Dense="true" OnClick="() => isConfirmVisible = true" />
+
+<If Condition="isConfirmVisible">
+    <Then>
+        <ConfirmDialog 
+                       Title="Delete"
+                       Message="Confirm delete operation"
+                       IsOpen="isConfirmVisible"
+                       OnConfirm="Delete"
+                       OnCancel="DismissDialog"/>
+    </Then>
+</If>
+
+@code {
+    private bool isConfirmVisible = false;
+
+    [Parameter] public EventCallback OnDelete { get; set; }
+
+    private async Task Delete()
+    {
+        DismissDialog();
+        await OnDelete.InvokeAsync(null);
+    }
+
+    private void DismissDialog()
+    {
+        isConfirmVisible = false;
+    }
+}

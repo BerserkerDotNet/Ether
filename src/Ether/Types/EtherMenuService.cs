@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using MatBlazor;
 
 namespace Ether.Types
 {
@@ -17,16 +18,16 @@ namespace Ether.Types
         public async Task LoadMenuAsync()
         {
             Menu = new List<MenuItem>(4);
-            await AddItem(MenuItem.Create("Home", "home", string.Empty, "Reports"));
-            await AddItem(MenuItem.Create("Dashboard", "tachometer-alt", "dashboard", "Dashboard"));
-            await AddItem(MenuItem.Create("Reports", "chart-pie", "reports", "Reports"));
-            await AddItem(MenuItem.CreateContainer("Azure DevOps", "cloud", "AzureDevOps Settings",
-                MenuItem.Create("Profiles", "address-card", "azure-devops/profiles", "AzureDevOps Settings"),
-                MenuItem.Create("Team Members", "users", "azure-devops/teammembers", "AzureDevOps Settings"),
-                MenuItem.Create("Projects & Repositories", "project-diagram", "azure-devops/projects-and-repositories", "AzureDevOps Settings")));
-            await AddItem(MenuItem.CreateContainer("Settings", "cogs", "Settings",
-                MenuItem.Create("Settings", "cog", "settings", "Settings"),
-                MenuItem.Create("Job Logs", "book", "job-logs", "Logs")));
+            await AddItem(MenuItem.Create("Home", MatIconNames.Home, "/", "Reports"));
+            //await AddItem(MenuItem.Create("Dashboard", MatIconNames.Dashboard, "dashboard", "Dashboard"));
+            await AddItem(MenuItem.Create("Reports", MatIconNames.Pie_chart, "reports", "Reports"));
+            await AddItem(MenuItem.CreateContainer("Azure DevOps", MatIconNames.Cloud, "AzureDevOps Settings",
+                MenuItem.Create("Profiles", MatIconNames.View_list, "azure-devops/profiles", "AzureDevOps Settings"),
+                MenuItem.Create("Team Members", MatIconNames.People, "azure-devops/teammembers", "AzureDevOps Settings"),
+                MenuItem.Create("Projects & Repositories", MatIconNames.Bar_chart, "azure-devops/projects-and-repositories", "AzureDevOps Settings")));
+            await AddItem(MenuItem.CreateContainer("Settings", MatIconNames.Settings, "Settings",
+                MenuItem.Create("Settings", MatIconNames.Settings_applications, "settings", "Settings"),
+                MenuItem.Create("Job Logs", MatIconNames.Book, "job-logs", "Logs")));
         }
 
         private async Task AddItem(MenuItem item)

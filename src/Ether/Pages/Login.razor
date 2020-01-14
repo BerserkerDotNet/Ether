@@ -8,7 +8,7 @@
 
 <EditForm class="text-center form-signin" Model="@model" OnValidSubmit="@DoLogin">
     <img class="mb-4" src="/images/logo.png" alt="Ether pie chart logo image" width="128" height="128">
-    <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
+    <MatHeadline5>Please sign in</MatHeadline5>
     <FluentValidationValidator />
     @if (!string.IsNullOrEmpty(error))
     {
@@ -16,23 +16,21 @@
             @error
         </div>
     }
-    <div class="form-group">
-        <InputText Class="form-control" id="UserName" @bind-Value="@model.UserName" placeholder="User name" />
+    <p>
+        <MatTextField @bind-Value="@model.UserName" Label="User Name" Icon="@MatIconNames.Person" FullWidth="true" />
         <ValidationMessage For="@(() => model.UserName)" />
-    </div>
-    <div class="form-group">
-        <InputText Class="form-control" id="Password" @bind-Value="@model.Password" type="password" placeholder="Password" />
+    </p>
+    <p>
+        <MatTextField @bind-Value="@model.Password" Label="Password" Type="password" Icon="@MatIconNames.Lock" FullWidth="true" />
         <ValidationMessage For="@(() => model.Password)" />
-    </div>
-    <button @ref="submit" type="submit" ref="submit" class="btn btn-lg btn-primary btn-fill btn-block"
-            data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i> Signing you in"
-            data-normal-text="Sign in">
-        Sign in
-    </button>
+    </p>
+    <MatButton Label="Sign in" Type="submit" Raised="true" />
     <p class="mt-5 mb-3 text-muted">Copyright © 2017 - @DateTime.UtcNow.Year <a href="https://twitter.com/BerserkerDotNET">Andrii Snihyr</a>.</p>
 </EditForm>
+<SpinnerDialog IsShown="isLoading" Label="Signing you in, please wait..." />
 @code{
 
+    private bool isLoading = false;
     private LoginViewModel model;
     private ElementReference submit;
     private string error = string.Empty;
@@ -45,9 +43,9 @@
 
     private async Task DoLogin()
     {
-        await JsUtils.ButtonState(submit, "loading");
         try
         {
+            isLoading = true;
             error = string.Empty;
             var token = await Client.RequestAccessToken(model);
             await TokenService.SetToken(token);
@@ -59,7 +57,7 @@
         }
         finally
         {
-            await JsUtils.ButtonState(submit, "");
+            isLoading = false;
         }
     }
 }

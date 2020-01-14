@@ -1,65 +1,50 @@
-﻿<EditableGrid Items="Props.Items"
-              IsReadOnly="true"
-              GridTitle="Job Logs"
-              ExistingTitle="Job Details"
-              CancelButtonText="Back"
-              OnRefresh="@(async () => await Props.OnRefresh.InvokeAsync(null))">
-    <ListModeContent Context="ctx">
-        <DataTable Items="@ctx.Items" 
-                   PageSize="10"
-                   TotalPages="Props.TotalPages"
-                   CurrentPage="Props.CurrentPage"
-                   IsServerPaging="true"
-                   OnNextPage="Props.OnNextPage"
-                   OnPreviousPage="Props.OnPreviousPage">
-            <TableHeader>
-                <th>Type</th>
-                <th>Result</th>
-                <th>Start time</th>
-                <th>End time</th>
-                <th>Execution time</th>
-            </TableHeader>
-            <RowTemplate Context="log">
-                <td>
-                    <If Condition="@(log.Result == ViewModels.Types.JobExecutionResult.Successful)">
-                        <Then>
-                            <button class="btn btn-link" @onclick="@(() => OnViewDetails(ctx, log))">@log.JobType</button>
-                        </Then>
-                        <Else>
-                            @log.JobType
-                        </Else>
-                    </If>
-                </td>
-                <td>
-                    <JobStatusBadge Status="log.Result" />
-                </td>
-                <td>@log.StartTime</td>
-                <td>@log.EndTime</td>
-                <td>@(log.EndTime.HasValue ? (log.EndTime - log.StartTime).ToString() : string.Empty)</td>
-            </RowTemplate>
-        </DataTable>
-    </ListModeContent>
-    <FormModeContent Context="ctx">
-        <If Condition="@(ctx.EditingItem.JobType == "PullRequestsSyncJob")">
+﻿<RichTable Items="Props.Items"
+           GridTitle="Job Logs"
+           FormTitle="Job Details"
+           OnRefresh="Props.OnRefresh"
+           ShowAdd="false">
+    <TableHeader>
+        <th>Type</th>
+        <th>Result</th>
+        <th>Start time</th>
+        <th>End time</th>
+        <th>Execution time</th>
+        <th>Actions</th>
+    </TableHeader>
+    <TableBody Context="ctx">
+        <td>
+            @ctx.CurrentItem.JobType
+        </td>
+        <td>
+            <JobStatusBadge Status="ctx.CurrentItem.Result" />
+        </td>
+        <td>@ctx.CurrentItem.StartTime</td>
+        <td>@ctx.CurrentItem.EndTime</td>
+        <td>@(ctx.CurrentItem.EndTime.HasValue ? (ctx.CurrentItem.EndTime - ctx.CurrentItem.StartTime).ToString() : string.Empty)</td>
+        <td>
+            <If Condition="@(ctx.CurrentItem.Result == ViewModels.Types.JobExecutionResult.Successful)">
+                <Then>
+                    <MatButton Icon="@MatIconNames.Details" OnClick="() => OnViewDetails(ctx)">Details</MatButton>
+                </Then>
+            </If>
+        </td>
+    </TableBody>
+    <FormBody Context="ctx">
+        <If Condition="@(ctx.CurrentItem.JobType == "PullRequestsSyncJob")">
             <Then>
-                <PullRequestJobDetail Details="@(ctx.EditingItem.Details as PullRequestJobDetails)" />
+                <PullRequestJobDetail Details="@(ctx.CurrentItem.Details as PullRequestJobDetails)" />
             </Then>
         </If>
-    </FormModeContent>
-</EditableGrid>
+    </FormBody>
+</RichTable>
 
 @code
 {
-    private OrderByConfiguration<JobLogViewModel>[] orderByConfig = OrderByConfigurationBuilder<JobLogViewModel>
-        .New()
-        .OrderByDescending(l => l.StartTime)
-        .Build();
-
     [Parameter] public JobLogsProps Props { get; set; }
 
-    protected async Task OnViewDetails(EditableGridBase<JobLogViewModel> context, JobLogViewModel log)
+    protected async Task OnViewDetails(RichTableContext<JobLogViewModel> context)
     {
-        await Props.OnDetailsRequested.InvokeAsync(log);
-        context.Edit(log);
+        await Props.OnDetailsRequested.InvokeAsync(context.CurrentItem);
+        context.Edit();
     }
 }

@@ -1,0 +1,22 @@
+﻿@typeparam TItem
+@inherits RichTableBase<TItem>
+
+<MatHeadline4>@GridTitle</MatHeadline4>
+<div class="pull-right">
+    @if (ShowAdd)
+    {
+        <MatButton Icon="@MatIconNames.Add" Dense="true" OnClick="New">New</MatButton>
+    }
+    <MatButton Icon="@MatIconNames.Refresh" Dense="true" OnClick="async () => await OnRefresh.InvokeAsync(null)">Refresh</MatButton>
+</div>
+<MatTable Items="Items" Class="mat-elevation-z5" PageSize="PageSize" ShowPaging="ShowPaging" Striped="true" Style="table-layout:auto">
+    <MatTableHeader>
+        @TableHeader
+    </MatTableHeader>
+    <MatTableRow Context="item">
+        @TableBodyInternal(item)
+    </MatTableRow>
+</MatTable>
+<EditFormDialog IsShown="IsEditing" Title="@FormTitle" Item="EditingItem" Context="ctx" OnCancel="CancelEdit" OnSave="SaveEdit">
+    @FormBodyInternal(ctx)
+</EditFormDialog>

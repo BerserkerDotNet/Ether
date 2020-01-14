@@ -1,0 +1,87 @@
+﻿@typeparam T
+
+<AutocompleteList
+                  Label="@($"Search for {Label}")"
+                  Items="FilteredItems"
+                  FullWidth="true"
+                  Icon="@MatIconNames.Search"
+                  CustomStringSelector="i => i.Name"
+                  @bind-Value="SelectedValue" />
+<MatDivider />
+<p>@Label</p>
+<MatList>
+    @foreach (var item in selectedOptions)
+    {
+        <MatListItem >
+            <MatIcon Icon="@ItemIcon" /> &nbsp;
+            <MatListItemText>@GetDisplayValue(item)</MatListItemText>
+            <MatIconButton Icon="@MatIconNames.Delete" Class="btn-right" OnClick="() => Remove(item)" />
+        </MatListItem>
+    }
+</MatList>
+
+@code {
+
+    private SelectOption<T> searchValue;
+    private List<T> selectedOptions = new List<T>();
+
+    [Parameter] public string Label { get; set; }
+
+    [Parameter] public IEnumerable<SelectOption<T>> Items { get; set; }
+
+    [Parameter] public IEnumerable<T> Value { get; set; }
+
+    [Parameter] public EventCallback<IEnumerable<T>> ValueChanged { get; set; }
+
+    [Parameter] public Expression<Func<IEnumerable<T>>> ValueExpression { get; set; }
+
+    [Parameter] public string ItemIcon { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        if (Value is object)
+        {
+            selectedOptions = new List<T>(Value);
+        }
+    }
+
+    public SelectOption<T> SelectedValue
+    {
+        get { return searchValue; }
+        set
+        {
+            if (value is null)
+            {
+                return;
+            }
+
+            if (!selectedOptions.Contains(value.Value))
+            {
+                selectedOptions.Add(value.Value);
+                Value = selectedOptions;
+                ValueChanged.InvokeAsync(Value);
+            }
+            searchValue = null;
+        }
+    }
+
+    public IEnumerable<SelectOption<T>> FilteredItems => Value is null ? Items : Items.Where(i => !Value.Contains(i.Value));
+
+    private string GetDisplayValue(T option)
+    {
+        var item = Items.FirstOrDefault(i => Equals(i.Value, option));
+        if (item == null)
+        {
+            return string.Empty;
+        }
+
+        return item.Name;
+    }
+
+    private void Remove(T item)
+    {
+        selectedOptions.Remove(item);
+        Value = selectedOptions;
+        ValueChanged.InvokeAsync(Value);
+    }
+}

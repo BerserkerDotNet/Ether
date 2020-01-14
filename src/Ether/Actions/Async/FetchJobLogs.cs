@@ -18,23 +18,26 @@ namespace Ether.Actions.Async
 
         public async Task Execute(IDispatcher dispatcher, FetchJobLogsCommand command)
         {
-            var page = await _client.GetAllPaged(command.Page, command.ItemsPerPage, o =>
+            await Utils.ExecuteWithLoading(dispatcher, async () =>
             {
-                var log = o.ToObject<JobLogViewModel>();
-                if (log.JobType == "PullRequestsSyncJob")
+                var page = await _client.GetAllPaged(command.Page, command.ItemsPerPage, o =>
                 {
-                    var details = o.GetValue(nameof(JobLogViewModel.Details), StringComparison.OrdinalIgnoreCase).ToObject<PullRequestJobDetails>();
-                    log.Details = details;
-                }
+                    var log = o.ToObject<JobLogViewModel>();
+                    if (log.JobType == "PullRequestsSyncJob")
+                    {
+                        var details = o.GetValue(nameof(JobLogViewModel.Details), StringComparison.OrdinalIgnoreCase).ToObject<PullRequestJobDetails>();
+                        log.Details = details;
+                    }
 
-                return log;
-            });
+                    return log;
+                });
 
-            dispatcher.Dispatch(new ReceivedJobLogsPage
-            {
-                Logs = page.Items,
-                TotalPages = page.TotalPages,
-                CurrentPage = page.CurrentPage
+                dispatcher.Dispatch(new ReceivedJobLogsPage
+                {
+                    Logs = page.Items,
+                    TotalPages = page.TotalPages,
+                    CurrentPage = page.CurrentPage
+                });
             });
         }
     }

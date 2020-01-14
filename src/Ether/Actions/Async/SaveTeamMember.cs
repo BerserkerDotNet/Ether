@@ -16,8 +16,11 @@ namespace Ether.Actions.Async
 
         public async Task Execute(IDispatcher dispatcher, TeamMemberViewModel member)
         {
-            await _client.Save(member);
-            await dispatcher.Dispatch<FetchMembers>();
+            await Utils.ExecuteWithLoading(dispatcher, async () =>
+            {
+                await _client.Save(member);
+                await dispatcher.Dispatch<FetchMembers>();
+            });
         }
     }
 }

@@ -1,118 +1,48 @@
-﻿<EditableGrid Items="Props.Members"
-              GridTitle="Team members"
-              NewTitle="New member"
-              ExistingTitle="Editing member"
-              OnSave="@(async (TeamMemberViewModel m) => await Props.OnChange.InvokeAsync(m))"
-              OnDelete="@(async (TeamMemberViewModel m) => await Props.OnDelete.InvokeAsync(m))"
-              OnRefresh="@(async () => await Props.OnRefresh.InvokeAsync(null))">
-    <ListModeContent Context="ctx">
-        <DataTable Items="ctx.Items" PageSize="10">
-            <FilterTemplate Context="dt">
-                <div class="form-group">
-                    <input class="form-control" type="text" placeholder="Type to search..."
-                           @oninput="@(e => ApplyFilter(e, dt, false))" />
-                </div>
-                <div class="form-group">
-                    <label>Profiles:</label>
-                    <select class="form-control" @onchange="@((args) => ApplyFilter(args, dt, true))">
-                        <option>None</option>
-                        @foreach (var profile in Props.Profiles)
-                        {
-                            <option value="@profile.Id">@profile.Name</option>
-                        }
-                    </select>
-                </div>
-            </FilterTemplate>
-            <TableHeader>
-                <th>Display Name</th>
-                <th>Email</th>
-                <th>Workitems count</th>
-                <th>Last workitems fetch</th>
-                <th>Last pull requests fetch</th>
-            </TableHeader>
-            <RowTemplate Context="member">
-                <td>@member.DisplayName</td>
-                <td>@member.Email</td>
-                <td>@member.WorkItemsCount</td>
-                <td>@member.LastWorkitemsFetchDate?.ToLocalTime()</td>
-                <td>@member.LastPullRequestsFetchDate?.ToLocalTime()</td>
-            </RowTemplate>
-            <ActionsTemplate Context="member">
-                <div>
-                    <div class=" dropdown btn-group" role="group">
-                        <button id="btnGroupWorkItemsMember" type="button" class="btn btn-info btn-fill dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Actions
-                        </button>
-                        <div class="dropdown-menu" aria-labelledby="btnGroupWorkItemsMember">
-                            <button class="dropdown-item" @onclick="@(async () => await Props.OnFetchWorkItems.InvokeAsync(member))">Fetch work items</button>
-                            <button class="dropdown-item" @onclick="@(async () => await Props.OnResetWorkItems.InvokeAsync(member))">Reset work items</button>
-                            <div class="dropdown-divider"></div>
-                            <button class="dropdown-item" @onclick="@(async () => await Props.OnFetchPullRequests.InvokeAsync(member))">Fetch pull requests</button>
-                            <button class="dropdown-item" @onclick="@(async () => await Props.OnResetPullRequests.InvokeAsync(member))">Reset pull requests</button>
-                        </div>
-                    </div>
-                    <button class="btn btn-warning btn-fill" @onclick="@(() => ctx.Edit(member))">Edit</button>
-                    <button class="btn btn-danger btn-fill" @onclick="@(() => ctx.Delete(member))">Delete</button>
-                </div>
-            </ActionsTemplate>
-        </DataTable>
-    </ListModeContent>
-    <FormModeContent Context="ctx">
-        <div class="form-group">
-            <label>Display name</label>
-            <InputText Class="form-control" @bind-Value="ctx.EditingItem.DisplayName" />
-            <ValidationMessage For="@(() => ctx.EditingItem.DisplayName)" />
-        </div>
-        <div class="form-group">
-            <label>Email</label>
-            <InputText Class="form-control" @bind-Value="ctx.EditingItem.Email" />
-            <ValidationMessage For="@(() => ctx.EditingItem.Email)" />
-        </div>
-    </FormModeContent>
-</EditableGrid>
+﻿<RichTable Items="Props.Members"
+           GridTitle="Team members"
+           FormTitle="Edit member"
+           OnRefresh="async () => await Props.OnRefresh.InvokeAsync(null)"
+           OnSaveEdit="Props.OnChange">
+    <TableHeader>
+        <th>Display Name</th>
+        <th>Email</th>
+        <th>Workitems count</th>
+        <th>Last workitems fetch</th>
+        <th>Last pull requests fetch</th>
+        <th></th>
+    </TableHeader>
+    <TableBody Context="ctx">
+        <td>@ctx.CurrentItem.DisplayName</td>
+        <td>@ctx.CurrentItem.Email</td>
+        <td>@ctx.CurrentItem.WorkItemsCount</td>
+        <td>@ctx.CurrentItem.LastWorkitemsFetchDate?.ToLocalTime()</td>
+        <td>@ctx.CurrentItem.LastPullRequestsFetchDate?.ToLocalTime()</td>
+        <td>
+            <div>
+                <MatButton Label="Edit" Icon="@MatIconNames.Edit" Dense="true" OnClick="() => ctx.Edit()" />
+                <DeleteButton OnDelete="async () => await Props.OnDelete.InvokeAsync(ctx.CurrentItem)" />
+                <DropDownMenu Label="More">
+                    <MatListItem OnClick="async () => await Props.OnFetchWorkItems.InvokeAsync(ctx.CurrentItem)"><MatIcon Icon="@MatIconNames.Refresh" />&nbsp; Fetch work items</MatListItem>
+                    <MatListItem OnClick="async () => await Props.OnResetWorkItems.InvokeAsync(ctx.CurrentItem)"><MatIcon Icon="@MatIconNames.Repeat" />&nbsp; Reset work items</MatListItem>
+                    <MatListDivider />
+                    <MatListItem OnClick="async () => await Props.OnFetchPullRequests.InvokeAsync(ctx.CurrentItem)"><MatIcon Icon="@MatIconNames.Refresh" />&nbsp; Fetch pull requests</MatListItem>
+                    <MatListItem OnClick="async () => await Props.OnResetPullRequests.InvokeAsync(ctx.CurrentItem)"><MatIcon Icon="@MatIconNames.Repeat" />&nbsp; Reset pull requests</MatListItem>
+                </DropDownMenu>
+            </div>
+        </td>
+    </TableBody>
+    <FormBody Context="ctx">
+        <p>
+            <MatTextField @bind-Value="ctx.CurrentItem.DisplayName" Label="Display name" FullWidth="true" />
+            <ValidationMessage For="@(() => ctx.CurrentItem.DisplayName)" />
+        </p>
+        <p>
+            <MatTextField @bind-Value="ctx.CurrentItem.Email" Label="Email" FullWidth="true" />
+            <ValidationMessage For="@(() => ctx.CurrentItem.Email)" />
+        </p>
+    </FormBody>
+</RichTable>
 
 @code{
     [Parameter] public TeamMembersProps Props { get; set; }
-
-    private string searchText = string.Empty;
-    private string selectedProfile = string.Empty;
-
-    private void ApplyFilter(ChangeEventArgs args, DataTableBase<TeamMemberViewModel> dataTable, bool isProfile)
-    {
-        if (isProfile)
-        {
-            selectedProfile = args.Value.ToString();
-        }
-        else
-        {
-            searchText = args.Value.ToString();
-        }
-
-        dataTable.Filter(t => ProfileFilter(t) && SearchBoxFilter(t));
-    }
-
-    private Func<TeamMemberViewModel, bool> ProfileFilter
-    {
-        get
-        {
-            var isGuid = Guid.TryParse(selectedProfile, out var profileId);
-            if (isGuid)
-            {
-                var profile = Props.Profiles.Single(p => p.Id == profileId);
-                return t => profile.Members.Contains(t.Id);
-            }
-            else
-            {
-                return _ => true;
-            }
-        }
-    }
-
-    private Func<TeamMemberViewModel, bool> SearchBoxFilter
-    {
-        get
-        {
-            return i => i.DisplayName.ToLower().Contains(searchText.ToLower()) || i.Email.Contains(searchText);
-        }
-    }
 }

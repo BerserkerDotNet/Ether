@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using BlazorState.Redux.Blazor;
 using BlazorState.Redux.Interfaces;
 using Ether.Actions.Async;
+using Ether.Types;
 using Ether.Types.State;
 using Ether.ViewModels;
 using Microsoft.AspNetCore.Components;
@@ -15,7 +16,7 @@ namespace Ether.Components.Settings
     {
         public IEnumerable<VstsProjectViewModel> Items { get; set; }
 
-        public Dictionary<Guid?, string> IdentitiesOptions { get; set; }
+        public IEnumerable<SelectOption<Guid?>> IdentitiesOptions { get; set; }
 
         public EventCallback<VstsProjectViewModel> OnSave { get; set; }
 
@@ -73,14 +74,14 @@ namespace Ether.Components.Settings
             return state?.Projects?.Projects ?? null;
         }
 
-        private Dictionary<Guid?, string> GetIdentityOptions(RootState state)
+        private IEnumerable<SelectOption<Guid?>> GetIdentityOptions(RootState state)
         {
             var identities = state?.Settings?.Identities ?? Enumerable.Empty<IdentityViewModel>();
-            var identitiesOptions = new Dictionary<Guid?, string>(identities.Count() + 1);
-            identitiesOptions.Add(Guid.Empty, Constants.NoneLabel);
+            var identitiesOptions = new List<SelectOption<Guid?>>(identities.Count() + 1);
+            identitiesOptions.Add(new SelectOption<Guid?>(Guid.Empty, Constants.NoneLabel));
             foreach (var identity in identities)
             {
-                identitiesOptions.Add(identity.Id, identity.Name);
+                identitiesOptions.Add(new SelectOption<Guid?>(identity.Id, identity.Name));
             }
 
             return identitiesOptions;

@@ -15,10 +15,13 @@ namespace Ether.Actions.Async
 
         public async Task Execute(IDispatcher dispatcher)
         {
-            var reportDescriptors = await _client.GetReportTypes();
-            dispatcher.Dispatch(new ReceiveReportDescriptorsAction
+            await Utils.ExecuteWithLoading(dispatcher, async () =>
             {
-                ReportDescriptors = reportDescriptors
+                var reportDescriptors = await _client.GetReportTypes();
+                dispatcher.Dispatch(new ReceiveReportDescriptorsAction
+                {
+                    ReportDescriptors = reportDescriptors
+                });
             });
         }
     }

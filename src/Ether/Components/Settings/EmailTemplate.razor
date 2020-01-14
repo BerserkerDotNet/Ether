@@ -1,8 +1,6 @@
-﻿<div class="form-group">
-    <label>Subject</label>
-    <input type="text" class="form-control" @bind-value="Model.EmailSubject" />
-</div>
-
+﻿<p>
+    <MatTextField @bind-Value="Model.EmailSubject" Label="Subject" FullWidth="true" />
+</p>
 <div class="form-group">
     <label>Body</label>
     <SummerNoteBootstrap @bind-Value="Model.EmailBody" />

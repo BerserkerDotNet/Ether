@@ -1,78 +1,65 @@
-﻿@inject EtherClient Client
-
-<EditableGrid Items="Props.Items"
-              GridTitle="Profiles"
-              ExistingTitle="Editing profile"
-              NewTitle="New profile"
-              OnSave="@(async (ProfileViewModel p) => await Props.OnChange.InvokeAsync(p))"
-              OnDelete="@(async (ProfileViewModel p) => await Props.OnDelete.InvokeAsync(p))"
-              OnRefresh="@(async () => await Props.OnRefresh.InvokeAsync(null))">
-    <ListModeContent Context="ctx">
-        <DataTable Items="@ctx.Items">
-            <TableHeader>
-                <th>Name</th>
-                <th>Type</th>
-                <th>Members</th>
-                <th>Repositories</th>
-            </TableHeader>
-            <RowTemplate Context="profile">
-                <td>@profile.Name</td>
-                <td>@profile.Type</td>
-                <td>@profile.Members.Count()</td>
-                <td>@profile.Repositories.Count()</td>
-            </RowTemplate>
-            <ActionsTemplate Context="profile">
-                <div>
-                    <div class="dropdown btn-group" role="group">
-                        <button id="btnGroupWorkItemsProfile" type="button" class="btn btn-info btn-fill dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Actions
-                        </button>
-                        <div class="dropdown-menu" aria-labelledby="btnGroupWorkItemsProfile">
-                            <button class="dropdown-item" @onclick="@(async () => await Props.OnFetchWorkItems.InvokeAsync(profile.Members))">Fetch work items</button>
-                            <button class="dropdown-item" @onclick="@(async () => await Props.OnResetWorkItems.InvokeAsync(profile.Members))">Reset work items</button>
-                            <div class="dropdown-divider"></div>
-                            <button class="dropdown-item" @onclick="@(async () => await Props.OnFetchPullRequests.InvokeAsync(profile.Members))">Fetch pull requests</button>
-                            <button class="dropdown-item" @onclick="@(async () => await Props.OnResetPullRequests.InvokeAsync(profile.Members))">Reset pull requests</button>
-                        </div>
-                    </div>
-                    <button class="btn btn-warning btn-fill" @onclick="@(() => ctx.Edit(profile))">Edit</button>
-                    <button class="btn btn-danger btn-fill" @onclick="@(() => ctx.Delete(profile))">Delete</button>
-                </div>
-            </ActionsTemplate>
-        </DataTable>
-    </ListModeContent>
-    <FormModeContent Context="ctx">
-        <div class="row">
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label>Name</label>
-                    <InputText Class="form-control" @bind-Value="ctx.EditingItem.Name" />
-                    <ValidationMessage For="@(() => ctx.EditingItem.Name)" />
-                </div>
-                <div class="form-group">
-                    <label>Type</label>
-                    <InputText Class="form-control" @bind-Value="ctx.EditingItem.Type" />
-                    <ValidationMessage For="@(() => ctx.EditingItem.Type)" />
-                </div>
-                <div class="form-group">
-                    <label>Members</label>
-                    <Ether.Components.Form.OptionsSelector Options="@Props.MembersOptions"
-                                                           @bind-Value="ctx.EditingItem.Members" />
-                    <ValidationMessage For="@(() => ctx.EditingItem.Members)" />
-                </div>
-                <div class="form-group">
-                    <label>Repositories</label>
-                    <Ether.Components.Form.OptionsSelector Options="@Props.RepositoriesOptions"
-                                                           @bind-Value="ctx.EditingItem.Repositories" />
-                    <ValidationMessage For="@(() => ctx.EditingItem.Repositories)" />
-                </div>
+﻿<RichTable
+           Items="Props.Items"
+           GridTitle="Profiles"
+           FormTitle="Editing profile"
+           OnRefresh="async () => await Props.OnRefresh.InvokeAsync(null)"
+           OnSaveEdit="Props.OnChange">
+    <TableHeader>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Members</th>
+        <th>Repositories</th>
+        <th></th>
+    </TableHeader>
+    <TableBody Context="ctx">
+        <td>@ctx.CurrentItem.Name</td>
+        <td>@ctx.CurrentItem.Type</td>
+        <td>@ctx.CurrentItem.Members.Count()</td>
+        <td>@ctx.CurrentItem.Repositories.Count()</td>
+        <td>
+            <div>
+                <MatButton Label="Edit" Icon="@MatIconNames.Edit" Dense="true" OnClick="() => ctx.Edit()" />
+                <DeleteButton OnDelete="async () => await Props.OnDelete.InvokeAsync(ctx.CurrentItem)" />
+                <DropDownMenu Label="More">
+                    <MatListItem OnClick="async () => await Props.OnFetchWorkItems.InvokeAsync(ctx.CurrentItem.Members)"><MatIcon Icon="@MatIconNames.Refresh" />&nbsp; Fetch work items</MatListItem>
+                    <MatListItem OnClick="async () => await Props.OnResetWorkItems.InvokeAsync(ctx.CurrentItem.Members)"><MatIcon Icon="@MatIconNames.Repeat" />&nbsp; Reset work items</MatListItem>
+                    <MatListDivider />
+                    <MatListItem OnClick="async () => await Props.OnFetchPullRequests.InvokeAsync(ctx.CurrentItem.Members)"><MatIcon Icon="@MatIconNames.Refresh" />&nbsp; Fetch pull requests</MatListItem>
+                    <MatListItem OnClick="async () => await Props.OnResetPullRequests.InvokeAsync(ctx.CurrentItem.Members)"><MatIcon Icon="@MatIconNames.Repeat" />&nbsp; Reset pull requests</MatListItem>
+                </DropDownMenu>
             </div>
-            <div class="col-md-6">
-                <EmailTemplate Model="ctx.EditingItem" />
-            </div>
-        </div>
-    </FormModeContent>
-</EditableGrid>
+        </td>
+    </TableBody>
+    <FormBody Context="ctx">
+        <MatTabGroup>
+            <MatTab Label="General">
+                <p>
+                    <MatTextField @bind-Value="ctx.CurrentItem.Name" Label="Name" FullWidth="true" />
+                    <ValidationMessage For="@(() => ctx.CurrentItem.Name)" />
+                </p>
+                <p>
+                    <MatTextField @bind-Value="ctx.CurrentItem.Type" Label="Type" FullWidth="true" />
+                    <ValidationMessage For="@(() => ctx.CurrentItem.Type)" />
+                </p>
+            </MatTab>
+            <MatTab Label="Members">
+                <p>
+                    <Options @bind-Value="ctx.CurrentItem.Members" Label="Members" Items="@Props.MembersOptions" ItemIcon="@MatIconNames.Person"></Options>
+                    <ValidationMessage For="@(() => ctx.CurrentItem.Members)" />
+                </p>
+            </MatTab>
+            <MatTab Label="Repositories">
+                <p>
+                    <Options @bind-Value="ctx.CurrentItem.Repositories" Label="Repositories" Items="@Props.RepositoriesOptions" ItemIcon="@MatIconNames.Archive"></Options>
+                    <ValidationMessage For="@(() => ctx.CurrentItem.Repositories)" />
+                </p>
+            </MatTab>
+            <MatTab Label="Email options">
+                <EmailTemplate Model="ctx.CurrentItem" />
+            </MatTab>
+        </MatTabGroup>
+    </FormBody>
+</RichTable>
 
 @code
 {

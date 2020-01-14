@@ -15,6 +15,8 @@ namespace Ether.Components.Reports
     {
         public IEnumerable<ReportViewModel> Reports { get; set; }
 
+        public bool IsLoading { get; set; }
+
         public EventCallback OnRefresh { get; set; }
 
         public EventCallback<ReportViewModel> OnDelete { get; set; }

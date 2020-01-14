@@ -16,8 +16,11 @@ namespace Ether.Actions.Async
 
         public async Task Execute(IDispatcher dispatcher, VstsDataSourceViewModel dataSource)
         {
-            await _client.SaveVstsDataSourceConfig(dataSource);
-            await dispatcher.Dispatch<FetchDataSourceSettings>();
+            await Utils.ExecuteWithLoading(dispatcher, async () =>
+            {
+                await _client.SaveVstsDataSourceConfig(dataSource);
+                await dispatcher.Dispatch<FetchDataSourceSettings>();
+            });
         }
     }
 }
