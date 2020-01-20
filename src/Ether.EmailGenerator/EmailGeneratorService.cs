@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
-using System.Runtime.ExceptionServices;
 using System.Text;
 
 namespace Ether.EmailGenerator
@@ -22,24 +21,26 @@ namespace Ether.EmailGenerator
 
         public void Generate(IEnumerable<TeamAttendanceViewModel> attendanceViewModel, WorkItemsReportViewModel report, ProfileViewModel profile, string points)
         {
-            try
+            if (string.IsNullOrEmpty(profile.EmailSubject))
             {
-                var subject = ApplyCommonPlaceholders(profile.EmailSubject, profile);
-                var body = ApplyCommonPlaceholders(profile.EmailBody, profile);
-                body = ApplyBodyPlaceholders(body, attendanceViewModel, report, points);
-                body = body.Replace("style=\"\"", string.Empty);
+                profile.EmailSubject = $"No subject template for profile '{profile.Name}'";
+            }
 
-                var app = new Application();
-                var msg = app.CreateItem(OlItemType.olMailItem) as MailItem;
-                msg.Subject = subject;
-                msg.HTMLBody = body;
-                msg.Display();
-            }
-            catch (System.Exception ex)
+            if (string.IsNullOrEmpty(profile.EmailBody))
             {
-                ExceptionDispatchInfo.Capture(ex).Throw();
-                throw;
+                profile.EmailBody = $"No email template found.\r\nPlease go to 'AzureDevOps -> Profiles -> Edit {profile.Name} -> Email Options' and add email template.";
             }
+
+            var subject = ApplyCommonPlaceholders(profile.EmailSubject, profile);
+            var body = ApplyCommonPlaceholders(profile.EmailBody, profile);
+            body = ApplyBodyPlaceholders(body, attendanceViewModel, report, points);
+            body = body.Replace("style=\"\"", string.Empty);
+
+            var app = new Application();
+            var msg = app.CreateItem(OlItemType.olMailItem) as MailItem;
+            msg.Subject = subject;
+            msg.HTMLBody = body;
+            msg.Display();
         }
 
         private string ApplyCommonPlaceholders(string value, ProfileViewModel profile)
