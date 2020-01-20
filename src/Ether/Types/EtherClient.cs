@@ -154,6 +154,12 @@ namespace Ether.Types
             return await HttpGet<byte[]>(url);
         }
 
+        public async Task<byte[]> DownloadGenerator()
+        {
+            var url = $"/Ether.EmailGenerator.zip";
+            return await HttpGet<byte[]>(url);
+        }
+
         public async Task<byte[]> GenerateEmail(GenerateEmailViewModel model)
         {
             var url = $"{GetApiUrl()}report/generateemail";

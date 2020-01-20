@@ -8,6 +8,10 @@
         <div class="mat-layout-grid-cell mat-layout-grid-cell-span-12">
             <MatHeadline4>@reportDisplayName</MatHeadline4>
             <div class="d-print-none pull-right d-print-none">
+                @if (supportsEmail)
+                {
+                    <MatButton Icon="@MatIconNames.Email" Label="Email generator" OnClick="DownloadEmailGenerator" />
+                }
                 @if (supportsExcel)
                 {
                     <MatButton Icon="@MatIconNames.Grid_on" Label="Export to Excel" OnClick="ExportToExcel" />
@@ -101,5 +105,10 @@
         var excelReport = await Client.GenerateExcel(report.Id);
         var base64EncodedReport = Convert.ToBase64String(excelReport);
         await JsUtils.SaveAsFile("report.xlsx", base64EncodedReport);
+    }
+
+    protected void DownloadEmailGenerator()
+    {
+        UriHelper.NavigateTo("/Ether.EmailGenerator.zip", forceLoad: true);
     }
 }
