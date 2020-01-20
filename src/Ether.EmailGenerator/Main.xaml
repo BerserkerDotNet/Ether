@@ -3,25 +3,30 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Ether.EmailGenerator"
-        xmlns:fa="http://schemas.fontawesome.io/icons/"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.FontWeight="Regular"
+        TextElement.FontSize="13"
+        TextOptions.TextFormattingMode="Ideal" 
+        TextOptions.TextRenderingMode="Auto"        
+        Background="{DynamicResource MaterialDesignPaper}"
+        FontFamily="{DynamicResource MaterialDesignFont}"
         mc:Ignorable="d"
-        Title="Main" Height="700" Width="900"
+        Title="Report Email Generator" Height="700" Width="920"
         WindowStartupLocation = "CenterScreen"
         ResizeMode="CanMinimize" >
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="150" />
-            <RowDefinition />
-            <RowDefinition Height="30" />
-        </Grid.RowDefinitions>
-        <StackPanel Grid.Row="0">
-            <TextBlock>Team:</TextBlock>
-            <ComboBox x:Name="_team" SelectionChanged="OnTeamSelected" />
-            <TextBlock>Points:</TextBlock>
-            <TextBox x:Name="_points" TextWrapping="Wrap" AcceptsReturn="True" Height="100" MaxLines="10" />
-        </StackPanel>
-        <DataGrid x:Name="_teamAttendance" Grid.Row="1"
+    <Grid >
+        <StackPanel Margin="12"
+                materialDesign:ShadowAssist.ShadowDepth="Depth3">
+            <ComboBox x:Name="_team" materialDesign:HintAssist.Hint="Team" SelectionChanged="OnTeamSelected" />
+            <TextBox x:Name="_points"
+                     materialDesign:HintAssist.Hint="Points for the week"
+                     TextWrapping="Wrap"
+                     AcceptsReturn="True"
+                     Height="100"
+                     MaxLines="10" />
+            <DataGrid x:Name="_teamAttendance"
+                      Height="470"
                   AutoGenerateColumns="False"
                   CanUserAddRows="False"
                   CanUserDeleteRows="False"
@@ -29,13 +34,19 @@
                   CanUserResizeRows="False"
                   CanUserSortColumns="False"
                   CanUserResizeColumns="False" />
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="2">
-            <Button Margin="2" Click="OnGenerate">Generate</Button>
-            <Button Margin="2" Click="OnReset">Reset</Button>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="5">
+                <Button Margin="2" Style="{StaticResource MaterialDesignRaisedButton}" Click="OnGenerate">Generate</Button>
+                <Button Margin="2" Style="{StaticResource MaterialDesignRaisedButton}" Click="OnReset">Reset</Button>
+            </StackPanel>
         </StackPanel>
-        <Grid Grid.RowSpan="3" x:Name="_spinner" Visibility="Hidden">
+
+        <Grid x:Name="_spinner" Visibility="Hidden">
             <TextBlock Background="Gray" Opacity="0.5" />
-            <fa:ImageAwesome Icon="Spinner" Spin="True" SpinDuration="4" Width="100" Foreground="Navy"/>
+            <ProgressBar
+                  Style="{StaticResource MaterialDesignCircularProgressBar}"
+                  Width="100"
+                  Value="0"
+                  IsIndeterminate="True" />
         </Grid>
     </Grid>
 </Window>

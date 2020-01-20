@@ -1,6 +1,7 @@
 ﻿<RichTable Items="Props.Members"
            GridTitle="Team members"
            FormTitle="Edit member"
+           FilterByColumn="DisplayName"
            OnRefresh="async () => await Props.OnRefresh.InvokeAsync(null)"
            OnSaveEdit="Props.OnChange">
     <TableHeader>

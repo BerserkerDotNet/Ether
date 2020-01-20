@@ -9,7 +9,7 @@
     }
     <MatButton Icon="@MatIconNames.Refresh" Dense="true" OnClick="async () => await OnRefresh.InvokeAsync(null)">Refresh</MatButton>
 </div>
-<MatTable Items="Items" Class="mat-elevation-z5" PageSize="PageSize" ShowPaging="ShowPaging" Striped="true" Style="table-layout:auto">
+<MatTable Items="Items" Class="mat-elevation-z5" PageSize="PageSize" ShowPaging="ShowPaging" FilterByColumnName="@FilterByColumn" Striped="true" Style="table-layout:auto">
     <MatTableHeader>
         @TableHeader
     </MatTableHeader>

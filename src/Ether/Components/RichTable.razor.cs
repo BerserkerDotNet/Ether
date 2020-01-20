@@ -33,6 +33,9 @@ namespace Ether.Components
         public int PageSize { get; set; } = 10;
 
         [Parameter]
+        public string FilterByColumn { get; set; }
+
+        [Parameter]
         public RenderFragment TableHeader { get; set; }
 
         [Parameter]

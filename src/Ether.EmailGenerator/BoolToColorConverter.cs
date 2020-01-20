@@ -9,7 +9,7 @@ namespace Ether.EmailGenerator
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return (bool)value ? Brushes.LightGreen : Brushes.LightYellow;
+            return (bool)value ? Brushes.LightGreen : Brushes.DarkOrange;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
