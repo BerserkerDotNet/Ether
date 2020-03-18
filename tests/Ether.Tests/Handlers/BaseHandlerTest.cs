@@ -148,6 +148,14 @@ namespace Ether.Tests.Handlers
                 .Verifiable();
         }
 
+        protected void SetupDelete<T>(Func<Expression, bool> predicateCheck)
+            where T : BaseDto
+        {
+            RepositoryMock.Setup(r => r.DeleteAsync(It.Is<Expression<Func<T, bool>>>(e => predicateCheck(e))))
+                .ReturnsAsync(true)
+                .Verifiable();
+        }
+
         protected virtual void Initialize()
         {
         }

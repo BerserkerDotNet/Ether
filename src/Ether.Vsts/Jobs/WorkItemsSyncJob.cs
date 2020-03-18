@@ -56,6 +56,10 @@ namespace Ether.Vsts.Jobs
             var workItems = await _mediator.RequestCollection<FetchWorkItemsFromProject, WorkItemViewModel>(new FetchWorkItemsFromProject(teamMember));
             _logger.LogInformation("Found {workitemsCount} workitems for '{teamMember}'.", workItems.Count(), teamMember.Email);
             await _mediator.Execute(new SaveWorkItemsForUser(workItems, teamMember));
+            _logger.LogInformation("Fetching workitems other than Bugs and Tasks.");
+            var workItemsToDeleteIds = await _mediator.RequestCollection<FetchWorkItemsOtherThanBugsAndTasks, int>(new FetchWorkItemsOtherThanBugsAndTasks());
+            _logger.LogInformation("Deleting workitems other than Bugs and Tasks.");
+            await _mediator.Execute(new DeleteWorkItems(workItemsToDeleteIds));
         }
     }
 }

@@ -32,6 +32,9 @@ namespace Ether.Contracts.Interfaces
         T GetSingle<T>(Expression<Func<T, bool>> predicate)
             where T : BaseDto;
 
+        Task<IEnumerable<T>> GetByFilteredArrayAsync<T>(string array, string[] elements)
+            where T : BaseDto;
+
         Task<TProjection> GetFieldValueAsync<TType, TProjection>(Expression<Func<TType, bool>> predicate, Expression<Func<TType, TProjection>> projection)
             where TType : BaseDto;
 
@@ -71,6 +74,9 @@ namespace Ether.Contracts.Interfaces
             where T : BaseDto;
 
         long Delete<T>(Expression<Func<T, bool>> predicate)
+            where T : BaseDto;
+
+        Task<bool> DeleteAsync<T>(Expression<Func<T, bool>> predicate)
             where T : BaseDto;
 
         Task<long> CountAsync<T>()
