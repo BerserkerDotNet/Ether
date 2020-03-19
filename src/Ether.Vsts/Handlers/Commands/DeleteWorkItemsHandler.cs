@@ -26,13 +26,10 @@ namespace Ether.Vsts.Handlers.Commands
                 return;
             }
 
-            foreach (var id in command.Ids)
-            {
-                await _repository.DeleteAsync<WorkItem>(workitem => workitem.WorkItemId == id);
-            }
+            await _repository.DeleteAsync<WorkItem>(workitem => command.Ids.Contains(workitem.WorkItemId));
 
             var idsInStrings = command.Ids.Select(id => id.ToString());
-            var teamMembers = await _repository.GetByFilteredArrayAsync<TeamMember>("RelatedWorkItems", idsInStrings.ToArray());
+            var teamMembers = await _repository.GetAsync<TeamMember>(m => m.RelatedWorkItems.Any(w => command.Ids.Contains(w)));
 
             foreach (var teamMember in teamMembers)
             {
