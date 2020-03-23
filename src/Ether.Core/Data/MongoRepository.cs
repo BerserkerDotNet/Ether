@@ -150,6 +150,16 @@ namespace Ether.Core.Data
             return (T)await GetSingleAsync(id, typeof(T));
         }
 
+        public async Task<IEnumerable<T>> GetByFilteredArrayAsync<T>(string array, string[] elements)
+            where T : BaseDto
+        {
+            var filter = Builders<T>.Filter.AnyIn(array, elements);
+
+            return await GetCollectionFor<T>()
+                .Find(filter)
+                .ToListAsync();
+        }
+
         public async Task<TProjection> GetFieldValueAsync<TType, TProjection>(Expression<Func<TType, bool>> predicate, Expression<Func<TType, TProjection>> projection)
             where TType : BaseDto
         {
@@ -275,6 +285,15 @@ namespace Ether.Core.Data
                 .DeleteMany(predicate);
 
             return result.DeletedCount;
+        }
+
+        public async Task<bool> DeleteAsync<T>(Expression<Func<T, bool>> predicate)
+            where T : BaseDto
+        {
+            await GetCollectionFor<T>()
+                .DeleteManyAsync(predicate);
+
+            return true;
         }
 
         public async Task<long> CountAsync<T>()
