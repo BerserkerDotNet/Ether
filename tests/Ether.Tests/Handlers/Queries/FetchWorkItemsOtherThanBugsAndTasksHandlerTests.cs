@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Ether.Vsts.Handlers.Queries;
@@ -23,9 +25,12 @@ namespace Ether.Tests.Handlers.Queries
         [Test]
         public async Task ShouldFetchWorkItemsAndWorkItemTypes()
         {
-            var workitems = Builder<WorkItem>.CreateListOfSize(5)
-                .Build();
-            var ids = workitems.Select(w => w.Id).ToArray();
+            var inProgressWorkItems = GenerateInProgressWorkItems(5);
+
+            SetupByFilteredArray("Fields.v", new[] { "New", "Active" }, inProgressWorkItems);
+
+            var workitems = GenerateWorkItems(5);
+            var ids = inProgressWorkItems.Select(inProgressWorkItem => Convert.ToInt32(inProgressWorkItem.Fields["System.Id"])).ToArray();
 
             _clientMock.Setup(c => c.GetWorkItemsAsync(ids, null, It.IsAny<string[]>(), default(CancellationToken)))
                 .ReturnsAsync(workitems)
@@ -49,6 +54,28 @@ namespace Ether.Tests.Handlers.Queries
             _clientFactoryMock.Setup(c => c.GetClient(null))
                 .ReturnsAsync(_clientMock.Object)
                 .Verifiable();
+        }
+
+        private IEnumerable<Vsts.Dto.WorkItem> GenerateInProgressWorkItems(int count)
+        {
+            Random random = new Random();
+
+            return Builder<Vsts.Dto.WorkItem>
+                    .CreateListOfSize(count)
+                    .All()
+                    .With(w => w.Fields, new Dictionary<string, string>() { { "System.Id", random.Next(1, 10000000).ToString() }, { "System.WorkItemType", "New" } })
+                    .Build();
+        }
+
+        private IList<WorkItem> GenerateWorkItems(int count)
+        {
+            Random random = new Random();
+
+            return Builder<WorkItem>
+                    .CreateListOfSize(count)
+                    .All()
+                    .With(w => w.Fields, new Dictionary<string, string>() { { "System.Id", random.Next(1, 10000000).ToString() }, { "System.WorkItemType", "New" } })
+                    .Build();
         }
     }
 }

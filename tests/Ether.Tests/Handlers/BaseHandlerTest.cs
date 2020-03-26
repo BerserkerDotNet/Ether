@@ -81,6 +81,14 @@ namespace Ether.Tests.Handlers
                 .Verifiable();
         }
 
+        protected void SetupByFilteredArray<T>(string array, string[] elements, IEnumerable<T> values)
+            where T : BaseDto
+        {
+            RepositoryMock.Setup(r => r.GetByFilteredArrayAsync<T>(array, elements))
+                .ReturnsAsync(values)
+                .Verifiable();
+        }
+
         protected void SetupMultipleWithPredicate<T>(IEnumerable<T> values)
              where T : BaseDto
         {
