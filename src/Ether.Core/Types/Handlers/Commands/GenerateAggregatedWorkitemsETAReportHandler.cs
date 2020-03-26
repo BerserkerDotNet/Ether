@@ -9,6 +9,7 @@ using Ether.Contracts.Types;
 using Ether.Core.Types.Commands;
 using Ether.ViewModels;
 using Microsoft.Extensions.Logging;
+using static Ether.Contracts.Types.WorkdaysAmountUtil;
 
 namespace Ether.Core.Types.Handlers.Commands
 {
@@ -58,7 +59,7 @@ namespace Ether.Core.Types.Handlers.Commands
                 report.IndividualReports.Add(individualReport);
             }
 
-            report.Workdays = WorkdaysAmount(command.Start, command.End);
+            report.Workdays = CalculateWorkdaysAmount(command.Start, command.End);
 
             return report;
         }
@@ -162,52 +163,6 @@ namespace Ether.Core.Types.Handlers.Commands
             }
 
             return allMembers;
-        }
-
-        private int WorkdaysAmount(DateTime start, DateTime end)
-        {
-            start = start.Date;
-            end = end.Date;
-
-            if (start > end)
-            {
-                throw new ArgumentException("Incorrect last day " + end);
-            }
-
-            TimeSpan span = end - start;
-            int businessDays = span.Days + 1;
-            int fullWeekCount = businessDays / 7;
-
-            if (businessDays > fullWeekCount * 7)
-            {
-                int firstDayOfWeek = start.DayOfWeek == DayOfWeek.Sunday ? 7 : (int)start.DayOfWeek;
-                int lastDayOfWeek = end.DayOfWeek == DayOfWeek.Sunday ? 7 : (int)end.DayOfWeek;
-
-                if (lastDayOfWeek < firstDayOfWeek)
-                {
-                    lastDayOfWeek += 7;
-                }
-
-                if (firstDayOfWeek <= 6)
-                {
-                    if (lastDayOfWeek >= 7)
-                    {
-                        businessDays -= 2;
-                    }
-                    else if (lastDayOfWeek >= 6)
-                    {
-                        businessDays -= 1;
-                    }
-                }
-                else if (firstDayOfWeek <= 7 && lastDayOfWeek >= 7)
-                {
-                    businessDays -= 1;
-                }
-            }
-
-            businessDays -= fullWeekCount + fullWeekCount;
-
-            return businessDays;
         }
     }
 }
