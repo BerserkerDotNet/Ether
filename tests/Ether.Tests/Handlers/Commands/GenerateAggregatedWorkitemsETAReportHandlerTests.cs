@@ -72,6 +72,7 @@ namespace Ether.Tests.Handlers.Commands
 
             await InvokeAndVerify<AggregatedWorkitemsETAReport>(Command, (report, reportId) =>
             {
+                report.Workdays.Should().Be(0);
                 report.IndividualReports.Should().BeEmpty();
             });
         }
@@ -91,6 +92,7 @@ namespace Ether.Tests.Handlers.Commands
 
             await InvokeAndVerify<AggregatedWorkitemsETAReport>(Command, (report, reportId) =>
             {
+                report.Workdays.Should().BeGreaterThan(0);
                 report.IndividualReports.Should().HaveCount(1);
                 VerifyReportFor(jim, report, expectedValuesForJim);
             });
