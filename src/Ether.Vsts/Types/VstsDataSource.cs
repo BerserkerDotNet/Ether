@@ -13,6 +13,7 @@ using Ether.ViewModels.Types;
 using Ether.Vsts.Dto;
 using Ether.Vsts.Interfaces;
 using Microsoft.Extensions.Logging;
+using static Ether.Contracts.Types.WorkdaysAmountUtil;
 using static Ether.Vsts.Constants;
 
 namespace Ether.Vsts.Types
@@ -126,7 +127,7 @@ namespace Ether.Vsts.Types
                     isActive = false;
                     if (lastActivated != null && assignedToTeam)
                     {
-                        activeTime += CountBusinessDaysBetween(lastActivated.Value, DateTime.Parse(update[WorkItemChangedDateField].NewValue));
+                        activeTime += CalculateWorkdaysAmount(lastActivated.Value, DateTime.Parse(update[WorkItemChangedDateField].NewValue));
                     }
                 }
                 else if ((isActivation && !isBlocked) || (isUnBlocked && !isInCodeReviewOrResolved))
@@ -138,7 +139,7 @@ namespace Ether.Vsts.Types
                 {
                     if (isActive && lastActivated != null && assignedToTeam)
                     {
-                        activeTime += CountBusinessDaysBetween(lastActivated.Value, DateTime.Parse(update[WorkItemChangedDateField].NewValue));
+                        activeTime += CalculateWorkdaysAmount(lastActivated.Value, DateTime.Parse(update[WorkItemChangedDateField].NewValue));
                     }
 
                     // Prevent short circuiting when pull request is added before the work item activated by team member.
@@ -412,74 +413,6 @@ namespace Ether.Vsts.Types
 
             float.TryParse(recoveredValue, out var result);
             return result;
-        }
-
-        private float CountBusinessDaysBetween(DateTime firstDay, DateTime lastDay, params DateTime[] holidays)
-        {
-            firstDay = firstDay.Date;
-            lastDay = lastDay.Date;
-            if (firstDay > lastDay)
-            {
-                throw new ArgumentException("Incorrect last day " + lastDay);
-            }
-
-            TimeSpan span = lastDay - firstDay;
-            int businessDays = span.Days;
-            if (businessDays == 0)
-            {
-                return 1;
-            }
-
-            int fullWeekCount = businessDays / 7;
-
-            // find out if there are weekends during the time exceedng the full weeks
-            if (businessDays > fullWeekCount * 7)
-            {
-                // we are here to find out if there is a 1-day or 2-days weekend
-                // in the time interval remaining after subtracting the complete weeks
-                int firstDayOfWeek = (int)firstDay.DayOfWeek;
-                int lastDayOfWeek = (int)lastDay.DayOfWeek;
-                if (lastDayOfWeek < firstDayOfWeek)
-                {
-                    lastDayOfWeek += 7;
-                }
-
-                if (firstDayOfWeek <= 6)
-                {
-                    // Both Saturday and Sunday are in the remaining time interval
-                    if (lastDayOfWeek >= 7)
-                    {
-                        businessDays -= 2;
-                    }
-
-                    // Only Saturday is in the remaining time interval
-                    else if (lastDayOfWeek >= 6)
-                    {
-                        businessDays -= 1;
-                    }
-                }
-
-                // Only Sunday is in the remaining time interval
-                else if (firstDayOfWeek <= 7 && lastDayOfWeek >= 7)
-                {
-                    businessDays -= 1;
-                }
-            }
-
-            // subtract the weekends during the full weeks in the interval
-            businessDays -= fullWeekCount + fullWeekCount;
-
-            // subtract the number of bank holidays during the time interval
-            foreach (var holiday in holidays)
-            {
-                var bh = holiday.Date;
-                if (firstDay <= bh && bh <= lastDay)
-                {
-                    --businessDays;
-                }
-            }
-
-            return businessDays;
         }
 
         private UserReference GetUserReference(string user)

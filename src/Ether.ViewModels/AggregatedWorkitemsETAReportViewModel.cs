@@ -12,6 +12,8 @@ namespace Ether.ViewModels
 
         public IEnumerable<IndividualETAReport> IndividualReports { get; set; }
 
+        public int Workdays { get; set; }
+
         public int TotalResolved => IndividualReports.Sum(r => r.TotalResolved);
 
         public float EstimatedToComplete => IndividualReports.Sum(r => r.EstimatedToComplete);

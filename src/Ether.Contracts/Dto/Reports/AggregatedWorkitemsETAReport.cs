@@ -18,6 +18,8 @@ namespace Ether.Contracts.Dto.Reports
 
         public List<IndividualETAReport> IndividualReports { get; set; }
 
+        public int Workdays { get; set; }
+
         public class IndividualETAReport
         {
             public string MemberEmail { get; set; }

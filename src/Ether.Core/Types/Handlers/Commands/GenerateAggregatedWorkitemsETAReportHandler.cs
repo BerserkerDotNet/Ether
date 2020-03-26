@@ -9,6 +9,7 @@ using Ether.Contracts.Types;
 using Ether.Core.Types.Commands;
 using Ether.ViewModels;
 using Microsoft.Extensions.Logging;
+using static Ether.Contracts.Types.WorkdaysAmountUtil;
 
 namespace Ether.Core.Types.Handlers.Commands
 {
@@ -57,6 +58,8 @@ namespace Ether.Core.Types.Handlers.Commands
                 var individualReport = GetIndividualReport(resolutions, workItems, dataSource, member, team);
                 report.IndividualReports.Add(individualReport);
             }
+
+            report.Workdays = CalculateWorkdaysAmount(command.Start, command.End);
 
             return report;
         }
