@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Ether.Vsts.Handlers.Queries;
@@ -24,12 +25,22 @@ namespace Ether.Tests.Handlers.Queries
         public async Task ShouldFetchWorkItemsAndWorkItemTypes()
         {
             var workitems = Builder<WorkItem>.CreateListOfSize(5)
+                .TheFirst(3)
+                .With(w => w.Fields, new Dictionary<string, string> { { "System.WorkItemType", "Foo" } })
+                .TheRest()
+                .With(w => w.Fields, new Dictionary<string, string>())
                 .Build();
             var ids = workitems.Select(w => w.Id).ToArray();
 
             _clientMock.Setup(c => c.GetWorkItemsAsync(ids, null, It.IsAny<string[]>(), default(CancellationToken)))
                 .ReturnsAsync(workitems)
                 .Verifiable();
+
+            RepositoryMock.Setup(r => r.GetByFilteredArrayAsync<Ether.Vsts.Dto.WorkItem>("Fields.v", It.IsAny<string[]>()))
+                .ReturnsAsync(workitems.Select(w => new Ether.Vsts.Dto.WorkItem
+                {
+                    WorkItemId = w.Id
+                }));
 
             var result = await _handler.Handle(new FetchWorkItemsOtherThanBugsAndTasks());
 

@@ -45,7 +45,7 @@ namespace Ether.Tests.TestData
             Action<UpdateBuilder, DateTime> onAfterActivation = null)
         {
             var activationDate = DateTime.Today.GetMondayOfCurrentWeek();
-            var resolutionDate = activationDate.AddBusinessDays(daysActive);
+            var resolutionDate = activationDate.AddBusinessDays(daysActive - 1);
 
             var updatesBuilder = UpdateBuilder.Create()
                 .New();
