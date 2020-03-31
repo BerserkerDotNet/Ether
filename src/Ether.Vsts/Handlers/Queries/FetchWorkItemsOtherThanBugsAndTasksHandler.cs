@@ -26,7 +26,7 @@ namespace Ether.Vsts.Handlers.Queries
             var inProgressWorkItems = await _repository.GetByFilteredArrayAsync<WorkItem>("Fields.v", new[] { "New", "Active" });
 
             // TODO: Find better way to query this
-            var ids = inProgressWorkItems.Select(workItem => Convert.ToInt32(workItem.Fields["System.Id"])).ToArray();
+            var ids = inProgressWorkItems.Select(workItem => Convert.ToInt32(workItem.WorkItemId)).ToArray();
 
             if (!ids.Any())
             {
@@ -43,7 +43,7 @@ namespace Ether.Vsts.Handlers.Queries
 
                 if (!workItemType.Any())
                 {
-                    return Enumerable.Empty<int>();
+                    continue;
                 }
 
                 if (workItemType.First().Value != "Task" && workItemType.First().Value != "Bug")

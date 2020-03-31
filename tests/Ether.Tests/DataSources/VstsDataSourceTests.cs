@@ -209,7 +209,7 @@ namespace Ether.Tests.DataSources
         public void GetActiveDurationShouldReturnActiveDurationForClosedTasks()
         {
             var john = Builder<TeamMemberViewModel>.CreateNew().Build();
-            var taskData = WorkItemsFactory.CreateTask().WithNormalLifecycle(resolvedBy: john, 3, activatedBy: john, assignedTo: john);
+            var taskData = WorkItemsFactory.CreateTask().WithNormalLifecycle(resolvedBy: john, 4, activatedBy: john, assignedTo: john);
 
             var result = _dataSource.GetActiveDuration(taskData.WorkItem, new[] { john });
 
@@ -219,7 +219,7 @@ namespace Ether.Tests.DataSources
         [Test]
         public void GetActiveDurationShouldNotCountTimeWhileBlocked()
         {
-            const int expectedDuration = 7;
+            const int expectedDuration = 9;
             var john = Builder<TeamMemberViewModel>.CreateNew().Build();
             var taskData = WorkItemsFactory
                 .CreateTask()
@@ -240,7 +240,7 @@ namespace Ether.Tests.DataSources
         [Test]
         public void GetActiveDurationShouldCorrectlyHandleOnHoldToCodeReviewInOneUpdate()
         {
-            const int expectedDuration = 2;
+            const int expectedDuration = 3;
             var john = Builder<TeamMemberViewModel>.CreateNew().Build();
             var taskData = WorkItemsFactory
                 .CreateTask();
@@ -263,7 +263,7 @@ namespace Ether.Tests.DataSources
         [Test]
         public void GetActiveDurationShouldCorrectlyHandleAddedPullRequest()
         {
-            const int expectedDuration = 2;
+            const int expectedDuration = 3;
             var john = Builder<TeamMemberViewModel>.CreateNew().Build();
             var taskData = WorkItemsFactory
                 .CreateTask();
@@ -285,7 +285,7 @@ namespace Ether.Tests.DataSources
         [Test]
         public void GetActiveDurationShouldCorrectlyHandleWhenPullRequestAddedBeforeActivation()
         {
-            const int expectedDuration = 2;
+            const int expectedDuration = 3;
             var john = Builder<TeamMemberViewModel>.CreateNew().Build();
             var taskData = WorkItemsFactory
                 .CreateTask();
@@ -306,7 +306,7 @@ namespace Ether.Tests.DataSources
         [Test]
         public void GetActiveDurationShouldCorrectlyHandleWhenPullRequestAddedAfterActivation()
         {
-            const int expectedDuration = 2;
+            const int expectedDuration = 3;
             var john = Builder<TeamMemberViewModel>.CreateNew().Build();
             var taskData = WorkItemsFactory
                 .CreateTask();
@@ -327,7 +327,7 @@ namespace Ether.Tests.DataSources
         [Test]
         public void GetActiveDurationShouldNotCountTimeWhileOnHold()
         {
-            const int expectedDuration = 7;
+            const int expectedDuration = 9;
             var john = Builder<TeamMemberViewModel>.CreateNew().Build();
             var taskData = WorkItemsFactory
                 .CreateTask()
