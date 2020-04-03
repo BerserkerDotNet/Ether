@@ -1,0 +1,39 @@
+﻿@page "/health-status"
+@layout LoginLayout
+@inject EtherClient Client
+
+<h1>Current status: <a href="#" class="badge badge-@GetStatusClass(healthStatus.Status)">@healthStatus.Status</a></h1>
+
+<table class="table"> 
+    <thead>
+        <tr>
+            <th>Component</th>
+            <th>Status</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var componentStatus in healthStatus.Results)
+        {
+            <tr>
+                <td>@componentStatus.Key</td>
+                <td><a href="#" class="badge badge-@GetStatusClass(componentStatus.Value.Status)">@componentStatus.Value.Status</a></td>
+                <td>@componentStatus.Value.Description</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code{
+    private AppHealthStatus healthStatus = new AppHealthStatus() { Status = string.Empty, Results = new Dictionary<string, HealthCheckStatus>() };
+
+    protected override async Task OnInitializedAsync()
+    {
+        healthStatus = await Client.GetHealthStatus();
+    }
+
+    private string GetStatusClass(string status)
+    {
+        return string.Equals(status, "unhealthy", StringComparison.OrdinalIgnoreCase) ? "danger" : (string.Equals(status, "degraded", StringComparison.OrdinalIgnoreCase) ? "warning" : "success");
+    }
+}

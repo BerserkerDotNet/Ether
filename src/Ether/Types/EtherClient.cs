@@ -81,6 +81,11 @@ namespace Ether.Types
             return HttpGet<VstsDataSourceViewModel>("Settings/VstsDataSourceConfiguration");
         }
 
+        public Task<AppHealthStatus> GetHealthStatus()
+        {
+            return HttpGet<AppHealthStatus>("health", checkStatusCode: false);
+        }
+
         public Task SaveVstsDataSourceConfig(VstsDataSourceViewModel model)
         {
             return HttpPost("Settings/VstsDataSourceConfiguration", model);
@@ -192,10 +197,13 @@ namespace Ether.Types
             return new AccessToken(tokenResponse.AccessToken, TimeSpan.FromSeconds(tokenResponse.ExpiresIn));
         }
 
-        private async Task<T> HttpGet<T>(string url)
+        private async Task<T> HttpGet<T>(string url, bool checkStatusCode = true)
         {
             var response = await _httpClient.GetAsync(url);
-            VerifyResponseStatusCode(response);
+            if (checkStatusCode)
+            {
+                VerifyResponseStatusCode(response);
+            }
 
             var content = await response.Content.ReadAsStringAsync();
             return JsonConvert.DeserializeObject<T>(content);

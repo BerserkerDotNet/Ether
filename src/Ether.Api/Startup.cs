@@ -1,6 +1,11 @@
 ﻿using System;
+using System.IO;
+using System.Text;
+using System.Text.Json;
+using System.Threading.Tasks;
 using Autofac;
 using AutoMapper;
+using Ether.Api.HealthChecks;
 using Ether.Api.Jobs;
 using Ether.Api.Types;
 using Ether.Contracts.Dto.Reports;
@@ -19,10 +24,13 @@ using FluentValidation.AspNetCore;
 using IdentityServer4.Services;
 using IdentityServer4.Validation;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -49,6 +57,11 @@ namespace Ether.Api
             services.Configure<DbConfiguration>(Configuration.GetSection("DbConfig"));
             services.Configure<ADConfiguration>(Configuration.GetSection("ADConfig"));
             services.Configure<EmailGeneratorConfiguration>(Configuration.GetSection("EmailGenerator"));
+
+            services.AddHealthChecks()
+                .AddCheck<DatabaseHealthCheck>("Database")
+                .AddCheck<ADHealthCheck>("AD")
+                .AddCheck<AzureDevOpsHealthCheck>("AzureDevOps");
 
             // Auto Mapper Configurations
             var mappingConfig = new MapperConfiguration(mc =>
@@ -142,17 +155,73 @@ namespace Ether.Api
             app.UseAuthorization();
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapHealthChecks("/health", new HealthCheckOptions
+                {
+                    AllowCachingResponses = false,
+                    ResponseWriter = WriteResponse
+                });
                 endpoints.MapControllers();
             });
         }
 
         private void RunMigrations(IApplicationBuilder app)
         {
-            var migrations = app.ApplicationServices.GetServices<IMigration>();
-            foreach (var migration in migrations)
+            try
             {
-                // ToDo: This should be awaited
-                migration.Run();
+                var migrations = app.ApplicationServices.GetServices<IMigration>();
+                foreach (var migration in migrations)
+                {
+                    // ToDo: This should be awaited
+                    migration.Run();
+                }
+            }
+            catch (Exception)
+            {
+                // TODO: ?
+            }
+        }
+
+        private Task WriteResponse(HttpContext context, HealthReport result)
+        {
+            context.Response.ContentType = "application/json; charset=utf-8";
+
+            var options = new JsonWriterOptions
+            {
+                Indented = true
+            };
+
+            using (var stream = new MemoryStream())
+            {
+                using (var writer = new Utf8JsonWriter(stream, options))
+                {
+                    writer.WriteStartObject();
+                    writer.WriteString("status", result.Status.ToString());
+                    writer.WriteStartObject("results");
+                    foreach (var entry in result.Entries)
+                    {
+                        writer.WriteStartObject(entry.Key);
+                        writer.WriteString("status", entry.Value.Status.ToString());
+                        writer.WriteString("description", entry.Value.Description);
+                        writer.WriteStartObject("data");
+                        foreach (var item in entry.Value.Data)
+                        {
+                            writer.WritePropertyName(item.Key);
+                            JsonSerializer.Serialize(
+                                writer, item.Value, item.Value?.GetType() ??
+                                typeof(object));
+                        }
+
+                        writer.WriteEndObject();
+                        writer.WriteEndObject();
+                    }
+
+                    writer.WriteEndObject();
+                    writer.WriteEndObject();
+                }
+
+                var json = Encoding.UTF8.GetString(stream.ToArray());
+
+                return context.Response.WriteAsync(json);
             }
         }
     }

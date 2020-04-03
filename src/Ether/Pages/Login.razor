@@ -6,6 +6,14 @@
 @inject NavigationManager Navigation
 @inject JsUtils JsUtils
 
+<If Condition="!IsHealthy">
+    <Then>
+        <div class="alert alert-danger" role="alert">
+            Service degradation detected. Visit <a href="/health-status" class="alert-link">health check page</a> to learn more.
+        </div>
+    </Then>
+</If>
+
 <EditForm class="text-center form-signin" Model="@model" OnValidSubmit="@DoLogin">
     <img class="mb-4" src="/images/logo.png" alt="Ether pie chart logo image" width="128" height="128">
     <MatHeadline5>Please sign in</MatHeadline5>
@@ -34,11 +42,14 @@
     private LoginViewModel model;
     private ElementReference submit;
     private string error = string.Empty;
+    private AppHealthStatus healthStatus = new AppHealthStatus();
 
-    protected override void OnInitialized()
+    private bool IsHealthy => healthStatus != null && string.Equals(healthStatus.Status, "healthy", StringComparison.OrdinalIgnoreCase);
+
+    protected override async Task OnInitializedAsync()
     {
         model = new LoginViewModel();
-        base.OnInitialized();
+        healthStatus = await Client.GetHealthStatus();
     }
 
     private async Task DoLogin()
