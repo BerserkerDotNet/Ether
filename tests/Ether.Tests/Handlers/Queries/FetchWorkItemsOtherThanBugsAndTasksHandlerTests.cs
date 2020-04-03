@@ -30,8 +30,15 @@ namespace Ether.Tests.Handlers.Queries
                 .TheRest()
                 .With(w => w.Fields, new Dictionary<string, string>())
                 .Build();
+            var references = workitems.Select(w => new WorkItemReference(w.Id));
             var ids = workitems.Select(w => w.Id).ToArray();
 
+            _clientMock.Setup(c => c.ExecuteFlatQueryAsync(It.IsAny<string>(), default(CancellationToken)))
+                .ReturnsAsync(new FlatWorkItemsQueryResult
+                {
+                    WorkItems = references
+                })
+                .Verifiable();
             _clientMock.Setup(c => c.GetWorkItemsAsync(ids, null, It.IsAny<string[]>(), default(CancellationToken)))
                 .ReturnsAsync(workitems)
                 .Verifiable();
