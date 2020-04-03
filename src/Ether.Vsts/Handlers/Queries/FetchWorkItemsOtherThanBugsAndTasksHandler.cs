@@ -12,6 +12,9 @@ namespace Ether.Vsts.Handlers.Queries
 {
     public class FetchWorkItemsOtherThanBugsAndTasksHandler : IQueryHandler<FetchWorkItemsOtherThanBugsAndTasks, IEnumerable<int>>
     {
+        private const string WorkItemsQueryTemplate = @"SELECT [System.Id] FROM WorkItems 
+                            WHERE [System.Id] IN ({0})";
+
         private readonly IVstsClientFactory _clientFactory;
         private readonly IRepository _repository;
 
@@ -26,15 +29,24 @@ namespace Ether.Vsts.Handlers.Queries
             var inProgressWorkItems = await _repository.GetByFilteredArrayAsync<WorkItem>("Fields.v", new[] { "New", "Active" });
 
             // TODO: Find better way to query this
-            var ids = inProgressWorkItems.Select(workItem => Convert.ToInt32(workItem.WorkItemId)).ToArray();
+            var idsFromDataBase = inProgressWorkItems.Select(workItem => Convert.ToInt32(workItem.WorkItemId)).ToArray();
+            var wiQuery = string.Format(WorkItemsQueryTemplate, string.Join(',', idsFromDataBase));
 
-            if (!ids.Any())
+            if (!idsFromDataBase.Any())
             {
                 return Enumerable.Empty<int>();
             }
 
             var client = await _clientFactory.GetClient();
-            var workItems = await client.GetWorkItemsAsync(ids);
+            var queryResult = await client.ExecuteFlatQueryAsync(wiQuery);
+            var idsFromAdo = queryResult.WorkItems.Select(w => w.Id).ToArray();
+
+            if (!idsFromAdo.Any())
+            {
+                return Enumerable.Empty<int>();
+            }
+
+            var workItems = await client.GetWorkItemsAsync(idsFromAdo);
             var result = new List<int>();
 
             foreach (var workItem in workItems)
@@ -51,6 +63,8 @@ namespace Ether.Vsts.Handlers.Queries
                     result.Add(workItem.Id);
                 }
             }
+
+            result.AddRange(idsFromDataBase.Except(idsFromAdo));
 
             return result;
         }
