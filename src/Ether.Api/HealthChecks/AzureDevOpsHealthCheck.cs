@@ -29,15 +29,20 @@ namespace Ether.Api.HealthChecks
                 return HealthCheckResult.Unhealthy("ADO default identity is not set.");
             }
 
+            if (string.IsNullOrEmpty(config.InstanceName))
+            {
+                return HealthCheckResult.Unhealthy("ADO instance name is not set.");
+            }
+
             var identity = await _mediator.Request<GetIdentityById, IdentityViewModel>(new GetIdentityById { Id = config.DefaultToken.Value });
             if (identity == null || string.IsNullOrEmpty(identity.Token))
             {
                 return HealthCheckResult.Unhealthy("Token is empty.");
             }
 
-            if (identity.ExpirationDate < DateTime.UtcNow.AddDays(30))
+            if (identity.ExpirationDate < DateTime.UtcNow.AddDays(15))
             {
-                return HealthCheckResult.Degraded("Default token will expire soon.");
+                return HealthCheckResult.Degraded($"Default token will expire on {identity.ExpirationDate.ToString("MM/dd/yyyy")}");
             }
 
             if (identity.ExpirationDate < DateTime.UtcNow)
@@ -55,7 +60,7 @@ namespace Ether.Api.HealthChecks
                 return HealthCheckResult.Unhealthy("Exception while fetching from ADO", ex);
             }
 
-            return HealthCheckResult.Healthy();
+            return HealthCheckResult.Healthy("AzureDevOps is OK");
         }
     }
 }

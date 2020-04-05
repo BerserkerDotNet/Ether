@@ -10,8 +10,23 @@
             <MatAppBarSection>
                 <MatIconButton Icon="@MatIconNames.Menu" OnClick="() => IsMenuOpened = !IsMenuOpened"></MatIconButton>
                 <MatAppBarTitle>Ether - KPI reporting tool</MatAppBarTitle>
+                <MatButton Unelevated="true" Link="/health-status">
+                    @if (healthStatus.HealthStatus == HealthStatus.Unhealthy)
+                    {
+                        <span class="badge badge-pill badge-danger">Unhealthy</span>
+                    }
+                    else if (healthStatus.HealthStatus == HealthStatus.Degraded)
+                    {
+                        <span class="badge badge-pill badge-warning">Degraded</span>
+                    }
+                    else
+                    {
+                        <span class="badge badge-pill badge-success">Healthy</span>
+                    }
+                </MatButton>
             </MatAppBarSection>
             <MatAppBarSection Align="MatAppBarSectionAlign.End">
+
                 <MatIcon Icon="@MatIconNames.Account_circle" />&nbsp; Welcome, @currentUser.DisplayName
             </MatAppBarSection>
         </MatAppBarRow>
@@ -37,8 +52,12 @@ else
 @code{
     protected bool isAuthenticated = false;
     protected UserViewModel currentUser = UserViewModel.Anonymous;
+    protected AppHealthStatus healthStatus = new AppHealthStatus();
 
     public bool IsMenuOpened { get; set; } = true;
+
+    [CascadingParameter]
+    public MatTheme Theme { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -51,6 +70,7 @@ else
         {
             Client.SetAccessToken(token.Token);
             currentUser = await Client.GetCurrentUserAsync();
+            healthStatus = await Client.GetHealthStatus();
             isAuthenticated = true;
         }
     }

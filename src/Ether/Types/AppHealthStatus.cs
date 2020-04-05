@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Ether.Types
 {
     public class AppHealthStatus
     {
         public string Status { get; set; }
+
+        public HealthStatus HealthStatus => (HealthStatus)Enum.Parse(typeof(HealthStatus), Status);
 
         public Dictionary<string, HealthCheckStatus> Results { get; set; }
 
@@ -17,6 +17,15 @@ namespace Ether.Types
     {
         public string Status { get; set; }
 
+        public HealthStatus HealthStatus => (HealthStatus)Enum.Parse(typeof(HealthStatus), Status);
+
         public string Description { get; set; }
+    }
+
+    public enum HealthStatus
+    {
+        Unhealthy,
+        Degraded,
+        Healthy
     }
 }

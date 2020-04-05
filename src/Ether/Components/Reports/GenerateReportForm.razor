@@ -36,6 +36,7 @@
 
     protected override void OnParametersSet()
     {
+        Console.WriteLine("OnParametersSet Start");
         base.OnParametersSet();
 
         reportRequest.Profile = Props.Profile;
@@ -49,6 +50,8 @@
         {
             reportRequest.End = Props.EndDate;
         }
+
+        Console.WriteLine("OnParametersSet Done");
     }
 
     private async Task Generate()

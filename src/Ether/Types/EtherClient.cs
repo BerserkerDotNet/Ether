@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using Ether.Types.Exceptions;
 using Ether.ViewModels;
 using Ether.ViewModels.Types;
 using IdentityModel.Client;
@@ -76,9 +78,17 @@ namespace Ether.Types
             }
         }
 
-        public Task<VstsDataSourceViewModel> GetVstsDataSourceConfig()
+        public async Task<VstsDataSourceViewModel> GetVstsDataSourceConfig()
         {
-            return HttpGet<VstsDataSourceViewModel>("Settings/VstsDataSourceConfiguration");
+            try
+            {
+                var result = await HttpGet<VstsDataSourceViewModel>("Settings/VstsDataSourceConfiguration");
+                return result;
+            }
+            catch (EtherApiException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                return new VstsDataSourceViewModel();
+            }
         }
 
         public Task<AppHealthStatus> GetHealthStatus()
@@ -197,46 +207,46 @@ namespace Ether.Types
             return new AccessToken(tokenResponse.AccessToken, TimeSpan.FromSeconds(tokenResponse.ExpiresIn));
         }
 
-        private async Task<T> HttpGet<T>(string url, bool checkStatusCode = true)
+        private async Task<T> HttpGet<T>(string url, bool checkStatusCode = true, [CallerMemberName] string caller = "")
         {
             var response = await _httpClient.GetAsync(url);
             if (checkStatusCode)
             {
-                VerifyResponseStatusCode(response);
+                VerifyResponseStatusCode(response, caller);
             }
 
             var content = await response.Content.ReadAsStringAsync();
             return JsonConvert.DeserializeObject<T>(content);
         }
 
-        private Task HttpPost(string url, object payload)
+        private Task HttpPost(string url, object payload, [CallerMemberName] string caller = "")
         {
-            return HttpPostInternal(url, payload);
+            return HttpPostInternal(url, payload, caller);
         }
 
-        private async Task<T> HttpPost<T>(string url, object payload)
+        private async Task<T> HttpPost<T>(string url, object payload, [CallerMemberName] string caller = "")
         {
-            var response = await HttpPostInternal(url, payload);
+            var response = await HttpPostInternal(url, payload, caller);
             var content = await response.Content.ReadAsStringAsync();
             return JsonConvert.DeserializeObject<T>(content);
         }
 
-        private async Task<HttpResponseMessage> HttpPostInternal(string url, object payload)
+        private async Task<HttpResponseMessage> HttpPostInternal(string url, object payload, string caller)
         {
             var json = JsonConvert.SerializeObject(payload);
             var response = await _httpClient.PostAsync(url, new StringContent(json, Encoding.UTF8, "application/json"));
-            VerifyResponseStatusCode(response);
+            VerifyResponseStatusCode(response, caller);
 
             return response;
         }
 
-        private async Task HttpDelete(string url)
+        private async Task HttpDelete(string url, [CallerMemberName] string caller = "")
         {
             var response = await _httpClient.DeleteAsync(url);
-            VerifyResponseStatusCode(response);
+            VerifyResponseStatusCode(response, caller);
         }
 
-        private void VerifyResponseStatusCode(HttpResponseMessage response)
+        private void VerifyResponseStatusCode(HttpResponseMessage response, string caller)
         {
             if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
             {
@@ -244,9 +254,9 @@ namespace Ether.Types
             }
             else if (!response.IsSuccessStatusCode)
             {
-                var message = $"{response.StatusCode} {response.ReasonPhrase}";
+                var message = $"Calling {caller} resulted in {response.StatusCode} {response.ReasonPhrase}";
                 _toaster.Add(message, MatToastType.Danger, "Server responded with error", MatIconNames.Error);
-                throw new Exception(message);
+                throw new EtherApiException(response.StatusCode, message);
             }
         }
 
