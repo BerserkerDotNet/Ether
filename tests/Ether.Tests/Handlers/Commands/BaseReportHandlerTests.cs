@@ -31,7 +31,7 @@ namespace Ether.Tests.Handlers.Commands
 
         protected THandler Handler { get; private set; }
 
-        protected TCommand Command => new TCommand { Profile = Guid.NewGuid(), Start = DateTime.UtcNow, End = DateTime.UtcNow };
+        protected TCommand Command => new TCommand { Profile = Guid.NewGuid(), Start = DateTime.UtcNow, End = DateTime.UtcNow.AddDays(7) };
 
         protected abstract string ReportType { get; }
 
