@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections;
 using System.Linq.Expressions;
 using AutoMapper;
 using Ether.Contracts.Dto;
 using Ether.Contracts.Interfaces;
+using Ether.Core.Extensions;
 using Ether.Core.Types.Queries;
 using Ether.ViewModels;
 

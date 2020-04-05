@@ -61,7 +61,9 @@ namespace Ether.Api
             services.AddHealthChecks()
                 .AddCheck<DatabaseHealthCheck>("Database")
                 .AddCheck<ADHealthCheck>("AD")
-                .AddCheck<AzureDevOpsHealthCheck>("AzureDevOps");
+                .AddCheck<AzureDevOpsHealthCheck>("AzureDevOps")
+                .AddCheck<JobsHealthCheck>("Jobs")
+                .AddCheck<LogsHealthCheck>("Logs");
 
             // Auto Mapper Configurations
             var mappingConfig = new MapperConfiguration(mc =>

@@ -1,10 +1,12 @@
 ﻿@page "/health-status"
 @layout LoginLayout
 @inject EtherClient Client
+@inject IJSRuntime JS
 
-<h1>Current status: <a href="#" class="badge badge-@GetStatusClass(healthStatus.Status)">@healthStatus.Status</a></h1>
+<MatButton Icon="@MatIconNames.Arrow_back" OnClick="@(async () => await JS.InvokeVoidAsync("window.history.back"))">Back</MatButton>
+<h1> Current status: <a href="#" class="badge badge-@GetStatusClass(healthStatus.Status)">@healthStatus.Status</a></h1>
 
-<table class="table"> 
+<table class="table">
     <thead>
         <tr>
             <th>Component</th>
