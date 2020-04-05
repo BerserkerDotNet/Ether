@@ -4,30 +4,37 @@
 @inject IJSRuntime JS
 
 <MatButton Icon="@MatIconNames.Arrow_back" OnClick="@(async () => await JS.InvokeVoidAsync("window.history.back"))">Back</MatButton>
-<h1> Current status: <a href="#" class="badge badge-@GetStatusClass(healthStatus.Status)">@healthStatus.Status</a></h1>
+<If Condition="healthStatus ==null">
+    <Then>
+        <SpinnerDialog IsShown="true" Label="Loading, please wait..." />
+    </Then>
+    <Else>
+        <h1> Current status: <a href="#" class="badge badge-@GetStatusClass(healthStatus.Status)">@healthStatus.Status</a></h1>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Component</th>
-            <th>Status</th>
-            <th>Description</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var componentStatus in healthStatus.Results)
-        {
-            <tr>
-                <td>@componentStatus.Key</td>
-                <td><a href="#" class="badge badge-@GetStatusClass(componentStatus.Value.Status)">@componentStatus.Value.Status</a></td>
-                <td>@componentStatus.Value.Description</td>
-            </tr>
-        }
-    </tbody>
-</table>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Component</th>
+                    <th>Status</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var componentStatus in healthStatus.Results)
+                {
+                    <tr>
+                        <td>@componentStatus.Key</td>
+                        <td><a href="#" class="badge badge-@GetStatusClass(componentStatus.Value.Status)">@componentStatus.Value.Status</a></td>
+                        <td>@componentStatus.Value.Description</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </Else>
+</If>
 
 @code{
-    private AppHealthStatus healthStatus = new AppHealthStatus() { Status = string.Empty, Results = new Dictionary<string, HealthCheckStatus>() };
+    private AppHealthStatus healthStatus = null;
 
     protected override async Task OnInitializedAsync()
     {
