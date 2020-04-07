@@ -1,7 +1,9 @@
+using Colorful;
 using Nuke.Common;
 using Nuke.Common.Execution;
 using Nuke.Common.ProjectModel;
 using Nuke.Common.Tools.DotNet;
+using Nuke.Common.Utilities;
 using static Nuke.Common.IO.FileSystemTasks;
 using static Nuke.Common.IO.PathConstruction;
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
@@ -94,4 +96,36 @@ class Build : NukeBuild
                 .SetConfiguration(Configuration)
                 .SetOutput(ArtifactsDirectory / EmailGenerator));
         });
+
+    Target Configure => _ => _
+        .Executes(() =>
+        {
+            DotNet($"user-secrets init --project \"{Solution.GetProject("Ether.Api")}\"");
+
+            var configureDb = ConsoleUtility.PromptForChoice("Do you want to configure database connection string?", (false, "No"), (true, "Yes"));
+            if (configureDb)
+            {
+                var host = ConsoleUtility.PromptForInput("What's the DB host name?", "localhost");
+                var port = ConsoleUtility.PromptForInput("What's the DB port?", "27017");
+                var username = ConsoleUtility.PromptForInput("Username to use when connecting", "");
+                Console.WriteLine("Password:");
+                var password = ConsoleUtility.ReadSecret();
+                SetSecret("DBConfig:ConnectionString", $"mongodb://{username}:{password}@{host}:{port}");
+            }
+
+            var configureAD = ConsoleUtility.PromptForChoice("Do you want to configure AD?", (false, "No"), (true, "Yes"));
+            if (configureAD)
+            {
+                var adType = ConsoleUtility.PromptForChoice("Select AD type",
+                    ("Machine", "The computer store. This represents the SAM store."),
+                    ("Domain", "The domain store. This represents the AD DS store."),
+                    ("ApplicationDirectory", "The application directory store. This represents the AD LDS store."));
+                SetSecret("ADConfig:Type", adType);
+            }
+        });
+
+    private void SetSecret(string name, string value)
+    {
+        DotNet($"user-secrets set \"{name}\" \"{value}\" --project \"{Solution.GetProject("Ether.Api")}\"");
+    }
 }

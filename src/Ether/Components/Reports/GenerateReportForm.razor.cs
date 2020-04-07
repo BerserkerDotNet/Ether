@@ -70,7 +70,13 @@ namespace Ether.Components.Reports
 
         private IEnumerable<ProfileViewModel> GetProfiles(RootState state)
         {
-            return state?.Profiles?.Profiles ?? new[] { new ProfileViewModel { Id = Guid.Empty, Name = "None" } };
+            var profiles = state?.Profiles?.Profiles;
+            if (profiles is null || !profiles.Any())
+            {
+                profiles = new[] { new ProfileViewModel { Id = Guid.Empty, Name = "None" } };
+            }
+
+            return profiles;
         }
 
         private IEnumerable<ReporterDescriptorViewModel> GetReportTypes(RootState state)

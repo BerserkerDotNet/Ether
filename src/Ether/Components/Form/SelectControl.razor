@@ -16,7 +16,7 @@
     public IEnumerable<SelectOption<T>> Options { get; set; }
 
     [Parameter]
-    public T Value{ get; set; }
+    public T Value { get; set; }
 
     [Parameter]
     public EventCallback<T> ValueChanged { get; set; }
@@ -40,8 +40,12 @@
         }
         set
         {
-            Value = StringToKey(value);
-            ValueChanged.InvokeAsync(Value);
+            var newValue = StringToKey(value);
+            if (!Equals(newValue, Value))
+            {
+                Value = newValue;
+                ValueChanged.InvokeAsync(Value);
+            }
         }
     }
 
