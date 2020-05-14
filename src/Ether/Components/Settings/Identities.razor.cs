@@ -12,7 +12,7 @@ namespace Ether.Components.Settings
 {
     public class IdentitiesProps
     {
-        public IEnumerable<IdentityViewModel> Items { get; set; }
+        public IEnumerable<IdentityViewModel> Identities { get; set; }
 
         public EventCallback<IdentityViewModel> OnSave { get; set; }
 
@@ -39,7 +39,7 @@ namespace Ether.Components.Settings
 
         private void MapStateToProps(RootState state, IdentitiesProps props)
         {
-            props.Items = GetIdentities(state);
+            props.Identities = GetIdentities(state);
         }
 
         private void MapDispatchToProps(IStore<RootState> store, IdentitiesProps props)

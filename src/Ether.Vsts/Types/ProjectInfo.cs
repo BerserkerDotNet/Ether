@@ -9,6 +9,8 @@ namespace Ether.Vsts.Types
 
         public bool IsWorkItemsEnabled { get; set; }
 
+        public OrganizationViewModel Organization { get; set; }
+
         public IdentityViewModel Identity { get; set; }
 
         public override bool Equals(object obj)

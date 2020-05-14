@@ -25,19 +25,19 @@ namespace Ether.Vsts.Types
 
         public async Task<IVstsClient> GetClient(string token = null)
         {
-            var config = await _mediator.Request<GetVstsDataSourceConfiguration, VstsDataSourceViewModel>();
-            if (config == null || !config.DefaultToken.HasValue)
+            var config = await _mediator.Request<GetOrganization, OrganizationViewModel>();
+            if (config == null || !config.Identity.HasValue)
             {
                 throw new AzureDevopsConfigurationIsMissingException();
             }
 
             if (string.IsNullOrEmpty(token))
             {
-                var identity = await _mediator.Request<GetIdentityById, IdentityViewModel>(new GetIdentityById { Id = config.DefaultToken.Value });
+                var identity = await _mediator.Request<GetIdentityById, IdentityViewModel>(new GetIdentityById { Id = config.Identity.Value });
                 token = identity.Token;
             }
 
-            Client = VstsClient.Get(new OnlineUrlBuilderFactory(config.InstanceName), token);
+            Client = VstsClient.Get(new OnlineUrlBuilderFactory(config.Name), token);
 
             return Client;
         }

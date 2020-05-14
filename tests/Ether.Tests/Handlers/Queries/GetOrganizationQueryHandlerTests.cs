@@ -12,16 +12,16 @@ using NUnit.Framework;
 namespace Ether.Tests.Handlers.Queries
 {
     [TestFixture]
-    public class GetVstsDataSourceConfigurationQueryHandlerTests
+    public class GetOrganizationQueryHandlerTests
     {
-        private GetVstsDataSourceConfigurationHandler _handler;
+        private GetOrganizationHandler _handler;
         private Mock<IRepository> _repositoryMock;
 
         [SetUp]
         public void SetUp()
         {
             _repositoryMock = new Mock<IRepository>(MockBehavior.Strict);
-            _handler = new GetVstsDataSourceConfigurationHandler(_repositoryMock.Object);
+            _handler = new GetOrganizationHandler(_repositoryMock.Object);
         }
 
         [Test]
@@ -38,7 +38,7 @@ namespace Ether.Tests.Handlers.Queries
         {
             SetupGetSingle(null);
 
-            var result = await _handler.Handle(new Vsts.Queries.GetVstsDataSourceConfiguration());
+            var result = await _handler.Handle(new Vsts.Queries.GetOrganization());
 
             result.Should().BeNull();
         }
@@ -46,40 +46,40 @@ namespace Ether.Tests.Handlers.Queries
         [Test]
         public async Task ShouldReturnCompleteViewModel()
         {
-            var expected = new VstsDataSourceSettings
+            var expected = new Organization
             {
                 Id = Guid.NewGuid(),
-                DefaultToken = Guid.NewGuid(),
-                InstanceName = "Dummy"
+                Identity = Guid.NewGuid(),
+                Name = "Dummy"
             };
             SetupGetSingle(expected);
 
-            var result = await _handler.Handle(new Vsts.Queries.GetVstsDataSourceConfiguration());
+            var result = await _handler.Handle(new Vsts.Queries.GetOrganization());
 
             result.Should().NotBeNull();
             result.Id.Should().Be(expected.Id);
-            result.DefaultToken.Should().Be(expected.DefaultToken);
-            result.InstanceName.Should().Be(expected.InstanceName);
+            result.Identity.Should().Be(expected.Identity);
+            result.Name.Should().Be(expected.Name);
         }
 
         [Test]
         public void ShouldPropagateAnyExceptions()
         {
-            _repositoryMock.Setup(r => r.GetSingleAsync(It.IsAny<Expression<Func<VstsDataSourceSettings, bool>>>()))
+            _repositoryMock.Setup(r => r.GetSingleAsync(It.IsAny<Expression<Func<Organization, bool>>>()))
                 .Throws<NotSupportedException>();
 
             _handler.Awaiting(h => h.Handle(null))
                 .Should().Throw<NotSupportedException>();
         }
 
-        private void SetupGetSingle(VstsDataSourceSettings record)
+        private void SetupGetSingle(Organization record)
         {
-            _repositoryMock.Setup(r => r.GetSingleAsync(It.Is<Expression<Func<VstsDataSourceSettings, bool>>>(e => VerifyPredicate(e))))
+            _repositoryMock.Setup(r => r.GetSingleAsync(It.Is<Expression<Func<Organization, bool>>>(e => VerifyPredicate(e))))
                 .ReturnsAsync(record)
                 .Verifiable();
         }
 
-        private bool VerifyPredicate(Expression<Func<VstsDataSourceSettings, bool>> predicate)
+        private bool VerifyPredicate(Expression<Func<Organization, bool>> predicate)
         {
             var right = ((BinaryExpression)predicate.Body).Right;
             return string.Equals(((ConstantExpression)right).Value, Constants.VstsType);

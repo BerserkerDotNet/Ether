@@ -7,14 +7,14 @@ namespace Ether.Types.State
     public class SettingsState
     {
         [JsonConstructor]
-        public SettingsState(IEnumerable<IdentityViewModel> identities, VstsDataSourceViewModel dataSource)
+        public SettingsState(IEnumerable<IdentityViewModel> identities, IEnumerable<OrganizationViewModel> organizations)
         {
             Identities = identities;
-            DataSource = dataSource;
+            Organizations = organizations;
         }
 
         public IEnumerable<IdentityViewModel> Identities { get; private set; }
 
-        public VstsDataSourceViewModel DataSource { get; private set; }
+        public IEnumerable<OrganizationViewModel> Organizations { get; private set; }
     }
 }

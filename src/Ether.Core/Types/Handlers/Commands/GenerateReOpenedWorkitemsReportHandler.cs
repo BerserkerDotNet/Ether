@@ -60,6 +60,7 @@ namespace Ether.Core.Types.Handlers.Commands
                             WorkItemId = e.WorkItem.Id,
                             WorkItemTitle = e.WorkItem.Title,
                             WorkItemType = e.WorkItem.Type,
+                            WorkItemOrganization = string.Empty,
                             WorkItemProject = string.Empty,
                             ReOpenedDate = e.Date,
                             AssociatedUser = e.AssociatedUser

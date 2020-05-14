@@ -8,6 +8,8 @@
 
         public string WorkItemType { get; set; }
 
+        public string WorkItemOrganization { get; set; }
+
         public string WorkItemProject { get; set; }
 
         public string Tags { get; set; }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using AutoMapper;
 using Ether.Contracts.Dto;
 using Ether.Contracts.Interfaces;
 using Ether.Contracts.Interfaces.CQS;
@@ -8,27 +7,23 @@ using Ether.Core.Types.Commands;
 
 namespace Ether.Core.Types.Handlers.Commands
 {
-    public class SaveIdentityHandler : ICommandHandler<SaveIdentity>
+    public class DeleteOrganizationHandler : ICommandHandler<DeleteOrganization>
     {
         private readonly IRepository _repository;
-        private readonly IMapper _mapper;
 
-        public SaveIdentityHandler(IRepository repository, IMapper mapper)
+        public DeleteOrganizationHandler(IRepository repository)
         {
             _repository = repository;
-            _mapper = mapper;
         }
 
-        public async Task Handle(SaveIdentity input)
+        public async Task Handle(DeleteOrganization input)
         {
-            if (input == null || input.Identity == null)
+            if (input == null)
             {
                 throw new ArgumentNullException(nameof(input));
             }
 
-            var dto = _mapper.Map<Identity>(input.Identity);
-
-            await _repository.CreateOrUpdateAsync(dto);
+            await _repository.DeleteAsync<Organization>(input.Id);
         }
     }
 }

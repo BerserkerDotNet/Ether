@@ -8,25 +8,25 @@ using Ether.Core.Types.Commands;
 
 namespace Ether.Core.Types.Handlers.Commands
 {
-    public class SaveIdentityHandler : ICommandHandler<SaveIdentity>
+    public class SaveOrganizationHandler : ICommandHandler<SaveOrganization>
     {
         private readonly IRepository _repository;
         private readonly IMapper _mapper;
 
-        public SaveIdentityHandler(IRepository repository, IMapper mapper)
+        public SaveOrganizationHandler(IRepository repository, IMapper mapper)
         {
             _repository = repository;
             _mapper = mapper;
         }
 
-        public async Task Handle(SaveIdentity input)
+        public async Task Handle(SaveOrganization input)
         {
-            if (input == null || input.Identity == null)
+            if (input == null || input.Organization == null)
             {
                 throw new ArgumentNullException(nameof(input));
             }
 
-            var dto = _mapper.Map<Identity>(input.Identity);
+            var dto = _mapper.Map<Organization>(input.Organization);
 
             await _repository.CreateOrUpdateAsync(dto);
         }

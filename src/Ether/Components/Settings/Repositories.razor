@@ -43,7 +43,7 @@
         var project = Props.ProjectsOptions.FirstOrDefault(i => i.Value == projectId);
         if (project is null)
         {
-            return "N/A";
+            return Constants.NotApplicableLabel;
         }
 
         return project.Name;

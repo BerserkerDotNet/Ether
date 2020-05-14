@@ -11,9 +11,9 @@ namespace Ether.Reducers
             switch (action)
             {
                 case ReceiveIdentitiesAction a:
-                    return new SettingsState(a.Identities, state?.DataSource);
-                case ReceiveDataSourceConfig a:
-                    return new SettingsState(state?.Identities, a.Config);
+                    return new SettingsState(a.Identities, state?.Organizations);
+                case ReceiveOrganizationsAction a:
+                    return new SettingsState(state?.Identities, a.Organizations);
                 default:
                     return state;
             }

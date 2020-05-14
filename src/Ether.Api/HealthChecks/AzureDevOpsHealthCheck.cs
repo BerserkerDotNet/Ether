@@ -23,18 +23,18 @@ namespace Ether.Api.HealthChecks
 
         public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
         {
-            var config = await _mediator.Request<GetVstsDataSourceConfiguration, VstsDataSourceViewModel>();
-            if (config == null || !config.DefaultToken.HasValue)
+            var config = await _mediator.Request<GetOrganization, OrganizationViewModel>();
+            if (config == null || !config.Identity.HasValue)
             {
                 return HealthCheckResult.Unhealthy("ADO default identity is not set.");
             }
 
-            if (string.IsNullOrEmpty(config.InstanceName))
+            if (string.IsNullOrEmpty(config.Name))
             {
                 return HealthCheckResult.Unhealthy("ADO instance name is not set.");
             }
 
-            var identity = await _mediator.Request<GetIdentityById, IdentityViewModel>(new GetIdentityById { Id = config.DefaultToken.Value });
+            var identity = await _mediator.Request<GetIdentityById, IdentityViewModel>(new GetIdentityById { Id = config.Identity.Value });
             if (identity == null || string.IsNullOrEmpty(identity.Token))
             {
                 return HealthCheckResult.Unhealthy("Token is empty.");
@@ -52,7 +52,7 @@ namespace Ether.Api.HealthChecks
 
             try
             {
-                var client = VstsClient.Get(new OnlineUrlBuilderFactory(config.InstanceName), identity.Token);
+                var client = VstsClient.Get(new OnlineUrlBuilderFactory(config.Name), identity.Token);
                 await client.ExecuteQueryAsync(WorkItemsQuery.Get(@"SELECT [System.Id] FROM WorkItems WHERE (ID < 1)"));
             }
             catch (Exception ex)

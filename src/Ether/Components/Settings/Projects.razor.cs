@@ -16,6 +16,8 @@ namespace Ether.Components.Settings
     {
         public IEnumerable<VstsProjectViewModel> Items { get; set; }
 
+        public IEnumerable<SelectOption<Guid?>> OrganizationsOptions { get; set; }
+
         public IEnumerable<SelectOption<Guid?>> IdentitiesOptions { get; set; }
 
         public EventCallback<VstsProjectViewModel> OnSave { get; set; }
@@ -35,6 +37,11 @@ namespace Ether.Components.Settings
 
         private async Task Init(IStore<RootState> store)
         {
+            if (!IsOrganizationsInitialized(store.State))
+            {
+                await store.Dispatch<FetchOrganizations>();
+            }
+
             if (!IsIdentitiesInitialized(store.State))
             {
                 await store.Dispatch<FetchIdentities>();
@@ -49,6 +56,7 @@ namespace Ether.Components.Settings
         private void MapStateToProps(RootState state, ProjectsProps props)
         {
             props.Items = GetProjects(state);
+            props.OrganizationsOptions = GetOrganizationOptions(state);
             props.IdentitiesOptions = GetIdentityOptions(state);
         }
 
@@ -64,6 +72,11 @@ namespace Ether.Components.Settings
             return state?.Projects?.Projects != null;
         }
 
+        private bool IsOrganizationsInitialized(RootState state)
+        {
+            return state?.Settings?.Organizations != null;
+        }
+
         private bool IsIdentitiesInitialized(RootState state)
         {
             return state?.Settings?.Identities != null;
@@ -74,11 +87,28 @@ namespace Ether.Components.Settings
             return state?.Projects?.Projects ?? null;
         }
 
+        private IEnumerable<SelectOption<Guid?>> GetOrganizationOptions(RootState state)
+        {
+            var organizations = state?.Settings?.Organizations ?? Enumerable.Empty<OrganizationViewModel>();
+            var organizationsOptions = new List<SelectOption<Guid?>>(organizations.Count() + 1);
+
+            organizationsOptions.Add(new SelectOption<Guid?>(Guid.Empty, Constants.NoneLabel));
+
+            foreach (var organization in organizations)
+            {
+                organizationsOptions.Add(new SelectOption<Guid?>(organization.Id, organization.Name));
+            }
+
+            return organizationsOptions;
+        }
+
         private IEnumerable<SelectOption<Guid?>> GetIdentityOptions(RootState state)
         {
             var identities = state?.Settings?.Identities ?? Enumerable.Empty<IdentityViewModel>();
             var identitiesOptions = new List<SelectOption<Guid?>>(identities.Count() + 1);
+
             identitiesOptions.Add(new SelectOption<Guid?>(Guid.Empty, Constants.NoneLabel));
+
             foreach (var identity in identities)
             {
                 identitiesOptions.Add(new SelectOption<Guid?>(identity.Id, identity.Name));
@@ -94,6 +124,11 @@ namespace Ether.Components.Settings
 
         private async Task HandleSave(IStore<RootState> store, VstsProjectViewModel project)
         {
+            var organization = store?.State?.Settings?.Organizations.Where(o => o.Id == project.Organization).FirstOrDefault();
+            var identity = store?.State?.Settings?.Identities.Where(i => i.Id == organization.Identity).FirstOrDefault();
+
+            project.Identity = identity.Id;
+
             await store.Dispatch<SaveProject, VstsProjectViewModel>(project);
         }
 

@@ -1,19 +1,17 @@
-﻿<RichTable Items="Props.Items"
-           GridTitle="Projects"
-           FormTitle="Edit project"
-           OnSaveEdit="Props.OnSave"
-           OnRefresh="Props.OnRefresh">
+﻿<RichTable Items="Props.Organizations"
+		   GridTitle="Organizations"
+		   FormTitle="Edit organization"
+		   OnSaveEdit="Props.OnSave"
+		   OnRefresh="Props.OnRefresh">
 	<TableHeader>
 		<th>Name</th>
-		<th>Is workitems enabled</th>
-		<th>Organization</th>
+		<th>Type</th>
 		<th>Identity</th>
 		<th></th>
 	</TableHeader>
 	<TableBody Context="ctx">
 		<td>@ctx.CurrentItem.Name</td>
-		<td>@ctx.CurrentItem.IsWorkItemsEnabled</td>
-		<td>@GetOrganizationName(ctx.CurrentItem.Organization)</td>
+		<td>@ctx.CurrentItem.Type</td>
 		<td>@GetIdentityName(ctx.CurrentItem.Identity)</td>
 		<td>
 			<div>
@@ -28,15 +26,20 @@
 			<ValidationMessage For="@(() => ctx.CurrentItem.Name)" />
 		</p>
 		<p>
-			<MatCheckbox @bind-Value="@ctx.CurrentItem.IsWorkItemsEnabled" Label="Is Work Items Enabled" />
-			<ValidationMessage For="@(() => ctx.CurrentItem.IsWorkItemsEnabled)" />
+			<MatSelect @bind-Value="ctx.CurrentItem.Type" Label="Type" Class="full-width">
+				@foreach (var type in Props.TypesOptions)
+				{
+					<MatOption Value="type">@type</MatOption>
+				}
+			</MatSelect>
+			<ValidationMessage For="@(() => ctx.CurrentItem.Type)" />
 		</p>
 		<p>
-			<SelectControl @bind-Value="ctx.CurrentItem.Organization"
-						   Options="Props.OrganizationsOptions"
+			<SelectControl @bind-Value="ctx.CurrentItem.Identity"
+						   Options="Props.IdentitiesOptions"
 						   KeyToString="k => k is null ? Guid.Empty.ToString() : k.ToString()"
 						   StringToKey="s => Guid.Parse(s) == Guid.Empty ? (Guid?)null : (Guid?)Guid.Parse(s)"
-						   Label="Organization" />
+						   Label="Identity" />
 			<ValidationMessage For="@(() => ctx.CurrentItem.Identity)" />
 		</p>
 	</FormBody>
@@ -44,24 +47,7 @@
 
 @code
 {
-	[Parameter] public ProjectsProps Props { get; set; }
-
-	private string GetOrganizationName(Guid? organizationId)
-	{
-		if (!organizationId.HasValue)
-		{
-			return Constants.NoneLabel;
-		}
-
-		var organization = Props.OrganizationsOptions.FirstOrDefault(i => i.Value == organizationId.Value);
-
-		if (organization is null)
-		{
-			return Constants.NotApplicableLabel;
-		}
-
-		return organization.Name;
-	}
+	[Parameter] public OrganizationsProps Props { get; set; }
 
 	private string GetIdentityName(Guid? identityId)
 	{
@@ -71,6 +57,7 @@
 		}
 
 		var identity = Props.IdentitiesOptions.FirstOrDefault(i => i.Value == identityId.Value);
+
 		if (identity is null)
 		{
 			return Constants.NotApplicableLabel;
