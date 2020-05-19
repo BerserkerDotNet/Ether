@@ -1,5 +1,4 @@
-﻿using Ether.ViewModels;
-using FluentValidation;
+﻿using FluentValidation;
 
 namespace Ether.ViewModels.Validators
 {
@@ -7,7 +6,9 @@ namespace Ether.ViewModels.Validators
     {
         public OrganizationViewModelValidator()
         {
-            RuleFor(d => d.Name).NotEmpty();
+            RuleFor(o => o.Name).NotEmpty();
+            RuleFor(o => o.Type).NotEmpty();
+            RuleFor(o => o.Identity).NotEmpty();
         }
     }
 }

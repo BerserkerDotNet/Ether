@@ -36,14 +36,14 @@ namespace Ether.Vsts.Types
                 config = await _mediator.Request<GetFirstOrganization, OrganizationViewModel>();
             }
 
-            if (config == null || !config.Identity.HasValue)
+            if (config == null || config.Identity.Equals(Guid.Empty))
             {
                 throw new AzureDevopsConfigurationIsMissingException();
             }
 
             if (string.IsNullOrEmpty(token))
             {
-                var identity = await _mediator.Request<GetIdentityById, IdentityViewModel>(new GetIdentityById { Id = config.Identity.Value });
+                var identity = await _mediator.Request<GetIdentityById, IdentityViewModel>(new GetIdentityById { Id = config.Identity });
                 token = identity.Token;
             }
 

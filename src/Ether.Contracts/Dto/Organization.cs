@@ -9,7 +9,7 @@ namespace Ether.Contracts.Dto
             Type = type;
         }
 
-        public Guid? Identity { get; set; }
+        public Guid Identity { get; set; }
 
         public string Name { get; set; }
 

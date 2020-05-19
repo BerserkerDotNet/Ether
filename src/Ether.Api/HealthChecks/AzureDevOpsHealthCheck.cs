@@ -24,7 +24,7 @@ namespace Ether.Api.HealthChecks
         public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
         {
             var config = await _mediator.Request<GetFirstOrganization, OrganizationViewModel>();
-            if (config == null || !config.Identity.HasValue)
+            if (config == null || config.Identity.Equals(Guid.Empty))
             {
                 return HealthCheckResult.Unhealthy("ADO default identity is not set.");
             }
@@ -34,7 +34,7 @@ namespace Ether.Api.HealthChecks
                 return HealthCheckResult.Unhealthy("ADO instance name is not set.");
             }
 
-            var identity = await _mediator.Request<GetIdentityById, IdentityViewModel>(new GetIdentityById { Id = config.Identity.Value });
+            var identity = await _mediator.Request<GetIdentityById, IdentityViewModel>(new GetIdentityById { Id = config.Identity });
             if (identity == null || string.IsNullOrEmpty(identity.Token))
             {
                 return HealthCheckResult.Unhealthy("Token is empty.");

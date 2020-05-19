@@ -34,10 +34,10 @@
 		<p>
 			<SelectControl @bind-Value="ctx.CurrentItem.Organization"
 						   Options="Props.OrganizationsOptions"
-						   KeyToString="k => k is null ? Guid.Empty.ToString() : k.ToString()"
-						   StringToKey="s => Guid.Parse(s) == Guid.Empty ? (Guid?)null : (Guid?)Guid.Parse(s)"
+						   KeyToString="k => k.ToString()"
+						   StringToKey="s => Guid.Parse(s)"
 						   Label="Organization" />
-			<ValidationMessage For="@(() => ctx.CurrentItem.Identity)" />
+			<ValidationMessage For="@(() => ctx.CurrentItem.Organization)" />
 		</p>
 	</FormBody>
 </RichTable>
@@ -46,14 +46,14 @@
 {
 	[Parameter] public ProjectsProps Props { get; set; }
 
-	private string GetOrganizationName(Guid? organizationId)
+	private string GetOrganizationName(Guid organizationId)
 	{
-		if (!organizationId.HasValue)
+		if (organizationId.Equals(Guid.Empty))
 		{
 			return Constants.NoneLabel;
 		}
 
-		var organization = Props.OrganizationsOptions.FirstOrDefault(i => i.Value == organizationId.Value);
+		var organization = Props.OrganizationsOptions.FirstOrDefault(i => i.Value == organizationId);
 
 		if (organization is null)
 		{
@@ -63,14 +63,14 @@
 		return organization.Name;
 	}
 
-	private string GetIdentityName(Guid? identityId)
+	private string GetIdentityName(Guid identityId)
 	{
-		if (!identityId.HasValue)
+		if (identityId.Equals(Guid.Empty))
 		{
 			return Constants.NoneLabel;
 		}
 
-		var identity = Props.IdentitiesOptions.FirstOrDefault(i => i.Value == identityId.Value);
+		var identity = Props.IdentitiesOptions.FirstOrDefault(i => i.Value == identityId);
 		if (identity is null)
 		{
 			return Constants.NotApplicableLabel;

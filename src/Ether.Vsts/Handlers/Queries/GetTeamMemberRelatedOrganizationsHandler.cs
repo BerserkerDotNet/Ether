@@ -39,8 +39,7 @@ namespace Ether.Vsts.Handlers.Queries
             var projects = await _repository.GetAsync<Project>(project => projectsToFetch.Contains(project.Id));
 
             var organizationsToFetch = projects
-                .Where(project => project.Organization.HasValue)
-                .Select(project => project.Organization.Value)
+                .Select(project => project.Organization)
                 .Distinct()
                 .ToArray();
             var organizations = await _repository.GetAsync<Dto.Organization>(organization => organizationsToFetch.Contains(organization.Id));

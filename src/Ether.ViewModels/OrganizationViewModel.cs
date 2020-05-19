@@ -4,7 +4,7 @@ namespace Ether.ViewModels
 {
     public class OrganizationViewModel : ViewModelWithId
     {
-        public Guid? Identity { get; set; }
+        public Guid Identity { get; set; }
 
         public string Name { get; set; }
 

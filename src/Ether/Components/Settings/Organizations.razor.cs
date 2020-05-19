@@ -19,7 +19,7 @@ namespace Ether.Components.Settings
 
         public IEnumerable<string> TypesOptions { get; set; }
 
-        public IEnumerable<SelectOption<Guid?>> IdentitiesOptions { get; set; }
+        public IEnumerable<SelectOption<Guid>> IdentitiesOptions { get; set; }
 
         public EventCallback<OrganizationViewModel> OnSave { get; set; }
 
@@ -79,16 +79,16 @@ namespace Ether.Components.Settings
             return typesOptions;
         }
 
-        private IEnumerable<SelectOption<Guid?>> GetIdentityOptions(RootState state)
+        private IEnumerable<SelectOption<Guid>> GetIdentityOptions(RootState state)
         {
             var identities = state?.Settings?.Identities ?? Enumerable.Empty<IdentityViewModel>();
-            var identitiesOptions = new List<SelectOption<Guid?>>(identities.Count() + 1);
+            var identitiesOptions = new List<SelectOption<Guid>>(identities.Count() + 1);
 
-            identitiesOptions.Add(new SelectOption<Guid?>(Guid.Empty, Constants.NoneLabel));
+            identitiesOptions.Add(new SelectOption<Guid>(Guid.Empty, string.Empty));
 
             foreach (var identity in identities)
             {
-                identitiesOptions.Add(new SelectOption<Guid?>(identity.Id, identity.Name));
+                identitiesOptions.Add(new SelectOption<Guid>(identity.Id, identity.Name));
             }
 
             return identitiesOptions;

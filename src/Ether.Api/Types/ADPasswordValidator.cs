@@ -41,10 +41,10 @@ namespace Ether.Api.Types
                 var isValid = principal.ValidateCredentials(userName, context.Password);
                 if (isValid)
                 {
-                    // var userNameToSearch = type == ContextType.Machine ? Environment.UserName : context.UserName;
-                    // var user = UserPrincipal.FindByIdentity(principal, userNameToSearch);
-                    var claims = GetAdditionalClaims();
-                    context.Result = new GrantValidationResult(subject: "Pavlo", authenticationMethod: "ADS", claims: claims);
+                    var userNameToSearch = type == ContextType.Machine ? Environment.UserName : context.UserName;
+                    var user = UserPrincipal.FindByIdentity(principal, userNameToSearch);
+                    var claims = GetAdditionalClaims(user);
+                    context.Result = new GrantValidationResult(subject: user.Name, authenticationMethod: "ADS", claims: claims);
                 }
                 else
                 {
@@ -55,10 +55,19 @@ namespace Ether.Api.Types
             }
         }
 
-        private IEnumerable<Claim> GetAdditionalClaims()
+        private IEnumerable<Claim> GetAdditionalClaims(UserPrincipal user)
         {
-            yield return new Claim(CustomClaims.DisplayName, "Pavlo");
-            yield return new Claim(ClaimTypes.Email, "v-pachm@microsoft.com");
+            yield return new Claim(CustomClaims.DisplayName, user.DisplayName);
+
+            if (user.Guid.HasValue)
+            {
+                yield return new Claim(CustomClaims.Id, user.Guid.Value.ToString());
+            }
+
+            if (!string.IsNullOrEmpty(user.EmailAddress))
+            {
+                yield return new Claim(ClaimTypes.Email, user.EmailAddress);
+            }
         }
     }
 }

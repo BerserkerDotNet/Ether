@@ -57,7 +57,7 @@ namespace Ether.Vsts.Handlers.Commands
 
             var repository = await _repository.GetSingleAsync<Repository>(pullRequest.Repository);
             var project = await _repository.GetSingleAsync<Project>(repository.Project);
-            var organization = project.Organization.HasValue ? (await _repository.GetSingleAsync<Contracts.Dto.Organization>(project.Organization.Value)) : null;
+            var organization = await _repository.GetSingleAsync<Contracts.Dto.Organization>(project.Organization);
             var client = await _clientFactory.GetPullRequestsClient(organization.Id);
 
             var prInfo = await client.GetPullRequestAsync(pullRequest.PullRequestId);

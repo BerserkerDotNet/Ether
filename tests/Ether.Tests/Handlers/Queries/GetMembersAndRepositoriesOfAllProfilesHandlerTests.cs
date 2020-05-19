@@ -113,7 +113,7 @@ namespace Ether.Tests.Handlers.Queries
 
             var projects = Builder<Project>.CreateListOfSize(10)
                 .All()
-                .With(p => p.Identity = null)
+                .With(p => p.Identity = Guid.Empty)
                 .Random(6)
                 .With(p => p.Identity = identity.Id)
                 .Build();

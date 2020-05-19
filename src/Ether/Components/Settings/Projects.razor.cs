@@ -16,9 +16,9 @@ namespace Ether.Components.Settings
     {
         public IEnumerable<VstsProjectViewModel> Items { get; set; }
 
-        public IEnumerable<SelectOption<Guid?>> OrganizationsOptions { get; set; }
+        public IEnumerable<SelectOption<Guid>> OrganizationsOptions { get; set; }
 
-        public IEnumerable<SelectOption<Guid?>> IdentitiesOptions { get; set; }
+        public IEnumerable<SelectOption<Guid>> IdentitiesOptions { get; set; }
 
         public EventCallback<VstsProjectViewModel> OnSave { get; set; }
 
@@ -87,31 +87,31 @@ namespace Ether.Components.Settings
             return state?.Projects?.Projects ?? null;
         }
 
-        private IEnumerable<SelectOption<Guid?>> GetOrganizationOptions(RootState state)
+        private IEnumerable<SelectOption<Guid>> GetOrganizationOptions(RootState state)
         {
             var organizations = state?.Settings?.Organizations ?? Enumerable.Empty<OrganizationViewModel>();
-            var organizationsOptions = new List<SelectOption<Guid?>>(organizations.Count() + 1);
+            var organizationsOptions = new List<SelectOption<Guid>>(organizations.Count() + 1);
 
-            organizationsOptions.Add(new SelectOption<Guid?>(Guid.Empty, Constants.NoneLabel));
+            organizationsOptions.Add(new SelectOption<Guid>(Guid.Empty, string.Empty));
 
             foreach (var organization in organizations)
             {
-                organizationsOptions.Add(new SelectOption<Guid?>(organization.Id, organization.Name));
+                organizationsOptions.Add(new SelectOption<Guid>(organization.Id, organization.Name));
             }
 
             return organizationsOptions;
         }
 
-        private IEnumerable<SelectOption<Guid?>> GetIdentityOptions(RootState state)
+        private IEnumerable<SelectOption<Guid>> GetIdentityOptions(RootState state)
         {
             var identities = state?.Settings?.Identities ?? Enumerable.Empty<IdentityViewModel>();
-            var identitiesOptions = new List<SelectOption<Guid?>>(identities.Count() + 1);
+            var identitiesOptions = new List<SelectOption<Guid>>(identities.Count() + 1);
 
-            identitiesOptions.Add(new SelectOption<Guid?>(Guid.Empty, Constants.NoneLabel));
+            identitiesOptions.Add(new SelectOption<Guid>(Guid.Empty, string.Empty));
 
             foreach (var identity in identities)
             {
-                identitiesOptions.Add(new SelectOption<Guid?>(identity.Id, identity.Name));
+                identitiesOptions.Add(new SelectOption<Guid>(identity.Id, identity.Name));
             }
 
             return identitiesOptions;
