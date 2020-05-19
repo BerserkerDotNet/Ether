@@ -37,7 +37,7 @@ namespace Ether.Vsts.Handlers.Queries
                 return Enumerable.Empty<int>();
             }
 
-            var client = await _clientFactory.GetClient();
+            var client = await _clientFactory.GetClient(query.OrganizationId);
             var queryResult = await client.ExecuteFlatQueryAsync(wiQuery);
             var idsFromAdo = queryResult.WorkItems.Select(w => w.Id).ToArray();
 

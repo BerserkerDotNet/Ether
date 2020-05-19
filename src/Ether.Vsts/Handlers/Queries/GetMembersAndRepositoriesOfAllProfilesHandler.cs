@@ -51,6 +51,13 @@ namespace Ether.Vsts.Handlers.Queries
                 .ToArray();
             var projects = await _repository.GetAsync<Project>(p => projectsToFetch.Contains(p.Id));
 
+            var organizationsToFetch = projects
+                .Where(p => p.Organization.HasValue)
+                .Select(p => p.Organization.Value)
+                .Distinct()
+                .ToArray();
+            var organizations = await _repository.GetAsync<Contracts.Dto.Organization>(i => organizationsToFetch.Contains(i.Id));
+
             var identitiesToFetch = projects
                 .Where(p => p.Identity.HasValue)
                 .Select(p => p.Identity.Value)
@@ -71,6 +78,7 @@ namespace Ether.Vsts.Handlers.Queries
 
                 var project = projects.Single(p => p.Id == r.Project);
                 var projectInfo = _mapper.Map<ProjectInfo>(project);
+                projectInfo.Organization = MapOrganization(organizations, project.Organization);
                 projectInfo.Identity = MapIdentity(identities, project.Identity);
                 info.Project = projectInfo;
 
@@ -78,6 +86,17 @@ namespace Ether.Vsts.Handlers.Queries
             })
             .Where(r => r.Members.Any())
             .ToArray();
+        }
+
+        private OrganizationViewModel MapOrganization(IEnumerable<Contracts.Dto.Organization> organizations, Guid? organizationId)
+        {
+            if (!organizationId.HasValue)
+            {
+                return null;
+            }
+
+            var organization = organizations.Single(p => p.Id == organizationId.Value);
+            return _mapper.Map<OrganizationViewModel>(organization);
         }
 
         private IdentityViewModel MapIdentity(IEnumerable<Identity> identities, Guid? identityId)

@@ -23,7 +23,7 @@ namespace Ether.Api.HealthChecks
 
         public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
         {
-            var config = await _mediator.Request<GetOrganization, OrganizationViewModel>();
+            var config = await _mediator.Request<GetFirstOrganization, OrganizationViewModel>();
             if (config == null || !config.Identity.HasValue)
             {
                 return HealthCheckResult.Unhealthy("ADO default identity is not set.");

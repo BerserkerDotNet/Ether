@@ -7,6 +7,7 @@ using Ether.ViewModels;
 using Ether.Vsts.Handlers.Queries;
 using Ether.Vsts.Interfaces;
 using Ether.Vsts.Queries;
+using Ether.Vsts.Types;
 using FizzWare.NBuilder;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
@@ -36,7 +37,7 @@ namespace Ether.Tests.Handlers.Queries
         [Test]
         public void ShouldThrowExceptionIfMemberIsNull()
         {
-            _handler.Awaiting(h => h.Handle(new FetchWorkItemsFromProject(null)))
+            _handler.Awaiting(h => h.Handle(new FetchWorkItemsFromProject(null, default)))
                 .Should().Throw<ArgumentNullException>();
         }
 
@@ -47,6 +48,8 @@ namespace Ether.Tests.Handlers.Queries
             var teamMember = Builder<TeamMemberViewModel>.CreateNew()
                 .With(m => m.Email, DummyEmail)
                 .With(m => m.LastWorkitemsFetchDate, lastFetchDate)
+                .Build();
+            var organization = Builder<OrganizationViewModel>.CreateNew()
                 .Build();
             var workitems = Builder<WorkItem>.CreateListOfSize(5)
                 .Build();
@@ -70,7 +73,7 @@ namespace Ether.Tests.Handlers.Queries
                 .ReturnsAsync(updates)
                 .Verifiable();
 
-            var result = await _handler.Handle(new FetchWorkItemsFromProject(teamMember));
+            var result = await _handler.Handle(new FetchWorkItemsFromProject(teamMember, organization.Id));
 
             result.Should().HaveCount(workitems.Count);
             result.Should().OnlyContain(vm => workitems.Any(w => w.Id == vm.WorkItemId) && vm.Updates.Count() == 2);
@@ -87,6 +90,8 @@ namespace Ether.Tests.Handlers.Queries
                .With(m => m.Email, DummyEmail)
                .With(m => m.LastWorkitemsFetchDate, null)
                .Build();
+            var organization = Builder<OrganizationViewModel>.CreateNew()
+                .Build();
 
             _clientMock.Setup(c => c.ExecuteFlatQueryAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new FlatWorkItemsQueryResult
@@ -95,7 +100,7 @@ namespace Ether.Tests.Handlers.Queries
                 })
                 .Verifiable();
 
-            var result = await _handler.Handle(new FetchWorkItemsFromProject(teamMember));
+            var result = await _handler.Handle(new FetchWorkItemsFromProject(teamMember, organization.Id));
 
             result.Should().BeEmpty();
 
@@ -120,10 +125,11 @@ namespace Ether.Tests.Handlers.Queries
                .With(m => m.Email, DummyEmail)
                .With(m => m.LastWorkitemsFetchDate, null)
                .Build();
-
             var workitems = Builder<WorkItem>.CreateListOfSize(5)
                 .All()
                 .With(w => w.Fields, fields)
+                .Build();
+            var organization = Builder<OrganizationViewModel>.CreateNew()
                 .Build();
             var references = workitems.Select(w => new WorkItemReference(w.Id));
             var ids = workitems.Select(w => w.Id).ToArray();
@@ -152,7 +158,7 @@ namespace Ether.Tests.Handlers.Queries
                 .ReturnsAsync(updates)
                 .Verifiable();
 
-            var result = await _handler.Handle(new FetchWorkItemsFromProject(teamMember));
+            var result = await _handler.Handle(new FetchWorkItemsFromProject(teamMember, organization.Id));
 
             result.Should().OnlyContain(w => !w.Fields.ContainsKey("FakeField1") && !w.Fields.ContainsKey("FakeField2"));
         }
@@ -172,6 +178,8 @@ namespace Ether.Tests.Handlers.Queries
                 .All()
                 .With(w => w.Relations, relations)
                 .Build();
+            var organization = Builder<OrganizationViewModel>.CreateNew()
+                .Build();
             var references = workitems.Select(w => new WorkItemReference(w.Id));
             var ids = workitems.Select(w => w.Id).ToArray();
             _clientMock.Setup(c => c.ExecuteFlatQueryAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
@@ -199,7 +207,7 @@ namespace Ether.Tests.Handlers.Queries
                 .ReturnsAsync(updates)
                 .Verifiable();
 
-            var result = await _handler.Handle(new FetchWorkItemsFromProject(teamMember));
+            var result = await _handler.Handle(new FetchWorkItemsFromProject(teamMember, organization.Id));
 
             result.Should().OnlyContain(w => w.Relations != null && w.Relations.Any());
         }
@@ -210,7 +218,7 @@ namespace Ether.Tests.Handlers.Queries
             _clientMock = new Mock<IVstsClient>(MockBehavior.Strict);
             _handler = new FetchWorkItemsFromProjectHandler(_clientFactoryMock.Object, Mock.Of<ILogger<FetchWorkItemsFromProjectHandler>>(), Mapper);
 
-            _clientFactoryMock.Setup(c => c.GetClient(null))
+            _clientFactoryMock.Setup(c => c.GetClient(default, null))
                 .ReturnsAsync(_clientMock.Object)
                 .Verifiable();
         }

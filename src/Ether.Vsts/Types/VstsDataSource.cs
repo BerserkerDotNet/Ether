@@ -450,10 +450,10 @@ namespace Ether.Vsts.Types
 
         private string GetOrganization(WorkItemViewModel item)
         {
-            var project = _repository.Get<Project>(project => project.Name == GetProject(item)).FirstOrDefault();
-            var organization = _repository.Get<Organization>(organization => organization.Id == project.Organization).FirstOrDefault();
+            var project = _repository.Get<Project>(p => p.Name == GetProject(item)).FirstOrDefault();
+            var organization = project != null ? _repository.Get<Organization>(o => o.Id == project.Organization).FirstOrDefault() : null;
 
-            return organization.Name;
+            return organization != null ? organization.Name : string.Empty;
         }
     }
 }

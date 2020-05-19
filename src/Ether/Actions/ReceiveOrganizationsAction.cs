@@ -1,6 +1,6 @@
-﻿using BlazorState.Redux.Interfaces;
+﻿using System.Collections.Generic;
+using BlazorState.Redux.Interfaces;
 using Ether.ViewModels;
-using System.Collections.Generic;
 
 namespace Ether.Actions
 {

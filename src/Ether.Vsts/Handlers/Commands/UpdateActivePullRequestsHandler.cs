@@ -55,11 +55,10 @@ namespace Ether.Vsts.Handlers.Commands
         {
             // TODO: Need to either get info about the repository or iterate over different identities on 401
 
-            /*var vstsRepository = await _repository.GetSingleAsync<Repository>(pullRequest.Repository);
-            var vstsProject = await _repository.GetSingleAsync<Project>(vstsRepository.Project);
-            var identity = vstsProject.Identity.HasValue ? (await _repository.GetSingleAsync<Identity>(vstsProject.Identity.Value)) : null;
-            var token = identity is null ? null : identity.Token;*/
-            var client = await _clientFactory.GetPullRequestsClient();
+            var repository = await _repository.GetSingleAsync<Repository>(pullRequest.Repository);
+            var project = await _repository.GetSingleAsync<Project>(repository.Project);
+            var organization = project.Organization.HasValue ? (await _repository.GetSingleAsync<Contracts.Dto.Organization>(project.Organization.Value)) : null;
+            var client = await _clientFactory.GetPullRequestsClient(organization.Id);
 
             var prInfo = await client.GetPullRequestAsync(pullRequest.PullRequestId);
             var iterations = await client.GetPullRequestIterationsAsync(prInfo.Repository.Project.Name, prInfo.Repository.Name, prInfo.PullRequestId);

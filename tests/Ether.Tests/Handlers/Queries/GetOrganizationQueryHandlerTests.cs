@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using AutoMapper;
 using Ether.Contracts.Interfaces;
 using Ether.Vsts;
 using Ether.Vsts.Dto;
@@ -14,14 +15,16 @@ namespace Ether.Tests.Handlers.Queries
     [TestFixture]
     public class GetOrganizationQueryHandlerTests
     {
-        private GetOrganizationHandler _handler;
+        private GetOrganizationByIdHandler _handler;
         private Mock<IRepository> _repositoryMock;
+        private Mock<IMapper> _mapperMock;
 
         [SetUp]
         public void SetUp()
         {
             _repositoryMock = new Mock<IRepository>(MockBehavior.Strict);
-            _handler = new GetOrganizationHandler(_repositoryMock.Object);
+            _mapperMock = new Mock<IMapper>(MockBehavior.Strict);
+            _handler = new GetOrganizationByIdHandler(_repositoryMock.Object, _mapperMock.Object);
         }
 
         [Test]
@@ -38,7 +41,7 @@ namespace Ether.Tests.Handlers.Queries
         {
             SetupGetSingle(null);
 
-            var result = await _handler.Handle(new Vsts.Queries.GetOrganization());
+            var result = await _handler.Handle(new Vsts.Queries.GetOrganizationById(default));
 
             result.Should().BeNull();
         }
@@ -54,7 +57,7 @@ namespace Ether.Tests.Handlers.Queries
             };
             SetupGetSingle(expected);
 
-            var result = await _handler.Handle(new Vsts.Queries.GetOrganization());
+            var result = await _handler.Handle(new Vsts.Queries.GetOrganizationById(expected.Id));
 
             result.Should().NotBeNull();
             result.Id.Should().Be(expected.Id);

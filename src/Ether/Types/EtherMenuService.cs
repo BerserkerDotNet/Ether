@@ -19,7 +19,7 @@ namespace Ether.Types
         {
             Menu = new List<MenuItem>(4);
             await AddItem(MenuItem.Create("Home", MatIconNames.Home, "/", "Reports"));
-            //await AddItem(MenuItem.Create("Dashboard", MatIconNames.Dashboard, "dashboard", "Dashboard"));
+            // await AddItem(MenuItem.Create("Dashboard", MatIconNames.Dashboard, "dashboard", "Dashboard"));
             await AddItem(MenuItem.Create("Reports", MatIconNames.Pie_chart, "reports", "Reports"));
             await AddItem(MenuItem.CreateContainer("Azure DevOps", MatIconNames.Cloud, "AzureDevOps Settings",
                 MenuItem.Create("Profiles", MatIconNames.View_list, "azure-devops/profiles", "AzureDevOps Settings"),

@@ -1,4 +1,5 @@
-﻿using Ether.Contracts.Interfaces.CQS;
+﻿using System;
+using Ether.Contracts.Interfaces.CQS;
 using Ether.ViewModels;
 
 namespace Ether.Vsts.Commands
@@ -6,5 +7,7 @@ namespace Ether.Vsts.Commands
     public class SaveTeamMember : ICommand
     {
         public TeamMemberViewModel TeamMember { get; set; }
+
+        public Guid OrganizationId { get; set; }
     }
 }
