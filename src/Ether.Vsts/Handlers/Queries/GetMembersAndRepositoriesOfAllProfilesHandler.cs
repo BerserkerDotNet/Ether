@@ -55,7 +55,7 @@ namespace Ether.Vsts.Handlers.Queries
                 .Select(p => p.Organization)
                 .Distinct()
                 .ToArray();
-            var organizations = await _repository.GetAsync<Contracts.Dto.Organization>(i => organizationsToFetch.Contains(i.Id));
+            var organizations = await _repository.GetAsync<Organization>(i => organizationsToFetch.Contains(i.Id));
 
             var identitiesToFetch = projects
                 .Select(p => p.Identity)

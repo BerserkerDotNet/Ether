@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -67,7 +68,7 @@ namespace Ether.Tests.Handlers.Queries
             _clientMock = new Mock<IVstsClient>(MockBehavior.Strict);
             _handler = new FetchWorkItemsOtherThanBugsAndTasksHandler(_clientFactoryMock.Object, RepositoryMock.Object);
 
-            _clientFactoryMock.Setup(c => c.GetClient(default, null))
+            _clientFactoryMock.Setup(c => c.GetClient(It.IsAny<Guid>(), It.IsAny<string>()))
                 .ReturnsAsync(_clientMock.Object)
                 .Verifiable();
         }

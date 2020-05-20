@@ -218,7 +218,7 @@ namespace Ether.Tests.Handlers.Queries
             _clientMock = new Mock<IVstsClient>(MockBehavior.Strict);
             _handler = new FetchWorkItemsFromProjectHandler(_clientFactoryMock.Object, Mock.Of<ILogger<FetchWorkItemsFromProjectHandler>>(), Mapper);
 
-            _clientFactoryMock.Setup(c => c.GetClient(default, null))
+            _clientFactoryMock.Setup(c => c.GetClient(It.IsAny<Guid>(), It.IsAny<string>()))
                 .ReturnsAsync(_clientMock.Object)
                 .Verifiable();
         }

@@ -2,6 +2,7 @@
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using AutoMapper;
+using Ether.Contracts.Dto;
 using Ether.Contracts.Interfaces;
 using Ether.Core.Types.Commands;
 using Ether.ViewModels;
@@ -10,25 +11,14 @@ using Ether.Vsts.Commands;
 using Ether.Vsts.Dto;
 using Ether.Vsts.Handlers.Commands;
 using FluentAssertions;
-using Moq;
 using NUnit.Framework;
 
 namespace Ether.Tests.Handlers.Commands
 {
     [TestFixture]
-    public class SaveOrganizationHandlerTests
+    public class SaveOrganizationHandlerTests : BaseHandlerTest
     {
-        private Mock<IRepository> _repositorMock;
-        private Mock<IMapper> _mapperMock;
         private SaveOrganizationHandler _handler;
-
-        [SetUp]
-        public void SetUp()
-        {
-            _repositorMock = new Mock<IRepository>(MockBehavior.Strict);
-            _mapperMock = new Mock<IMapper>(MockBehavior.Strict);
-            _handler = new SaveOrganizationHandler(_repositorMock.Object, _mapperMock.Object);
-        }
 
         [Test]
         public void ShouldThrowExceptionIfCommandIsNull()
@@ -47,19 +37,24 @@ namespace Ether.Tests.Handlers.Commands
         [Test]
         public async Task ShouldSaveConfiguration()
         {
-            var config = new OrganizationViewModel
+            var expectedOrganization = new OrganizationViewModel
             {
                 Id = Guid.NewGuid(),
                 Identity = Guid.NewGuid(),
-                Name = "Fooooo"
+                Name = "Fooooo",
+                Type = "Fooooo"
             };
-            _repositorMock.Setup(r => r.CreateOrUpdateIfAsync(It.Is<Expression<Func<VstsOrganization, bool>>>(e => CheckCriteria(e)), It.Is<VstsOrganization>(s => CheckDtoRecord(config, s))))
-                .ReturnsAsync(true)
-                .Verifiable();
 
-            await _handler.Handle(new SaveOrganization { Organization = config });
+            SetupCreateOrUpdate<Organization, OrganizationViewModel>(expectedOrganization);
 
-            _repositorMock.VerifyAll();
+            await _handler.Handle(new SaveOrganization { Organization = expectedOrganization });
+
+            RepositoryMock.VerifyAll();
+        }
+
+        protected override void Initialize()
+        {
+            _handler = new SaveOrganizationHandler(RepositoryMock.Object, Mapper);
         }
 
         private bool CheckDtoRecord(OrganizationViewModel model, VstsOrganization record)
