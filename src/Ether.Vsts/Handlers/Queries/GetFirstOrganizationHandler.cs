@@ -22,7 +22,7 @@ namespace Ether.Vsts.Handlers.Queries
 
         public async Task<OrganizationViewModel> Handle(GetFirstOrganization input)
         {
-            var result = await _repository.GetAllAsync<Organization>();
+            var result = await _repository.GetAllAsync<VstsOrganization>();
 
             return _mapper.Map<OrganizationViewModel>(result.First());
         }

@@ -4,6 +4,7 @@ using Ether.Contracts.Interfaces.CQS;
 using Ether.Core.Types.Commands;
 using Ether.Core.Types.Queries;
 using Ether.ViewModels;
+using Ether.Vsts.Commands;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

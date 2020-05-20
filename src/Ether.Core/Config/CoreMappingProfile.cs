@@ -12,8 +12,6 @@ namespace Ether.Core.Config
         {
             CreateMap<IdentityViewModel, Identity>();
             CreateMap<Identity, IdentityViewModel>();
-            CreateMap<Organization, OrganizationViewModel>();
-            CreateMap<OrganizationViewModel, Organization>();
             CreateMap<PullRequestsReport, PullRequestReportViewModel>();
             CreateMap<AggregatedWorkitemsETAReport, AggregatedWorkitemsETAReportViewModel>();
             CreateMap<WorkItemsReport, WorkItemsReportViewModel>();

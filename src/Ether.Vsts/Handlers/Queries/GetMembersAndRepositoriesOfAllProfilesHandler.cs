@@ -86,7 +86,7 @@ namespace Ether.Vsts.Handlers.Queries
             .ToArray();
         }
 
-        private OrganizationViewModel MapOrganization(IEnumerable<Contracts.Dto.Organization> organizations, Guid? organizationId)
+        private OrganizationViewModel MapOrganization(IEnumerable<Organization> organizations, Guid? organizationId)
         {
             if (!organizationId.HasValue)
             {

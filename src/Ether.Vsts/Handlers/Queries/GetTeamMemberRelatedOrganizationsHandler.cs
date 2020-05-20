@@ -42,7 +42,7 @@ namespace Ether.Vsts.Handlers.Queries
                 .Select(project => project.Organization)
                 .Distinct()
                 .ToArray();
-            var organizations = await _repository.GetAsync<Dto.Organization>(organization => organizationsToFetch.Contains(organization.Id));
+            var organizations = await _repository.GetAsync<VstsOrganization>(organization => organizationsToFetch.Contains(organization.Id));
 
             return _mapper.Map<IEnumerable<OrganizationViewModel>>(organizations);
         }

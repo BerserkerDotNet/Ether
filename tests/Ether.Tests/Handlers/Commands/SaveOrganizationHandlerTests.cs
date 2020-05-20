@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using AutoMapper;
 using Ether.Contracts.Interfaces;
+using Ether.Core.Types.Commands;
 using Ether.ViewModels;
 using Ether.Vsts;
 using Ether.Vsts.Commands;
@@ -17,13 +19,15 @@ namespace Ether.Tests.Handlers.Commands
     public class SaveOrganizationHandlerTests
     {
         private Mock<IRepository> _repositorMock;
+        private Mock<IMapper> _mapperMock;
         private SaveOrganizationHandler _handler;
 
         [SetUp]
         public void SetUp()
         {
             _repositorMock = new Mock<IRepository>(MockBehavior.Strict);
-            _handler = new SaveOrganizationHandler(_repositorMock.Object);
+            _mapperMock = new Mock<IMapper>(MockBehavior.Strict);
+            _handler = new SaveOrganizationHandler(_repositorMock.Object, _mapperMock.Object);
         }
 
         [Test]
@@ -49,7 +53,7 @@ namespace Ether.Tests.Handlers.Commands
                 Identity = Guid.NewGuid(),
                 Name = "Fooooo"
             };
-            _repositorMock.Setup(r => r.CreateOrUpdateIfAsync(It.Is<Expression<Func<Organization, bool>>>(e => CheckCriteria(e)), It.Is<Organization>(s => CheckDtoRecord(config, s))))
+            _repositorMock.Setup(r => r.CreateOrUpdateIfAsync(It.Is<Expression<Func<VstsOrganization, bool>>>(e => CheckCriteria(e)), It.Is<VstsOrganization>(s => CheckDtoRecord(config, s))))
                 .ReturnsAsync(true)
                 .Verifiable();
 
@@ -58,14 +62,14 @@ namespace Ether.Tests.Handlers.Commands
             _repositorMock.VerifyAll();
         }
 
-        private bool CheckDtoRecord(OrganizationViewModel model, Organization record)
+        private bool CheckDtoRecord(OrganizationViewModel model, VstsOrganization record)
         {
             return model.Id == record.Id &&
                 string.Equals(model.Name, record.Name) &&
                 string.Equals(model.Identity, record.Identity);
         }
 
-        private bool CheckCriteria(Expression<Func<Organization, bool>> criteria)
+        private bool CheckCriteria(Expression<Func<VstsOrganization, bool>> criteria)
         {
             var right = ((BinaryExpression)criteria.Body).Right;
             return string.Equals(((ConstantExpression)right).Value, Constants.VstsType);

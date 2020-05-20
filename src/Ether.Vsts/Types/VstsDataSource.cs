@@ -30,14 +30,14 @@ namespace Ether.Vsts.Types
         private readonly IRepository _repository;
         private readonly IMapper _mapper;
         private readonly ILogger<VstsDataSource> _logger;
-        private Lazy<Organization> _vstsConfigCache;
+        private Lazy<VstsOrganization> _vstsConfigCache;
 
         public VstsDataSource(IRepository repository, IMapper mapper, ILogger<VstsDataSource> logger)
         {
             _repository = repository;
             _mapper = mapper;
             _logger = logger;
-            _vstsConfigCache = new Lazy<Organization>(() => repository.GetSingle<Organization>(_ => true));
+            _vstsConfigCache = new Lazy<VstsOrganization>(() => repository.GetSingle<VstsOrganization>(_ => true));
         }
 
         public VstsDataSource()
@@ -451,7 +451,7 @@ namespace Ether.Vsts.Types
         private string GetOrganization(WorkItemViewModel item)
         {
             var project = _repository.Get<Project>(p => p.Name == GetProject(item)).FirstOrDefault();
-            var organization = project != null ? _repository.Get<Organization>(o => o.Id == project.Organization).FirstOrDefault() : null;
+            var organization = project != null ? _repository.Get<VstsOrganization>(o => o.Id == project.Organization).FirstOrDefault() : null;
 
             return organization != null ? organization.Name : string.Empty;
         }

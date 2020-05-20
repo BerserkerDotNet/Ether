@@ -49,7 +49,7 @@ namespace Ether.Tests.Handlers.Queries
         [Test]
         public async Task ShouldReturnCompleteViewModel()
         {
-            var expected = new Organization
+            var expected = new VstsOrganization
             {
                 Id = Guid.NewGuid(),
                 Identity = Guid.NewGuid(),
@@ -68,21 +68,21 @@ namespace Ether.Tests.Handlers.Queries
         [Test]
         public void ShouldPropagateAnyExceptions()
         {
-            _repositoryMock.Setup(r => r.GetSingleAsync(It.IsAny<Expression<Func<Organization, bool>>>()))
+            _repositoryMock.Setup(r => r.GetSingleAsync(It.IsAny<Expression<Func<VstsOrganization, bool>>>()))
                 .Throws<NotSupportedException>();
 
             _handler.Awaiting(h => h.Handle(null))
                 .Should().Throw<NotSupportedException>();
         }
 
-        private void SetupGetSingle(Organization record)
+        private void SetupGetSingle(VstsOrganization record)
         {
-            _repositoryMock.Setup(r => r.GetSingleAsync(It.Is<Expression<Func<Organization, bool>>>(e => VerifyPredicate(e))))
+            _repositoryMock.Setup(r => r.GetSingleAsync(It.Is<Expression<Func<VstsOrganization, bool>>>(e => VerifyPredicate(e))))
                 .ReturnsAsync(record)
                 .Verifiable();
         }
 
-        private bool VerifyPredicate(Expression<Func<Organization, bool>> predicate)
+        private bool VerifyPredicate(Expression<Func<VstsOrganization, bool>> predicate)
         {
             var right = ((BinaryExpression)predicate.Body).Right;
             return string.Equals(((ConstantExpression)right).Value, Constants.VstsType);

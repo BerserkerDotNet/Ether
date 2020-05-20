@@ -1,35 +1,29 @@
 ﻿using System;
 using System.Threading.Tasks;
+using AutoMapper;
 using Ether.Contracts.Interfaces;
-using Ether.Contracts.Interfaces.CQS;
+using Ether.Core.Types.Commands;
+using Ether.ViewModels;
 using Ether.Vsts.Commands;
 using Ether.Vsts.Dto;
 
 namespace Ether.Vsts.Handlers.Commands
 {
-    public class SaveOrganizationHandler : ICommandHandler<SaveOrganization>
+    public class SaveOrganizationHandler : SaveHandler<OrganizationViewModel, VstsOrganization, SaveOrganization>
     {
-        private readonly IRepository _repository;
-
-        public SaveOrganizationHandler(IRepository repository)
+        public SaveOrganizationHandler(IRepository repository, IMapper mapper)
+            : base(repository, mapper)
         {
-            _repository = repository;
         }
 
-        public async Task Handle(SaveOrganization input)
+        protected override void ValidateCommand(SaveOrganization command)
         {
-            if (input == null || input.Organization == null)
+            if (command.Organization == null)
             {
-                throw new ArgumentNullException(nameof(input.Organization));
+                throw new ArgumentNullException(nameof(command.Organization));
             }
-
-            var config = input.Organization;
-            await _repository.CreateOrUpdateIfAsync(i => i.Type == Constants.VstsType, new Organization
-            {
-                Id = config.Id,
-                Identity = config.Identity,
-                Name = config.Name
-            });
         }
+
+        protected override Task<OrganizationViewModel> FixViewModel(SaveOrganization command) => Task.FromResult(command.Organization);
     }
 }

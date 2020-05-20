@@ -32,7 +32,7 @@ namespace Ether.Vsts.Handlers.Queries
                 return null;
             }
 
-            var result = await _repository.GetSingleAsync<Organization>(input.Id);
+            var result = await _repository.GetSingleAsync<VstsOrganization>(input.Id);
 
             if (result == null)
             {
