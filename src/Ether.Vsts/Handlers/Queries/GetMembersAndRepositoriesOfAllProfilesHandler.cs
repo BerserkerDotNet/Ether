@@ -57,7 +57,7 @@ namespace Ether.Vsts.Handlers.Queries
                 .ToArray();
             var organizations = await _repository.GetAsync<Organization>(i => organizationsToFetch.Contains(i.Id));
 
-            var identitiesToFetch = projects
+            var identitiesToFetch = organizations
                 .Select(p => p.Identity)
                 .Distinct()
                 .ToArray();
@@ -77,7 +77,7 @@ namespace Ether.Vsts.Handlers.Queries
                 var project = projects.Single(p => p.Id == r.Project);
                 var projectInfo = _mapper.Map<ProjectInfo>(project);
                 projectInfo.Organization = MapOrganization(organizations, project.Organization);
-                projectInfo.Identity = MapIdentity(identities, project.Identity);
+                projectInfo.Identity = MapIdentity(identities, projectInfo.Organization.Identity);
                 info.Project = projectInfo;
 
                 return info;

@@ -111,11 +111,13 @@ namespace Ether.Tests.Handlers.Queries
             var identity = Builder<Identity>.CreateNew().Build();
             SetupMultipleWithPredicate(new[] { identity });
 
-            var organization = Builder<Organization>.CreateNew()
+            var organizations = Builder<Organization>.CreateListOfSize(2)
+                .All()
                 .WithFactory(() => new Organization(type))
                 .With(o => o.Identity = identity.Id)
                 .Build();
-            SetupMultipleWithPredicate(new[] { organization });
+
+            SetupMultipleWithPredicate(organizations);
 
             var members = Builder<TeamMember>.CreateListOfSize(10).Build();
             SetupMultipleWithPredicate(members);
@@ -123,9 +125,10 @@ namespace Ether.Tests.Handlers.Queries
             var projects = Builder<Project>.CreateListOfSize(10)
                 .All()
                 .With(p => p.Identity = Guid.Empty)
+                .With(p => p.Organization, organizations.First().Id)
                 .Random(6)
-                .With(p => p.Organization = organization.Id)
-                .With(p => p.Identity = identity.Id)
+                .With(p => p.Identity, identity.Id)
+                .With(p => p.Organization, organizations.Last().Id)
                 .Build();
             SetupMultipleWithPredicate(projects);
 
@@ -142,7 +145,7 @@ namespace Ether.Tests.Handlers.Queries
                 .Build();
             SetupMultiple(PredicateValidator, profiles);
 
-            return (members, projects, repositories, profiles, organization, identity);
+            return (members, projects, repositories, profiles, organizations.First(), identity);
         }
     }
 }
