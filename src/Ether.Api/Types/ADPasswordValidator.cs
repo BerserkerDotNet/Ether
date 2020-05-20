@@ -58,6 +58,7 @@ namespace Ether.Api.Types
         private IEnumerable<Claim> GetAdditionalClaims(UserPrincipal user)
         {
             yield return new Claim(CustomClaims.DisplayName, user.DisplayName);
+
             if (user.Guid.HasValue)
             {
                 yield return new Claim(CustomClaims.Id, user.Guid.Value.ToString());

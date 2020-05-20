@@ -102,20 +102,33 @@ namespace Ether.Tests.Handlers.Queries
             IEnumerable<Project> projects,
             IEnumerable<Repository> repositories,
             IEnumerable<VstsProfile> profiles,
+            Organization organization,
             Identity identity) SetupData()
 #pragma warning restore SA1008 // Opening parenthesis must be spaced correctly
         {
+            string type = "Fooooo";
+
             var identity = Builder<Identity>.CreateNew().Build();
             SetupMultipleWithPredicate(new[] { identity });
+
+            var organizations = Builder<Organization>.CreateListOfSize(2)
+                .All()
+                .WithFactory(() => new Organization(type))
+                .With(o => o.Identity = identity.Id)
+                .Build();
+
+            SetupMultipleWithPredicate(organizations);
 
             var members = Builder<TeamMember>.CreateListOfSize(10).Build();
             SetupMultipleWithPredicate(members);
 
             var projects = Builder<Project>.CreateListOfSize(10)
                 .All()
-                .With(p => p.Identity = null)
+                .With(p => p.Identity = Guid.Empty)
+                .With(p => p.Organization, organizations.First().Id)
                 .Random(6)
-                .With(p => p.Identity = identity.Id)
+                .With(p => p.Identity, identity.Id)
+                .With(p => p.Organization, organizations.Last().Id)
                 .Build();
             SetupMultipleWithPredicate(projects);
 
@@ -132,7 +145,7 @@ namespace Ether.Tests.Handlers.Queries
                 .Build();
             SetupMultiple(PredicateValidator, profiles);
 
-            return (members, projects, repositories, profiles, identity);
+            return (members, projects, repositories, profiles, organizations.First(), identity);
         }
     }
 }

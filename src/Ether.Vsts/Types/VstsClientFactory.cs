@@ -23,47 +23,62 @@ namespace Ether.Vsts.Types
 
         public IVstsClient Client { get; private set; }
 
-        public async Task<IVstsClient> GetClient(string token = null)
+        public async Task<IVstsClient> GetClient(Guid organizationId, string token = null)
         {
-            var config = await _mediator.Request<GetVstsDataSourceConfiguration, VstsDataSourceViewModel>();
-            if (config == null || !config.DefaultToken.HasValue)
+            OrganizationViewModel config;
+
+            if (organizationId != default)
+            {
+                config = await _mediator.Request<Queries.GetOrganizationById, OrganizationViewModel>(new Queries.GetOrganizationById(organizationId));
+            }
+            else
+            {
+                config = await _mediator.Request<GetFirstOrganization, OrganizationViewModel>();
+            }
+
+            if (config == null || config.Identity.Equals(Guid.Empty))
             {
                 throw new AzureDevopsConfigurationIsMissingException();
             }
 
             if (string.IsNullOrEmpty(token))
             {
-                var identity = await _mediator.Request<GetIdentityById, IdentityViewModel>(new GetIdentityById { Id = config.DefaultToken.Value });
+                var identity = await _mediator.Request<GetIdentityById, IdentityViewModel>(new GetIdentityById { Id = config.Identity });
                 token = identity.Token;
             }
 
-            Client = VstsClient.Get(new OnlineUrlBuilderFactory(config.InstanceName), token);
+            Client = VstsClient.Get(new OnlineUrlBuilderFactory(config.Name), token);
 
             return Client;
         }
 
         public async Task<IVstsIdentityClient> GetIdentityClient(string token = null)
         {
-            var client = await GetClient(token);
+            var client = await GetClient(default, token);
+
             return client;
         }
 
-        public async Task<IVstsPullRequestsClient> GetPullRequestsClient(string token = null)
+        public async Task<IVstsPullRequestsClient> GetPullRequestsClient(Guid organizationId, string token = null)
         {
-            var client = await GetClient(token);
+            var client = await GetClient(organizationId, token);
+
             return client;
         }
 
         public async Task<IVstsWorkItemsClient> GetWorkItemsClient(Guid? identityId)
         {
             var token = string.Empty;
+
             if (identityId.HasValue)
             {
                 var identity = await _mediator.Request<GetIdentityById, IdentityViewModel>(new GetIdentityById { Id = identityId.Value });
+
                 token = identity.Token;
             }
 
-            var client = await GetClient(token);
+            var client = await GetClient(default, token);
+
             return client;
         }
     }

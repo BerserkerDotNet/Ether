@@ -171,7 +171,7 @@ namespace Ether.Tests.Handlers
 
         private void SetupVstsClientFactory()
         {
-            VstsClientFactory.Setup(c => c.GetPullRequestsClient(It.IsAny<string>()))
+            VstsClientFactory.Setup(c => c.GetPullRequestsClient(It.IsAny<Guid>(), It.IsAny<string>()))
                 .ReturnsAsync(PullRequestsClient.Object)
                 .Verifiable();
         }

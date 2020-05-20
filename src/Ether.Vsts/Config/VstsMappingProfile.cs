@@ -10,6 +10,9 @@ namespace Ether.Vsts.Config
     {
         public VstsMappingProfile()
         {
+            CreateMap<VstsOrganization, OrganizationViewModel>()
+                .ReverseMap();
+
             CreateMap<Project, VstsProjectViewModel>()
                 .ReverseMap();
 
@@ -40,6 +43,7 @@ namespace Ether.Vsts.Config
                 .ForMember(r => r.Members, o => o.Ignore());
 
             CreateMap<Project, ProjectInfo>()
+                .ForMember(r => r.Organization, o => o.Ignore())
                 .ForMember(r => r.Identity, o => o.Ignore());
 
             CreateMap<Repository, VstsRepositoryViewModel>();

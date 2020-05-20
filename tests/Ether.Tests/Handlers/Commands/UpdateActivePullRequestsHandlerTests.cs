@@ -41,6 +41,9 @@ namespace Ether.Tests.Handlers.Commands
             SetupMultiple(VerifyPredicateForActivePullRequests, activePullRequests);
             SetupCreateOrUpdate<PullRequest>();
             SetupPullRequestsFetch(activePullRequests, Enumerable.Empty<PullRequest>());
+            SetupRepository();
+            SetupProject();
+            SetupOrganization();
             SetupIterations();
             SetupThreads();
 
@@ -61,7 +64,7 @@ namespace Ether.Tests.Handlers.Commands
                 Completed = DateTime.UtcNow.AddDays(-5),
                 Author = "Author 1",
                 AuthorId = Guid.NewGuid(),
-                State = Vsts.Types.PullRequestState.Completed,
+                State = PullRequestState.Completed,
                 Iterations = 4,
                 Comments = 8,
                 PullRequestId = 1246587,
@@ -76,11 +79,14 @@ namespace Ether.Tests.Handlers.Commands
                 .With(p => p.PullRequestId, expecetedPullRequest.PullRequestId)
                 .With(p => p.LastSync, expecetedPullRequest.LastSync)
                 .With(p => p.Repository, expecetedPullRequest.Repository)
-                .With(p => p.State, Vsts.Types.PullRequestState.Active)
+                .With(p => p.State, PullRequestState.Active)
                 .Build();
 
             SetupMultiple(VerifyPredicateForActivePullRequests, new[] { activePullRequest });
             SetupCreateOrUpdate<PullRequest>();
+            SetupRepository();
+            SetupProject();
+            SetupOrganization();
             SetupIterations(expecetedPullRequest.Iterations);
             SetupThreads(expecetedPullRequest.Comments);
 
@@ -161,6 +167,44 @@ namespace Ether.Tests.Handlers.Commands
                     .ThrowsAsync(new Exception("Failed to fetch PR"))
                     .Verifiable();
             }
+        }
+
+        private void SetupRepository()
+        {
+            var expectedRepository = new Repository
+            {
+                Id = Guid.NewGuid(),
+                Name = "Dummy",
+                Project = Guid.NewGuid()
+            };
+
+            SetupSingle(expectedRepository);
+        }
+
+        private void SetupProject()
+        {
+            var expectedProject = new Project
+            {
+                Id = Guid.NewGuid(),
+                Name = "Dummy",
+                IsWorkItemsEnabled = true,
+                Identity = Guid.NewGuid(),
+                Organization = Guid.NewGuid()
+            };
+
+            SetupSingle(expectedProject);
+        }
+
+        private void SetupOrganization()
+        {
+            var expectedOrganization = new Organization("Dummy")
+            {
+                Id = Guid.NewGuid(),
+                Name = "Dummy",
+                Identity = Guid.NewGuid()
+            };
+
+            SetupSingle(expectedOrganization);
         }
 
         private void SetupIterations(int count = 1)

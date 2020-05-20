@@ -42,8 +42,8 @@ namespace Ether.Vsts.Handlers.Queries
                 return new FetchPullRequestsResult { PullRequests = Enumerable.Empty<PullRequestViewModel>(), Details = Enumerable.Empty<PullRequestJobDetails.PullRequestDetail>() };
             }
 
-            var token = info.Project.Identity != null && !string.IsNullOrEmpty(info.Project.Identity.Token) ? info.Project.Identity.Token : null;
-            var client = await _clientFactory.GetPullRequestsClient(token);
+            var organization = info.Project.Organization != null ? info.Project.Organization.Id : default;
+            var client = await _clientFactory.GetPullRequestsClient(organization);
             var pullRequests = new List<PullRequestViewModel>();
             var details = new List<PullRequestJobDetails.PullRequestDetail>();
             var errors = new List<PullRequestJobDetails.ErrorDetail>();

@@ -23,7 +23,6 @@ namespace Ether.Actions.Async
 
             // TODO: instead of refresh delete?
             await dispatcher.Dispatch<FetchMembers>();
-
         }
     }
 }

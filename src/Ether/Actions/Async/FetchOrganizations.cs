@@ -1,15 +1,15 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using BlazorState.Redux.Interfaces;
 using Ether.Types;
+using Ether.ViewModels;
 
 namespace Ether.Actions.Async
 {
-    public class FetchDataSourceSettings : IAsyncAction
+    public class FetchOrganizations : IAsyncAction
     {
         private readonly EtherClient _client;
 
-        public FetchDataSourceSettings(EtherClient client)
+        public FetchOrganizations(EtherClient client)
         {
             _client = client;
         }
@@ -18,10 +18,11 @@ namespace Ether.Actions.Async
         {
             await Utils.ExecuteWithLoading(dispatcher, async () =>
             {
-                var config = await _client.GetVstsDataSourceConfig();
-                dispatcher.Dispatch(new ReceiveDataSourceConfig
+                var organizations = await _client.GetAll<OrganizationViewModel>();
+
+                dispatcher.Dispatch(new ReceiveOrganizationsAction
                 {
-                    Config = config
+                    Organizations = organizations
                 });
             });
         }

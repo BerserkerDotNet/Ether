@@ -104,6 +104,14 @@ namespace Ether.Api.Controllers
             return Ok(excelConverter.Convert(report));
         }
 
+        [HttpDelete]
+        [Route(nameof(Delete))]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            await _mediator.Execute(new DeleteReport { Id = id });
+            return Ok();
+        }
+
         private Task<Guid> GenerateReport(Type generateCommandType, GenerateReportViewModel requestModel)
         {
             var request = _mapper.Map(requestModel, typeof(GenerateReportViewModel), generateCommandType) as GenerateReportCommand;

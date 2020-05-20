@@ -1,0 +1,68 @@
+﻿<RichTable Items="Props.Organizations"
+		   GridTitle="Organizations"
+		   FormTitle="Edit organization"
+		   OnSaveEdit="Props.OnSave"
+		   OnRefresh="Props.OnRefresh">
+	<TableHeader>
+		<th>Name</th>
+		<th>Type</th>
+		<th>Identity</th>
+		<th></th>
+	</TableHeader>
+	<TableBody Context="ctx">
+		<td>@ctx.CurrentItem.Name</td>
+		<td>@ctx.CurrentItem.Type</td>
+		<td>@GetIdentityName(ctx.CurrentItem.Identity)</td>
+		<td>
+			<div>
+				<MatButton Label="Edit" Icon="@MatIconNames.Edit" Dense="true" OnClick="() => ctx.Edit()" />
+				<DeleteButton OnDelete="async () => await Props.OnDelete.InvokeAsync(ctx.CurrentItem)" />
+			</div>
+		</td>
+	</TableBody>
+	<FormBody Context="ctx">
+		<p>
+			<MatTextField @bind-Value="ctx.CurrentItem.Name" Label="Name" FullWidth="true" />
+			<ValidationMessage For="@(() => ctx.CurrentItem.Name)" />
+		</p>
+		<p>
+			<MatSelect @bind-Value="ctx.CurrentItem.Type" Label="Type" Class="full-width">
+				@foreach (var type in Props.TypesOptions)
+				{
+					<MatOption Value="type">@type</MatOption>
+				}
+			</MatSelect>
+			<ValidationMessage For="@(() => ctx.CurrentItem.Type)" />
+		</p>
+		<p>
+			<SelectControl @bind-Value="ctx.CurrentItem.Identity"
+						   Options="Props.IdentitiesOptions"
+						   KeyToString="k => k.ToString()"
+						   StringToKey="s => Guid.Parse(s)"
+						   Label="Identity" />
+			<ValidationMessage For="@(() => ctx.CurrentItem.Identity)" />
+		</p>
+	</FormBody>
+</RichTable>
+
+@code
+{
+	[Parameter] public OrganizationsProps Props { get; set; }
+
+	private string GetIdentityName(Guid identityId)
+	{
+		if (identityId.Equals(Guid.Empty))
+		{
+			return Constants.NoneLabel;
+		}
+
+		var identity = Props.IdentitiesOptions.FirstOrDefault(i => i.Value == identityId);
+
+		if (identity is null)
+		{
+			return Constants.NotApplicableLabel;
+		}
+
+		return identity.Name;
+	}
+}

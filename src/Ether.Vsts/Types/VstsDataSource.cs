@@ -30,14 +30,14 @@ namespace Ether.Vsts.Types
         private readonly IRepository _repository;
         private readonly IMapper _mapper;
         private readonly ILogger<VstsDataSource> _logger;
-        private Lazy<VstsDataSourceSettings> _vstsConfigCache;
+        private Lazy<VstsOrganization> _vstsConfigCache;
 
         public VstsDataSource(IRepository repository, IMapper mapper, ILogger<VstsDataSource> logger)
         {
             _repository = repository;
             _mapper = mapper;
             _logger = logger;
-            _vstsConfigCache = new Lazy<VstsDataSourceSettings>(() => repository.GetSingle<VstsDataSourceSettings>(_ => true));
+            _vstsConfigCache = new Lazy<VstsOrganization>(() => repository.GetSingle<VstsOrganization>(_ => true));
         }
 
         public VstsDataSource()
@@ -214,6 +214,7 @@ namespace Ether.Vsts.Types
                 WorkItemId = item.WorkItemId,
                 WorkItemTitle = item[WorkItemTitleField],
                 WorkItemType = item[WorkItemTypeField],
+                WorkItemOrganization = GetOrganization(item),
                 WorkItemProject = GetProject(item),
                 Tags = item.Updates.LastOrDefault(u => !string.IsNullOrWhiteSpace(u[WorkItemTagsField].NewValue))?[WorkItemTagsField]?.NewValue,
                 OriginalEstimate = etaValues.OriginalEstimate,
@@ -432,19 +433,27 @@ namespace Ether.Vsts.Types
 
         private string GetWorkItemUrl(string project, int workItemId)
         {
-            var instance = _vstsConfigCache.Value.InstanceName;
+            var instance = _vstsConfigCache.Value.Name;
             return $"https://{instance}.visualstudio.com/{project}/_workitems/edit/{workItemId}";
         }
 
         private string GetPullRequestUrl(string project, Guid repository, int pullRequestId)
         {
-            var instance = _vstsConfigCache.Value.InstanceName;
+            var instance = _vstsConfigCache.Value.Name;
             return $"https://{instance}.visualstudio.com/{project}/_git/{repository}/pullrequest/{pullRequestId}";
         }
 
         private string GetProject(WorkItemViewModel item)
         {
             return string.IsNullOrWhiteSpace(item[WorkItemAreaPathField]) ? null : item[WorkItemAreaPathField].Split('\\')[0];
+        }
+
+        private string GetOrganization(WorkItemViewModel item)
+        {
+            var project = _repository.GetSingle<Project>(p => p.Name == GetProject(item));
+            var organization = project != null ? _repository.GetSingle<VstsOrganization>(o => o.Id == project.Organization) : null;
+
+            return organization != null ? organization.Name : string.Empty;
         }
     }
 }

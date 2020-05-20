@@ -10,7 +10,6 @@ namespace Ether.Types
         public HealthStatus HealthStatus => (HealthStatus)Enum.Parse(typeof(HealthStatus), Status);
 
         public Dictionary<string, HealthCheckStatus> Results { get; set; }
-
     }
 
     public class HealthCheckStatus

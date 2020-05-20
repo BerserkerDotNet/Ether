@@ -104,7 +104,7 @@
 
 @code
 {
-    private VstsDataSourceViewModel vstsConfiguration = new VstsDataSourceViewModel();
+    private OrganizationViewModel vstsConfiguration = new OrganizationViewModel();
 
     [Parameter] public Guid Id { get; set; }
 
@@ -112,12 +112,12 @@
 
     protected override async Task OnInitializedAsync()
     {
-        vstsConfiguration = await Client.GetVstsDataSourceConfig();
+        //vstsConfiguration = await Client.GetOrganization();
     }
 
     // HACK: Presentetional component should not query services
     protected string GetWorkItemUrl(string project, int workItemId)
     {
-        return $"https://{vstsConfiguration.InstanceName}.visualstudio.com/{project}/_workitems/edit/{workItemId}";
+        return $"https://{vstsConfiguration.Name}.visualstudio.com/{project}/_workitems/edit/{workItemId}";
     }
 }

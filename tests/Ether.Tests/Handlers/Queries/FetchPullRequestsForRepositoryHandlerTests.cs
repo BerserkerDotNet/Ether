@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Ether.Contracts.Dto;
 using Ether.ViewModels;
 using Ether.Vsts.Handlers.Queries;
 using Ether.Vsts.Interfaces;
@@ -138,6 +139,7 @@ namespace Ether.Tests.Handlers.Queries
             var members = Builder<TeamMemberViewModel>.CreateListOfSize(expectedMembersCount)
                 .Build();
             var project = Builder<ProjectInfo>.CreateNew()
+                .With(p => p.Organization, Builder<OrganizationViewModel>.CreateNew().Build())
                 .With(p => p.Identity, Builder<IdentityViewModel>.CreateNew().Build())
                 .Build();
             var info = Builder<RepositoryInfo>.CreateNew()
@@ -145,7 +147,7 @@ namespace Ether.Tests.Handlers.Queries
                 .With(i => i.Project, project)
                 .Build();
 
-            SetupClient(project.Identity.Token);
+            SetupClient(project.Organization.Id);
             SetupPullRequests(info.Project.Name, info.Name);
             SetupPullRequestIterationsAndComments(info.Project.Name, info.Name);
 
@@ -186,9 +188,9 @@ namespace Ether.Tests.Handlers.Queries
             return members.Any(m => m.Id == query.CreatorId) && string.Equals(query.Status, "all");
         }
 
-        private void SetupClient(string token = null)
+        private void SetupClient(Guid organizationId = default, string token = null)
         {
-            _clientFactoryMock.Setup(c => c.GetPullRequestsClient(token))
+            _clientFactoryMock.Setup(c => c.GetPullRequestsClient(organizationId, token))
                 .ReturnsAsync(_clientMock.Object)
                 .Verifiable();
         }

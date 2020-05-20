@@ -54,7 +54,7 @@ namespace Ether.Vsts.Handlers.Queries
         {
             CheckIfArgumentNull(query.Member, nameof(query.Member));
 
-            var client = await _clientFactory.GetClient();
+            var client = await _clientFactory.GetClient(query.OrganizationId);
 
             var lastFetchDate = query.Member.LastWorkitemsFetchDate.HasValue ? query.Member.LastWorkitemsFetchDate.Value : DateTime.UtcNow.AddYears(-10);
             var wiQuery = string.Format(WorkItemsQueryTemplate, query.Member.Email, lastFetchDate.ToString("MM/dd/yyyy"));

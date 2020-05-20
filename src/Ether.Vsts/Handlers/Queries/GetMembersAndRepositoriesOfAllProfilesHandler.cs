@@ -51,9 +51,14 @@ namespace Ether.Vsts.Handlers.Queries
                 .ToArray();
             var projects = await _repository.GetAsync<Project>(p => projectsToFetch.Contains(p.Id));
 
-            var identitiesToFetch = projects
-                .Where(p => p.Identity.HasValue)
-                .Select(p => p.Identity.Value)
+            var organizationsToFetch = projects
+                .Select(p => p.Organization)
+                .Distinct()
+                .ToArray();
+            var organizations = await _repository.GetAsync<Organization>(i => organizationsToFetch.Contains(i.Id));
+
+            var identitiesToFetch = organizations
+                .Select(p => p.Identity)
                 .Distinct()
                 .ToArray();
             var identities = await _repository.GetAsync<Identity>(i => identitiesToFetch.Contains(i.Id));
@@ -71,13 +76,25 @@ namespace Ether.Vsts.Handlers.Queries
 
                 var project = projects.Single(p => p.Id == r.Project);
                 var projectInfo = _mapper.Map<ProjectInfo>(project);
-                projectInfo.Identity = MapIdentity(identities, project.Identity);
+                projectInfo.Organization = MapOrganization(organizations, project.Organization);
+                projectInfo.Identity = MapIdentity(identities, projectInfo.Organization.Identity);
                 info.Project = projectInfo;
 
                 return info;
             })
             .Where(r => r.Members.Any())
             .ToArray();
+        }
+
+        private OrganizationViewModel MapOrganization(IEnumerable<Organization> organizations, Guid? organizationId)
+        {
+            if (!organizationId.HasValue)
+            {
+                return null;
+            }
+
+            var organization = organizations.Single(p => p.Id == organizationId.Value);
+            return _mapper.Map<OrganizationViewModel>(organization);
         }
 
         private IdentityViewModel MapIdentity(IEnumerable<Identity> identities, Guid? identityId)

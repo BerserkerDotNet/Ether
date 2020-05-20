@@ -19,6 +19,7 @@ namespace Ether.Actions.Async
             await Utils.ExecuteWithLoading(dispatcher, async () =>
             {
                 var identities = await _client.GetAll<IdentityViewModel>();
+
                 dispatcher.Dispatch(new ReceiveIdentitiesAction
                 {
                     Identities = identities

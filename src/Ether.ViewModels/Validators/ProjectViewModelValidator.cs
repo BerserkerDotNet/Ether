@@ -7,6 +7,7 @@ namespace Ether.ViewModels.Validators
         public ProjectViewModelValidator()
         {
             RuleFor(p => p.Name).NotEmpty();
+            RuleFor(o => o.Organization).NotEmpty();
         }
     }
 }

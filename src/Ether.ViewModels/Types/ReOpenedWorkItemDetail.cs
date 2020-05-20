@@ -8,6 +8,8 @@ namespace Ether.ViewModels.Types
 
         public string WorkItemTitle { get; set; }
 
+        public string WorkItemOrganization { get; set; }
+
         public string WorkItemProject { get; set; }
 
         public string WorkItemType { get; set; }

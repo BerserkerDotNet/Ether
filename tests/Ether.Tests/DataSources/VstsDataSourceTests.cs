@@ -632,6 +632,8 @@ namespace Ether.Tests.DataSources
         {
             const float expected = 3.45F;
 
+            SetupProjectAndOrganization();
+
             var vm = Builder<WorkItemViewModel>.CreateNew()
                 .With(v => v.Fields, new Dictionary<string, string>())
                 .With(v => v.Updates, Enumerable.Empty<WorkItemUpdateViewModel>())
@@ -652,6 +654,8 @@ namespace Ether.Tests.DataSources
         {
             const string expected = "testReason";
 
+            SetupProjectAndOrganization();
+
             var vm = Builder<WorkItemViewModel>.CreateNew()
                 .With(v => v.Fields, new Dictionary<string, string>())
                 .With(v => v.Updates, Enumerable.Empty<WorkItemUpdateViewModel>())
@@ -668,6 +672,8 @@ namespace Ether.Tests.DataSources
         {
             const float expectedOriginal = 3.45F;
             const float expectedRemaining = 2.0F;
+
+            SetupProjectAndOrganization();
 
             var vm = Builder<WorkItemViewModel>.CreateNew()
                 .With(v => v.Fields, new Dictionary<string, string>())
@@ -689,6 +695,8 @@ namespace Ether.Tests.DataSources
         {
             const float expectedOriginal = 3.45F;
             const float expectedCompleted = 2.0F;
+
+            SetupProjectAndOrganization();
 
             var vm = Builder<WorkItemViewModel>.CreateNew()
                 .With(v => v.Fields, new Dictionary<string, string>())
@@ -712,6 +720,8 @@ namespace Ether.Tests.DataSources
             const float expectedRemaining = 2.0F;
             const float expectedCompleted = 4.0F;
 
+            SetupProjectAndOrganization();
+
             var vm = Builder<WorkItemViewModel>.CreateNew()
                 .With(v => v.Fields, new Dictionary<string, string>())
                 .With(v => v.Updates, Enumerable.Empty<WorkItemUpdateViewModel>())
@@ -732,6 +742,8 @@ namespace Ether.Tests.DataSources
         public void ShouldSetEstimateAndTimeSpentToDefaultIfAllFieldsAreNull()
         {
             const float defaultValue = 1.0F;
+
+            SetupProjectAndOrganization();
 
             var vm = Builder<WorkItemViewModel>.CreateNew()
                 .With(v => v.Fields, new Dictionary<string, string>())
@@ -760,6 +772,18 @@ namespace Ether.Tests.DataSources
             RepositoryMock.Setup(r => r.GetFieldValueAsync(id, It.IsAny<Expression<Func<TType, TProjection>>>()))
                 .ReturnsAsync(value)
                 .Verifiable();
+        }
+
+        private void SetupProjectAndOrganization()
+        {
+            var org = Builder<VstsOrganization>.CreateNew()
+                .Build();
+            var project = Builder<Project>.CreateNew()
+                .With(p => p.Organization, org.Id)
+                .Build();
+
+            RepositoryMock.Setup(r => r.GetSingle(It.IsAny<Expression<Func<Project, bool>>>())).Returns(project);
+            RepositoryMock.Setup(r => r.GetSingle(It.IsAny<Expression<Func<VstsOrganization, bool>>>())).Returns(org);
         }
     }
 }

@@ -1,7 +1,7 @@
-﻿using BlazorState.Redux.Interfaces;
-using Ether.Actions;
-using System;
+﻿using System;
 using System.Threading.Tasks;
+using BlazorState.Redux.Interfaces;
+using Ether.Actions;
 
 namespace Ether.Types
 {

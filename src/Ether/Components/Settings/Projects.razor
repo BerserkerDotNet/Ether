@@ -3,60 +3,79 @@
            FormTitle="Edit project"
            OnSaveEdit="Props.OnSave"
            OnRefresh="Props.OnRefresh">
-    <TableHeader>
-        <th>Name</th>
-        <th>Is workitems enabled</th>
-        <th>Identity</th>
-        <th></th>
-    </TableHeader>
-    <TableBody Context="ctx">
-        <td>@ctx.CurrentItem.Name</td>
-        <td>@ctx.CurrentItem.IsWorkItemsEnabled</td>
-        <td>@GetIdentityName(ctx.CurrentItem.Identity)</td>
-        <td>
-            <div>
-                <MatButton Label="Edit" Icon="@MatIconNames.Edit" Dense="true" OnClick="() => ctx.Edit()" />
-                <DeleteButton OnDelete="async () => await Props.OnDelete.InvokeAsync(ctx.CurrentItem)" />
-            </div>
-        </td>
-    </TableBody>
-    <FormBody Context="ctx">
-        <p>
-            <MatTextField @bind-Value="ctx.CurrentItem.Name" Label="Name" FullWidth="true" />
-            <ValidationMessage For="@(() => ctx.CurrentItem.Name)" />
-        </p>
-        <p>
-            <MatCheckbox @bind-Value="@ctx.CurrentItem.IsWorkItemsEnabled" Label="Is Work Items Enabled" />
-            <ValidationMessage For="@(() => ctx.CurrentItem.IsWorkItemsEnabled)" />
-        </p>
-        <p>
-            <SelectControl @bind-Value="ctx.CurrentItem.Identity"
-                           Options="Props.IdentitiesOptions"
-                           KeyToString="k => k is null ? Guid.Empty.ToString() : k.ToString()"
-                           StringToKey="s => Guid.Parse(s) == Guid.Empty ? (Guid?)null : (Guid?)Guid.Parse(s)"
-                           Label="Identity" />
-            <ValidationMessage For="@(() => ctx.CurrentItem.Identity)" />
-        </p>
-    </FormBody>
+	<TableHeader>
+		<th>Name</th>
+		<th>Is workitems enabled</th>
+		<th>Organization</th>
+		<th>Identity</th>
+		<th></th>
+	</TableHeader>
+	<TableBody Context="ctx">
+		<td>@ctx.CurrentItem.Name</td>
+		<td>@ctx.CurrentItem.IsWorkItemsEnabled</td>
+		<td>@GetOrganizationName(ctx.CurrentItem.Organization)</td>
+		<td>@GetIdentityName(ctx.CurrentItem.Identity)</td>
+		<td>
+			<div>
+				<MatButton Label="Edit" Icon="@MatIconNames.Edit" Dense="true" OnClick="() => ctx.Edit()" />
+				<DeleteButton OnDelete="async () => await Props.OnDelete.InvokeAsync(ctx.CurrentItem)" />
+			</div>
+		</td>
+	</TableBody>
+	<FormBody Context="ctx">
+		<p>
+			<MatTextField @bind-Value="ctx.CurrentItem.Name" Label="Name" FullWidth="true" />
+			<ValidationMessage For="@(() => ctx.CurrentItem.Name)" />
+		</p>
+		<p>
+			<MatCheckbox @bind-Value="@ctx.CurrentItem.IsWorkItemsEnabled" Label="Is Work Items Enabled" />
+			<ValidationMessage For="@(() => ctx.CurrentItem.IsWorkItemsEnabled)" />
+		</p>
+		<p>
+			<SelectControl @bind-Value="ctx.CurrentItem.Organization"
+						   Options="Props.OrganizationsOptions"
+						   KeyToString="k => k.ToString()"
+						   StringToKey="s => Guid.Parse(s)"
+						   Label="Organization" />
+			<ValidationMessage For="@(() => ctx.CurrentItem.Organization)" />
+		</p>
+	</FormBody>
 </RichTable>
 
 @code
 {
-    [Parameter] public ProjectsProps Props { get; set; }
+	[Parameter] public ProjectsProps Props { get; set; }
 
-    private string GetIdentityName(Guid? identityId)
-    {
-        if (!identityId.HasValue)
-        {
-            return Constants.NoneLabel;
-        }
+	private string GetOrganizationName(Guid organizationId)
+	{
+		if (organizationId.Equals(Guid.Empty))
+		{
+			return Constants.NoneLabel;
+		}
 
-        var identity = Props.IdentitiesOptions.FirstOrDefault(i => i.Value == identityId.Value);
-        if (identity is null)
-        {
-            return "N/A";
-        }
+		var organization = Props.OrganizationsOptions.FirstOrDefault(i => i.Value == organizationId);
 
-        return identity.Name;
-    }
+		if (organization is null)
+		{
+			return Constants.NotApplicableLabel;
+		}
+
+		return organization.Name;
+	}
+
+	private string GetIdentityName(Guid identityId)
+	{
+		if (identityId.Equals(Guid.Empty))
+		{
+			return Constants.NoneLabel;
+		}
+
+		var identity = Props.IdentitiesOptions.FirstOrDefault(i => i.Value == identityId);
+		if (identity is null)
+		{
+			return Constants.NotApplicableLabel;
+		}
+
+		return identity.Name;
+	}
 }

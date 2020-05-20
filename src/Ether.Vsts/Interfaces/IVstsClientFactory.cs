@@ -6,9 +6,9 @@ namespace Ether.Vsts.Interfaces
 {
     public interface IVstsClientFactory
     {
-        Task<IVstsClient> GetClient(string token = null);
+        Task<IVstsClient> GetClient(Guid organizationId, string token = null);
 
-        Task<IVstsPullRequestsClient> GetPullRequestsClient(string token = null);
+        Task<IVstsPullRequestsClient> GetPullRequestsClient(Guid organizationId, string token = null);
 
         Task<IVstsIdentityClient> GetIdentityClient(string token = null);
 

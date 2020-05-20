@@ -8,6 +8,8 @@ namespace Ether.ViewModels
 
         public bool IsWorkItemsEnabled { get; set; }
 
-        public Guid? Identity { get; set; }
+        public Guid Organization { get; set; }
+
+        public Guid Identity { get; set; }
     }
 }

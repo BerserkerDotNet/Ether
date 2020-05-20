@@ -27,6 +27,7 @@ namespace Ether.Core.Types.Handlers.Commands
             }
 
             var dto = _mapper.Map<Identity>(input.Identity);
+
             await _repository.CreateOrUpdateAsync(dto);
         }
     }

@@ -28,6 +28,7 @@ namespace Ether.Types
             { typeof(TeamMemberViewModel), "vsts/teammember" },
             { typeof(ProfileViewModel), "vsts/profile" },
             { typeof(IdentityViewModel), "identity" },
+            { typeof(OrganizationViewModel), "organization" },
             { typeof(ReportViewModel), "report" },
             { typeof(PullRequestReportViewModel), "report" },
             { typeof(AggregatedWorkitemsETAReportViewModel), "report" },
@@ -78,27 +79,9 @@ namespace Ether.Types
             }
         }
 
-        public async Task<VstsDataSourceViewModel> GetVstsDataSourceConfig()
-        {
-            try
-            {
-                var result = await HttpGet<VstsDataSourceViewModel>("Settings/VstsDataSourceConfiguration");
-                return result;
-            }
-            catch (EtherApiException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
-            {
-                return new VstsDataSourceViewModel();
-            }
-        }
-
         public Task<AppHealthStatus> GetHealthStatus()
         {
             return HttpGet<AppHealthStatus>("health", checkStatusCode: false);
-        }
-
-        public Task SaveVstsDataSourceConfig(VstsDataSourceViewModel model)
-        {
-            return HttpPost("Settings/VstsDataSourceConfiguration", model);
         }
 
         public Task<IEnumerable<T>> GetAll<T>()

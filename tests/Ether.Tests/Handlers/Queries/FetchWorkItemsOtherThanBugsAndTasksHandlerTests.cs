@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Ether.ViewModels;
 using Ether.Vsts.Handlers.Queries;
 using Ether.Vsts.Interfaces;
 using Ether.Vsts.Queries;
@@ -30,6 +32,8 @@ namespace Ether.Tests.Handlers.Queries
                 .TheRest()
                 .With(w => w.Fields, new Dictionary<string, string>())
                 .Build();
+            var organization = Builder<OrganizationViewModel>.CreateNew()
+                .Build();
             var references = workitems.Select(w => new WorkItemReference(w.Id));
             var ids = workitems.Select(w => w.Id).ToArray();
 
@@ -49,7 +53,7 @@ namespace Ether.Tests.Handlers.Queries
                     WorkItemId = w.Id
                 }));
 
-            var result = await _handler.Handle(new FetchWorkItemsOtherThanBugsAndTasks());
+            var result = await _handler.Handle(new FetchWorkItemsOtherThanBugsAndTasks(organization.Id));
 
             result.Should().HaveCountLessOrEqualTo(workitems.Count);
             result.Should().OnlyContain(i => workitems.Any(w => w.Id == i));
@@ -64,7 +68,7 @@ namespace Ether.Tests.Handlers.Queries
             _clientMock = new Mock<IVstsClient>(MockBehavior.Strict);
             _handler = new FetchWorkItemsOtherThanBugsAndTasksHandler(_clientFactoryMock.Object, RepositoryMock.Object);
 
-            _clientFactoryMock.Setup(c => c.GetClient(null))
+            _clientFactoryMock.Setup(c => c.GetClient(It.IsAny<Guid>(), It.IsAny<string>()))
                 .ReturnsAsync(_clientMock.Object)
                 .Verifiable();
         }

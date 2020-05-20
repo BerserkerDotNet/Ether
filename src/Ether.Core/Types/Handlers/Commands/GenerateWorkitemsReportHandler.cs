@@ -58,6 +58,7 @@ namespace Ether.Core.Types.Handlers.Commands
             var scope = new ClassificationScope(team, command.Start, command.End);
 
             var report = WorkItemsReport.Empty;
+
             foreach (var workItem in workItems)
             {
                 var isInCodeReview = await dataSource.IsInCodeReview(workItem);
