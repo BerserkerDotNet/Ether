@@ -8,7 +8,6 @@ namespace Ether.ViewModels.Validators
         {
             RuleFor(p => p.Name).NotEmpty();
             RuleFor(o => o.Organization).NotEmpty();
-            RuleFor(o => o.Identity).NotEmpty();
         }
     }
 }
