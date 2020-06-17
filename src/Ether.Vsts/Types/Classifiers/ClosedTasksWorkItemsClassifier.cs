@@ -14,7 +14,7 @@ namespace Ether.Vsts.Types.Classifiers
         {
             var resolutionUpdate = request.WorkItem.Updates.LastOrDefault(u => WasClosedByTeamMember(u, request));
             var wasEverResolved = request.WorkItem.Updates.Any(u => u[WorkItemStateField].NewValue == WorkItemStateResolved);
-            if (resolutionUpdate == null || wasEverResolved)
+            if (resolutionUpdate == null || wasEverResolved || resolutionUpdate[WorkItemClosedByField].NewValue == null || resolutionUpdate[WorkItemChangedDateField].NewValue == null)
             {
                 return Enumerable.Empty<IWorkItemEvent>();
             }
