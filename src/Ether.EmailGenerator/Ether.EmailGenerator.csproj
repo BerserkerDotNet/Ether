@@ -10,7 +10,7 @@
   <ItemGroup>
     <PackageReference Include="IdentityModel" Version="4.1.1" />
     <PackageReference Include="MaterialDesignThemes" Version="3.0.1" />
-    <PackageReference Include="NetOffice.Outlook" Version="1.7.4.4" />
+    <PackageReference Include="NetOfficeFw.Outlook" Version="1.7.4.11" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
   </ItemGroup>
 
