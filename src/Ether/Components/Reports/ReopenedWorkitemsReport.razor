@@ -45,7 +45,7 @@
             <th>User</th>
         </MatTableHeader>
         <MatTableRow Context="detail">
-            <td><a href="@GetWorkItemUrl(detail.WorkItemProject, detail.WorkItemId)" target="_blank">@detail.WorkItemId</a></td>
+            <td><a href="@GetWorkItemUrl(detail.WorkItemProject, detail.WorkItemId, detail.WorkItemOrganization)" target="_blank">@detail.WorkItemId</a></td>
             <td>@detail.WorkItemTitle</td>
             <td>@detail.WorkItemType</td>
             <td>@detail.ReOpenedDate</td>
@@ -68,9 +68,9 @@
 
     [Parameter] public ReOpenedWorkItemsReportViewModel Report { get; set; }
 
-    protected string GetWorkItemUrl(string project, int workItemId)
+    protected string GetWorkItemUrl(string project, int workItemId, string workitemOrganization)
     {
-        return $"https://{vstsConfiguration.Name}.visualstudio.com/{project}/_workitems/edit/{workItemId}";
+        return $"https://dev.azure.com/{workitemOrganization}/{project}/_workitems/edit/{workItemId}";
     }
 
     // HACK: Presentetional component should not query services

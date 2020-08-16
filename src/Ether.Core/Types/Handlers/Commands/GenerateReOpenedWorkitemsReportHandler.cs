@@ -5,11 +5,9 @@ using System.Threading.Tasks;
 using Autofac.Features.Indexed;
 using Ether.Contracts.Dto.Reports;
 using Ether.Contracts.Interfaces;
-using Ether.Contracts.Interfaces.CQS;
 using Ether.Contracts.Types;
 using Ether.Core.Types.Commands;
 using Ether.ViewModels;
-using Ether.ViewModels.Types;
 using Microsoft.Extensions.Logging;
 
 namespace Ether.Core.Types.Handlers.Commands
@@ -53,18 +51,9 @@ namespace Ether.Core.Types.Handlers.Commands
             {
                 try
                 {
-                    var resolutions = _workItemClassificationContext.Classify(workItem, scope);
+                    IEnumerable<IWorkItemEvent> resolutions = _workItemClassificationContext.Classify(workItem, scope);
                     var details = resolutions.OfType<WorkItemReOpenedEvent>()
-                        .Select(e => new ReOpenedWorkItemDetail
-                        {
-                            WorkItemId = e.WorkItem.Id,
-                            WorkItemTitle = e.WorkItem.Title,
-                            WorkItemType = e.WorkItem.Type,
-                            WorkItemOrganization = string.Empty,
-                            WorkItemProject = string.Empty,
-                            ReOpenedDate = e.Date,
-                            AssociatedUser = e.AssociatedUser
-                        });
+                        .Select(e => dataSource.CreateReOpenedWorkItemDetail(workItem, e));
                     report.Details.AddRange(details);
 
                     var resolvedByUser = resolutions.OfType<WorkItemResolvedEvent>().Select(e => (e.AssociatedUser.Email, e.WorkItem.Id));
