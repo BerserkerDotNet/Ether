@@ -30,7 +30,7 @@ namespace Ether.Api.Types
             }
 
             var domain = domainAndName[0];
-            var userName = context.UserName.Substring(context.UserName.IndexOf('\\'));
+            var userName = domainAndName[1];
             if (type == ContextType.Machine)
             {
                 domain = Environment.MachineName;
@@ -38,7 +38,7 @@ namespace Ether.Api.Types
 
             using (var principal = new PrincipalContext(type, domain))
             {
-                var isValid = principal.ValidateCredentials(userName, context.Password);
+                var isValid = principal.ValidateCredentials(userName, context.Password, ContextOptions.Negotiate);
                 if (isValid)
                 {
                     var userNameToSearch = type == ContextType.Machine ? Environment.UserName : context.UserName;
