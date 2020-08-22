@@ -43,9 +43,6 @@ namespace Ether.Tests.Handlers.Queries
                     WorkItems = references
                 })
                 .Verifiable();
-            _clientMock.Setup(c => c.GetWorkItemsAsync(ids, null, It.IsAny<string[]>(), default(CancellationToken)))
-                .ReturnsAsync(workitems)
-                .Verifiable();
 
             RepositoryMock.Setup(r => r.GetByFilteredArrayAsync<Ether.Vsts.Dto.WorkItem>("Fields.v", It.IsAny<string[]>()))
                 .ReturnsAsync(workitems.Select(w => new Ether.Vsts.Dto.WorkItem
