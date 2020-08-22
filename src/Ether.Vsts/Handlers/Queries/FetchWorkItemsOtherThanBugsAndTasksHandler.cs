@@ -12,8 +12,7 @@ namespace Ether.Vsts.Handlers.Queries
 {
     public class FetchWorkItemsOtherThanBugsAndTasksHandler : IQueryHandler<FetchWorkItemsOtherThanBugsAndTasks, IEnumerable<int>>
     {
-        private const string WorkItemsQueryTemplate = @"SELECT [System.Id] FROM WorkItems 
-                            WHERE [System.Id] IN ({0})";
+        private const string WorkItemsQueryTemplate = @"SELECT [System.Id] FROM WorkItems WHERE ([System.WorkItemType] != 'Bug' AND [System.WorkItemType]!='Task') AND [System.Id] IN ({0})";
 
         private readonly IVstsClientFactory _clientFactory;
         private readonly IRepository _repository;
@@ -30,43 +29,18 @@ namespace Ether.Vsts.Handlers.Queries
 
             // TODO: Find better way to query this
             var idsFromDataBase = inProgressWorkItems.Select(workItem => Convert.ToInt32(workItem.WorkItemId)).ToArray();
-            var wiQuery = string.Format(WorkItemsQueryTemplate, string.Join(',', idsFromDataBase));
-
             if (!idsFromDataBase.Any())
             {
                 return Enumerable.Empty<int>();
             }
 
             var client = await _clientFactory.GetClient(query.OrganizationId);
+
+            var wiQuery = string.Format(WorkItemsQueryTemplate, string.Join(',', idsFromDataBase));
             var queryResult = await client.ExecuteFlatQueryAsync(wiQuery);
-            var idsFromAdo = queryResult.WorkItems.Select(w => w.Id).ToArray();
 
-            if (!idsFromAdo.Any())
-            {
-                return Enumerable.Empty<int>();
-            }
-
-            var workItems = await client.GetWorkItemsAsync(idsFromAdo);
-            var result = new List<int>();
-
-            foreach (var workItem in workItems)
-            {
-                var workItemType = workItem.Fields?.Where(field => field.Key == "System.WorkItemType");
-
-                if (!workItemType.Any())
-                {
-                    continue;
-                }
-
-                if (workItemType.First().Value != "Task" && workItemType.First().Value != "Bug")
-                {
-                    result.Add(workItem.Id);
-                }
-            }
-
-            result.AddRange(idsFromDataBase.Except(idsFromAdo));
-
-            return result;
+            var idsFromAdoThatIsNotTaskOrBug = queryResult.WorkItems.Select(w => w.Id).ToArray();
+            return idsFromAdoThatIsNotTaskOrBug;
         }
     }
 }
