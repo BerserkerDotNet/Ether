@@ -11,7 +11,6 @@ using Ether.Core.Extensions;
 using Ether.ViewModels;
 using Ether.ViewModels.Types;
 using Ether.Vsts.Dto;
-using Ether.Vsts.Interfaces;
 using Microsoft.Extensions.Logging;
 using static Ether.Contracts.Types.WorkdaysAmountUtil;
 using static Ether.Vsts.Constants;
@@ -221,6 +220,21 @@ namespace Ether.Vsts.Types
                 EstimatedToComplete = estimatedToComplete,
                 TimeSpent = timeSpent,
                 Reason = item[WorkItemReasonField]
+            };
+        }
+
+        // TODO: DataSource should not have knowledge on the type specific to reporters!
+        public ReOpenedWorkItemDetail CreateReOpenedWorkItemDetail(WorkItemViewModel item, IWorkItemEvent workItemEvent)
+        {
+            return new ReOpenedWorkItemDetail
+            {
+                WorkItemId = item.WorkItemId,
+                WorkItemTitle = item[WorkItemTitleField],
+                WorkItemType = item[WorkItemTypeField],
+                WorkItemOrganization = GetOrganization(item),
+                WorkItemProject = GetProject(item),
+                ReOpenedDate = workItemEvent.Date,
+                AssociatedUser = workItemEvent.AssociatedUser
             };
         }
 

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using Ether.Contracts.Types;
 using Ether.ViewModels;
 using Ether.ViewModels.Types;
 
@@ -31,6 +30,8 @@ namespace Ether.Contracts.Interfaces
         bool IsResolved(IEnumerable<IWorkItemEvent> events);
 
         WorkItemDetail CreateWorkItemDetail(WorkItemViewModel item, IEnumerable<TeamMemberViewModel> team);
+
+        ReOpenedWorkItemDetail CreateReOpenedWorkItemDetail(WorkItemViewModel item, IWorkItemEvent workItemEvent);
 
         Task<WorkitemInformationViewModel> GetWorkItemInfo(WorkItemViewModel item, IEnumerable<TeamMemberViewModel> team);
 

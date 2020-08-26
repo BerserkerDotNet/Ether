@@ -17,7 +17,7 @@
             <th>Time Spent (Days)</th>
         </MatTableHeader>
         <MatTableRow Context="detail">
-            <td><a href="@GetWorkItemUrl(detail.WorkItemProject, detail.WorkItemId)" target="_blank">@detail.WorkItemId</a></td>
+            <td><a href="@GetWorkItemUrl(detail.WorkItemProject, detail.WorkItemId, detail.WorkItemOrganization)" target="_blank">@detail.WorkItemId</a></td>
             <td>@detail.WorkItemTitle</td>
             <td>@detail.WorkItemType</td>
             <td>@detail.EstimatedToComplete</td>
@@ -51,7 +51,7 @@
             <th>Time Spent (Days)</th>
         </MatTableHeader>
         <MatTableRow Context="detail">
-            <td><a href="@GetWorkItemUrl(detail.WorkItemProject, detail.WorkItemId)" target="_blank">@detail.WorkItemId</a></td>
+            <td><a href="@GetWorkItemUrl(detail.WorkItemProject, detail.WorkItemId, detail.WorkItemOrganization)" target="_blank">@detail.WorkItemId</a></td>
             <td>@detail.WorkItemTitle</td>
             <td>@detail.WorkItemType</td>
             <td>@detail.EstimatedToComplete</td>
@@ -85,7 +85,7 @@
             <th>Time Spent (Days)</th>
         </MatTableHeader>
         <MatTableRow Context="detail">
-            <td><a href="@GetWorkItemUrl(detail.WorkItemProject, detail.WorkItemId)" target="_blank">@detail.WorkItemId</a></td>
+            <td><a href="@GetWorkItemUrl(detail.WorkItemProject, detail.WorkItemId, detail.WorkItemOrganization)" target="_blank">@detail.WorkItemId</a></td>
             <td>@detail.WorkItemTitle</td>
             <td>@detail.WorkItemType</td>
             <td>@detail.EstimatedToComplete</td>
@@ -110,14 +110,10 @@
 
     [Parameter] public WorkItemsReportViewModel Report { get; set; }
 
-    protected override async Task OnInitializedAsync()
-    {
-        //vstsConfiguration = await Client.GetOrganization();
-    }
-
+    
     // HACK: Presentetional component should not query services
-    protected string GetWorkItemUrl(string project, int workItemId)
+    protected string GetWorkItemUrl(string project, int workItemId, string workitemOrganization)
     {
-        return $"https://{vstsConfiguration.Name}.visualstudio.com/{project}/_workitems/edit/{workItemId}";
+        return $"https://dev.azure.com/{workitemOrganization}/{project}/_workitems/edit/{workItemId}";        
     }
 }
